@@ -34,17 +34,7 @@ table_results_predictions:
 # the bias analysis. The result should have a column "entity_id" and then 1 or more columns
 # representing the protected attributes.
 protected_attributes:
-  attr_query: "select
-   o.officer_id as entity_id,
-   lr.value as race,
-   lg.value as gender,
-   lms.value as marital_status
- from staging.officers_hub o
-  JOIN staging.officer_characteristics oc USING (officer_id)
-  JOIN staging.officer_marital USING (officer_id)
-  JOIN staging.lookup_races lr on race_code = lr.code
-  JOIN staging.lookup_genders lg on gender_code = lg.code
-  JOIN staging.lookup_marital_statuses lms on marital_status_code = lms.code"
+  attr_query: "select ..."
 
 
 # Thresholds for positive class (absolutes top k and top k %)
