@@ -1,0 +1,53 @@
+# This config file contains info about:
+# 1) database credentials, naming of tables and columns in your database
+# 2) the train_end_time defines the set of models will be used for running the analysis
+# 3) the list of protected attributes (one or more)
+
+# Database containing predictions, evaluations, staging data (DSAPP schema):
+db_credentials:
+  host: postgres.dssg.io
+  database: charlotte_pd_replication
+  user: charlotte_pd
+  password: mSFoZejZIFxLX3uXI53qMCIS3
+  port: 5432
+
+
+# Info about models you used for predicting scores
+# Important: the train_end_time_value defines which models will be selected for bias analysis
+table_results_models:
+  train_end_time_value: 2016-01-01 00:00:00
+  table: results.models
+  model_id_column: model_id
+  train_end_time_column: train_end_time
+
+# Info about the predictions table
+table_results_predictions:
+  table: results.predictions
+  model_id_column: model_id
+  train_end_time_column: as_of_date
+  entity_id_column: entity_id
+  score_column: score
+  label_value_column: label_value
+
+# protected_attributes:
+# attr_query is a single SQL query where you define the target protected atrributes for running
+# the bias analysis. The result should have a column "entity_id" and then 1 or more columns
+# representing the protected attributes.
+protected_attributes:
+  attr_query: "select
+   o.officer_id as entity_id,
+   lr.value as race,
+   lg.value as gender,
+   lms.value as marital_status
+ from staging.officers_hub o
+  JOIN staging.officer_characteristics oc USING (officer_id)
+  JOIN staging.officer_marital USING (officer_id)
+  JOIN staging.lookup_races lr on race_code = lr.code
+  JOIN staging.lookup_genders lg on gender_code = lg.code
+  JOIN staging.lookup_marital_statuses lms on marital_status_code = lms.code"
+
+
+# Thresholds for positive class (absolutes top k and top k %)
+thresholds:
+  rank_abs: [10, 50, 100]
+  rank_pct: [1.0, 2.0, 5.0, 10.0 ]
