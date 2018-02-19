@@ -28,7 +28,7 @@ The output gets stored in the bias_raw and bias_complete tables.
 
 1. Create db_credentials.yaml file inside bias/
 
-```
+'''
 cd aequitas/
 
 
@@ -38,7 +38,7 @@ vim bias/db_credentials.yaml
     user: xxxx
     password: xxxx
     port: 5432
-```
+'''
 
 2. Edit PG queries in bias/sql/project_queries.py to make it compliant with your project's schema and the protected variables you want to perform bias analyses on.
 
