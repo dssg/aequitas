@@ -1,166 +1,156 @@
 import pandas as pd
 
+
 class Group(object):
     def __init__(self, thresholds):
 
-        self.label_neg_count = lambda label_col: lambda x: \
-            (x[label_col] == 0).sum()
-
-        self.label_pos_count = lambda label_col: lambda x: \
-            (x[label_col] == 1).sum()
-
-        #Defining the bias functions using lambda to later be used with .apply in pandas
-        self.divide = lambda x,y: x/y if y != 0 else 0.0
-
-        self.predicted_pos_group = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide((x[rank_col] <= thres).sum(), len(x) + 0.0)
-
-        self.predicted_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            (x[rank_col] <= thres).sum()
-
-        self.predicted_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            (x[rank_col] > thres).sum()
-
-        self.predicted_pos_ratio_k = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide((x[rank_col] <= thres).sum(), k + 0.0)
-
-        self.predicted_pos_ratio_g = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide((x[rank_col] <= thres).sum(), len(x) + 0.0)
-
-        self.false_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] > thres) & (x[label_col] == 1)).sum()
-
-        self.false_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] <= thres) & (x[label_col] == 0)).sum()
-
-        self.true_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] > thres) & (x[label_col] == 0)).sum()
-
-        self.true_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] <= thres) & (x[label_col] == 1)).sum()
-
-        self.fpr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(), (x[label_col] ==0).sum().astype(
-                float))
-
-        self.tnr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum() , (x[label_col] ==
-                                                                             0).sum().astype(
-                float))
-
-        self.fnr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(),(x[label_col] == 1).sum().astype(
-                float))
-
-        self.tpr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(),(x[label_col] ==
-                                                                             1).sum().astype(
-                float))
-
-        self.fomr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(),(x[rank_col] >
-                                                                               thres).sum(
-            ).astype(float))
-
-        self.npv = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum(),(x[rank_col] > thres).sum().astype(
-                float))
-
-        self.precision = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(), (x[rank_col] <=
-                                                                               thres).sum(
-            ).astype(float))
-
-        self.fdr = lambda rank_col, label_col, thres, k: lambda x: \
-            self.divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(),(x[rank_col] <=
-                                                                               thres).sum(
-            ).astype(float))
-
-
-
-        self.bias_functions = {'tpr': self.tpr,
-                               'tnr': self.tnr,
-                               'fomr': self.fomr,
-                               'fdr': self.fdr,
-                               'fpr': self.fpr,
-                               'fnr': self.fnr,
-                               'npv': self.npv,
-                               'precision': self.precision,
-                               'pp_k': self.predicted_pos_count,
-                               'pn_k': self.predicted_neg_count,
-                               'ppr_k': self.predicted_pos_ratio_k,
-                               'ppr_g': self.predicted_pos_ratio_g,
-                               'fp': self.false_pos_count,
-                               'fn': self.false_neg_count,
-                               'tn': self.true_neg_count,
-                               'tp': self.true_pos_count}
-
         # the columns in the evaluation table and the thresholds we want to apply to them
         self.thresholds = thresholds
+        self.quantizers = {
+            'quartiles': lambda s: 'quantile_' + pd.qcut(s, q=4, duplicates='drop', labels=False).
+                map(lambda x: '%.0f' % x)}
 
+        self.label_neg_count = lambda label_col: lambda x: \
+            (x[label_col] == 0).sum()
+        self.label_pos_count = lambda label_col: lambda x: \
+            (x[label_col] == 1).sum()
+        self.group_functions = self.get_group_functions()
 
+    def get_group_functions(self):
 
+        divide = lambda x, y: x / y if y != 0 else 0.0
 
+        predicted_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
+            (x[rank_col] <= thres).sum()
 
+        predicted_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
+            (x[rank_col] > thres).sum()
 
+        predicted_pos_ratio_k = lambda rank_col, label_col, thres, k: lambda x: \
+            divide((x[rank_col] <= thres).sum(), k + 0.0)
 
-def create_crosstabs(self, db_conn, models, thresholds, quantizers,
-                     prediction_table_query,
-                     staging_data_query,
-                     push_to_db=True):
-    '''
-    Calculate various bias functions and prior distributions per model_id and as_of_date, and
-    return two dataframes - one with FP/NP/FN/TN counts per model_id, as_of_date, and protected
-    status value, and one with prior counts.
+        predicted_pos_ratio_g = lambda rank_col, label_col, thres, k: lambda x: \
+            divide((x[rank_col] <= thres).sum(), len(x) + 0.0)
 
-    Args:
-        models (pd.DataFrame): Must have columns 'model_id' and 'as_of_date'.
-                               Only models from this dataframe will be processed.
-        prediction_table_query (str): query to return staging prediction table,
-                                      with model_id and as_of_date still undefined
-        staging_data_query (str): query to return officer data table (example at top
-                                  of module), with model_id and as_of_date still
-                                  undefined
-        bias_functions (dict): a dictionary of name:lambda functions that will be applied to each group;
-                                 names serve to label the resulting columns. Check top of this module
-                                 for the default.
-        thresholds (dict): a dictionary of column:value pairs, where the column needs to exist in the
-                           predictions table, and the values are the thresholds to be applied for
-                           that column. Check top of this module for an example.
-        quantizers (dict): a dictionary of name: lamdba functions which are applied to each floaty
-                           column, and should turn that column categorical. Check top of module
-                           for an example.
-        push_to_db (bool): If True, then the resulting dataframes will be pushed to the PG DB.
-    '''
-    if not quantizers:
-        quantizers = self.quantizers
-    results_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
-                                       'group_variable', 'group_value', 'metric', 'value'])
-    prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
-                                     'count', 'n'])
-    dfs = []
-    prior_dfs = []
-    count = 0
-    for row in models.iterrows():
-        count += 1
-        print(count)
-        model_id = row[1]['model_id']
-        as_of_date = row[1]['as_of_date']
+        false_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
+            ((x[rank_col] > thres) & (x[label_col] == 1)).sum()
+
+        false_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
+            ((x[rank_col] <= thres) & (x[label_col] == 0)).sum()
+
+        true_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
+            ((x[rank_col] > thres) & (x[label_col] == 0)).sum()
+
+        true_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
+            ((x[rank_col] <= thres) & (x[label_col] == 1)).sum()
+
+        fpr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(),
+                   (x[label_col] == 0).sum().astype(
+                       float))
+
+        tnr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum(), (x[label_col] ==
+                                                                         0).sum().astype(
+                float))
+
+        fnr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(),
+                   (x[label_col] == 1).sum().astype(
+                       float))
+
+        tpr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(), (x[label_col] ==
+                                                                          1).sum().astype(
+                float))
+
+        fomr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(), (x[rank_col] >
+                                                                         thres).sum(
+            ).astype(float))
+
+        npv = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum(),
+                   (x[rank_col] > thres).sum().astype(
+                       float))
+
+        precision = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(), (x[rank_col] <=
+                                                                          thres).sum(
+            ).astype(float))
+
+        fdr = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(), (x[rank_col] <=
+                                                                          thres).sum(
+            ).astype(float))
+
+        group_functions = {'tpr': tpr,
+                           'tnr': tnr,
+                           'fomr': fomr,
+                           'fdr': fdr,
+                           'fpr': fpr,
+                           'fnr': fnr,
+                           'npv': npv,
+                           'precision': precision,
+                           'pp_k': predicted_pos_count,
+                           'pn_k': predicted_neg_count,
+                           'ppr_k': predicted_pos_ratio_k,
+                           'ppr_g': predicted_pos_ratio_g,
+                           'fp': false_pos_count,
+                           'fn': false_neg_count,
+                           'tn': true_neg_count,
+                           'tp': true_pos_count}
+        return group_functions
+
+    def get_crosstabs(self, db_conn, model_id, thresholds, quantizers,
+                      prediction_table_query,
+                      staging_data_query,
+                      push_to_db=True, push_to_file=True):
+        '''
+        Calculate various bias functions and prior distributions per model_id and as_of_date, and
+        return two dataframes - one with FP/NP/FN/TN counts per model_id, as_of_date, and protected
+        status value, and one with prior counts.
+
+        Args:
+            models (pd.DataFrame): Must have columns 'model_id' and 'as_of_date'.
+                                   Only models from this dataframe will be processed.
+            prediction_table_query (str): query to return staging prediction table,
+                                          with model_id and as_of_date still undefined
+            staging_data_query (str): query to return officer data table (example at top
+                                      of module), with model_id and as_of_date still
+                                      undefined
+            group_functions (dict): a dictionary of name:lambda functions that will be applied to
+            each group;
+                                     names serve to label the resulting columns. Check top of this module
+                                     for the default.
+            thresholds (dict): a dictionary of column:value pairs, where the column needs to exist in the
+                               predictions table, and the values are the thresholds to be applied for
+                               that column. Check top of this module for an example.
+            quantizers (dict): a dictionary of name: lamdba functions which are applied to each floaty
+                               column, and should turn that column categorical. Check top of module
+                               for an example.
+            push_to_db (bool): If True, then the resulting dataframes will be pushed to the PG DB.
+        '''
+        if not quantizers:
+            quantizers = self.quantizers
+        results_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
+                                           'group_variable', 'group_value', 'metric', 'value'])
+        prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
+                                         'count', 'n'])
+        dfs = []
+        prior_dfs = []
+
         results_query = '''
                 with prediction_table as (
                 {prediction_table}
                 ), group_data as (
                 {group_table}
                 )
-                SELECT DISTINCT on (entity_id) * FROM prediction_table LEFT JOIN group_data 
-                USING (
-                entity_id);    
+                SELECT * FROM prediction_table LEFT JOIN group_data USING (entity_id);    
             '''.format(prediction_table=prediction_table_query.format(
-            model_id=model_id, as_of_date=as_of_date),
-            group_table=staging_data_query.format(model_id=model_id,
-                                                  as_of_date=as_of_date)
+            model_id=model_id),
+            group_table=staging_data_query.format(model_id=model_id)
         )
-        print(results_query)
         # grab the labelled data
         df = pd.read_sql(results_query, db_conn)
         model_cols = ['model_id', 'as_of_date', 'entity_id', 'score', 'rank_abs', 'rank_pct',
@@ -204,20 +194,9 @@ def create_crosstabs(self, db_conn, models, thresholds, quantizers,
                 for thres_val in thres_values:
                     flag = 0
                     k = (df[thres_unit] <= thres_val).sum()
-                    # print (thres_unit, thres_val, k)
-                    for name, func in self.bias_functions.items():
+                    for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
-
-                        '''
-                        if not 'nan' in df[col]:
-                            #feat_bias = df.fillna({col: 'nan'}).groupby(col).apply(func)
-                            feat_bias = col_group.apply(func)
-                        else:
-                            raise ValueError(
-                                "%s cannot be na-filled because the value 'nan' is already used" % col)
-
-                        '''
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
                             'as_of_date': [as_of_date] * len(feat_bias),
@@ -236,18 +215,24 @@ def create_crosstabs(self, db_conn, models, thresholds, quantizers,
                             bias_df = bias_df.merge(metrics_df)
                         # print(bias_df.head(1))
                     dfs.append(bias_df)
-    # precision@	25_abs
-    results_df = pd.concat(dfs)
-    priors = pd.concat(prior_dfs)
-    # print(len(results_df), len(priors))
-    if push_to_db:
-        results_df.set_index(['model_id', 'as_of_date', 'group_variable']).to_sql(
-            schema='results',
-            name='bias_raw',
-            con=db_conn,
-            if_exists='append')
-        priors.set_index(['model_id', 'as_of_date']).to_sql(schema='results', name='priors',
-                                                            con=db_conn,
-                                                            if_exists='append')
+        # precision@	25_abs
+        results_df = pd.concat(dfs)
+        priors = pd.concat(prior_dfs)
+        # print(len(results_df), len(priors))
+        if push_to_db:
+            results_df.set_index(['model_id', 'as_of_date', 'group_variable']).to_sql(
+                schema='results',
+                name='bias_raw',
+                con=db_conn,
+                if_exists='append')
+            priors.set_index(['model_id', 'as_of_date']).to_sql(schema='results', name='priors',
+                                                                con=db_conn,
+                                                                if_exists='append')
+        if push_to_file:
+            results_df.to_csv('group_metrics.csv', sep='\t', encoding='utf-8')
+            priors.to_csv('priors.csv', sep='\t', encoding='utf-8')
+        return results_df, priors
 
-    return results_df, priors
+    def get_group_metrics(self, df):
+        # TODO: decouple crosstabs from group metrics
+        return 0
