@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-Center for Data Science and Public Policy <datascifellows@gmail.com>
+Center for Data Science and Public Policy <dsapp.uchicago.edu>
 
 Contributors
 ------------
