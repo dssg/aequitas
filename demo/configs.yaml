@@ -40,6 +40,10 @@ protected_attributes:
 
 
 # Thresholds for positive class (absolutes top k and top k %)
+# column:value pairs, where the column needs to exist in the
+# predictions table, and the values are the thresholds to be applied for
+# that column. Check top of this module for an example.
+
 thresholds:
   rank_abs: [10, 50, 100]
   rank_pct: [1.0, 2.0, 5.0, 10.0 ]
