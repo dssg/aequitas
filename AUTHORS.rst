@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-Center for Data Science and Public Policy <dsapp.uchicago.edu>
+Center for Data Science and Public Policy <http://dsapp.uchicago.edu/>
 
 Contributors
 ------------
