@@ -101,9 +101,7 @@ class Group(object):
                            'tp': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, db_conn, model_id, thresholds,
-                      prediction_table_query,
-                      staging_data_query,
+    def get_crosstabs(self, df, thresholds,
                       push_to_db=False, push_to_file=False):
         '''
         Calculate various bias functions and prior distributions per model_id and as_of_date, and
