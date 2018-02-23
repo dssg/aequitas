@@ -67,10 +67,12 @@ def get_models(configs, engine):
         models_query = configs['dsapp']['models_query']
     except KeyError:
         logging.error('Configs: could not load models_query (dsapp section)')
+        exit()
     try:
         models = pd.read_sql(models_query, engine)
     except SQLAlchemyError:
         logging.error('PG: models query failed!')
+        exit()
     return list(models['model_id'])
 
 
