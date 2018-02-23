@@ -1,15 +1,15 @@
 # change relative imports
+import argparse
+import logging
+from sys import exit
+
+import yaml
+
+from bin.utils.dsapp import create_bias_tables
 from bin.utils.dsapp import get_dsapp_data
 from bin.utils.dsapp import get_engine
 from bin.utils.dsapp import get_models
-from bin.utils.dsapp import create_bias_tables
 from src.aequitas.group import Group
-
-from sys import exit
-import logging
-import argparse
-import yaml
-import pandas as pd
 
 about = """
 ##########################################################################
@@ -105,6 +105,7 @@ def run_dsapp(engine, configs):
         print(count)
         df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
         results, priors = g.get_crosstabs(df, thresholds, push_to_db=False)
+        print(len(priors))
     return
 
 
