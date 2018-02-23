@@ -103,25 +103,17 @@ class Group(object):
 
     def get_crosstabs(self, df, thresholds, model_id,
                       push_to_db=False, push_to_file=False):
-        '''
-        Calculate various bias functions and prior distributions per model_id and as_of_date, and
-        return two dataframes - one with FP/NP/FN/TN counts per model_id, as_of_date, and protected
-        status value, and one with prior counts.
+        """
+        Creates univariate groups and calculates group metrics.
 
-        Args:
-            models (pd.DataFrame): Must have columns 'model_id' and 'as_of_date'.
-                                   Only models from this dataframe will be processed.
-            prediction_table_query (str): query to return staging prediction table,
-                                          with model_id and as_of_date still undefined
-            staging_data_query (str): query to return officer data table (example at top
-                                      of module), with model_id and as_of_date still
-                                      undefined
-            group_functions (dict): a dictionary of name:lambda functions that will be applied to
-            each group;
-                                     names serve to label the resulting columns. Check top of this module
-                                     for the default.
-            push_to_db (bool): If True, then the resulting dataframes will be pushed to the PG DB.
-        '''
+        :param df: a dataframe containing the following required columns [entity_id, as_of_date,
+        model_id, score, rank_abs, rank_pct, label_value
+        :param thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[] }
+        :param model_id:
+        :param push_to_db: if you want to save the results on a db table
+        :param push_to_file: if you want to save the results on a csv file
+        :return:
+        """
         results_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
                                            'group_variable', 'group_value', 'metric', 'value'])
         prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
