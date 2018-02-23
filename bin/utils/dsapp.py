@@ -1,6 +1,7 @@
-import pandas as pd
 import logging
 from sys import exit
+
+import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -121,7 +122,6 @@ def create_bias_tables(db_engine):
            DROP TABLE IF EXISTS results.aequitas_group;
            CREATE TABLE results.aequitas_group (
                model_id INTEGER,
-               as_of_date TIMESTAMP,
                threshold_value FLOAT, -- for example, 1 or 0.5
                threshold_unit TEXT, -- should be 'pct' or 'abs'
                parameter TEXT, -- should be 'pct' or 'abs'
@@ -148,7 +148,6 @@ def create_bias_tables(db_engine):
            DROP TABLE IF EXISTS results.aequitas_priors;
            CREATE TABLE results.aequitas_priors (
                model_id INTEGER,
-               as_of_date TIMESTAMP,
                group_variable TEXT, -- the protected status, like 'gender'
                group_value TEXT,  -- like 'female'
                group_size INTEGER, -- the number of entities of this group_variable and group_value

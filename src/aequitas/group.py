@@ -101,7 +101,7 @@ class Group(object):
                            'tp': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, df, thresholds,
+    def get_crosstabs(self, df, thresholds, model_id,
                       push_to_db=False, push_to_file=False):
         '''
         Calculate various bias functions and prior distributions per model_id and as_of_date, and
@@ -150,10 +150,10 @@ class Group(object):
             # find the priors
             col_group = df.fillna({col: 'nan'}).groupby(col)
             counts = col_group.entity_id.count()
+            print('COUNTS:::', counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
-                'as_of_date': [as_of_date] * len(counts),
                 'group_variable': [col] * len(counts),
                 'group_value': counts.index.values,
                 'group_label_pos': col_group.apply(self.label_pos_count(
@@ -175,7 +175,6 @@ class Group(object):
                         feat_bias = col_group.apply(func)
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
-                            'as_of_date': [as_of_date] * len(feat_bias),
                             'threshold_value': thres_val,
                             'threshold_unit': thres_unit[-3:],
                             'parameter': str(thres_val) + '_' + thres_unit[-3:],
