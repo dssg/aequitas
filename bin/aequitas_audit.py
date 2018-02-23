@@ -1,28 +1,34 @@
 # change relative imports
-from ..src.aequitas.dsapp import create_bias_tables
-from ..src.aequitas.dsapp import get_models
-from ..src.aequitas.dsapp import get_queries
+from bin.utils.dsapp import get_dsapp_data
+from bin.utils.dsapp import get_engine
+from bin.utils.dsapp import get_models
+from bin.utils.dsapp import create_bias_tables
+from src.aequitas.group import Group
 
+from sys import exit
 import logging
 import argparse
-import sys
 import yaml
-from sqlalchemy import create_engine
+import pandas as pd
 
 about = """
-Center for Data Science and Public Policy
-dsapp.uchicago.edu
+##########################################################################
+##   Center for Data Science and Public Policy                          ##
+##   http://dsapp.uchicago.edu                                          ##
+##                                                                      ##
+##   Copyright 2017. The University of Chicago. All Rights Reserved.    ## 
+##########################################################################
 
-Copyright 2017.  The University of Chicago. All Rights Reserved.  
 
-_______________________________________________________
-                                _ _            
-          __ _  ___  __ _ _   _(_) |_ __ _ ___ 
-         / _` |/ _ \/ _` | | | | | __/ _` / __| 
-        | (_| |  __/ (_| | |_| | | || (_| \__ \ 
-         \__,_|\___|\__, |\__,_|_|\__\__,_|___/
-                       |_|                            
-_______________________________________________________  
+
+_________________________________________________________________________
+                                     _ _            
+               __ _  ___  __ _ _   _(_) |_ __ _ ___ 
+              / _` |/ _ \/ _` | | | | | __/ _` / __| 
+             | (_| |  __/ (_| | |_| | | || (_| \__ \ 
+              \__,_|\___|\__, |\__,_|_|\__\__,_|___/
+                            |_|                            
+_________________________________________________________________________  
 
 
 
@@ -51,7 +57,6 @@ def parse_args():
     parser.add_argument('--config',
                         action='store',
                         dest='config_file',
-
                         default='config.yaml',
                         help='Absolute filepath for input yaml config file.')
 
@@ -77,22 +82,31 @@ def parse_args():
 
 
 def run_dsapp(engine, configs):
+    """
+
+    :param engine:
+    :param configs:
+    :return:
+    """
+    print('run_dsapp()')
     try:
-        models_table = configs['table_results_models']
-        prediction_table = configs['table_results_predictions']
-        protected_attr = configs['protected_attributes']
         thresholds = configs['thresholds']
+        predictions_table = configs['dsapp']['predictions_table']
+        attrib_query = configs['dsapp']['attributes_query']
+        models = get_models(configs, engine)
+
     except KeyError:
         logging.error('KeyError in configuration file (dsapp section).')
-
-    exp_query, model_query, prediction_query = get_queries(models_table, prediction_table)
-
-    for row in models.iterrows():
+    engine = get_engine(configs)
+    g = Group(thresholds)
+    count = 0
+    for model_id in models:
         count += 1
         print(count)
-        model_id = row[1]['model_id']
-        as_of_date = row[1]['as_of_date']
-        # g.get_crosstabs(model_id,...)
+        df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
+        results, priors = g.get_crosstabs(df, thresholds, push_to_db=False)
+    return
+
 
 
 def main():
@@ -100,34 +114,22 @@ def main():
     if args.format not in ['csv', 'dsapp']:
         logging.error('Please define input data --format: csv or dsapp (postgres db with DSAPP '
                       'schemas)')
-        sys.exit()
+        exit()
     try:
-        with open('../' + args.config_file) as f:
+        with open(args.config_file) as f:
             configs = yaml.load(f)
     except FileNotFoundError:
         logging.error('Could not load configurations! Please set configs.yaml file using --config')
-        sys.exit()
+        exit()
     if not configs:
         logging.error('Empty configurations! Please set configs.yaml file using --config')
-        sys.exit()
+        exit()
 
     # when having score vs prediction compatibility, thresholds just make sense for score
-    thresholds = configs['thresholds']
     if args.format == 'dsapp':
-        try:
-            db_access = configs['db_credentials']
-            engine = create_engine('postgresql://{user}:{pw}@{host}:{port}/{db}'.format(
-                user=db_access['user'],
-                pw=db_access['password'],
-                host=db_access['host'],
-                port=db_access['port'],
-                db=db_access['database']))
-        except KeyError:
-            logging.error('KeyError in configuration file.')
-            sys.exit()
+        engine = get_engine(configs)
         if args.create_tables:
             create_bias_tables(db_engine=engine)
-
         run_dsapp(engine, configs)
 
 

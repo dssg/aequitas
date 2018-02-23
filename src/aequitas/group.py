@@ -2,10 +2,9 @@ import pandas as pd
 
 
 class Group(object):
-    def __init__(self, thresholds):
+    def __init__(self):
 
         # the columns in the evaluation table and the thresholds we want to apply to them
-        self.thresholds = thresholds
         self.quantizers = {
             'quartiles': lambda s: 'quantile_' + pd.qcut(s, q=4, duplicates='drop', labels=False).
                 map(lambda x: '%.0f' % x)}
@@ -102,10 +101,10 @@ class Group(object):
                            'tp': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, db_conn, model_id, thresholds, quantizers,
+    def get_crosstabs(self, db_conn, model_id, thresholds,
                       prediction_table_query,
                       staging_data_query,
-                      push_to_db=True, push_to_file=True):
+                      push_to_db=False, push_to_file=False):
         '''
         Calculate various bias functions and prior distributions per model_id and as_of_date, and
         return two dataframes - one with FP/NP/FN/TN counts per model_id, as_of_date, and protected
@@ -123,16 +122,8 @@ class Group(object):
             each group;
                                      names serve to label the resulting columns. Check top of this module
                                      for the default.
-            thresholds (dict): a dictionary of column:value pairs, where the column needs to exist in the
-                               predictions table, and the values are the thresholds to be applied for
-                               that column. Check top of this module for an example.
-            quantizers (dict): a dictionary of name: lamdba functions which are applied to each floaty
-                               column, and should turn that column categorical. Check top of module
-                               for an example.
             push_to_db (bool): If True, then the resulting dataframes will be pushed to the PG DB.
         '''
-        if not quantizers:
-            quantizers = self.quantizers
         results_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
                                            'group_variable', 'group_value', 'metric', 'value'])
         prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
@@ -140,19 +131,6 @@ class Group(object):
         dfs = []
         prior_dfs = []
 
-        results_query = '''
-                with prediction_table as (
-                {prediction_table}
-                ), group_data as (
-                {group_table}
-                )
-                SELECT * FROM prediction_table LEFT JOIN group_data USING (entity_id);    
-            '''.format(prediction_table=prediction_table_query.format(
-            model_id=model_id),
-            group_table=staging_data_query.format(model_id=model_id)
-        )
-        # grab the labelled data
-        df = pd.read_sql(results_query, db_conn)
         model_cols = ['model_id', 'as_of_date', 'entity_id', 'score', 'rank_abs', 'rank_pct',
                       'label_value']
         # within each model and as_of_date, discretize the floaty features
@@ -160,7 +138,7 @@ class Group(object):
             (df.dtypes != object) & (df.dtypes != str) & (~df.columns.isin(model_cols))]
         for col in float_cols:
             # transform floaty columns into categories
-            for qname, quantizer in quantizers.items():
+            for qname, quantizer in self.quantizers.items():
                 if qname == '':
                     raise ValueError("Quantizer name cannot be empty")
                 df[col + '_' + qname] = quantizer(df[col])
@@ -234,5 +212,4 @@ class Group(object):
         return results_df, priors
 
     def get_group_metrics(self, df):
-        # TODO: decouple crosstabs from group metrics
         return 0
