@@ -98,14 +98,15 @@ def run_dsapp(engine, configs):
     except KeyError:
         logging.error('KeyError in configuration file (dsapp section).')
     engine = get_engine(configs)
-    g = Group(thresholds)
+    g = Group()
     count = 0
     for model_id in models:
+        print('MODEL_ID: ', model_id)
         count += 1
         print(count)
         df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
-        results, priors = g.get_crosstabs(df, thresholds, push_to_db=False)
-        print(len(priors))
+        print(df.head(1))
+        results, priors = g.get_crosstabs(df, thresholds, model_id, push_to_db=False)
     return
 
 
