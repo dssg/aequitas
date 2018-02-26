@@ -3,6 +3,7 @@ import argparse
 import logging
 from sys import exit
 
+import pandas as pd
 import yaml
 
 from bin.utils.dsapp import create_bias_tables
@@ -100,20 +101,24 @@ def run_dsapp(engine, configs):
     engine = get_engine(configs)
     g = Group()
     count = 0
+    results = pd.DataFrame()
+    priors = pd.DatFrame()
     for model_id in models:
         print('MODEL_ID: ', model_id)
         count += 1
         print(count)
         df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
         print(df.head(1))
-        results, priors = g.get_crosstabs(df, thresholds, model_id, push_to_db=False)
+        groups_model, priors_model = g.get_crosstabs(df, thresholds, model_id, push_to_db=False)
+        results['model_id'] = model_id
+        priors['model_id'] = model_id
     return
 
 
 
 def main():
     args = parse_args()
-    if args.format not in ['csv', 'dsapp']:
+    if args.format not in {'csv', 'db'}:
         logging.error('Please define input data --format: csv or dsapp (postgres db with DSAPP '
                       'schemas)')
         exit()
@@ -128,11 +133,28 @@ def main():
         exit()
 
     # when having score vs prediction compatibility, thresholds just make sense for score
-    if args.format == 'dsapp':
+    if args.format == 'db':
         engine = get_engine(configs)
         if args.create_tables:
-            create_bias_tables(db_engine=engine)
+            create_bias_tables(engine, output_schema)
         run_dsapp(engine, configs)
+
+
+"""
+        if push_to_db:
+            groups_df.set_index(['model_id', 'as_of_date', 'group_variable']).to_sql(
+                schema='results',
+                name='bias_raw',
+                con=db_conn,
+                if_exists='append')
+            priors_df.set_index(['model_id', 'as_of_date']).to_sql(schema='results', name='priors_df',
+                                                                con=db_conn,
+                                                                if_exists='append')
+        if push_to_file:
+            groups_df.to_csv('group_metrics.csv', sep='\t', encoding='utf-8')
+            priors_df.to_csv('priors_df.csv', sep='\t', encoding='utf-8')
+"""
+
 
 
 if __name__ == '__main__':
