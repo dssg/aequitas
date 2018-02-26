@@ -83,26 +83,25 @@ class Group(object):
                                                                           thres).sum(
             ).astype(float))
 
-        group_functions = {'tpr': tpr,
-                           'tnr': tnr,
-                           'fomr': fomr,
-                           'fdr': fdr,
-                           'fpr': fpr,
-                           'fnr': fnr,
-                           'npv': npv,
-                           'precision': precision,
-                           'pp_k': predicted_pos_count,
-                           'pn_k': predicted_neg_count,
-                           'ppr_k': predicted_pos_ratio_k,
-                           'ppr_g': predicted_pos_ratio_g,
-                           'fp': false_pos_count,
-                           'fn': false_neg_count,
-                           'tn': true_neg_count,
-                           'tp': true_pos_count}
+        group_functions = {'TPR': tpr,
+                           'TNR': tnr,
+                           'FOmR': fomr,
+                           'FDR': fdr,
+                           'FPR': fpr,
+                           'FNR': fnr,
+                           'NPV': npv,
+                           'Precision': precision,
+                           'PP': predicted_pos_count,
+                           'PN': predicted_neg_count,
+                           'PPR': predicted_pos_ratio_k,
+                           'PPrev': predicted_pos_ratio_g,
+                           'FP': false_pos_count,
+                           'FN': false_neg_count,
+                           'TN': true_neg_count,
+                           'TP': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, df, thresholds, model_id,
-                      push_to_db=False, push_to_file=False):
+    def get_crosstabs(self, df, thresholds, model_id):
         """
         Creates univariate groups and calculates group metrics.
 
@@ -114,7 +113,7 @@ class Group(object):
         :param push_to_file: if you want to save the results on a csv file
         :return:
         """
-        results_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
+        groups_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
                                            'group_variable', 'group_value', 'metric', 'value'])
         prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
                                          'count', 'n'])
@@ -139,7 +138,7 @@ class Group(object):
         print("Feature Columns (Groups):", feat_cols.values)
         # for each group variable do
         for col in feat_cols:
-            # find the priors
+            # find the priors_df
             col_group = df.fillna({col: 'nan'}).groupby(col)
             counts = col_group.entity_id.count()
             print('COUNTS:::', counts)
@@ -176,29 +175,16 @@ class Group(object):
                             name: feat_bias.values
                         })
                         if flag == 0:
-                            bias_df = metrics_df
+                            this_group_df = metrics_df
                             flag = 1
                         else:
-                            bias_df = bias_df.merge(metrics_df)
-                        # print(bias_df.head(1))
-                    dfs.append(bias_df)
+                            this_group_df = this_group_df.merge(metrics_df)
+                        # print(this_group_df.head(1))
+                    dfs.append(this_group_df)
         # precision@	25_abs
-        results_df = pd.concat(dfs)
-        priors = pd.concat(prior_dfs)
-        # print(len(results_df), len(priors))
-        if push_to_db:
-            results_df.set_index(['model_id', 'as_of_date', 'group_variable']).to_sql(
-                schema='results',
-                name='bias_raw',
-                con=db_conn,
-                if_exists='append')
-            priors.set_index(['model_id', 'as_of_date']).to_sql(schema='results', name='priors',
-                                                                con=db_conn,
-                                                                if_exists='append')
-        if push_to_file:
-            results_df.to_csv('group_metrics.csv', sep='\t', encoding='utf-8')
-            priors.to_csv('priors.csv', sep='\t', encoding='utf-8')
-        return results_df, priors
+        groups_df = pd.concat(dfs)
+        priors_df = pd.concat(prior_dfs)
+        return groups_df, priors_df
 
     def get_group_metrics(self, df):
         return 0

@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 def get_dsapp_data(engine, model_id, attrib_query, predictions_table):
     """
-
+    Queries for the input table (dsapp) to be used by get_crosstabs
     :param engine:
     :param model_id:
     :param attrib_query:
@@ -37,7 +37,6 @@ def get_engine(configs):
     :param configs:
     :return: Returns a SQLAlchemy pg connnection.
     """
-
     try:
         db_access = configs['dsapp']['db_credentials']
     except KeyError:
@@ -63,7 +62,6 @@ def get_models(configs, engine):
     :param engine:
     :return: Returns the list of models to search for in the predictions table.
     """
-
     try:
         models_query = configs['dsapp']['models_query']
     except KeyError:
@@ -111,16 +109,15 @@ def get_prediction_query(predictions_table, model_id):
     return prediction_query
 
 
-def create_bias_tables(db_engine):
+def create_bias_tables(db_engine, output_schema):
     """
 
     :param db_engine:
     :return: Convenience function to run the CREATE TABLE statements
     """
     print('Creating aequitas tables....')
-    query = '''
-           DROP TABLE IF EXISTS results.aequitas_group;
-           CREATE TABLE results.aequitas_group (
+    query = """ DROP TABLE IF EXISTS {output_schema}.aequitas_group;
+           CREATE TABLE {output_schema}.aequitas_group (
                model_id INTEGER,
                threshold_value FLOAT, -- for example, 1 or 0.5
                threshold_unit TEXT, -- should be 'pct' or 'abs'
@@ -145,8 +142,8 @@ def create_bias_tables(db_engine):
                fomr REAL,
                npv REAL
            );
-           DROP TABLE IF EXISTS results.aequitas_priors;
-           CREATE TABLE results.aequitas_priors (
+           DROP TABLE IF EXISTS {output_schema}.aequitas_priors;
+           CREATE TABLE {output_schema}.aequitas_priors (
                model_id INTEGER,
                group_variable TEXT, -- the protected status, like 'gender'
                group_value TEXT,  -- like 'female'
@@ -155,7 +152,7 @@ def create_bias_tables(db_engine):
                group_label_neg INTEGER,
                total_entities INTEGER -- the total number of entities on this predictions list
                );
-           '''
+    """.format(output_schema=output_schema)
     db_engine.execute(query)
 
 
