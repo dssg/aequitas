@@ -1,4 +1,4 @@
-# change relative imports
+
 import argparse
 import logging
 from sys import exit
@@ -10,6 +10,7 @@ from bin.utils.dsapp import create_bias_tables
 from bin.utils.dsapp import get_dsapp_data
 from bin.utils.dsapp import get_engine
 from bin.utils.dsapp import get_models
+from src.aequitas.bias import Bias
 from src.aequitas.group import Group
 
 about = """
@@ -46,7 +47,7 @@ def parse_args():
                         dest='format',
                         default='csv',
                         type=str,
-                        help='Data input format: csv or pg (postgres db).')
+                        help='Data input format: csv or db (postgres db).')
 
     parser.add_argument('--score-prediction',
                         action='store',
@@ -90,28 +91,34 @@ def run_dsapp(engine, configs):
     :return:
     """
     print('run_dsapp()')
+    models = None
     try:
         thresholds = configs['thresholds']
-        predictions_table = configs['dsapp']['predictions_table']
-        attrib_query = configs['dsapp']['attributes_query']
+        predictions_table = configs['db']['predictions_table']
+        attrib_query = configs['db']['attributes_query']
         models = get_models(configs, engine)
-
     except KeyError:
-        logging.error('KeyError in configuration file (dsapp section).')
+        logging.error('KeyError in configuration file (db section).')
     engine = get_engine(configs)
     g = Group()
     count = 0
-    results = pd.DataFrame()
-    priors = pd.DatFrame()
+    groups_model_list = []
     for model_id in models:
         print('MODEL_ID: ', model_id)
         count += 1
         print(count)
         df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
         print(df.head(1))
-        groups_model, priors_model = g.get_crosstabs(df, thresholds, model_id, push_to_db=False)
-        results['model_id'] = model_id
-        priors['model_id'] = model_id
+        groups_model = g.get_crosstabs(df, thresholds, model_id)
+        groups_model_list.append(groups_model)
+    group_results = pd.concat(groups_model_list, ignore_index=True)
+    # print(group_results.head(10))
+    # print(group_results[['model_id','parameter','k', 'group_variable','group_value','Prev','PPrev']])
+
+    b = Bias()
+    # bias_df = b.get_bias_min_metric(group_results)
+    bias_df = b.get_bias_major_group(group_results)
+    print(bias_df.head(10))
     return
 
 
@@ -136,7 +143,7 @@ def main():
     if args.format == 'db':
         engine = get_engine(configs)
         if args.create_tables:
-            create_bias_tables(engine, output_schema)
+            create_bias_tables(engine, args.output_schema)
         run_dsapp(engine, configs)
 
 

@@ -38,7 +38,7 @@ def get_engine(configs):
     :return: Returns a SQLAlchemy pg connnection.
     """
     try:
-        db_access = configs['dsapp']['db_credentials']
+        db_access = configs['db']['db_credentials']
     except KeyError:
         logging.error('KeyError in configuration file.')
         exit()
@@ -63,7 +63,7 @@ def get_models(configs, engine):
     :return: Returns the list of models to search for in the predictions table.
     """
     try:
-        models_query = configs['dsapp']['models_query']
+        models_query = configs['db']['models_query']
     except KeyError:
         logging.error('Configs: could not load models_query (dsapp section)')
         exit()
@@ -119,39 +119,28 @@ def create_bias_tables(db_engine, output_schema):
     query = """ DROP TABLE IF EXISTS {output_schema}.aequitas_group;
            CREATE TABLE {output_schema}.aequitas_group (
                model_id INTEGER,
-               threshold_value FLOAT, -- for example, 1 or 0.5
-               threshold_unit TEXT, -- should be 'pct' or 'abs'
                parameter TEXT, -- should be 'pct' or 'abs'
                k INTEGER,
                group_variable TEXT, -- the protected status, like 'gender'
                group_value TEXT,  -- like 'female'
-               pp_k REAL,
-               pn_k REAL,
-               ppr_k REAL,
-               ppr_g REAL,
-               tp REAL,
-               fp REAL,
-               tn REAL,
-               fn REAL, 
-               tpr REAL,
-               fpr REAL,
-               tnr REAL,
-               fnr REAL,
-               precision REAL,
-               fdr REAL,
-               fomr REAL,
-               npv REAL
+               Prev REAL,
+               PP REAL,
+               PN REAL,
+               PPR REAL,
+               PPrev REAL,
+               TP REAL,
+               FP REAL,
+               TN REAL,
+               FN REAL, 
+               TPR REAL,
+               FPR REAL,
+               TNR REAL,
+               FNR REAL,
+               Precision REAL,
+               FDR REAL,
+               FOmR REAL,
+               NPV REAL
            );
-           DROP TABLE IF EXISTS {output_schema}.aequitas_priors;
-           CREATE TABLE {output_schema}.aequitas_priors (
-               model_id INTEGER,
-               group_variable TEXT, -- the protected status, like 'gender'
-               group_value TEXT,  -- like 'female'
-               group_size INTEGER, -- the number of entities of this group_variable and group_value
-               group_label_pos INTEGER,
-               group_label_neg INTEGER,
-               total_entities INTEGER -- the total number of entities on this predictions list
-               );
     """.format(output_schema=output_schema)
     db_engine.execute(query)
 

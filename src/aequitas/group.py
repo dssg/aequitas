@@ -154,6 +154,7 @@ class Group(object):
                 'group_size': counts.values,
                 'total_entities': [len(df)] * len(counts)
             })
+            this_prior_df['Prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
             # for each model_id and as_of_date the priors_df has length group_variables * group_values
             prior_dfs.append(this_prior_df)
             # we calculate the bias for two different types of thresholds (percentage ranks and absolute ranks)
@@ -166,8 +167,6 @@ class Group(object):
                         feat_bias = col_group.apply(func)
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
-                            'threshold_value': thres_val,
-                            'threshold_unit': thres_unit[-3:],
                             'parameter': str(thres_val) + '_' + thres_unit[-3:],
                             'k': k,
                             'group_variable': [col] * len(feat_bias),
@@ -182,9 +181,12 @@ class Group(object):
                         # print(this_group_df.head(1))
                     dfs.append(this_group_df)
         # precision@	25_abs
-        groups_df = pd.concat(dfs)
-        priors_df = pd.concat(prior_dfs)
-        return groups_df, priors_df
+        groups_df = pd.concat(dfs, ignore_index=True)
+        priors_df = pd.concat(prior_dfs, ignore_index=True)
+        groups_df = groups_df.merge(priors_df, on=['model_id', 'group_variable',
+                                                   'group_value'])
+        return groups_df
+
 
     def get_group_metrics(self, df):
         return 0
