@@ -43,17 +43,24 @@ class Bias(object):
         :param df:
         :return:
         """
+        print('get_bias_major_group')
         fill_1 = {}
         key_cols = ['model_id', 'parameter', 'group_variable']
-        attr_groupby = df.groupby(key_cols)
+        df_group = df.loc[df.groupby(key_cols)['group_size'].idxmax()]
+        count = 0
         for group_metric in self.group_metrics:
+            count += 1
+            print(count, group_metric)
             fill_1[group_metric] = 1.000000
             df2 = pd.DataFrame()
             # but we also want to get the group_value of the reference group for each bias metric
+            # here we just getting the ref group metric value in the disparity column (it is not
+            # the actual disparity value)
             df2[key_cols + [group_metric + ' Disparity', group_metric + '_ref_group_value']] = \
-            df.loc[
-                attr_groupby['group_size'].idxmax()][key_cols + [group_metric, 'group_value']]
+                df_group[key_cols + [group_metric, 'group_value']]
             df = df.merge(df2, on=key_cols)
+            # now we are dividing the group metric value with the ref group metric value
+            df[group_metric + ' Disparity'] = df[group_metric] / df[group_metric + ' Disparity']
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(np.inf, self.fill_divbyzero)
         df = df.fillna(value=fill_1)
