@@ -10,10 +10,16 @@ class Bias(object):
     def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
         if not key_columns:
             self.key_columns = ['model_id', 'parameter', 'group_variable']
+        else:
+            self.key_columns = key_columns
         if not input_group_metrics:
             self.input_group_metrics = ['PPR', 'PPrev', 'FDR', 'FOmR', 'FPR', 'FNR']
+        else:
+            self.input_group_metrics = input_group_metrics
         if not fill_divbyzero:
             self.fill_divbyzero = 10.00000
+        else:
+            self.fill_divbyzero = fill_divbyzero
 
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
@@ -78,27 +84,28 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
-        fill_zeros = {}
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
             logging.error('get_bias_major_group:: one of the following columns is not on the input '
                           'dataframe : model_id ,parameter,group_variable, group_size ')
             exit()
-        for group_metric in input_group_metrics:
-            fill_zeros[group_metric + '_disparity'] = 1.000000
-            df_to_merge = pd.DataFrame()
-            # but we also want to get the group_value of the reference group for each bias metric
-            # here we just getting the ref group metric value in the disparity column (it is not
-            # the actual disparity value)
-            df_to_merge[
-                key_columns + [group_metric + '_disparity', group_metric + '_ref_group_value']] = \
-                df_major_group[key_columns + [group_metric, 'group_value']]
-            df = df.merge(df_to_merge, on=key_columns)
-            # now we are dividing the group metric value with the ref group metric value
-            df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + ' Disparity']
+        disparity_metrics = [col + '_disparity' for col in input_group_metrics]
+        df_to_merge = pd.DataFrame()
+        # we created the df_to_merge has a subset of the df_ref_group containing the target ref
+        # group values which are now labeled as _disparity but we still need to perform the division
+        df_to_merge[key_columns + disparity_metrics] = df_major_group[
+            key_columns + input_group_metrics]
+        # we now need to create the ref_group_value columns in the df_to_merge
+        for col in input_group_metrics:
+            df_to_merge[col + '_ref_group_value'] = df_major_group['group_value']
+        df = df.merge(df_to_merge, on=key_columns)
+        df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(np.inf, fill_divbyzero)
+        # when there is a zero in the numerator and a zero in denominator it is considered NaN
+        # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
+        fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         df = df.fillna(value=fill_zeros)
         return df
 
