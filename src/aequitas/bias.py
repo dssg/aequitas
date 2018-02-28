@@ -25,6 +25,8 @@ class Bias(object):
         we want to calculate the Disparity values
         :return: a dataframe
         """
+
+        print('get_disparity_min_metric()')
         if not key_columns:
             key_columns = self.key_columns
         if not input_group_metrics:
@@ -69,7 +71,7 @@ class Bias(object):
         :return: a dataframe with the bias metrics as new columns and the ref group,
                 it must have the same number of rows as the input dataframe
         """
-        print('get_disparity_major_group')
+        print('get_disparity_major_group()')
         if not key_columns:
             key_columns = self.key_columns
         if not input_group_metrics:
@@ -111,14 +113,20 @@ class Bias(object):
     def get_disparity_predefined_groups(self, df, ref_groups_dict, key_columns=None,
                                         input_group_metrics=None, fill_divbyzero=None):
         """
+            Calculates the bias (disparity) metrics for the predefined list of input group metrics
+            using a predefined reference group value for each attribute which is passed using
+            ref_groups_dict (configs['reference_groups'])
 
-        :param df:
-        :param group_metrics_list:
-        :param ref_groups_list:
-        :return:
+        :param df: the output dataframe of the group.get_crosstabs
+        :param ref_groups_dict: a dictionary {group_variable:group_value, ...}
+        :param key_columns: optional, the key columns to use on joins
+        :param input_group_metrics: optional, the group metrics to be used for creating the new
+        disparity metrics
+        :param fill_divbyzero: optional, fill value to use when divided by zero
+        :return: a dataframe with same number of rows as the input but with additional
+        disparity metrics columns and ref_group_values
         """
-
-        print('get_disparity_predefined_group')
+        print('get_disparity_predefined_group()')
         if not key_columns:
             key_columns = self.key_columns
         if not input_group_metrics:
