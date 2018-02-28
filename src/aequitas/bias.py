@@ -151,12 +151,12 @@ class Bias(object):
         # we now need to create the ref_group_value columns in the df_to_merge
         for col in input_group_metrics:
             df_to_merge[col + '_ref_group_value'] = df_ref_group['group_value']
-        print('df_to_merge-->shape:', df_to_merge.shape)
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(np.inf, fill_divbyzero)
-        # when there is a zero in the numerator it is considered NaN after division
+        # when there is a zero in the numerator and a zero in denominator it is considered NaN
+        # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         df = df.fillna(value=fill_zeros)
         return df
