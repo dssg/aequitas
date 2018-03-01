@@ -42,19 +42,19 @@ def parse_args():
         description=about + 'Runs audits on predictions of machine learning models '
                             'to calculate a variety of bias and fairness metrics.\n')
 
-    parser.add_argument('--format',
+    parser.add_argument('--io-format',
                         action='store',
                         dest='format',
                         default='csv',
                         type=str,
-                        help='Data input format: csv or db (postgres db).')
+                        help='Data input/output format: csv or db (postgres db).')
 
-    parser.add_argument('--score-prediction',
+    parser.add_argument('--ref_group',
                         action='store',
-                        dest='score_predict',
-                        default='score',
+                        dest='format',
+                        default='min',
                         type=str,
-                        help='Data input format: csv or pg (postgres db).')
+                        help='Reference group method for bias metrics: min, major, predefined')
 
     parser.add_argument('--config',
                         action='store',
@@ -79,6 +79,13 @@ def parse_args():
                         dest='create_tables',
                         default=False,
                         help='Create aequitas tables from scratch. Drop existing tables.')
+
+    parser.add_argument('--score-prediction',
+                        action='store',
+                        dest='score_predict',
+                        default='score',
+                        type=str,
+                        help='Data input format: csv or pg (postgres db).')
 
     return parser.parse_args()
 
@@ -114,11 +121,22 @@ def run_dsapp(engine, configs):
     group_results = pd.concat(groups_model_list, ignore_index=True)
     # print(group_results.head(10))
     # print(group_results[['model_id','parameter','k', 'group_variable','group_value','Prev','PPrev']])
-
+    print('df shape from the crosstabs:', group_results.shape)
     b = Bias()
-    # bias_df = b.get_bias_min_metric(group_results)
-    bias_df = b.get_bias_major_group(group_results)
-    print(bias_df.head(10))
+    bias_df = b.get_disparity_major_group(group_results)
+    print('number of rows after bias majority ref group:', len(bias_df))
+    # bias_df = b.get_disparity_min_metric(group_results)
+    # print(bias_df.columns.values)
+    """
+    if 'reference_groups' in configs:
+        bias_df = b.get_disparity_predefined_groups(group_results, configs['reference_groups'])
+
+    """
+
+    print('df shape after bias minimum per metric ref group:', bias_df.shape)
+    print(bias_df[['group_variable', 'group_value', 'parameter', 'FDR', 'FDR_disparity',
+                   'FDR_ref_group_value']])
+    print('Any NaN?: ', bias_df.isnull().values.any())
     return
 
 
