@@ -3,6 +3,9 @@ import pandas as pd
 
 class Group(object):
     def __init__(self):
+        """
+
+        """
 
         # the columns in the evaluation table and the thresholds we want to apply to them
         self.quantizers = {
@@ -16,6 +19,10 @@ class Group(object):
         self.group_functions = self.get_group_functions()
 
     def get_group_functions(self):
+        """
+
+        :return:
+        """
 
         divide = lambda x, y: x / y if y != 0 else 0.0
 
