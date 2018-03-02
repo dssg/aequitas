@@ -67,7 +67,7 @@ class Bias(object):
             df = df.merge(df_to_merge, on=key_columns)
             # creating disparity by dividing each group metric value by the corresponding min
             # value from the groups of the target attribute
-            df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + ' Disparity']
+            df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(np.inf, fill_divbyzero)
         df = df.fillna(value=fill_zeros)
