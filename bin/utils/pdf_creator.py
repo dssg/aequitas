@@ -4,7 +4,8 @@ from fpdf import FPDF
 class PDF(FPDF):
     def header(self):
         # Logo
-        self.image('utils/aequitas_report_header.png', 0, h=20, x=1)
+        self.image('utils/aequitas_report_header.png', x=5, w=0, h=20)
+        self.ln(10)
         # Arial bold 15
         self.set_font('Arial', 'B', 20)
         # Move to the right
