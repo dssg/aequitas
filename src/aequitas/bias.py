@@ -8,6 +8,12 @@ import pandas as pd
 class Bias(object):
 
     def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
+        """
+
+        :param key_columns:
+        :param input_group_metrics:
+        :param fill_divbyzero:
+        """
         if not key_columns:
             self.key_columns = ['model_id', 'parameter', 'group_variable']
         else:
