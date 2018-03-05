@@ -13,7 +13,7 @@ class PDF(FPDF):
         # Title
         self.cell(30, 10, 'Bias and Fairness Audit Report', 0, 0, 'C')
         # Line break
-        self.ln(20)
+        self.ln(10)
 
     # Page footer
     def footer(self):
@@ -22,7 +22,8 @@ class PDF(FPDF):
         # Arial italic 8
         self.set_font('Arial', 'I', 8)
         # Page number
-        self.cell(0, 10, 'Copyright \xa9 2017. The University of Chicago. All Rights Reserved.     '
+        self.cell(0, 10, 'aequitas \xa9 2017. The University of Chicago. All Rights '
+                         'Reserved.     '
                          '\t \t'
                          'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
 
