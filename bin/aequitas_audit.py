@@ -1,5 +1,7 @@
+
 import argparse
 import logging
+from datetime import datetime
 from sys import exit
 
 import pandas as pd
@@ -54,8 +56,8 @@ def parse_args():
 
     parser.add_argument('--ref_group',
                         action='store',
-                        dest='format',
-                        default='min',
+                        dest='ref_groups',
+                        default='predefined',
                         type=str,
                         help='Reference group method for bias metrics: min, major, predefined')
 
@@ -88,12 +90,12 @@ def parse_args():
                         dest='score_predict',
                         default='score',
                         type=str,
-                        help='Data input format: csv or pg (postgres db).')
+                        help='Data input format: score or prediction')
 
     return parser.parse_args()
 
 
-def run_db(engine, configs):
+def run_db(engine, configs, ref_groups_method):
     """
 
     :param engine:
@@ -137,41 +139,70 @@ def run_db(engine, configs):
 
     print('df shape after bias minimum per metric ref group:', bias_df.shape)
     f = Fairness()
-    group_value_df = f.get_group_value_fairness(bias_df)
-    print(group_value_df[['group_variable', 'group_value', 'parameter', 'FDR', 'FDR_disparity',
-                          'FDR_ref_group_value', 'TypeI Parity', 'TypeII Parity', 'Impact Parity',
-                          'Statistical Parity', 'Unsupervised Fairness', 'Supervised Fairness']])
-    group_variable_df = f.get_group_variable_fairness(group_value_df)
-    fair = f.get_overall_fairness(group_variable_df)
-    audit_report(configs, fair)
+    # group_value_df = f.get_group_value_fairness(bias_df)
+    # print(group_value_df[['group_variable', 'group_value', 'parameter', 'FDR', 'FDR_disparity',
+    #                       'FDR_ref_group_value', 'TypeI Parity', 'TypeII Parity', 'Impact Parity',
+    #                       'Statistical Parity', 'Unsupervised Fairness', 'Supervised Fairness']])
+    # #group_variable_df = f.get_group_variable_fairness(group_value_df)
+    # #fair = f.get_overall_fairness(group_variable_df)
+    parameter = '300_abs'
+    audit_report(model_id, parameter, configs, {'overall': False}, f.fair_measures,
+                 ref_groups_method)
     return
 
 
-def audit_report(configs, fair_results):
+def audit_report(model_id, parameter, configs, fair_results, fair_measures, ref_groups_method):
     proj_desc = configs['project_description']
     print('\n\n\n:::::: REPORT ::::::\n')
     print('Project Title: ', proj_desc['title'])
     print('Project Goal: ', proj_desc['goal'])
     print('Bias Results:', str(fair_results))
-
     pdf = PDF()
+    pdf.set_margins(left=20, right=15, top=10)
     pdf.alias_nb_pages()
     pdf.add_page()
+    pdf.set_font('Arial', '', 16)
+    pdf.cell(0, 10, proj_desc['title'], 0, 1, 'C')
+
     pdf.set_font('Arial', '', 12)
-    pdf.cell(0, 10, 'Project Title: ' + proj_desc['title'], 0, 1)
-    pdf.cell(0, 10, 'Project Goal: ' + proj_desc['goal'], 0, 1)
+    pdf.cell(0, 10, datetime.now().strftime("%Y-%m-%d"), 0, 1, 'C')
+
+    pdf.multi_cell(0, 10, 'Project Goal: ' + proj_desc['goal'], 0, 1)
+    model_metric = 'Precisiton at top ' + parameter
+    pdf.multi_cell(0, 10, 'Model Perfomance Metric: ' + model_metric, 0, 1)
+    pdf.multi_cell(0, 10, 'Model Audited: #' + str(model_id) + '\t Performance: 0.0', 0, 1)
+
+    pdf.multi_cell(0, 10, 'Fairness Measures: ' + ', '.join(fair_measures.keys()), 0, 1)
+
     ref_groups = None
-    if 'reference_groups' in configs:
-        ref_groups = str(configs['reference_groups'])
+    if ref_groups_method == 'predefined':
+        if 'reference_groups' in configs:
+            ref_groups = str(configs['reference_groups'])
+    elif ref_groups_method == 'majority':
+        ref_groups = None
 
-    pdf.cell(0, 10, 'Reference Groups: ' + ref_groups, 0, 1)
+    elif ref_groups_method == 'min_metric':
+        ref_groups = None
+    else:
+        logging.error('audit_report(): wrong reference group method!')
+        exit()
+    pdf.multi_cell(0, 10, 'Reference Groups: ' + ref_groups_method + ',   ' + ref_groups, 0, 1)
 
-    pdf.cell(0, 10, 'Fairness Results: ' + str(fair_results), 0, 1)
+    if fair_results['overall'] is True:
+        is_fair = 'FAIR'
+        pdf.set_text_color(0, 128, 0)
+    else:
+        is_fair = 'UNFAIR'
+        pdf.set_text_color(255, 0, 0)
 
-    # for i in range(1, 41):
-    #    pdf.cell(0, 10, 'Printing line number ' + str(i), 0, 1)
-    pdf.output('output/aequitas.pdf', 'F')
+    results_text = 'aequitas has found that model #' + str(model_id) + ' is ' + is_fair + '.'
+    pdf.cell(0, 10, results_text, 0, 1)
+    pdf.set_text_color(0, 0, 0)
 
+    datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
+    report_filename = 'aequitas_report_' + str(model_id) + '_' + proj_desc['title'].replace(' ',
+                                                                                            '_') + '_' + datestr
+    pdf.output('output/' + report_filename + '.pdf', 'F')
     return None
 
 def main():
@@ -196,7 +227,7 @@ def main():
         engine = get_engine(configs)
         if args.create_tables:
             create_bias_tables(engine, args.output_schema)
-        run_db(engine, configs)
+        run_db(engine, configs, args.ref_groups)
 
 
 """
