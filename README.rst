@@ -4,7 +4,6 @@ aequitas
 
 Bias and Fairness audit tool.
 
-.. image:: bin/utils/aequitas_report_header.png
 
 Runs audits on predictions of machine learning models to calculate a variety of bias metrics, combines the results, and displays a report to select tradeoffs between performance and bias.
 
@@ -24,28 +23,4 @@ Currently we support the DSAPP schemas for the information above thart contain t
 
 The output gets stored in the bias_raw and bias_complete tables.
 
-
-## Usage
-
-1. Create db_credentials.yaml file inside bias/
-
-``
-cd aequitas/
-
-
-vim bias/db_credentials.yaml
-    host: xxxx
-    database: xxxx
-    user: xxxx
-    password: xxxx
-    port: 5432
-``
-
-2. Edit PG queries in bias/sql/project_queries.py to make it compliant with your project's schema and the protected variables you want to perform bias analyses on.
-
-3. Edit bias/configs.py to define the train_end_time of the models you want to use on the bias analysis. You can also define the thresholds to calculate metrics based on your results.evaluations table.
-
-4. To create and populate bias tables (bias_raw and bias_complete) run the following in aequitas/:
-
-``python3 -m bias.create_bias_tables``
 
