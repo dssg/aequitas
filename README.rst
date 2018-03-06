@@ -4,7 +4,7 @@ aequitas
 
 Bias and Fairness audit tool.
 
-.. image:: bin/utils/to/aequitas_report_header.png
+.. image:: https://github.com/dssg/aequitas-public/blob/master/bin/utils/aequitas_report_header.png
 
 Runs audits on predictions of machine learning models to calculate a variety of bias metrics, combines the results, and displays a report to select tradeoffs between performance and bias.
 
