@@ -192,7 +192,7 @@ class Group(object):
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'group_variable',
                                                    'group_value'])
-        return groups_df
+        return groups_df, feat_cols
 
 
     def get_group_metrics(self, df):

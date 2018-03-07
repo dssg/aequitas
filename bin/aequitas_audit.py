@@ -1,20 +1,18 @@
 
 import argparse
 import logging
-from datetime import datetime
-from sys import exit
-
 import pandas as pd
 import yaml
-
 from bin.utils.db import create_bias_tables
 from bin.utils.db import get_dsapp_data
 from bin.utils.db import get_engine
 from bin.utils.db import get_models
 from bin.utils.pdf_creator import PDF
+from datetime import datetime
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
+from sys import exit
 
 about = """
 ############################################################################
@@ -59,7 +57,8 @@ def parse_args():
                         dest='ref_groups',
                         default='predefined',
                         type=str,
-                        help='Reference group method for bias metrics: min, major, predefined')
+                        help='Reference group method for bias metrics: min_metric, majority, '
+                             'predefined')
 
     parser.add_argument('--config',
                         action='store',
@@ -115,43 +114,47 @@ def run_db(engine, configs, ref_groups_method):
     g = Group()
     count = 0
     groups_model_list = []
+    attributes = []
     for model_id in models:
-        print('MODEL_ID: ', model_id)
+        print('\n\n\nMODEL_ID: ', model_id)
         count += 1
         print(count)
         df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
         print(df.head(1))
-        groups_model = g.get_crosstabs(df, thresholds, model_id)
-        groups_model_list.append(groups_model)
-    group_results = pd.concat(groups_model_list, ignore_index=True)
-    # print(group_results.head(10))
-    # print(group_results[['model_id','parameter','k', 'group_variable','group_value','Prev','PPrev']])
-    print('df shape from the crosstabs:', group_results.shape)
-    b = Bias()
-    bias_df = b.get_disparity_major_group(group_results)
-    print('number of rows after bias majority ref group:', len(bias_df))
-    print('Any NaN?: ', bias_df.isnull().values.any())
-    """
-    if 'reference_groups' in configs:
-        bias_df = b.get_disparity_predefined_groups(group_results, configs['reference_groups'])
+        groups_model, attributes = g.get_crosstabs(df, thresholds, model_id)
+        print('df shape from the crosstabs:', groups_model.shape)
+        b = Bias()
+        if ref_groups_method == 'predefined' and 'reference_groups' in configs:
+            bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
+        elif ref_groups_method == 'min_metric':
+            bias_df = b.get_disparity_min_metric(groups_model)
+        else:
+            bias_df = b.get_disparity_major_group(groups_model)
+        print('number of rows after bias majority ref group:', len(bias_df))
+        print('Any NaN?: ', bias_df.isnull().values.any())
+        print('df shape after bias minimum per metric ref group:', bias_df.shape)
+        f = Fairness()
 
-    """
-
-    print('df shape after bias minimum per metric ref group:', bias_df.shape)
-    f = Fairness()
-    # group_value_df = f.get_group_value_fairness(bias_df)
-    # print(group_value_df[['group_variable', 'group_value', 'parameter', 'FDR', 'FDR_disparity',
-    #                       'FDR_ref_group_value', 'TypeI Parity', 'TypeII Parity', 'Impact Parity',
-    #                       'Statistical Parity', 'Unsupervised Fairness', 'Supervised Fairness']])
-    # #group_variable_df = f.get_group_variable_fairness(group_value_df)
-    # #fair = f.get_overall_fairness(group_variable_df)
-    parameter = '300_abs'
-    audit_report(model_id, parameter, configs, {'overall': False}, f.fair_measures,
-                 ref_groups_method)
+        group_value_df = f.get_group_value_fairness(bias_df)
+        print('_______________\nGroup Value level:')
+        print(group_value_df)
+        group_variable_df = f.get_group_variable_fairness(group_value_df)
+        print('_______________\nGroup Variable level:')
+        print(group_variable_df)
+        fair_results = f.get_overall_fairness(group_variable_df)
+        print('_______________\nModel level:')
+        print(fair_results)
+        parameter = '300_abs'
+        # fair_results = {'Overall Fairness': False}
+        model_eval = 'xx.yy'
+        audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
+                     f.fair_measures,
+                     ref_groups_method)
     return
 
 
-def audit_report(model_id, parameter, configs, fair_results, fair_measures, ref_groups_method):
+def audit_report(model_id, parameter, attributes, model_eval, configs, fair_results, fair_measures,
+                 ref_groups_method):
     proj_desc = configs['project_description']
     print('\n\n\n:::::: REPORT ::::::\n')
     print('Project Title: ', proj_desc['title'])
@@ -162,17 +165,19 @@ def audit_report(model_id, parameter, configs, fair_results, fair_measures, ref_
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font('Arial', '', 16)
-    pdf.cell(0, 10, proj_desc['title'], 0, 1, 'C')
-
-    pdf.set_font('Arial', '', 12)
+    pdf.cell(0, 5, proj_desc['title'], 0, 1, 'C')
+    pdf.set_font('Helvetica', '', 11)
     pdf.cell(0, 10, datetime.now().strftime("%Y-%m-%d"), 0, 1, 'C')
-
-    pdf.multi_cell(0, 10, 'Project Goal: ' + proj_desc['goal'], 0, 1)
-    model_metric = 'Precisiton at top ' + parameter
-    pdf.multi_cell(0, 10, 'Model Perfomance Metric: ' + model_metric, 0, 1)
-    pdf.multi_cell(0, 10, 'Model Audited: #' + str(model_id) + '\t Performance: 0.0', 0, 1)
-
-    pdf.multi_cell(0, 10, 'Fairness Measures: ' + ', '.join(fair_measures.keys()), 0, 1)
+    pdf.multi_cell(0, 5, 'Project Goal: ' + proj_desc['goal'], 0, 1)
+    pdf.ln(2)
+    model_metric = 'Precision at top ' + parameter
+    pdf.multi_cell(0, 5, 'Model Perfomance Metric: ' + model_metric, 0, 1)
+    pdf.multi_cell(0, 5, 'Fairness Measures: ' + ', '.join(fair_measures.keys()), 0, 1)
+    pdf.ln(2)
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.multi_cell(0, 5, 'Model Audited: #' + str(model_id) + '\t Performance: ' + str(model_eval),
+                   0, 1)
+    pdf.set_font('Helvetica', '', 11)
 
     ref_groups = None
     if ref_groups_method == 'predefined':
@@ -186,18 +191,29 @@ def audit_report(model_id, parameter, configs, fair_results, fair_measures, ref_
     else:
         logging.error('audit_report(): wrong reference group method!')
         exit()
-    pdf.multi_cell(0, 10, 'Reference Groups: ' + ref_groups_method + ',   ' + ref_groups, 0, 1)
-
-    if fair_results['overall'] is True:
+    pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(attributes), 0, 1)
+    pdf.multi_cell(0, 5, 'Reference groups used: ' + ref_groups_method + ':   '
+                                                                         '' + ref_groups, 0, 1)
+    pdf.ln(2)
+    results_text = 'aequitas has found that model #' + str(model_id) + ' is '
+    if fair_results['Overall Fairness'] is True:
         is_fair = 'FAIR'
         pdf.set_text_color(0, 128, 0)
+        pdf.cell(0, 5, results_text + is_fair + '.', 0, 1)
     else:
         is_fair = 'UNFAIR'
+        pdf.image('utils/danger.png', x=20, w=7, h=7)
+        pdf.cell(73, 5, results_text, 0, 0)
+        pdf.set_font('Helvetica', 'B', 11)
         pdf.set_text_color(255, 0, 0)
+        pdf.cell(0, 5, is_fair + '.', 0, 1)
+        pdf.set_font('Helvetica', '', 11)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(0, 5, 'The Bias is in the following attributes:', 0, 1)
 
-    results_text = 'aequitas has found that model #' + str(model_id) + ' is ' + is_fair + '.'
-    pdf.cell(0, 10, results_text, 0, 1)
-    pdf.set_text_color(0, 0, 0)
+
+
+
 
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
     report_filename = 'aequitas_report_' + str(model_id) + '_' + proj_desc['title'].replace(' ',
