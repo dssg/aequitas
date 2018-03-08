@@ -1,18 +1,18 @@
 
 import argparse
 import logging
-import pandas as pd
+from sys import exit
+
 import yaml
+
 from bin.utils.db import create_bias_tables
 from bin.utils.db import get_dsapp_data
 from bin.utils.db import get_engine
 from bin.utils.db import get_models
-from bin.utils.pdf_creator import PDF
-from datetime import datetime
+from bin.utils.report import get_group_value_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
-from sys import exit
 
 about = """
 ############################################################################
@@ -126,10 +126,11 @@ def run_db(engine, configs, ref_groups_method):
         b = Bias()
         if ref_groups_method == 'predefined' and 'reference_groups' in configs:
             bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
-        elif ref_groups_method == 'min_metric':
-            bias_df = b.get_disparity_min_metric(groups_model)
-        else:
+        elif ref_groups_method == 'majority':
             bias_df = b.get_disparity_major_group(groups_model)
+        else:
+            bias_df = b.get_disparity_min_metric(groups_model)
+
         print('number of rows after bias majority ref group:', len(bias_df))
         print('Any NaN?: ', bias_df.isnull().values.any())
         print('df shape after bias minimum per metric ref group:', bias_df.shape)
@@ -147,79 +148,13 @@ def run_db(engine, configs, ref_groups_method):
         parameter = '300_abs'
         # fair_results = {'Overall Fairness': False}
         model_eval = 'xx.yy'
+        group_value_report = get_group_value_report(group_value_df)
         audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
                      f.fair_measures,
-                     ref_groups_method)
+                     ref_groups_method, group_value_report)
     return
 
 
-def audit_report(model_id, parameter, attributes, model_eval, configs, fair_results, fair_measures,
-                 ref_groups_method):
-    proj_desc = configs['project_description']
-    print('\n\n\n:::::: REPORT ::::::\n')
-    print('Project Title: ', proj_desc['title'])
-    print('Project Goal: ', proj_desc['goal'])
-    print('Bias Results:', str(fair_results))
-    pdf = PDF()
-    pdf.set_margins(left=20, right=15, top=10)
-    pdf.alias_nb_pages()
-    pdf.add_page()
-    pdf.set_font('Arial', '', 16)
-    pdf.cell(0, 5, proj_desc['title'], 0, 1, 'C')
-    pdf.set_font('Helvetica', '', 11)
-    pdf.cell(0, 10, datetime.now().strftime("%Y-%m-%d"), 0, 1, 'C')
-    pdf.multi_cell(0, 5, 'Project Goal: ' + proj_desc['goal'], 0, 1)
-    pdf.ln(2)
-    model_metric = 'Precision at top ' + parameter
-    pdf.multi_cell(0, 5, 'Model Perfomance Metric: ' + model_metric, 0, 1)
-    pdf.multi_cell(0, 5, 'Fairness Measures: ' + ', '.join(fair_measures.keys()), 0, 1)
-    pdf.ln(2)
-    pdf.set_font('Helvetica', 'B', 11)
-    pdf.multi_cell(0, 5, 'Model Audited: #' + str(model_id) + '\t Performance: ' + str(model_eval),
-                   0, 1)
-    pdf.set_font('Helvetica', '', 11)
-
-    ref_groups = None
-    if ref_groups_method == 'predefined':
-        if 'reference_groups' in configs:
-            ref_groups = str(configs['reference_groups'])
-    elif ref_groups_method == 'majority':
-        ref_groups = None
-
-    elif ref_groups_method == 'min_metric':
-        ref_groups = None
-    else:
-        logging.error('audit_report(): wrong reference group method!')
-        exit()
-    pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(attributes), 0, 1)
-    pdf.multi_cell(0, 5, 'Reference groups used: ' + ref_groups_method + ':   '
-                                                                         '' + ref_groups, 0, 1)
-    pdf.ln(2)
-    results_text = 'aequitas has found that model #' + str(model_id) + ' is '
-    if fair_results['Overall Fairness'] is True:
-        is_fair = 'FAIR'
-        pdf.set_text_color(0, 128, 0)
-        pdf.cell(0, 5, results_text + is_fair + '.', 0, 1)
-    else:
-        is_fair = 'UNFAIR'
-        pdf.image('utils/danger.png', x=20, w=7, h=7)
-        pdf.cell(73, 5, results_text, 0, 0)
-        pdf.set_font('Helvetica', 'B', 11)
-        pdf.set_text_color(255, 0, 0)
-        pdf.cell(0, 5, is_fair + '.', 0, 1)
-        pdf.set_font('Helvetica', '', 11)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 5, 'The Bias is in the following attributes:', 0, 1)
-
-
-
-
-
-    datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
-    report_filename = 'aequitas_report_' + str(model_id) + '_' + proj_desc['title'].replace(' ',
-                                                                                            '_') + '_' + datestr
-    pdf.output('output/' + report_filename + '.pdf', 'F')
-    return None
 
 def main():
     args = parse_args()

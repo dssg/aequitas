@@ -127,6 +127,3 @@ class Fairness(object):
 
         return overall_fairness
 
-    def get_descriptions(self, group_value_df):
-
-        return group_value_df
