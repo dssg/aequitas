@@ -9,6 +9,7 @@ from bin.utils.db import create_bias_tables
 from bin.utils.db import get_dsapp_data
 from bin.utils.db import get_engine
 from bin.utils.db import get_models
+from bin.utils.report import audit_report
 from bin.utils.report import get_group_value_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
