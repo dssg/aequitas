@@ -3,10 +3,11 @@ import argparse
 import logging
 from sys import exit
 
+import pandas as pd
 import yaml
 
 from bin.utils.db import create_bias_tables
-from bin.utils.db import get_dsapp_data
+from bin.utils.db import get_db_data
 from bin.utils.db import get_engine
 from bin.utils.db import get_models
 from bin.utils.report import audit_report
@@ -14,6 +15,11 @@ from bin.utils.report import get_group_value_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
+
+# Authors: Pedro Saleiro <saleiro@uchicago.edu>
+#          Rayid Ghani
+#
+# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
 
 about = """
 ############################################################################
@@ -46,56 +52,93 @@ def parse_args():
         description=about + 'Runs audits on predictions of machine learning models '
                             'to calculate a variety of bias and fairness metrics.\n')
 
-    parser.add_argument('--io-format',
+    parser.add_argument('--input',
                         action='store',
-                        dest='format',
-                        default='csv',
-                        type=str,
-                        help='Data input/output format: csv or db (postgres db).')
+                        dest='input_file',
+                        default=None,
+                        help='Absolute filepath for input dataset in csv format. If no input is provided we assume there is a '
+                             'db configuration in the configs.yaml file.')
 
-    parser.add_argument('--ref_group',
+    parser.add_argument('--ref-group',
                         action='store',
                         dest='ref_groups',
-                        default='predefined',
+                        default='majority',
                         type=str,
                         help='Reference group method for bias metrics: min_metric, majority, '
                              'predefined')
 
+    parser.add_argument('--create-report',
+                        action='store_true',
+                        dest='report',
+                        default=False,
+                        help='If --report, then a pdf report is produced and stored in the output directory.')
+
+
     parser.add_argument('--config',
                         action='store',
                         dest='config_file',
-                        default='config.yaml',
-                        help='Absolute filepath for input yaml config file.')
+                        default='configs/configs.yaml',
+                        help='Absolute filepath for input yaml config file. Default is configs/configs.yaml')
 
-    parser.add_argument('--input',
-                        action='store',
-                        dest='input_file',
-                        default='',
-                        help='Absolute filepath for input dataset in csv format.')
 
     parser.add_argument('--output-folder',
                         action='store',
                         dest='output_folder',
-                        default='',
+                        default='output/',
                         help='Folder name to be created inside aequitas/output/')
 
-    parser.add_argument('--create_tables',
+    parser.add_argument('--create-tables',
                         action='store_true',
                         dest='create_tables',
                         default=False,
-                        help='Create aequitas tables from scratch. Drop existing tables.')
-
-    parser.add_argument('--score-prediction',
-                        action='store',
-                        dest='score_predict',
-                        default='score',
-                        type=str,
-                        help='Data input format: score or prediction')
+                        help='Create aequitas table from scratch. Drop existing tables.')
 
     return parser.parse_args()
 
 
-def run_db(engine, configs, ref_groups_method):
+def audit(df, ref_groups_method, configs, model_id=1, report=True):
+    """
+
+    :param df:
+    :param model_id:
+    :param ref_groups_method:
+    :return:
+    """
+    g = Group()
+    thresholds = configs['thresholds'] if 'thresholds' in configs else None
+    groups_model, attributes = g.get_crosstabs(df, thresholds, model_id)
+    print('df shape from the crosstabs:', groups_model.shape)
+    b = Bias()
+    if ref_groups_method == 'predefined' and 'reference_groups' in configs:
+        bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
+    elif ref_groups_method == 'majority':
+        bias_df = b.get_disparity_major_group(groups_model)
+    else:
+        bias_df = b.get_disparity_min_metric(groups_model)
+    print('number of rows after bias majority ref group:', len(bias_df))
+    print('Any NaN?: ', bias_df.isnull().values.any())
+    print('df shape after bias minimum per metric ref group:', bias_df.shape)
+    f = Fairness()
+    group_value_df = f.get_group_value_fairness(bias_df)
+    print('_______________\nGroup Value level:')
+    print(group_value_df)
+    group_variable_df = f.get_group_variable_fairness(group_value_df)
+    print('_______________\nGroup Variable level:')
+    print(group_variable_df)
+    fair_results = f.get_overall_fairness(group_variable_df)
+    print('_______________\nModel level:')
+    print(fair_results)
+    parameter = '300_abs'
+    # fair_results = {'Overall Fairness': False}
+    model_eval = 'xx.yy'
+    group_value_report = get_group_value_report(group_value_df)
+    if report is True:
+        audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
+                     f.fair_measures,
+                     ref_groups_method, group_value_report)
+
+
+def run_db(engine, configs, ref_groups_method, report):
     """
 
     :param engine:
@@ -120,67 +163,54 @@ def run_db(engine, configs, ref_groups_method):
         print('\n\n\nMODEL_ID: ', model_id)
         count += 1
         print(count)
-        df = get_dsapp_data(engine, model_id, attrib_query, predictions_table)
+        df = get_db_data(engine, model_id, attrib_query, predictions_table)
         print(df.head(1))
-        groups_model, attributes = g.get_crosstabs(df, thresholds, model_id)
-        print('df shape from the crosstabs:', groups_model.shape)
-        b = Bias()
-        if ref_groups_method == 'predefined' and 'reference_groups' in configs:
-            bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
-        elif ref_groups_method == 'majority':
-            bias_df = b.get_disparity_major_group(groups_model)
-        else:
-            bias_df = b.get_disparity_min_metric(groups_model)
-
-        print('number of rows after bias majority ref group:', len(bias_df))
-        print('Any NaN?: ', bias_df.isnull().values.any())
-        print('df shape after bias minimum per metric ref group:', bias_df.shape)
-        f = Fairness()
-
-        group_value_df = f.get_group_value_fairness(bias_df)
-        print('_______________\nGroup Value level:')
-        print(group_value_df)
-        group_variable_df = f.get_group_variable_fairness(group_value_df)
-        print('_______________\nGroup Variable level:')
-        print(group_variable_df)
-        fair_results = f.get_overall_fairness(group_variable_df)
-        print('_______________\nModel level:')
-        print(fair_results)
-        parameter = '300_abs'
-        # fair_results = {'Overall Fairness': False}
-        model_eval = 'xx.yy'
-        group_value_report = get_group_value_report(group_value_df)
-        audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
-                     f.fair_measures,
-                     ref_groups_method, group_value_report)
+        audit(df, ref_groups_method, configs, model_id, report)
     return
 
 
+def run_csv(input_file, ref_groups_method, configs, report):
+    print('run_csv()')
+    df = None
+    try:
+        df = pd.read_csv(input_file)
+    except IOError:
+        logging.error('run_csv: could not load csv provided as input.')
+        exit()
+    if df is not None:
+        if 'model_id' in df.columns:
+            for model_id in df.model_id.unique():
+                audit(df, ref_groups_method, configs, model_id, report)
+        else:
+            audit(df, ref_groups_method, configs, report)
+    else:
+        logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
+        exit()
+
+    return
 
 def main():
     args = parse_args()
     print(about)
-    if args.format not in {'csv', 'db'}:
-        logging.error('Please define input data --format: csv or dsapp (postgres db with DSAPP '
-                      'schemas)')
-        exit()
+    configs = None
     try:
         with open(args.config_file) as f:
             configs = yaml.load(f)
     except FileNotFoundError:
         logging.error('Could not load configurations! Please set configs.yaml file using --config')
         exit()
-    if not configs:
+    if configs is None:
         logging.error('Empty configurations! Please set configs.yaml file using --config')
         exit()
 
-    # when having score vs prediction compatibility, thresholds just make sense for score
-    if args.format == 'db':
+    # when having score vs prediction compatibility, thresholds only make sense for score
+    if args.input_file is None:
         engine = get_engine(configs)
         if args.create_tables:
             create_bias_tables(engine, args.output_schema)
         run_db(engine, configs, args.ref_groups)
-
+    else:
+        run_csv(args.input_file, args.ref_groups, configs)
 
 """
         if push_to_db:

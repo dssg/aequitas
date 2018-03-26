@@ -1,6 +1,11 @@
 import pandas as pd
 
 
+# Authors: Pedro Saleiro <saleiro@uchicago.edu>
+#          Rayid Ghani
+#
+# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+
 class Fairness(object):
 
     def __init__(self, fair_eval=None, tau=None, fair_measures=None, high_level_fairness=None):
