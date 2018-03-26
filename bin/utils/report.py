@@ -4,6 +4,12 @@ from datetime import datetime
 from fpdf import FPDF
 
 
+# Authors: Pedro Saleiro <saleiro@uchicago.edu>
+#          Rayid Ghani
+#
+# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+
+
 def get_group_value_report(group_value_df):
     """
 
@@ -15,12 +21,38 @@ def get_group_value_report(group_value_df):
             group_value_df['Supervised Fairness'] == False)]
     for index, row in the_false_df.iterrows():
         report = ''
+        metrics = []
         group = row['group_variable'] + ' = ' + row['group_value']
         text1 = group + ' does not have '
         report += text1
         text2 = ''
+        if row['Unsupervised Fairness'] is False:
+            text2 += 'Unsupervised Fairness '
+            text3 = ''
+            if row['Statistical Parity'] is False:
+                text3 += '(no Statistical Parity'
+                ref_val = 0.0
+                ref_group_value = group_value_df.loc[(group_value_df['group_variable'] == row[
+                    'group_variable']) & (group_value_df['group_value'] == row[
+                    'PPR_ref_group_value'])]['PPR'].values[0]
+                ppr_text = '{:.2f}% of the group is selected, compared to {:.2f} % of the ' \
+                           'reference group '.format(row['PPR'] * 100, ref_group_value * 100) + \
+                           row[
+                               'group_variable'] + ' = ' + row['PPR_ref_group_value']
+                metrics.append(ppr_text)
+            if row['Impact Parity'] is False:
+                if text3 == '':
+                    text3 += '(no Impact Parity)'
+                else:
+                    text3 += ', no Impact Parity)'
+                pprev_text = ''
+            else:
+                text3 += ')'
+            text2 += text3
         if row['Supervised Fairness'] is False:
-            text2 = 'Supervised Fairness '
+            if text2 != '':
+                text2 += ' neither '
+            text2 += 'Supervised Fairness '
             text3 = ''
             if row['TypeI Parity'] is False:
                 text3 += '(no Type I Parity'
@@ -28,27 +60,12 @@ def get_group_value_report(group_value_df):
                 if text3 == '':
                     text3 += '(no Type II Parity)'
                 else:
-                    text3 += ' neither Type II Parity)'
+                    text3 += ', no Type II Parity)'
             else:
                 text3 += ') '
             text2 += text3
-        if row['Unsupervised Fairness'] is False:
-            if text2 != '':
-                text2 += ' neither '
-            text2 += 'Unsupervised Fairness '
-            text3 = ''
-            if row['Statistical Parity'] is False:
-                text3 += '(no Statistical Parity'
-            if row['Impact Parity'] is False:
-                if text3 == '':
-                    text3 += '(no Impact Parity)'
-                else:
-                    text3 += ' neither Impact Parity)'
-            else:
-                text3 += ')'
-            text2 += text3
         report += text2
-        group_value_report[group] = report
+        group_value_report[group] = [report, metrics]
 
     return group_value_report
 
@@ -92,14 +109,14 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
                    0, 1)
     pdf.set_font('Helvetica', '', 11)
 
-    ref_groups = None
+    ref_groups = ''
     if ref_groups_method == 'predefined':
         if 'reference_groups' in configs:
             ref_groups = str(configs['reference_groups'])
     elif ref_groups_method == 'majority':
-        ref_groups = None
+        ref_groups = ''
     elif ref_groups_method == 'min_metric':
-        ref_groups = None
+        ref_groups = ''
     else:
         logging.error('audit_report(): wrong reference group method!')
         exit()
@@ -124,10 +141,12 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
         pdf.ln(2)
         for key, value in sorted(group_value_report.items()):
             pdf.ln(2)
-            pdf.multi_cell(0, 5, value, 0, 1)
+            pdf.multi_cell(0, 5, value[0], 0, 1)
             pdf.ln(2)
-
-
+            pdf.set_x(40.0)
+            pdf.multi_cell(0, 5, '\t' + ', '.join(value[1]), 0, 1)
+            pdf.ln(4)
+            pdf.set_x(20.0)
 
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
     report_filename = 'aequitas_report_' + str(model_id) + '_' + proj_desc['title'].replace(' ',

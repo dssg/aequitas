@@ -1,5 +1,13 @@
+import logging
+
 import pandas as pd
 
+
+# Authors: Pedro Saleiro <saleiro@uchicago.edu>
+#          Rayid Ghani
+#          Benedict Kuester
+#
+# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved
 
 class Group(object):
     def __init__(self):
@@ -108,25 +116,33 @@ class Group(object):
                            'TP': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, df, thresholds, model_id):
+    def get_crosstabs(self, df, thresholds=None, model_id=1):
         """
         Creates univariate groups and calculates group metrics.
 
         :param df: a dataframe containing the following required columns [entity_id, as_of_date,
         model_id, score, rank_abs, rank_pct, label_value
-        :param thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[] }
+        :param thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
         :param model_id:
         :param push_to_db: if you want to save the results on a db table
         :param push_to_file: if you want to save the results on a csv file
         :return:
         """
-        groups_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'threshold_parameter',
-                                           'group_variable', 'group_value', 'metric', 'value'])
-        prior_df = pd.DataFrame(columns=['model_id', 'as_of_date', 'group_variable', 'group_value',
-                                         'count', 'n'])
+        # if no thresholds are provided, we assume that rank_abs=number of 1s in the score column
+
+        if not thresholds:
+            df['score'] = df['score'].astype(float)
+            count_ones = df['score'].value_counts()[1.0]
+            if count_ones == 0:
+                logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
+                exit()
+            thresholds = {'rank_abs': [count_ones]}
+
+        df = df.sort_values('score', ascending=False)
+        df['rank_abs'] = range(1, len(df) + 1)
+        df['rank_pct'] = df['rank_abs'] / len(df)
         dfs = []
         prior_dfs = []
-
         model_cols = ['model_id', 'as_of_date', 'entity_id', 'score', 'rank_abs', 'rank_pct',
                       'label_value']
         # within each model and as_of_date, discretize the floaty features

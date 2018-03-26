@@ -6,7 +6,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 
-def get_dsapp_data(engine, model_id, attrib_query, predictions_table):
+# Authors: Pedro Saleiro <saleiro@uchicago.edu>
+#          Rayid Ghani
+#
+# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+
+
+def get_db_data(engine, model_id, attrib_query, predictions_table):
     """
     Queries for the input table (dsapp) to be used by get_crosstabs
     :param engine:
