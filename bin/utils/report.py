@@ -34,11 +34,11 @@ def get_group_value_report(group_value_df):
                 ref_val = 0.0
                 ref_group_value = group_value_df.loc[(group_value_df['group_variable'] == row[
                     'group_variable']) & (group_value_df['group_value'] == row[
-                    'PPR_ref_group_value'])]['PPR'].values[0]
+                    'ppr_ref_group_value'])]['ppr'].values[0]
                 ppr_text = '{:.2f}% of the group is selected, compared to {:.2f} % of the ' \
-                           'reference group '.format(row['PPR'] * 100, ref_group_value * 100) + \
+                           'reference group '.format(row['ppr'] * 100, ref_group_value * 100) + \
                            row[
-                               'group_variable'] + ' = ' + row['PPR_ref_group_value']
+                               'group_variable'] + ' = ' + row['ppr_ref_group_value']
                 metrics.append(ppr_text)
             if row['Impact Parity'] is False:
                 if text3 == '':
@@ -71,7 +71,7 @@ def get_group_value_report(group_value_df):
 
 
 def audit_report(model_id, parameter, attributes, model_eval, configs, fair_results, fair_measures,
-                 ref_groups_method, group_value_report):
+                 ref_groups_method, group_value_df):
     """
 
     :param model_id:
@@ -82,10 +82,17 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
     :param fair_results:
     :param fair_measures:
     :param ref_groups_method:
-    :param group_value_report:
+    :param group_value_df:
     :return:
     """
-    proj_desc = configs['project_description']
+    group_value_report = get_group_value_report(group_value_df)
+    proj_desc = configs['project_description'] if 'project_description' in configs else None
+    if proj_desc is None:
+        proj_desc = {'title': ' ', 'goal': ' '}
+    if proj_desc['title'] is None:
+        proj_desc['title'] = ' '
+    if proj_desc['goal'] is None:
+        proj_desc['goal'] = ' '
     print('\n\n\n:::::: REPORT ::::::\n')
     print('Project Title: ', proj_desc['title'])
     print('Project Goal: ', proj_desc['goal'])

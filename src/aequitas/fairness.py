@@ -25,14 +25,14 @@ class Fairness(object):
         else:
             self.tau = tau
         if not fair_measures:
-            self.fair_measures = {'Statistical Parity': 'PPR_disparity',
-                                  'Impact Parity': 'PPrev_disparity',
-                                  'FDR Parity': 'FDR_disparity',
-                                  'FPR Parity': 'FPR_disparity',
-                                  'FOmR Parity': 'FOmR_disparity',
-                                  'FNR Parity': 'FNR_disparity',
+            self.fair_measures = {'Statistical Parity': 'ppr_disparity',
+                                  'Impact Parity': 'pprev_disparity',
+                                  'FDR Parity': 'fdr_disparity',
+                                  'FPR Parity': 'fpr_disparity',
+                                  'FOR Parity': 'for_disparity',
+                                  'FNR Parity': 'fnr_disparity',
                                   'TypeI Parity': ['FDR Parity', 'FPR Parity'],
-                                  'TypeII Parity': ['FOmR Parity', 'FNR Parity']}
+                                  'TypeII Parity': ['FOR Parity', 'FNR Parity']}
         if not high_level_fairness:
             self.high_level_fairness = {
                 'Unsupervised Fairness': ['Statistical Parity', 'Impact Parity'],

@@ -24,7 +24,7 @@ class Bias(object):
         else:
             self.key_columns = key_columns
         if not input_group_metrics:
-            self.input_group_metrics = ['PPR', 'PPrev', 'FDR', 'FOmR', 'FPR', 'FNR']
+            self.input_group_metrics = ['ppr', 'pprev', 'fdr', 'for', 'fpr', 'fnr']
         else:
             self.input_group_metrics = input_group_metrics
         if not fill_divbyzero:
