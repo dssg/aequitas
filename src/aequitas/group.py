@@ -98,22 +98,22 @@ class Group(object):
                                                                           thres).sum(
             ).astype(float))
 
-        group_functions = {'TPR': tpr,
-                           'TNR': tnr,
-                           'FOmR': fomr,
-                           'FDR': fdr,
-                           'FPR': fpr,
-                           'FNR': fnr,
-                           'NPV': npv,
-                           'Precision': precision,
-                           'PP': predicted_pos_count,
-                           'PN': predicted_neg_count,
-                           'PPR': predicted_pos_ratio_k,
-                           'PPrev': predicted_pos_ratio_g,
-                           'FP': false_pos_count,
-                           'FN': false_neg_count,
-                           'TN': true_neg_count,
-                           'TP': true_pos_count}
+        group_functions = {'tpr': tpr,
+                           'tnr': tnr,
+                           'for': fomr,
+                           'fdr': fdr,
+                           'fpr': fpr,
+                           'fnr': fnr,
+                           'npv': npv,
+                           'precision': precision,
+                           'pp': predicted_pos_count,
+                           'pn': predicted_neg_count,
+                           'ppr': predicted_pos_ratio_k,
+                           'pprev': predicted_pos_ratio_g,
+                           'fp': false_pos_count,
+                           'fn': false_neg_count,
+                           'tn': true_neg_count,
+                           'tp': true_pos_count}
         return group_functions
 
     def get_crosstabs(self, df, thresholds=None, model_id=1):
@@ -137,7 +137,7 @@ class Group(object):
                 logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
                 exit()
             thresholds = {'rank_abs': [count_ones]}
-
+        print('model_id, thresholds', model_id, thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
         df['rank_pct'] = df['rank_abs'] / len(df)
@@ -190,8 +190,8 @@ class Group(object):
                         feat_bias = col_group.apply(func)
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
-                            'parameter': str(thres_val) + '_' + thres_unit[-3:],
-                            'k': k,
+                            'parameter': [str(thres_val) + '_' + thres_unit[-3:]] * len(feat_bias),
+                            'k': [k] * len(feat_bias),
                             'group_variable': [col] * len(feat_bias),
                             'group_value': feat_bias.index.values,
                             name: feat_bias.values

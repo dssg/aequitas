@@ -124,29 +124,28 @@ def create_bias_tables(db_engine, output_schema):
     print('Creating aequitas tables....')
     query = """ DROP TABLE IF EXISTS {output_schema}.aequitas_group;
            CREATE TABLE {output_schema}.aequitas_group (
-               model_id INTEGER,
+model_id INTEGER,
                parameter TEXT, -- should be 'pct' or 'abs'
                k INTEGER,
                group_variable TEXT, -- the protected status, like 'gender'
                group_value TEXT,  -- like 'female'
-               Prev REAL,
-               PP REAL,
-               PN REAL,
-               PPR REAL,
-               PPrev REAL,
-               TP REAL,
-               FP REAL,
-               TN REAL,
-               FN REAL, 
-               TPR REAL,
-               FPR REAL,
-               TNR REAL,
-               FNR REAL,
-               Precision REAL,
-               FDR REAL,
-               FOmR REAL,
-               NPV REAL
-           );
+               prev REAL,
+               pp REAL,
+               pn REAL,
+               ppr REAL,
+               pprev REAL,
+               tp REAL,
+               fp REAL,
+               tn REAL,
+               fn REAL,
+               tpr REAL,
+               fpr REAL,
+               tnr REAL,
+               fnr REAL,
+               precision REAL,
+               fdr REAL,
+               "for" REAL,
+               npv REAL           );
     """.format(output_schema=output_schema)
     db_engine.execute(query)
 

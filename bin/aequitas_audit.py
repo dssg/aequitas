@@ -1,6 +1,7 @@
 
 import argparse
 import logging
+from datetime import datetime
 from sys import exit
 
 import pandas as pd
@@ -11,7 +12,6 @@ from bin.utils.db import get_db_data
 from bin.utils.db import get_engine
 from bin.utils.db import get_models
 from bin.utils.report import audit_report
-from bin.utils.report import get_group_value_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
@@ -96,16 +96,21 @@ def parse_args():
     return parser.parse_args()
 
 
-def audit(df, ref_groups_method, configs, model_id=1, report=True):
+def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=True):
     """
 
     :param df:
-    :param model_id:
     :param ref_groups_method:
+    :param model_id:
+    :param configs:
+    :param report:
     :return:
     """
     g = Group()
-    thresholds = configs['thresholds'] if 'thresholds' in configs else None
+    if configs:
+        thresholds = configs['thresholds'] if 'thresholds' in configs else None
+    else:
+        thresholds = None
     groups_model, attributes = g.get_crosstabs(df, thresholds, model_id)
     print('df shape from the crosstabs:', groups_model.shape)
     b = Bias()
@@ -128,17 +133,19 @@ def audit(df, ref_groups_method, configs, model_id=1, report=True):
     fair_results = f.get_overall_fairness(group_variable_df)
     print('_______________\nModel level:')
     print(fair_results)
+    # TODO
     parameter = '300_abs'
     # fair_results = {'Overall Fairness': False}
     model_eval = 'xx.yy'
-    group_value_report = get_group_value_report(group_value_df)
+    #TODO
     if report is True:
         audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
                      f.fair_measures,
-                     ref_groups_method, group_value_report)
+                     ref_groups_method, group_value_df)
+    return group_value_df
 
 
-def run_db(engine, configs, ref_groups_method, report):
+def run_db(engine, ref_groups_method, configs, report):
     """
 
     :param engine:
@@ -157,19 +164,33 @@ def run_db(engine, configs, ref_groups_method, report):
     engine = get_engine(configs)
     g = Group()
     count = 0
-    groups_model_list = []
-    attributes = []
+    model_df_list = []
     for model_id in models:
         print('\n\n\nMODEL_ID: ', model_id)
         count += 1
         print(count)
         df = get_db_data(engine, model_id, attrib_query, predictions_table)
         print(df.head(1))
-        audit(df, ref_groups_method, configs, model_id, report)
+        model_df = audit(df, ref_groups_method=ref_groups_method, model_id=model_id, configs=configs, report=report)
+        model_df_list.append(model_df)
+    group_value_df = pd.concat(model_df_list)
+    group_value_df.set_index(['model_id', 'group_variable']).to_sql(
+        schema='results',
+        name='aequitas_groups',
+        con=engine,
+        if_exists='append')
     return
 
 
 def run_csv(input_file, ref_groups_method, configs, report):
+    """
+
+    :param input_file:
+    :param ref_groups_method:
+    :param configs:
+    :param report:
+    :return:
+    """
     print('run_csv()')
     df = None
     try:
@@ -179,14 +200,20 @@ def run_csv(input_file, ref_groups_method, configs, report):
         exit()
     if df is not None:
         if 'model_id' in df.columns:
+            model_df_list = []
             for model_id in df.model_id.unique():
-                audit(df, ref_groups_method, configs, model_id, report)
+                model_df = audit(df, ref_groups_method=ref_groups_method, model_id=model_id, configs=configs, report=report)
+                model_df_list.append(model_df)
+            group_value_df = pd.concat(model_df_list)
+
         else:
-            audit(df, ref_groups_method, configs, report)
+            group_value_df = audit(df, ref_groups_method=ref_groups_method, configs=configs, report=report)
+        datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
+        outpath = input_file[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
+        group_value_df.to_csv(outpath, sep='\t', encoding='utf-8')
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit()
-
     return
 
 def main():
@@ -202,24 +229,23 @@ def main():
     if configs is None:
         logging.error('Empty configurations! Please set configs.yaml file using --config')
         exit()
-
     # when having score vs prediction compatibility, thresholds only make sense for score
     if args.input_file is None:
         engine = get_engine(configs)
         if args.create_tables:
             create_bias_tables(engine, args.output_schema)
-        run_db(engine, configs, args.ref_groups)
+        run_db(engine, args.ref_groups, configs, args.report)
     else:
-        run_csv(args.input_file, args.ref_groups, configs)
+        run_csv(args.input_file, args.ref_groups, configs, args.report)
 
 """
         if push_to_db:
-            groups_df.set_index(['model_id', 'as_of_date', 'group_variable']).to_sql(
+            groups_df.set_index(['model_id', 'group_variable']).to_sql(
                 schema='results',
-                name='bias_raw',
+                name='aequitas_groups',
                 con=db_conn,
                 if_exists='append')
-            priors_df.set_index(['model_id', 'as_of_date']).to_sql(schema='results', name='priors_df',
+            priors_df.set_index(['model_id']).to_sql(schema='results', name='priors_df',
                                                                 con=db_conn,
                                                                 if_exists='append')
         if push_to_file:
