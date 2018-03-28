@@ -126,7 +126,7 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
         ref_groups = ''
     else:
         logging.error('audit_report(): wrong reference group method!')
-        exit()
+        exit(1)
     pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(attributes), 0, 1)
     pdf.multi_cell(0, 5, 'Reference groups used: ' + ref_groups_method + ':   '
                                                                          '' + ref_groups, 0, 1)
