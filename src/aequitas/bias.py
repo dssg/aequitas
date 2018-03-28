@@ -68,7 +68,7 @@ class Bias(object):
                     'get_bias_min_metric:: one of the following columns is not on the input '
                     'dataframe : model_id ,parameter,group_variable or any of the input_group_metrics '
                     'list')
-                exit()
+                exit(1)
             df = df.merge(df_to_merge, on=key_columns)
             # creating disparity by dividing each group metric value by the corresponding min
             # value from the groups of the target attribute
@@ -100,7 +100,7 @@ class Bias(object):
         except KeyError:
             logging.error('get_bias_major_group:: one of the following columns is not on the input '
                           'dataframe : model_id ,parameter,group_variable, group_size ')
-            exit()
+            exit(1)
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
         # we created the df_to_merge has a subset of the df_ref_group containing the target ref
@@ -157,7 +157,7 @@ class Bias(object):
             logging.error('Bias.get_disparity_predefined_groups(): the number of predefined group '
                           'values to use as reference is less than the actual number of '
                           'attributes in the input dataframe.')
-            exit()
+            exit(1)
         df_ref_group = pd.DataFrame()
         try:
             for key, val in ref_groups_dict.items():
@@ -167,7 +167,7 @@ class Bias(object):
         except (KeyError, ValueError):
             logging.error('get_disparity_predefined_groups(): reference groups and values provided '
                           'do not exist as columns/values in the input dataframe.(Note: check for syntax errors)')
-            exit()
+            exit(1)
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
         # we created the df_to_merge has a subset of the df_ref_group containing the target ref

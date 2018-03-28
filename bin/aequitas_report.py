@@ -4,7 +4,7 @@ from sys import exit
 
 import yaml
 
-from bin.utils.db import get_engine
+from bin.utils.io import get_engine
 from bin.utils.report import audit_report
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
@@ -74,10 +74,10 @@ def main():
             configs = yaml.load(f)
     except FileNotFoundError:
         logging.error('Could not load configurations! Please set configs.yaml file using --config')
-        exit()
+        exit(1)
     if configs is None:
         logging.error('Empty configurations! Please set configs.yaml file using --config')
-        exit()
+        exit(1)
 
     # when having score vs prediction compatibility, thresholds only make sense for score
     if args.input_file is None:
