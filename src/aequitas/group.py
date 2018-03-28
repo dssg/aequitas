@@ -135,7 +135,7 @@ class Group(object):
             count_ones = df['score'].value_counts()[1.0]
             if count_ones == 0:
                 logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
-                exit()
+                exit(1)
             thresholds = {'rank_abs': [count_ones]}
         print('model_id, thresholds', model_id, thresholds)
         df = df.sort_values('score', ascending=False)
@@ -177,7 +177,7 @@ class Group(object):
                 'group_size': counts.values,
                 'total_entities': [len(df)] * len(counts)
             })
-            this_prior_df['Prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
+            this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
             # for each model_id and as_of_date the priors_df has length group_variables * group_values
             prior_dfs.append(this_prior_df)
             # we calculate the bias for two different types of thresholds (percentage ranks and absolute ranks)

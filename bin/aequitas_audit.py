@@ -1,16 +1,16 @@
 
 import argparse
 import logging
-from datetime import datetime
 from sys import exit
 
 import pandas as pd
 import yaml
 
-from bin.utils.db import create_bias_tables
-from bin.utils.db import get_db_data
-from bin.utils.db import get_engine
-from bin.utils.db import get_models
+from bin.utils.io import get_csv_data
+from bin.utils.io import get_db_data
+from bin.utils.io import get_engine
+from bin.utils.io import push_tocsv
+from bin.utils.io import push_todb
 from bin.utils.report import audit_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
@@ -134,7 +134,7 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     print('_______________\nModel level:')
     print(fair_results)
     # TODO
-    parameter = '300_abs'
+    parameter = 'xyz_abs'
     # fair_results = {'Overall Fairness': False}
     model_eval = 'xx.yy'
     #TODO
@@ -145,59 +145,16 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     return group_value_df
 
 
-def run_db(engine, ref_groups_method, configs, report):
+def run(df, ref_groups_method, configs, report):
     """
 
-    :param engine:
-    :param configs:
-    :return:
-    """
-    print('run_dsapp()')
-    models = None
-    try:
-        thresholds = configs['thresholds']
-        predictions_table = configs['db']['predictions_table']
-        attrib_query = configs['db']['attributes_query']
-        models = get_models(configs, engine)
-    except KeyError:
-        logging.error('KeyError in configuration file (db section).')
-    engine = get_engine(configs)
-    g = Group()
-    count = 0
-    model_df_list = []
-    for model_id in models:
-        print('\n\n\nMODEL_ID: ', model_id)
-        count += 1
-        print(count)
-        df = get_db_data(engine, model_id, attrib_query, predictions_table)
-        print(df.head(1))
-        model_df = audit(df, ref_groups_method=ref_groups_method, model_id=model_id, configs=configs, report=report)
-        model_df_list.append(model_df)
-    group_value_df = pd.concat(model_df_list)
-    group_value_df.set_index(['model_id', 'group_variable']).to_sql(
-        schema='results',
-        name='aequitas_groups',
-        con=engine,
-        if_exists='append')
-    return
-
-
-def run_csv(input_file, ref_groups_method, configs, report):
-    """
-
-    :param input_file:
+    :param df:
     :param ref_groups_method:
     :param configs:
     :param report:
     :return:
     """
-    print('run_csv()')
-    df = None
-    try:
-        df = pd.read_csv(input_file)
-    except IOError:
-        logging.error('run_csv: could not load csv provided as input.')
-        exit()
+    group_value_df = None
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
@@ -208,13 +165,10 @@ def run_csv(input_file, ref_groups_method, configs, report):
 
         else:
             group_value_df = audit(df, ref_groups_method=ref_groups_method, configs=configs, report=report)
-        datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
-        outpath = input_file[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
-        group_value_df.to_csv(outpath, sep='\t', encoding='utf-8')
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
-        exit()
-    return
+        exit(1)
+    return group_value_df
 
 def main():
     args = parse_args()
@@ -225,34 +179,27 @@ def main():
             configs = yaml.load(f)
     except FileNotFoundError:
         logging.error('Could not load configurations! Please set configs.yaml file using --config')
-        exit()
-    if configs is None:
-        logging.error('Empty configurations! Please set configs.yaml file using --config')
-        exit()
-    # when having score vs prediction compatibility, thresholds only make sense for score
+        exit(1)
     if args.input_file is None:
+        if configs is None:
+            logging.error('No input file provided, so I assume you want to connect to a db, wait... but you also forget to '
+                          'provide db credentials in the configs yaml file...! ')
+            exit(1)
         engine = get_engine(configs)
+        output_schema = 'public'
+        if 'output_schema' in configs['db']:
+            output_schema = configs['db']['output_schema']
+        create_tables = 'append'
         if args.create_tables:
-            create_bias_tables(engine, args.output_schema)
-        run_db(engine, args.ref_groups, configs, args.report)
+            create_tables = 'replace'
+        input_query = configs['db']['input_query']
+        df = get_db_data(engine, input_query)
+        group_value_df = run(df, args.ref_groups, configs, args.report)
+        push_todb(engine, output_schema, create_tables, group_value_df)
     else:
-        run_csv(args.input_file, args.ref_groups, configs, args.report)
-
-"""
-        if push_to_db:
-            groups_df.set_index(['model_id', 'group_variable']).to_sql(
-                schema='results',
-                name='aequitas_groups',
-                con=db_conn,
-                if_exists='append')
-            priors_df.set_index(['model_id']).to_sql(schema='results', name='priors_df',
-                                                                con=db_conn,
-                                                                if_exists='append')
-        if push_to_file:
-            groups_df.to_csv('group_metrics.csv', sep='\t', encoding='utf-8')
-            priors_df.to_csv('priors_df.csv', sep='\t', encoding='utf-8')
-"""
-
+        df = get_csv_data(args.input_file)
+        group_value_df = run(df, args.ref_groups, configs, args.report)
+        push_tocsv(args.input_file, args.output_folder, group_value_df)
 
 
 if __name__ == '__main__':
