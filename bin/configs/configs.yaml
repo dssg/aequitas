@@ -1,45 +1,35 @@
-
-# This config file contains info about:
-# 1) database credentials, naming of tables and columns in your database
-# 2) the train_end_time defines the set of models will be used for running the analysis
-# 3) the list of protected attributes (one or more)
-## Models query, you can use wherever query you want, it needs to return a table with column model_id
-
-
 # Thresholds for positive class (absolutes top k and top k %)
 # column:value pairs, where the column needs to exist in the
-# predictions table, and the values are the thresholds to be applied for
-# that column. Check top of this module for an example.
-
+# input_query resulting table, and the values are the thresholds to be applied for
+# that column. Check top of this module for an examples
 thresholds:
-  rank_abs: [10, 50, 100]
-  rank_pct: [1.0, 2.0, 5.0, 10.0 ]
+    rank_abs: [300]
+    #rank_pct: [1.0, 5.0, 10.0 ]
 
+reference_groups:
+  "gender": "male"
+  "age": "35-50"
 
-
-dsapp:
+db:
   # Database containing predictions, evaluations, staging data (DSAPP schema):
   # protected_attributes:
   # attr_query is a single SQL query where you define the target protected atrributes for running
   # the bias analysis. The result should have a column "entity_id" and then 1 or more columns
   # representing the protected attributes.
-  db_credentials:
-    host: abc.de
-    database: abc
-    user: abc
-    password: def
-    port: 1234
+    db_credentials:
+        host: localhost
+        database: dbname
+        user: dbuser
+        password: dbpass
+        port: 5432
 
-  predictions_table: results.predictions
+    #output schema is optional, default=public
+    output_schema: results
 
-  models_query: "select distinct model_id
-   from results.models
-   where train_end_time='2016-01-01'"
-
-  attributes_query: "select entity_id,
-   gender,
-   race
-   from your_schema.table_with_attributes"
+    input_query: "select model_id, entity_id, score, label_value, attrA, attrB from ... ; "
 
 
-
+#optional project desctiption to be used in the pdf report
+project_description:
+    title: "Insert project title"
+    goal: "Insert project goal."
