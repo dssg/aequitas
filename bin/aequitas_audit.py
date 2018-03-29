@@ -133,11 +133,9 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     fair_results = f.get_overall_fairness(group_variable_df)
     print('_______________\nModel level:')
     print(fair_results)
-    # TODO
     parameter = 'xyz_abs'
     # fair_results = {'Overall Fairness': False}
     model_eval = 'xx.yy'
-    #TODO
     if report is True:
         audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
                      f.fair_measures,
