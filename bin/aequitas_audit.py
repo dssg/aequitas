@@ -143,7 +143,7 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     return group_value_df
 
 
-def run(df, ref_groups_method, configs, report):
+def run(df, ref_groups_method, configs, report=True, preprocessed=False):
     """
 
     :param df:
@@ -160,12 +160,13 @@ def run(df, ref_groups_method, configs, report):
             for model_id in df.model_id.unique():
                 model_df = audit(df.loc[df['model_id'] == model_id], ref_groups_method=ref_groups_method, model_id=model_id, \
                                  configs=configs,
-                                 report=report)
+                                 report=report, preprocessed=preprocessed)
                 model_df_list.append(model_df)
             group_value_df = pd.concat(model_df_list)
 
         else:
-            group_value_df = audit(df, ref_groups_method=ref_groups_method, configs=configs, report=report)
+            group_value_df = audit(df, ref_groups_method=ref_groups_method, configs=configs, report=report,
+                                   preprocessed=preprocessed)
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
