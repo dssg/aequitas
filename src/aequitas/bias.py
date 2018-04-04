@@ -4,6 +4,7 @@ from sys import exit
 import numpy as np
 import pandas as pd
 
+logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani

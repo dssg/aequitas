@@ -7,11 +7,13 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
+logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
 #
 # License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+
 
 def get_db_data(engine, input_query):
     """

@@ -3,6 +3,7 @@ import argparse
 import logging
 from sys import exit
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -96,7 +97,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=True):
+def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=True, preprocessed=False):
     """
 
     :param df:
@@ -104,6 +105,7 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     :param model_id:
     :param configs:
     :param report:
+    :param preprocessed:
     :return:
     """
     g = Group()
@@ -111,8 +113,8 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
         thresholds = configs['thresholds'] if 'thresholds' in configs else None
     else:
         thresholds = None
-    groups_model, attributes = g.get_crosstabs(df, thresholds, model_id)
-    print('df shape from the crosstabs:', groups_model.shape)
+    groups_model, attributes = g.get_crosstabs(df, thresholds, model_id, preprocessed)
+    print('audit: df shape from the crosstabs:', groups_model.shape)
     b = Bias()
     if ref_groups_method == 'predefined' and 'reference_groups' in configs:
         bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
@@ -125,11 +127,9 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     print('df shape after bias minimum per metric ref group:', bias_df.shape)
     f = Fairness()
     group_value_df = f.get_group_value_fairness(bias_df)
-    print('_______________\nGroup Value level:')
-    print(group_value_df)
     group_variable_df = f.get_group_variable_fairness(group_value_df)
     print('_______________\nGroup Variable level:')
-    print(group_variable_df)
+    print(group_value_df['Statistical Parity'])
     fair_results = f.get_overall_fairness(group_variable_df)
     print('_______________\nModel level:')
     print(fair_results)
@@ -152,12 +152,15 @@ def run(df, ref_groups_method, configs, report):
     :param report:
     :return:
     """
+    df['age'] = np.random.randint(30, 50, df.shape[0])
     group_value_df = None
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
             for model_id in df.model_id.unique():
-                model_df = audit(df, ref_groups_method=ref_groups_method, model_id=model_id, configs=configs, report=report)
+                model_df = audit(df.loc[df['model_id'] == model_id], ref_groups_method=ref_groups_method, model_id=model_id, \
+                                 configs=configs,
+                                 report=report)
                 model_df_list.append(model_df)
             group_value_df = pd.concat(model_df_list)
 

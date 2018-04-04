@@ -1,5 +1,8 @@
+import logging
+
 import pandas as pd
 
+logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -36,7 +39,7 @@ class Fairness(object):
         if not high_level_fairness:
             self.high_level_fairness = {
                 'Unsupervised Fairness': ['Statistical Parity', 'Impact Parity'],
-                                  'Supervised Fairness': ['TypeI Parity', 'TypeII Parity']}
+                'Supervised Fairness': ['TypeI Parity', 'TypeII Parity']}
 
         else:
             self.fair_measures = fair_measures
