@@ -93,7 +93,7 @@ def get_engine(configs):
     :return: Returns a SQLAlchemy pg connnection.
     """
     try:
-        db_access = configs['db']['db_credentials']
+        db_access = configs.db['db_credentials']
     except KeyError:
         logging.error('KeyError in configuration file.')
         exit(1)

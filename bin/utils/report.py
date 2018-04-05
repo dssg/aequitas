@@ -71,8 +71,8 @@ def get_group_value_report(group_value_df):
     return group_value_report
 
 
-def audit_report(model_id, parameter, attributes, model_eval, configs, fair_results, fair_measures,
-                 ref_groups_method, group_value_df):
+def audit_report(model_id, parameter, model_eval, configs, fair_results, fair_measures,
+                 group_value_df):
     """
 
     :param model_id:
@@ -87,26 +87,26 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
     :return:
     """
     group_value_report = get_group_value_report(group_value_df)
-    proj_desc = configs['project_description'] if 'project_description' in configs else None
-    if proj_desc is None:
-        proj_desc = {'title': ' ', 'goal': ' '}
-    if proj_desc['title'] is None:
-        proj_desc['title'] = ' '
-    if proj_desc['goal'] is None:
-        proj_desc['goal'] = ' '
+    project_description = configs.project_description
+    if project_description is None:
+        project_description = {'title': ' ', 'goal': ' '}
+    if project_description['title'] is None:
+        project_description['title'] = ' '
+    if project_description['goal'] is None:
+        project_description['goal'] = ' '
     print('\n\n\n:::::: REPORT ::::::\n')
-    print('Project Title: ', proj_desc['title'])
-    print('Project Goal: ', proj_desc['goal'])
+    print('Project Title: ', project_description['title'])
+    print('Project Goal: ', project_description['goal'])
     print('Bias Results:', str(fair_results))
     pdf = PDF()
     pdf.set_margins(left=20, right=15, top=10)
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font('Arial', '', 16)
-    pdf.cell(0, 5, proj_desc['title'], 0, 1, 'C')
+    pdf.cell(0, 5, project_description['title'], 0, 1, 'C')
     pdf.set_font('Helvetica', '', 11)
     pdf.cell(0, 10, datetime.now().strftime("%Y-%m-%d"), 0, 1, 'C')
-    pdf.multi_cell(0, 5, 'Project Goal: ' + proj_desc['goal'], 0, 1)
+    pdf.multi_cell(0, 5, 'Project Goal: ' + project_description['goal'], 0, 1)
     pdf.ln(2)
     model_metric = 'Precision at top ' + parameter
     pdf.multi_cell(0, 5, 'Model Perfomance Metric: ' + model_metric, 0, 1)
@@ -118,18 +118,18 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
     pdf.set_font('Helvetica', '', 11)
 
     ref_groups = ''
-    if ref_groups_method == 'predefined':
-        if 'reference_groups' in configs:
-            ref_groups = str(configs['reference_groups'])
-    elif ref_groups_method == 'majority':
+    if configs.ref_groups_method == 'predefined':
+        if configs.ref_groups:
+            ref_groups = str(configs.ref_groups)
+    elif configs.ref_groups_method == 'majority':
         ref_groups = ''
-    elif ref_groups_method == 'min_metric':
+    elif configs.ref_groups_method == 'min_metric':
         ref_groups = ''
     else:
         logging.error('audit_report(): wrong reference group method!')
         exit(1)
-    pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(attributes), 0, 1)
-    pdf.multi_cell(0, 5, 'Reference groups used: ' + ref_groups_method + ':   '
+    pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(configs.attr_cols), 0, 1)
+    pdf.multi_cell(0, 5, 'Reference groups used: ' + configs.ref_groups_method + ':   '
                                                                          '' + ref_groups, 0, 1)
     pdf.ln(4)
     results_text = 'aequitas has found that model #' + str(model_id) + ' is '
@@ -157,7 +157,7 @@ def audit_report(model_id, parameter, attributes, model_eval, configs, fair_resu
             pdf.set_x(20.0)
 
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
-    report_filename = 'aequitas_report_' + str(model_id) + '_' + proj_desc['title'].replace(' ',
+    report_filename = 'aequitas_report_' + str(model_id) + '_' + project_description['title'].replace(' ',
                                                                                             '_') + '_' + datestr
     pdf.output('output/' + report_filename + '.pdf', 'F')
     return None

@@ -3,10 +3,9 @@ import argparse
 import logging
 from sys import exit
 
-import numpy as np
 import pandas as pd
-import yaml
 
+from bin.utils.configs_loader import Configs
 from bin.utils.io import get_csv_data
 from bin.utils.io import get_db_data
 from bin.utils.io import get_engine
@@ -16,6 +15,7 @@ from bin.utils.report import audit_report
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
+from src.aequitas.preprocessing import preprocess_input_df
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -60,21 +60,6 @@ def parse_args():
                         help='Absolute filepath for input dataset in csv format. If no input is provided we assume there is a '
                              'db configuration in the configs.yaml file.')
 
-    parser.add_argument('--ref-group',
-                        action='store',
-                        dest='ref_groups',
-                        default='majority',
-                        type=str,
-                        help='Reference group method for bias metrics: min_metric, majority, '
-                             'predefined')
-
-    parser.add_argument('--create-report',
-                        action='store_true',
-                        dest='report',
-                        default=False,
-                        help='If --report, then a pdf report is produced and stored in the output directory.')
-
-
     parser.add_argument('--config',
                         action='store',
                         dest='config_file',
@@ -97,7 +82,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=True, preprocessed=False):
+def audit(df, configs, model_id=1, preprocessed=False):
     """
 
     :param df:
@@ -108,16 +93,19 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     :param preprocessed:
     :return:
     """
+    if not preprocessed:
+        df, attr_cols_input = preprocess_input_df(df)
+        if not configs.attr_cols:
+            configs.attr_cols = attr_cols_input
     g = Group()
-    if configs:
-        thresholds = configs['thresholds'] if 'thresholds' in configs else None
-    else:
-        thresholds = None
-    groups_model, attributes = g.get_crosstabs(df, thresholds, model_id, preprocessed)
+    groups_model, attr_cols = g.get_crosstabs(df, score_thresholds=configs.score_thresholds, model_id=model_id,
+                                              attr_cols=configs.attr_cols)
     print('audit: df shape from the crosstabs:', groups_model.shape)
     b = Bias()
-    if ref_groups_method == 'predefined' and 'reference_groups' in configs:
-        bias_df = b.get_disparity_predefined_groups(groups_model, configs['reference_groups'])
+    # todo move this to the new configs object / the attr_cols now are passed through the configs object...
+    ref_groups_method = configs.ref_groups_method
+    if ref_groups_method == 'predefined' and configs.ref_groups:
+        bias_df = b.get_disparity_predefined_groups(groups_model, configs.ref_groups)
     elif ref_groups_method == 'majority':
         bias_df = b.get_disparity_major_group(groups_model)
     else:
@@ -125,25 +113,23 @@ def audit(df, ref_groups_method='majority', model_id=1, configs=None, report=Tru
     print('number of rows after bias majority ref group:', len(bias_df))
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('df shape after bias minimum per metric ref group:', bias_df.shape)
-    f = Fairness()
+    f = Fairness(tau=configs.fairness_threshold)
     group_value_df = f.get_group_value_fairness(bias_df)
     group_variable_df = f.get_group_variable_fairness(group_value_df)
     print('_______________\nGroup Variable level:')
-    print(group_value_df['Statistical Parity'])
+    print(group_variable_df)
     fair_results = f.get_overall_fairness(group_variable_df)
     print('_______________\nModel level:')
     print(fair_results)
     parameter = 'xyz_abs'
-    # fair_results = {'Overall Fairness': False}
     model_eval = 'xx.yy'
-    if report is True:
-        audit_report(model_id, parameter, attributes, model_eval, configs, fair_results,
-                     f.fair_measures,
-                     ref_groups_method, group_value_df)
+    if configs.report is True:
+        audit_report(model_id=model_id, parameter=parameter, model_eval=model_eval, configs=configs, fair_results=fair_results,
+                     fair_measures=f.fair_measures, group_value_df=group_value_df)
     return group_value_df
 
 
-def run(df, ref_groups_method, configs, report=True, preprocessed=False):
+def run(df, configs, preprocessed=False):
     """
 
     :param df:
@@ -152,21 +138,17 @@ def run(df, ref_groups_method, configs, report=True, preprocessed=False):
     :param report:
     :return:
     """
-    df['age'] = np.random.randint(30, 50, df.shape[0])
     group_value_df = None
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
             for model_id in df.model_id.unique():
-                model_df = audit(df.loc[df['model_id'] == model_id], ref_groups_method=ref_groups_method, model_id=model_id, \
-                                 configs=configs,
-                                 report=report, preprocessed=preprocessed)
+                model_df = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
+                                 preprocessed=preprocessed)
                 model_df_list.append(model_df)
             group_value_df = pd.concat(model_df_list)
-
         else:
-            group_value_df = audit(df, ref_groups_method=ref_groups_method, configs=configs, report=report,
-                                   preprocessed=preprocessed)
+            group_value_df = audit(df, configs=configs, preprocessed=preprocessed)
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
@@ -175,32 +157,27 @@ def run(df, ref_groups_method, configs, report=True, preprocessed=False):
 def main():
     args = parse_args()
     print(about)
-    configs = None
-    try:
-        with open(args.config_file) as f:
-            configs = yaml.load(f)
-    except FileNotFoundError:
-        logging.error('Could not load configurations! Please set configs.yaml file using --config')
-        exit(1)
+    configs = Configs.load_configs(args.config_file)
     if args.input_file is None:
-        if configs is None:
+        if configs.db is None:
             logging.error('No input file provided, so I assume you want to connect to a db, wait... but you also forget to '
                           'provide db credentials in the configs yaml file...! ')
             exit(1)
         engine = get_engine(configs)
-        output_schema = 'public'
-        if 'output_schema' in configs['db']:
-            output_schema = configs['db']['output_schema']
+        if 'output_schema' in configs.db:
+            output_schema = configs.db['output_schema']
+        else:
+            output_schema = 'public'
         create_tables = 'append'
         if args.create_tables:
             create_tables = 'replace'
-        input_query = configs['db']['input_query']
+        input_query = configs.db['input_query']
         df = get_db_data(engine, input_query)
-        group_value_df = run(df, args.ref_groups, configs, args.report)
+        group_value_df = run(df, configs=configs, preprocessed=False)
         push_todb(engine, output_schema, create_tables, group_value_df)
     else:
         df = get_csv_data(args.input_file)
-        group_value_df = run(df, args.ref_groups, configs, args.report)
+        group_value_df = run(df, configs=configs, preprocessed=False)
         push_tocsv(args.input_file, args.output_folder, group_value_df)
 
 

@@ -134,7 +134,7 @@ class Bias(object):
         """
             Calculates the bias (disparity) metrics for the predefined list of input group metrics
             using a predefined reference group value for each attribute which is passed using
-            ref_groups_dict (configs['reference_groups'])
+            ref_groups_dict ({'attr1':'val1', 'attr2':'val2'})
 
         :param df: the output dataframe of the group.get_crosstabs
         :param ref_groups_dict: a dictionary {group_variable:group_value, ...}

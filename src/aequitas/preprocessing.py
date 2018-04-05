@@ -35,7 +35,7 @@ def get_attr_cols(df, non_attr_cols):
     attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
     if attr_cols.empty:
         raise ValueError
-    return attr_cols
+    return attr_cols.tolist()
 
 
 def discretize(df, target_cols):
@@ -69,9 +69,9 @@ def preprocess_input_df(df, required_cols=None):
     non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (~df.columns.isin(non_attr_cols))]
     df = discretize(df, non_string_cols)
     try:
-        attr_cols = get_attr_cols(df, non_attr_cols)
+        attr_cols_input = get_attr_cols(df, non_attr_cols)
     except ValueError:
         logging.error('preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required '
                       'columns. Please add attribute columns to the input df.')
         exit(1)
-    return df, attr_cols
+    return df, attr_cols_input
