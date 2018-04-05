@@ -2,6 +2,9 @@ import logging
 
 import pandas as pd
 
+from src.aequitas.preprocessing import preprocess_input_df
+
+logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -116,7 +119,7 @@ class Group(object):
                            'tp': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, df, thresholds=None, model_id=1):
+    def get_crosstabs(self, df, thresholds=None, model_id=1, non_attr_cols=None, preprocessed=False):
         """
         Creates univariate groups and calculates group metrics.
 
@@ -124,12 +127,15 @@ class Group(object):
         model_id, score, rank_abs, rank_pct, label_value
         :param thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
         :param model_id:
-        :param push_to_db: if you want to save the results on a db table
-        :param push_to_file: if you want to save the results on a csv file
         :return:
         """
+        if not non_attr_cols:
+            non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
+        if not preprocessed:
+            df, attr_cols = preprocess_input_df(df)
+        else:
+            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
         # if no thresholds are provided, we assume that rank_abs=number of 1s in the score column
-
         if not thresholds:
             df['score'] = df['score'].astype(float)
             count_ones = df['score'].value_counts()[1.0]
@@ -143,24 +149,11 @@ class Group(object):
         df['rank_pct'] = df['rank_abs'] / len(df)
         dfs = []
         prior_dfs = []
-        model_cols = ['model_id', 'as_of_date', 'entity_id', 'score', 'rank_abs', 'rank_pct',
-                      'label_value']
-        # within each model and as_of_date, discretize the floaty features
-        float_cols = df.columns[
-            (df.dtypes != object) & (df.dtypes != str) & (~df.columns.isin(model_cols))]
-        for col in float_cols:
-            # transform floaty columns into categories
-            for qname, quantizer in self.quantizers.items():
-                if qname == '':
-                    raise ValueError("Quantizer name cannot be empty")
-                df[col + '_' + qname] = quantizer(df[col])
-                df = df.drop(col, 1)
         # calculate the bias for these columns
-        feat_cols = df.columns[~df.columns.isin(model_cols)]  # index of the columns that are
-        # not default(model_cols), therefore represent the group variables!
-        print("Feature Columns (Groups):", feat_cols.values)
+        # not default(non_attr_cols), therefore represent the group variables!
+        print("Attribute Columns (Groups):", attr_cols.values)
         # for each group variable do
-        for col in feat_cols:
+        for col in attr_cols:
             # find the priors_df
             col_group = df.fillna({col: 'nan'}).groupby(col)
             counts = col_group.entity_id.count()
@@ -208,7 +201,7 @@ class Group(object):
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'group_variable',
                                                    'group_value'])
-        return groups_df, feat_cols
+        return groups_df, attr_cols
 
 
     def get_group_metrics(self, df):

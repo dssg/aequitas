@@ -3,6 +3,7 @@ from datetime import datetime
 
 from fpdf import FPDF
 
+logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
