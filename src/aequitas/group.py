@@ -2,8 +2,6 @@ import logging
 
 import pandas as pd
 
-from src.aequitas.preprocessing import preprocess_input_df
-
 logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
@@ -14,14 +12,6 @@ logging.getLogger(__name__)
 
 class Group(object):
     def __init__(self):
-        """
-
-        """
-
-        # the columns in the evaluation table and the thresholds we want to apply to them
-        self.quantizers = {
-            'quartiles': lambda s: 'quantile_' + pd.qcut(s, q=4, duplicates='drop', labels=False).
-                map(lambda x: '%.0f' % x)}
 
         self.label_neg_count = lambda label_col: lambda x: \
             (x[label_col] == 0).sum()
@@ -119,31 +109,39 @@ class Group(object):
                            'tp': true_pos_count}
         return group_functions
 
-    def get_crosstabs(self, df, thresholds=None, model_id=1, non_attr_cols=None, preprocessed=False):
+    def get_crosstabs(self, df, score_thresholds=None, model_id=1, attr_cols=None):
         """
         Creates univariate groups and calculates group metrics.
 
         :param df: a dataframe containing the following required columns [entity_id, as_of_date,
         model_id, score, rank_abs, rank_pct, label_value
-        :param thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
         :param model_id:
         :return:
         """
-        if not non_attr_cols:
+        if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
-        if not preprocessed:
-            df, attr_cols = preprocess_input_df(df)
-        else:
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
-        # if no thresholds are provided, we assume that rank_abs=number of 1s in the score column
-        if not thresholds:
+        # check if all attr_cols exist in df
+        check = [col in df.columns for col in attr_cols]
+        if False in check:
+            # todo: create separate check method that raises exception...
+            logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
+            exit(1)
+        # check if all columns are strings:
+        non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
+        if non_string_cols.empty is False:
+            logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
+            exit(1)
+        # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
+        if not score_thresholds:
             df['score'] = df['score'].astype(float)
             count_ones = df['score'].value_counts()[1.0]
             if count_ones == 0:
                 logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
                 exit(1)
-            thresholds = {'rank_abs': [count_ones]}
-        print('model_id, thresholds', model_id, thresholds)
+            score_thresholds = {'rank_abs': [count_ones]}
+        print('model_id, score_thresholds', model_id, score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
         df['rank_pct'] = df['rank_abs'] / len(df)
@@ -151,7 +149,7 @@ class Group(object):
         prior_dfs = []
         # calculate the bias for these columns
         # not default(non_attr_cols), therefore represent the group variables!
-        print("Attribute Columns (Groups):", attr_cols.values)
+        logging.info('getcrosstabs: attribute columns to perform crosstabs:' + ','.join(attr_cols))
         # for each group variable do
         for col in attr_cols:
             # find the priors_df
@@ -173,8 +171,8 @@ class Group(object):
             this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
             # for each model_id and as_of_date the priors_df has length group_variables * group_values
             prior_dfs.append(this_prior_df)
-            # we calculate the bias for two different types of thresholds (percentage ranks and absolute ranks)
-            for thres_unit, thres_values in thresholds.items():
+            # we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)
+            for thres_unit, thres_values in score_thresholds.items():
                 for thres_val in thres_values:
                     flag = 0
                     k = (df[thres_unit] <= thres_val).sum()
@@ -202,7 +200,3 @@ class Group(object):
         groups_df = groups_df.merge(priors_df, on=['model_id', 'group_variable',
                                                    'group_value'])
         return groups_df, attr_cols
-
-
-    def get_group_metrics(self, df):
-        return 0
