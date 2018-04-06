@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 
 from fpdf import FPDF
+from tabulate import tabulate
 
 logging.getLogger(__name__)
 
@@ -70,7 +71,15 @@ def get_group_value_report(group_value_df):
     return group_value_report
 
 
-def audit_report(model_id, parameter, model_eval, configs, fair_results, fair_measures,
+def audit_report_markdown(group_value_df, group_variable_df, overall_fairness, fair_measures, model_id=1, parameter='binary'):
+    report = ''
+    mkdown_report_header = '# The Bias Report \n'
+    mkdown_group_variable_df = tabulate(group_variable_df, headers='keys', tablefmt='pipe')
+    report += mkdown_report_header + mkdown_group_variable_df
+    return report
+
+
+def audit_report_pdf(model_id, parameter, model_eval, configs, fair_results, fair_measures,
                  group_value_df):
     """
 
