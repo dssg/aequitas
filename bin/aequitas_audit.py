@@ -100,7 +100,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
     g = Group()
     groups_model, attr_cols = g.get_crosstabs(df, score_thresholds=configs.score_thresholds, model_id=model_id,
                                               attr_cols=configs.attr_cols)
-    print('audit: df shape from the crosstabs:', groups_model.shape)
+    logging.info('audit: df shape from the crosstabs:', groups_model.shape)
     b = Bias()
     # todo move this to the new configs object / the attr_cols now are passed through the configs object...
     ref_groups_method = configs.ref_groups_method
@@ -112,10 +112,12 @@ def audit(df, configs, model_id=1, preprocessed=False):
         bias_df = b.get_disparity_min_metric(groups_model)
     print('number of rows after bias majority ref group:', len(bias_df))
     print('Any NaN?: ', bias_df.isnull().values.any())
-    print('df shape after bias minimum per metric ref group:', bias_df.shape)
+    print('bias_df shape:', bias_df.shape)
     f = Fairness(tau=configs.fairness_threshold)
-    group_value_df = f.get_group_value_fairness(bias_df)
-    group_variable_df = f.get_group_variable_fairness(group_value_df)
+    print('Fairness Threshold:', configs.fairness_threshold)
+    print('Fairness Measures:', configs.fair_measures_requested)
+    group_value_df = f.get_group_value_fairness(bias_df, fair_measures_requested=configs.fair_measures_requested)
+    group_variable_df = f.get_group_variable_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     print('_______________\nGroup Variable level:')
     print(group_variable_df)
     fair_results = f.get_overall_fairness(group_variable_df)
@@ -125,7 +127,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
     model_eval = 'xx.yy'
     if configs.report is True:
         audit_report(model_id=model_id, parameter=parameter, model_eval=model_eval, configs=configs, fair_results=fair_results,
-                     fair_measures=f.fair_measures, group_value_df=group_value_df)
+                     fair_measures=configs.fair_measures_requested, group_value_df=group_value_df)
     return group_value_df
 
 

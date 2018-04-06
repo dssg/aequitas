@@ -38,8 +38,7 @@ def get_group_value_report(group_value_df):
                     'ppr_ref_group_value'])]['ppr'].values[0]
                 ppr_text = '{:.2f}% of the group is selected, compared to {:.2f} % of the ' \
                            'reference group '.format(row['ppr'] * 100, ref_group_value * 100) + \
-                           row[
-                               'group_variable'] + ' = ' + row['ppr_ref_group_value']
+                           row['group_variable'] + ' = ' + row['ppr_ref_group_value']
                 metrics.append(ppr_text)
             if row['Impact Parity'] is False:
                 if text3 == '':
@@ -110,7 +109,7 @@ def audit_report(model_id, parameter, model_eval, configs, fair_results, fair_me
     pdf.ln(2)
     model_metric = 'Precision at top ' + parameter
     pdf.multi_cell(0, 5, 'Model Perfomance Metric: ' + model_metric, 0, 1)
-    pdf.multi_cell(0, 5, 'Fairness Measures: ' + ', '.join(fair_measures.keys()), 0, 1)
+    pdf.multi_cell(0, 5, 'Fairness Measures: ' + ', '.join(fair_measures), 0, 1)
     pdf.ln(2)
     pdf.set_font('Helvetica', 'B', 11)
     pdf.multi_cell(0, 5, 'Model Audited: #' + str(model_id) + '\t Performance: ' + str(model_eval),
