@@ -1,9 +1,10 @@
 import os
 import sys
-from flask import Flask, request, redirect, url_for, send_from_directory, flash, render_template, session
+import markdown
+from flask import Flask, Markup, request, redirect, url_for, send_from_directory, flash, render_template, session
 from flask_bootstrap import Bootstrap
-from werkzeug.utils import secure_filename
 import pandas as pd
+import markdown2
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
@@ -58,18 +59,13 @@ def uploaded_file():
         subgroups[col] = (list(set(df[col])))
 
     if "submit" not in request.form:
-        fairness_measures = ['Statistical Parity',
-                            'Impact Parity',
-                            'False Positive Rate Parity',
-                            'False Omission Rate Parity',
-                            'False Negative Rate Parity',
-                            'False Discovery Rate Parity']
+        f = Fairness()
+        fairness_measures = f.fair_measures_supported
         return render_template("customize_report2.html",
                                            categories=groups,
                                            subcategories = subgroups,
                                            fairness = fairness_measures)
     else:
-        print(request.form)
         group_variables = request.form.getlist('group_variable')
         # check if user forgot to select anything; return all
         if len(group_variables)==0:
@@ -89,12 +85,13 @@ def uploaded_file():
 
         configs = Configs(ref_groups=subgroups,
                           ref_groups_method=rgm,
-                          report=False,
-                          fairness_threshold=fp)
+                          fairness_threshold=fp,
+                          fairness_measures=fairness_measures)
 
-        gv_df = audit(df, model_id=1, configs=configs, preprocessed=True)
+        gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
+        content = Markup(markdown2.markdown(report, extras=['tables']))
 
-        return gv_df.to_html()
+        return render_template('report.html', content=content)
 
     '''
     <!doctype html>
