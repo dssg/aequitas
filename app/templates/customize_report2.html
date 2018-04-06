@@ -11,7 +11,7 @@
     <title>Bias Radar</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../static/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="../static/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -22,6 +22,9 @@
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="../static/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="../static/js/toggle_radio.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -46,20 +49,22 @@
       </div>
 
       <div class="row marketing">
-         <h1>Customize report</h1>
 
+      <h1>Customize report</h1>
+<form method="post">
     <p><b>Select method of determining reference group:</b></p>
     <div>
-    <input type='radio' name='ref_group'> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type='radio' name='ref_group'> Majority group &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type='radio' name='ref_group'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type='radio' name='ref_groups_method' value='min_metric' id='id2'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
     </div>
     <br>
     <p><b>Select variables that should be used to check for bias and the reference group for each group:</b></p>
-    <form method="post">
 
-    {% for cat in categories %}
-    <p>
+    <div>
+    <div id="div1">
+     {% for cat in categories %}
+     <p>
         <input type="checkbox" name="group_variable" value="{{cat}}">{{cat}}
         <select name="{{cat}}" method="GET" action="/", float>
             <option value="{{subcategories[cat][0]}}" selected>{{subcategories[cat][0]}}</option>
@@ -69,6 +74,17 @@
         </select>
     </p>
     {% endfor %}
+    </div>
+    <div id="div2">
+    {% for cat in categories %}
+     <p>
+        <input type="checkbox" name="group_variable" value="{{cat}}">{{cat}}
+    </p>
+    {% endfor %}
+   </div>
+</div>
+
+
 
 
 
