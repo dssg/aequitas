@@ -1,6 +1,5 @@
 import os
 import sys
-import markdown
 from flask import Flask, Markup, request, redirect, url_for, send_from_directory, flash, render_template, session
 from flask_bootstrap import Bootstrap
 import pandas as pd
