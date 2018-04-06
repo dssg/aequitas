@@ -90,7 +90,7 @@ def uploaded_file():
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
         content = Markup(markdown2.markdown(report, extras=['tables']))
-        os.remove('tmp.csv')
+        #os.remove('tmp.csv')
 
         return render_template('report.html', content=content)
 
