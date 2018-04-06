@@ -48,7 +48,7 @@ class Fairness(object):
         else:
             self.fair_measures_depend = fair_measures_depend
         # the self.fair_measures represents the list of fairness_measures to be calculated by default
-        self.fair_measures_requested = self.fair_measures_depend.keys()
+        self.fair_measures_supported = self.fair_measures_depend.keys()
 
         if not type_parity_depend:
             self.type_parity_depend = {'TypeI Parity': ['FDR Parity', 'FPR Parity'],
@@ -80,7 +80,7 @@ class Fairness(object):
         if not tau:
             tau = self.tau
         if not fair_measures_requested:
-            fair_measures_requested = self.fair_measures_requested
+            fair_measures_requested = self.fair_measures_supported
 
         for fair, input in self.fair_measures_depend.items():
             if fair in fair_measures_requested:
@@ -118,7 +118,7 @@ class Fairness(object):
         """
         logging.info('get_group_variable_fairness')
         if not fair_measures_requested:
-            fair_measures_requested = self.fair_measures_requested
+            fair_measures_requested = self.fair_measures_supported
         group_variable_df = pd.DataFrame()
         key_columns = ['model_id', 'parameter', 'group_variable']
         groupby_variable = group_value_df.groupby(key_columns)
