@@ -11,7 +11,7 @@ from bin.utils.io import get_db_data
 from bin.utils.io import get_engine
 from bin.utils.io import push_tocsv
 from bin.utils.io import push_todb
-from bin.utils.report import audit_report
+from bin.utils.report import audit_report_markdown
 from src.aequitas.bias import Bias
 from src.aequitas.fairness import Fairness
 from src.aequitas.group import Group
@@ -112,10 +112,12 @@ def audit(df, configs, model_id=1, preprocessed=False):
         bias_df = b.get_disparity_min_metric(groups_model)
     print('number of rows after bias majority ref group:', len(bias_df))
     print('Any NaN?: ', bias_df.isnull().values.any())
-    print('df shape after bias minimum per metric ref group:', bias_df.shape)
+    print('bias_df shape:', bias_df.shape)
     f = Fairness(tau=configs.fairness_threshold)
-    group_value_df = f.get_group_value_fairness(bias_df)
-    group_variable_df = f.get_group_variable_fairness(group_value_df)
+    print('Fairness Threshold:', configs.fairness_threshold)
+    print('Fairness Measures:', configs.fair_measures_requested)
+    group_value_df = f.get_group_value_fairness(bias_df, fair_measures_requested=configs.fair_measures_requested)
+    group_variable_df = f.get_group_variable_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     print('_______________\nGroup Variable level:')
     print(group_variable_df)
     fair_results = f.get_overall_fairness(group_variable_df)
@@ -123,10 +125,11 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print(fair_results)
     parameter = 'xyz_abs'
     model_eval = 'xx.yy'
+    report = None
     if configs.report is True:
-        audit_report(model_id=model_id, parameter=parameter, model_eval=model_eval, configs=configs, fair_results=fair_results,
-                     fair_measures=f.fair_measures, group_value_df=group_value_df)
-    return group_value_df
+        report = audit_report_markdown(group_value_df, group_variable_df, overall_fairness=fair_results,
+                                       fair_measures=configs.fair_measures_requested)
+    return group_value_df, report
 
 
 def run(df, configs, preprocessed=False):
@@ -142,16 +145,20 @@ def run(df, configs, preprocessed=False):
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
+            report_list = []
             for model_id in df.model_id.unique():
-                model_df = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
-                                 preprocessed=preprocessed)
+                model_df, model_report = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
+                                               preprocessed=preprocessed)
                 model_df_list.append(model_df)
+                report_list.append(model_report)
             group_value_df = pd.concat(model_df_list)
+            report = report_list
         else:
-            group_value_df = audit(df, configs=configs, preprocessed=preprocessed)
+            group_value_df, report = audit(df, configs=configs, preprocessed=preprocessed)
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
+    print(report)
     return group_value_df
 
 def main():
