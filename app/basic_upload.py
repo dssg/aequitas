@@ -31,6 +31,7 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
+        session.clear()
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
@@ -43,16 +44,16 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             df = pd.read_csv(request.files.get('file'))
-            session['df'] = df.to_json()
+            df.to_csv('tmp.csv')
+            #session['df'] = df.to_json()
             return redirect(url_for("uploaded_file"))
     return render_template("file_upload.html")
 
 
 @app.route('/customize', methods=['get', 'post'])
 def uploaded_file():
-    necessary_cols = ['model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
-    #df, groups = preprocess_input_df(pd.read_csv(app.config['UPLOAD_FOLDER']+'/'+uuid))
-    df, groups = preprocess_input_df(pd.read_json(session['df']))
+    df = pd.read_csv('tmp.csv')
+    df, groups = preprocess_input_df(df)
     subgroups = {}
     for col in groups:
         subgroups[col] = (list(set(df[col])))
@@ -70,7 +71,6 @@ def uploaded_file():
         if len(group_variables)==0:
             group_variables = groups
         # remove unwanted cols from df
-        df = df[necessary_cols+group_variables]
         subgroups = {g:request.form[g] for g in group_variables}
         majority_groups = request.form.getlist('use_majority_group')
         fairness_measures = request.form.getlist('fairness_measures')
@@ -85,10 +85,12 @@ def uploaded_file():
         configs = Configs(ref_groups=subgroups,
                           ref_groups_method=rgm,
                           fairness_threshold=fp,
-                          fairness_measures=fairness_measures)
+                          fairness_measures=fairness_measures,
+                          attr_cols=group_variables)
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
         content = Markup(markdown2.markdown(report, extras=['tables']))
+        os.remove('tmp.csv')
 
         return render_template('report.html', content=content)
 
