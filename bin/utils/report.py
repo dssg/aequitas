@@ -71,11 +71,29 @@ def get_group_value_report(group_value_df):
     return group_value_report
 
 
-def audit_report_markdown(group_value_df, group_variable_df, overall_fairness, fair_measures, model_id=1, parameter='binary'):
-    report = ''
-    mkdown_report_header = '# The Bias Report \n'
-    mkdown_group_variable_df = tabulate(group_variable_df, headers='keys', tablefmt='pipe')
-    report += mkdown_report_header + mkdown_group_variable_df
+def get_highlevel_report(group_attribute_df):
+    cols = ['model_id', 'score_threshold', 'attribute_name']
+    if 'Unsupervised Fairness' in group_attribute_df.columns:
+        cols.append('Unsupervised Fairness')
+    if 'Supervised Fairness' in group_attribute_df.columns:
+        cols.append('Supervised Fairness')
+    highlevel_report = tabulate(group_attribute_df[cols], headers='keys', tablefmt='pipe')
+    return highlevel_report
+
+
+def audit_report_markdown(group_value_df, group_attribute_df, overall_fairness, fair_measures, model_id=1, parameter='binary'):
+    report = """
+    
+    # The Report \n
+    \n
+    ## Overview at the attribute level\n\n
+    
+    
+    
+    """
+    mkdown_highlevel = get_highlevel_report(group_attribute_df)
+
+    report += mkdown_highlevel
     return report
 
 

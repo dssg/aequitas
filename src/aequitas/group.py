@@ -134,6 +134,7 @@ class Group(object):
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
             exit(1)
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
+        count_ones = None  # it also serves as flag to set parameter to 'binary'
         if not score_thresholds:
             df['score'] = df['score'].astype(float)
             count_ones = df['score'].value_counts()[1.0]
@@ -159,8 +160,8 @@ class Group(object):
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
-                'group_variable': [col] * len(counts),
-                'group_value': counts.index.values,
+                'attribute_name': [col] * len(counts),
+                'attribute_value': counts.index.values,
                 'group_label_pos': col_group.apply(self.label_pos_count(
                     'label_value')).values,
                 'group_label_neg': col_group.apply(self.label_neg_count(
@@ -169,22 +170,23 @@ class Group(object):
                 'total_entities': [len(df)] * len(counts)
             })
             this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
-            # for each model_id and as_of_date the priors_df has length group_variables * group_values
+            # for each model_id and as_of_date the priors_df has length attribute_names * attribute_values
             prior_dfs.append(this_prior_df)
             # we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)
             for thres_unit, thres_values in score_thresholds.items():
                 for thres_val in thres_values:
                     flag = 0
                     k = (df[thres_unit] <= thres_val).sum()
+                    score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
-                            'parameter': [str(thres_val) + '_' + thres_unit[-3:]] * len(feat_bias),
+                            'score_threshold': [score_threshold] * len(feat_bias),
                             'k': [k] * len(feat_bias),
-                            'group_variable': [col] * len(feat_bias),
-                            'group_value': feat_bias.index.values,
+                            'attribute_name': [col] * len(feat_bias),
+                            'attribute_value': feat_bias.index.values,
                             name: feat_bias.values
                         })
                         if flag == 0:
@@ -197,6 +199,6 @@ class Group(object):
         # precision@	25_abs
         groups_df = pd.concat(dfs, ignore_index=True)
         priors_df = pd.concat(prior_dfs, ignore_index=True)
-        groups_df = groups_df.merge(priors_df, on=['model_id', 'group_variable',
-                                                   'group_value'])
+        groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
+                                                   'attribute_value'])
         return groups_df, attr_cols

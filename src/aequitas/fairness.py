@@ -107,62 +107,62 @@ class Fairness(object):
                 logging.error('No high level measure input found on bias_df')
         return bias_df
 
-    def get_group_variable_fairness(self, group_value_df, fair_measures_requested=None):
+    def get_group_attribute_fairness(self, group_value_df, fair_measures_requested=None):
         """
 
         :param group_value_df: the output dataframe of the get_group_value_fairness()
-        :return: a new dataframe at the group_variable level (no group_values) with fairness
-        measures at the group_variable level. Checks for the min (False) across the groups
-        defined by the group_variable. IF the minimum is False then all group_variable is false
+        :return: a new dataframe at the group_attribute level (no group_values) with fairness
+        measures at the group_attribute level. Checks for the min (False) across the groups
+        defined by the group_attribute. IF the minimum is False then all group_attribute is false
         for the given fairness measure.
         """
-        logging.info('get_group_variable_fairness')
+        logging.info('get_group_attribute_fairness')
         if not fair_measures_requested:
             fair_measures_requested = self.fair_measures_supported
-        group_variable_df = pd.DataFrame()
-        key_columns = ['model_id', 'parameter', 'group_variable']
+        group_attribute_df = pd.DataFrame()
+        key_columns = ['model_id', 'score_threshold', 'attribute_name']
         groupby_variable = group_value_df.groupby(key_columns)
         init = 0
         for key in fair_measures_requested:
             df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
             if init == 0:
-                group_variable_df[key_columns + [key]] = df_min_idx[key_columns + [key]]
+                group_attribute_df[key_columns + [key]] = df_min_idx[key_columns + [key]]
             else:
-                group_variable_df = group_variable_df.merge(df_min_idx[key_columns + [key]],
-                                                            on=key_columns)
+                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
+                                                              on=key_columns)
             init = 1
         # todo throw exception instead of exiting
-        if group_variable_df.empty:
-            logging.error('get_group_variable_fairness: no fairness measures requested found on input group_value_df columns')
+        if group_attribute_df.empty:
+            logging.error('get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns')
             exit(1)
         for key in self.type_parity_depend:
             if key in group_value_df.columns:
                 df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
-                group_variable_df = group_variable_df.merge(df_min_idx[key_columns + [key]],
-                                                            on=key_columns)
+                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
+                                                              on=key_columns)
         for key in self.high_level_fairness_depend:
             if key in group_value_df.columns:
                 df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
-                group_variable_df = group_variable_df.merge(df_min_idx[key_columns + [key]],
-                                                        on=key_columns)
+                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
+                                                              on=key_columns)
 
-        return group_variable_df
+        return group_attribute_df
 
-    def get_overall_fairness(self, group_variable_df):
+    def get_overall_fairness(self, group_attribute_df):
         """
-            Calculates overall fairness regardless of the group_variables. It searches for
-            unfairness across group_variables and outputs fairness if all group_variables are fair
+            Calculates overall fairness regardless of the group_attributes. It searches for
+            unfairness across group_attributes and outputs fairness if all group_attributes are fair
 
-        :param group_variable_df: the output df of the get_group_variable_fairness
+        :param group_attribute_df: the output df of the get_group_attributes_fairness
         :return: dictionary with overall unsupervised/supervised fairness and fairness in general
         """
         overall_fairness = {}
-        if 'Unsupervised Fairness' in group_variable_df.columns:
+        if 'Unsupervised Fairness' in group_attribute_df.columns:
             overall_fairness['Unsupervised Fairness'] = False if \
-                group_variable_df['Unsupervised Fairness'].min() == False else True
+                group_attribute_df['Unsupervised Fairness'].min() == False else True
 
-        if 'Supervised Fairness' in group_variable_df.columns:
-            overall_fairness['Supervised Fairness'] = False if group_variable_df['Supervised Fairness'].min() == False else True
+        if 'Supervised Fairness' in group_attribute_df.columns:
+            overall_fairness['Supervised Fairness'] = False if group_attribute_df['Supervised Fairness'].min() == False else True
 
         fair_vals = [val for key, val in overall_fairness.items()]
         if False in fair_vals:

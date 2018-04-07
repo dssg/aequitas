@@ -21,7 +21,7 @@ class Bias(object):
         :param fill_divbyzero:
         """
         if not key_columns:
-            self.key_columns = ['model_id', 'parameter', 'group_variable']
+            self.key_columns = ['model_id', 'score_threshold', 'attribute_name']
         else:
             self.key_columns = key_columns
         if not input_group_metrics:
@@ -63,11 +63,11 @@ class Bias(object):
                 df_to_merge = pd.DataFrame()
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
                                            '_ref_group_value']] = \
-                    df_min_idx[key_columns + [group_metric, 'group_value']]
+                    df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
                 logging.error(
                     'get_bias_min_metric:: one of the following columns is not on the input '
-                    'dataframe : model_id ,parameter,group_variable or any of the input_group_metrics '
+                    'dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics '
                     'list')
                 exit(1)
             df = df.merge(df_to_merge, on=key_columns)
@@ -100,7 +100,7 @@ class Bias(object):
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
             logging.error('get_bias_major_group:: one of the following columns is not on the input '
-                          'dataframe : model_id ,parameter,group_variable, group_size ')
+                          'dataframe : model_id ,parameter,attribute_name, group_size ')
             exit(1)
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
@@ -110,7 +110,7 @@ class Bias(object):
             key_columns + input_group_metrics]
         # we now need to create the ref_group_value columns in the df_to_merge
         for col in input_group_metrics:
-            df_to_merge[col + '_ref_group_value'] = df_major_group['group_value']
+            df_to_merge[col + '_ref_group_value'] = df_major_group['attribute_value']
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...
@@ -122,7 +122,7 @@ class Bias(object):
         return df
 
     def verify_ref_groups_dict_len(self, df, ref_groups_dict):
-        if len(ref_groups_dict) != len(df['group_variable'].unique()):
+        if len(ref_groups_dict) != len(df['attribute_name'].unique()):
             raise ValueError
 
     def verify_ref_group_loc(self, group_slice):
@@ -137,7 +137,7 @@ class Bias(object):
             ref_groups_dict ({'attr1':'val1', 'attr2':'val2'})
 
         :param df: the output dataframe of the group.get_crosstabs
-        :param ref_groups_dict: a dictionary {group_variable:group_value, ...}
+        :param ref_groups_dict: a dictionary {attribute_name:attribute_value, ...}
         :param key_columns: optional, the key columns to use on joins
         :param input_group_metrics: optional, the group metrics to be used for creating the new
         disparity metrics
@@ -162,7 +162,7 @@ class Bias(object):
         df_ref_group = pd.DataFrame()
         try:
             for key, val in ref_groups_dict.items():
-                group_slice = df.loc[(df['group_variable'] == key) & (df['group_value'] == val)]
+                group_slice = df.loc[(df['attribute_name'] == key) & (df['attribute_value'] == val)]
                 self.verify_ref_group_loc(group_slice)
                 df_ref_group = pd.concat([df_ref_group, group_slice])
         except (KeyError, ValueError):
@@ -177,7 +177,7 @@ class Bias(object):
             key_columns + input_group_metrics]
         # we now need to create the ref_group_value columns in the df_to_merge
         for col in input_group_metrics:
-            df_to_merge[col + '_ref_group_value'] = df_ref_group['group_value']
+            df_to_merge[col + '_ref_group_value'] = df_ref_group['attribute_value']
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...

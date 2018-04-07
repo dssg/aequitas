@@ -117,17 +117,17 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print('Fairness Threshold:', configs.fairness_threshold)
     print('Fairness Measures:', configs.fair_measures_requested)
     group_value_df = f.get_group_value_fairness(bias_df, fair_measures_requested=configs.fair_measures_requested)
-    group_variable_df = f.get_group_variable_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
+    group_attribute_df = f.get_group_attribute_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     print('_______________\nGroup Variable level:')
-    print(group_variable_df)
-    fair_results = f.get_overall_fairness(group_variable_df)
+    print(group_attribute_df)
+    fair_results = f.get_overall_fairness(group_attribute_df)
     print('_______________\nModel level:')
     print(fair_results)
     parameter = 'xyz_abs'
     model_eval = 'xx.yy'
     report = None
     if configs.report is True:
-        report = audit_report_markdown(group_value_df, group_variable_df, overall_fairness=fair_results,
+        report = audit_report_markdown(group_value_df, group_attribute_df, overall_fairness=fair_results,
                                        fair_measures=configs.fair_measures_requested)
     return group_value_df, report
 
