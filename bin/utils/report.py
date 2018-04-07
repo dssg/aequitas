@@ -82,15 +82,8 @@ def get_highlevel_report(group_attribute_df):
 
 
 def audit_report_markdown(group_value_df, group_attribute_df, overall_fairness, fair_measures, model_id=1, parameter='binary'):
-    report = """
-    
-    # The Report \n
-    \n
-    ## Overview at the attribute level\n\n
-    
-    
-    
-    """
+    report = '# The Report \n \n ## Overview at the attribute level\n\n'
+
     mkdown_highlevel = get_highlevel_report(group_attribute_df)
 
     report += mkdown_highlevel
