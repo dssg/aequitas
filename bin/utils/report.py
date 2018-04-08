@@ -2,6 +2,8 @@ import logging
 
 from tabulate import tabulate
 
+tabulate.PRESERVE_WHITESPACE = True
+
 logging.getLogger(__name__)
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
@@ -75,6 +77,7 @@ def get_highlevel_report(group_attribute_df):
         cols.append('Unsupervised Fairness')
     if 'Supervised Fairness' in group_attribute_df.columns:
         cols.append('Supervised Fairness')
+
     highlevel_report = tabulate(group_attribute_df[cols], headers='keys', tablefmt='pipe', showindex='never')
     return highlevel_report
 
@@ -82,7 +85,11 @@ def get_highlevel_report(group_attribute_df):
 def get_parity_group_report(group_value_df, attribute, fairness_measures):
     def_cols = ['attribute_value']
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
-    print(aux_df[def_cols + fairness_measures])
+    aux_df = aux_df[def_cols + fairness_measures]
+    map = {}
+    for col in aux_df.columns:
+        map[col] = col + '& nbsp;'
+    aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df[def_cols + fairness_measures],
                             headers='keys',
                             tablefmt='pipe', showindex='never')
@@ -90,20 +97,19 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
 
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
-    manylines = '    \n    \n    \n '
-    oneline = '    \n '
-    mkdown_highlevel = '## Fairness Overview' + oneline
+    manylines = '    \n    \n    \n'
+    oneline = '    \n'
+    mkdown_highlevel = '\n## Fairness Overview' + oneline
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
-
-    mkdown_parity = '## Parity Metrics' + oneline
+    mkdown_parity = '\n## Parity Fairness' + oneline
 
     for attr in configs.attr_cols:
-        mkdown_parity += '### ' + attr + oneline
+        mkdown_parity += '\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
         mkdown_parity += manylines
 
-    report = mkdown_highlevel + mkdown_parity
+    report = mkdown_highlevel + '----\n' + mkdown_parity
     return report
 
 
