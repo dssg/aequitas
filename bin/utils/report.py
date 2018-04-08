@@ -119,6 +119,24 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     return disparities_group
 
 
+def get_group_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
+    def_cols = ['attribute_value']
+    for par, disp in fairness_measures_depend.items():
+        if par in fairness_measures:
+            def_cols.append(disp.replace('_disparity', ''))
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    aux_df = aux_df[def_cols]
+    aux_df = aux_df.round(2)
+    map = {}
+    for col in aux_df.columns:
+        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    aux_df = aux_df.rename(index=str, columns=map)
+    group_group = tabulate(aux_df,
+                           headers='keys',
+                           tablefmt='pipe', showindex='never')
+    return group_group
+
+
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
@@ -126,19 +144,22 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
     mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results'
-
     mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
-
+    mkdown_group = '  \n&nbsp;\n\n## Bias Metrics Results'
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
+        mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
+        mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
+                                               fairness_measures_depend)
         mkdown_parity += manylines
         mkdown_disparities += manylines
+        mkdown_group += manylines
 
-    report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities
+    report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
 
     return report
 
