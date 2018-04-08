@@ -88,7 +88,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     aux_df = aux_df[def_cols + fairness_measures]
     map = {}
     for col in aux_df.columns:
-        map[col] = col + '& nbsp;'
+        map[col] = col + '& nbsp; &nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df[def_cols + fairness_measures],
                             headers='keys',
