@@ -90,20 +90,19 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
 
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
-    manylines = '    \n    \n    \n '
-    oneline = '    \n '
-    mkdown_highlevel = '## Fairness Overview' + oneline
+    manylines = '    \n    \n    \n'
+    oneline = '    \n'
+    mkdown_highlevel = '\n## Fairness Overview' + oneline
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
-
-    mkdown_parity = '## Parity Metrics' + oneline
+    mkdown_parity = '\n## Parity Metrics' + oneline
 
     for attr in configs.attr_cols:
-        mkdown_parity += '### ' + attr + oneline
+        mkdown_parity += '\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
         mkdown_parity += manylines
 
-    report = mkdown_highlevel + mkdown_parity
+    report = mkdown_highlevel + '----\n' + mkdown_parity
     return report
 
 
