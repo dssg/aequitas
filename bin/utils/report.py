@@ -101,13 +101,13 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     return parity_group
 
 
-def get_disparities_group_report(group_value_df, attribute, fairness_measures):
+def get_disparities_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
     def_cols = ['attribute_value']
-    for col in group_value_df.columns:
-        if col.endswith('_disparity'):
-            def_cols.append(col)
+    for par, disp in fairness_measures_depend.items():
+        if par in fairness_measures:
+            def_cols.append(disp)
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
-    aux_df = aux_df[def_cols + fairness_measures]
+    aux_df = aux_df[def_cols]
     aux_df = aux_df.round(2)
     map = {}
     for col in aux_df.columns:
@@ -119,9 +119,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures):
     return disparities_group
 
 
-
-
-def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
+def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
     mkdown_highlevel = '    \n&nbsp;\n\n## Fairness Overview' + oneline
@@ -135,7 +133,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_f
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
-        mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested)
+        mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
+                                                           fairness_measures_depend)
         mkdown_parity += manylines
         mkdown_disparities += manylines
 
