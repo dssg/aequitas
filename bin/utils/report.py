@@ -102,15 +102,15 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
 
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
-    manylines = '\n<br/>\n<br/>\n<br/>\n'
-    oneline = '\n<br/>\n'
-    mkdown_highlevel = '\n<br/>\n## Fairness Overview' + oneline
+    manylines = '\n\s\s\n\s\s\n\s\s\n'
+    oneline = '\n\s\s\n'
+    mkdown_highlevel = '\n\s\s\n## Fairness Overview' + oneline
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
-    mkdown_parity = '\n<br/>\n## Parity Fairness' + oneline
+    mkdown_parity = '\n\s\s\n## Parity Fairness'
 
     for attr in configs.attr_cols:
-        mkdown_parity += '\n<br/>\n### ' + attr + oneline
+        mkdown_parity += '\n\s\s\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
         mkdown_parity += manylines
 
