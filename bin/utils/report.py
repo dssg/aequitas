@@ -77,8 +77,13 @@ def get_highlevel_report(group_attribute_df):
         cols.append('Unsupervised Fairness')
     if 'Supervised Fairness' in group_attribute_df.columns:
         cols.append('Supervised Fairness')
+    group_attribute_df = group_attribute_df[cols]
+    map = {}
+    for col in group_attribute_df.columns:
+        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    group_attribute_df = group_attribute_df.rename(index=str, columns=map)
 
-    highlevel_report = tabulate(group_attribute_df[cols], headers='keys', tablefmt='pipe', showindex='never')
+    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
     return highlevel_report
 
 
@@ -88,7 +93,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     aux_df = aux_df[def_cols + fairness_measures]
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp; &nbsp;&nbsp;'
+        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df = aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df,
                             headers='keys',
