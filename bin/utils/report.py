@@ -75,15 +75,17 @@ def get_highlevel_report(group_attribute_df):
         cols.append('Unsupervised Fairness')
     if 'Supervised Fairness' in group_attribute_df.columns:
         cols.append('Supervised Fairness')
-    highlevel_report = tabulate(group_attribute_df[cols], headers='keys', tablefmt='pipe')
+    highlevel_report = tabulate(group_attribute_df[cols], headers='keys', tablefmt='pipe', showindex='never')
     return highlevel_report
 
 
 def get_parity_group_report(group_value_df, attribute, fairness_measures):
     def_cols = ['attribute_value']
-    parity_group = tabulate(group_value_df.loc[group_value_df['attribute_name'] == attribute][def_cols + fairness_measures],
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    print(aux_df[def_cols + fairness_measures])
+    parity_group = tabulate(aux_df[def_cols + fairness_measures],
                             headers='keys',
-                            tablefmt='pipe')
+                            tablefmt='pipe', showindex='never')
     return parity_group
 
 
@@ -91,10 +93,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_f
     manylines = '    \n    \n    \n '
     oneline = '    \n '
     mkdown_highlevel = '## Fairness Overview' + oneline
+    mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
-    mkdown_highlevel += get_highlevel_report(group_attribute_df)
-
-    mkdown_highlevel += mkdown_highlevel + manylines
 
     mkdown_parity = '## Parity Metrics' + oneline
 
