@@ -127,8 +127,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
     model_eval = 'xx.yy'
     report = None
     if configs.report is True:
-        report = audit_report_markdown(group_value_df, group_attribute_df, overall_fairness=fair_results,
-                                       fair_measures=configs.fair_measures_requested)
+        report = audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness=fair_results)
     return group_value_df, report
 
 

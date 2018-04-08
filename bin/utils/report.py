@@ -1,7 +1,5 @@
 import logging
-from datetime import datetime
 
-from fpdf import FPDF
 from tabulate import tabulate
 
 logging.getLogger(__name__)
@@ -72,7 +70,7 @@ def get_group_value_report(group_value_df):
 
 
 def get_highlevel_report(group_attribute_df):
-    cols = ['model_id', 'score_threshold', 'attribute_name']
+    cols = ['attribute_name']
     if 'Unsupervised Fairness' in group_attribute_df.columns:
         cols.append('Unsupervised Fairness')
     if 'Supervised Fairness' in group_attribute_df.columns:
@@ -81,30 +79,38 @@ def get_highlevel_report(group_attribute_df):
     return highlevel_report
 
 
-def audit_report_markdown(group_value_df, group_attribute_df, overall_fairness, fair_measures, model_id=1, parameter='binary'):
-    report = '# The Report \n \n ## Overview at the attribute level\n\n'
+def get_parity_group_report(group_value_df, attribute, fairness_measures):
+    def_cols = ['attribute_value']
+    parity_group = tabulate(group_value_df.loc[group_value_df['attribute_name'] == attribute][def_cols + fairness_measures],
+                            headers='keys',
+                            tablefmt='pipe')
+    return parity_group
 
-    mkdown_highlevel = get_highlevel_report(group_attribute_df)
 
-    report += mkdown_highlevel
+def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
+    manylines = '    \n    \n    \n '
+    oneline = '    \n '
+    mkdown_highlevel = '## Fairness Overview' + oneline
+
+    mkdown_highlevel += get_highlevel_report(group_attribute_df)
+
+    mkdown_highlevel += mkdown_highlevel + manylines
+
+    mkdown_parity = '## Parity Metrics' + oneline
+
+    for attr in configs.attr_cols:
+        mkdown_parity += '### ' + attr + oneline
+        mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
+        mkdown_parity += manylines
+
+    report = mkdown_highlevel + mkdown_parity
     return report
 
 
+"""
 def audit_report_pdf(model_id, parameter, model_eval, configs, fair_results, fair_measures,
                  group_value_df):
-    """
 
-    :param model_id:
-    :param parameter:
-    :param attributes:
-    :param model_eval:
-    :param configs:
-    :param fair_results:
-    :param fair_measures:
-    :param ref_groups_method:
-    :param group_value_df:
-    :return:
-    """
     group_value_report = get_group_value_report(group_value_df)
     project_description = configs.project_description
     if project_description is None:
@@ -180,33 +186,4 @@ def audit_report_pdf(model_id, parameter, model_eval, configs, fair_results, fai
                                                                                             '_') + '_' + datestr
     pdf.output('output/' + report_filename + '.pdf', 'F')
     return None
-
-
-class PDF(FPDF):
-    def header(self):
-        # Logo
-        self.image('utils/img/aequitas_report_header.png', x=5, w=0, h=20)
-        self.ln(10)
-        # Arial bold 15
-        self.set_font('Arial', 'B', 20)
-        # Move to the right
-        self.cell(80)
-        # Title
-        self.cell(30, 10, 'Bias and Fairness Audit Report', 0, 0, 'C')
-        # Line break
-        self.ln(10)
-
-    # Page footer
-    def footer(self):
-        # Position at 1.5 cm from bottom
-        self.set_y(-15)
-        # Arial italic 8
-        self.set_font('Arial', 'I', 8)
-        # Page number
-        self.cell(0, 10, 'aequitas \xa9 2017. The University of Chicago. All Rights '
-                         'Reserved.     '
-                         '\t \t'
-                         'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
-
-# fpdf.cell(w, h = 0, txt = '', border = 0, ln = 0,
-#          align = '', fill = False, link = '')
+"""
