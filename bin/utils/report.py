@@ -101,20 +101,46 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     return parity_group
 
 
+def get_disparities_group_report(group_value_df, attribute, fairness_measures):
+    def_cols = ['attribute_value']
+    for col in group_value_df.columns:
+        if col.endswith('_disparity'):
+            def_cols.append(col)
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    aux_df = aux_df[def_cols + fairness_measures]
+    aux_df = aux_df.round(2)
+    map = {}
+    for col in aux_df.columns:
+        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+    aux_df = aux_df.rename(index=str, columns=map)
+    disparities_group = tabulate(aux_df,
+                                 headers='keys',
+                                 tablefmt='pipe', showindex='never')
+    return disparities_group
+
+
+
+
 def audit_report_markdown(configs, group_value_df, group_attribute_df, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
     mkdown_highlevel = '    \n&nbsp;\n\n## Fairness Overview' + oneline
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
 
-    mkdown_parity = '  \n&nbsp;\n\n## Parity Fairness'
+    mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results'
+
+    mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
 
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
+        mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
+        mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested)
         mkdown_parity += manylines
+        mkdown_disparities += manylines
 
-    report = mkdown_highlevel + '----' + mkdown_parity
+    report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities
+
     return report
 
 
