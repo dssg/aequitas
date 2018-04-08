@@ -78,9 +78,9 @@ def uploaded_file():
         rgm = request.form["ref_groups_method"]
 
         try:
-            fp = 100-int(fairness_pct)
+            fp = float(fairness_pct) / 100.0
         except:
-            fp = 80
+            fp = 0.8
 
         configs = Configs(ref_groups=subgroups,
                           ref_groups_method=rgm,
