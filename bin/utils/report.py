@@ -1,5 +1,6 @@
 import logging
 
+from markdown2 import markdown
 from tabulate import tabulate
 
 tabulate.PRESERVE_WHITESPACE = True
@@ -92,8 +93,8 @@ def get_highlevel_report(group_attribute_df):
 
 
     highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
-    highlevel_report = highlevel_report.replace('False', '<font color="color:red">False</font>')
-    highlevel_report = highlevel_report.replace('True', '<span color="color:green">True</font>')
+    highlevel_report = highlevel_report.replace('>False', ' style="color:red">False')
+    highlevel_report = highlevel_report.replace('>True', ' style="color:green">True')
 
 
 
@@ -177,7 +178,12 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_group += manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
-    return report
+    report_html = markdown(report, extras=['tables', 'header-ids'])
+    # coloring True/False results
+    report_html = report_html.replace('>False', ' style="color:red">False')
+    report_html = report_html.replace('>True', ' style="color:green">True')
+
+    return report_html
 
 
 """
