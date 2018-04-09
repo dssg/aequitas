@@ -90,24 +90,21 @@ def get_highlevel_report(group_attribute_df):
                 group_attribute_df.loc[group_attribute_df['attribute_name'] == attr, col] = '[' + group_attribute_df[col][
                     group_attribute_df['attribute_name'] == attr] + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')'
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
-
-
     highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
-    highlevel_report = highlevel_report.replace('>False', ' style="color:red">False')
-    highlevel_report = highlevel_report.replace('>True', ' style="color:green">True')
-
-
-
     return highlevel_report
 
 
 def get_parity_group_report(group_value_df, attribute, fairness_measures):
+    group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols + fairness_measures]
     map = {}
     for col in aux_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col in fairness_measures:
+            group_value_df.loc[group_value_df['attribute_name'] == attribute, col] = '[' + group_value_df[col][
+                group_value_df['attribute_name'] == attribute] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
     aux_df = aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df,
                             headers='keys',
