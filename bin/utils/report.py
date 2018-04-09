@@ -72,6 +72,7 @@ def get_group_value_report(group_value_df):
 
 
 def get_highlevel_report(group_attribute_df):
+    group_attribute_df = group_attribute_df.applymap(str)
     cols = ['attribute_name']
     if 'Unsupervised Fairness' in group_attribute_df.columns:
         cols.append('Unsupervised Fairness')
@@ -79,11 +80,23 @@ def get_highlevel_report(group_attribute_df):
         cols.append('Supervised Fairness')
     group_attribute_df = group_attribute_df[cols]
     map = {}
+    attr_list = group_attribute_df['attribute_name'].unique()
     for col in group_attribute_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        # to be able to click on true/false and redirect to the next section
+        if col != 'attribute_name':
+            for attr in attr_list:
+                group_attribute_df.loc[group_attribute_df['attribute_name'] == attr, col] = '[' + group_attribute_df[col][
+                    group_attribute_df['attribute_name'] == attr] + ']' + '(' + '-'.join(attr.lower().split(' ')) + ')'
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
 
+
     highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
+    highlevel_report = highlevel_report.replace('False', '<span style="color:red">False</span>')
+    highlevel_report = highlevel_report.replace('True', '<span style="color:green">True</span>')
+
+
+
     return highlevel_report
 
 
@@ -164,8 +177,6 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_group += manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
-    report = report.replace('False', '<span style="color:red">False</span>')
-    report = report.replace('True', '<span style="color:green">True</span>')
     return report
 
 
