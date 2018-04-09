@@ -164,7 +164,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_group += manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
-
+    report = report.replace('False', '<span style="color:red">False</span>')
+    report = report.replace('True', '<span style="color:green">True</span>')
     return report
 
 
