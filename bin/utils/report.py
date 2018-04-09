@@ -87,13 +87,13 @@ def get_highlevel_report(group_attribute_df):
         if col != 'attribute_name':
             for attr in attr_list:
                 group_attribute_df.loc[group_attribute_df['attribute_name'] == attr, col] = '[' + group_attribute_df[col][
-                    group_attribute_df['attribute_name'] == attr] + ']' + '(' + '-'.join(attr.lower().split(' ')) + ')'
+                    group_attribute_df['attribute_name'] == attr] + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')'
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
 
 
     highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
-    highlevel_report = highlevel_report.replace('False', '<span style="color:red">False</span>')
-    highlevel_report = highlevel_report.replace('True', '<span style="color:green">True</span>')
+    highlevel_report = highlevel_report.replace('False', '<font color="color:red">False</font>')
+    highlevel_report = highlevel_report.replace('True', '<span color="color:green">True</font>')
 
 
 
