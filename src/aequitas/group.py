@@ -113,8 +113,7 @@ class Group(object):
         """
         Creates univariate groups and calculates group metrics.
 
-        :param df: a dataframe containing the following required columns [entity_id, as_of_date,
-        model_id, score, rank_abs, rank_pct, label_value
+        :param df: a dataframe containing the following required columns [score,  label_value]
         :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
         :param model_id:
         :return:
@@ -155,7 +154,7 @@ class Group(object):
         for col in attr_cols:
             # find the priors_df
             col_group = df.fillna({col: 'nan'}).groupby(col)
-            counts = col_group.entity_id.count()
+            counts = col_group.size()
             print('COUNTS:::', counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
