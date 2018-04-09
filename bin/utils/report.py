@@ -112,16 +112,20 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
 
 
 def get_disparities_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
+    group_value_df = group_value_df.round(2)
+    group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
+    metrics = []
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
-            def_cols.append(disp)
+            metrics.append(disp)
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
-    aux_df = aux_df[def_cols]
-    aux_df = aux_df.round(2)
+    aux_df = aux_df[def_cols + metrics]
     map = {}
     for col in aux_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col in metrics:
+            aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
     disparities_group = tabulate(aux_df,
                                  headers='keys',
@@ -176,8 +180,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
-    report_html = report_html.replace('>False', ' style="color:red">False')
-    report_html = report_html.replace('>True', ' style="color:green">True')
+    # report_html = report_html.replace('>False', ' style="color:red">False')
+    # report_html = report_html.replace('>True', ' style="color:green">True')
 
     return report_html
 
