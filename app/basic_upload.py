@@ -3,7 +3,6 @@ import sys
 from flask import Flask, Markup, request, redirect, url_for, send_from_directory, flash, render_template, session
 from flask_bootstrap import Bootstrap
 import pandas as pd
-import markdown2
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
@@ -89,12 +88,8 @@ def uploaded_file():
                           attr_cols=group_variables)
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
-        content = markdown2.markdown(report, extras=['tables','header-ids'])
-        content = Markup(content)
-
-        print(type(content))
+        content = Markup(report)
         #os.remove('tmp.csv')
-
         return render_template('report.html', content=content)
 
     '''
