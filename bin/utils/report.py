@@ -143,7 +143,9 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_highlevel = '    \n&nbsp;\n\n## Fairness Overview' + oneline
     mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
     mkdown_highlevel += oneline + '### Table of Contents:\n'
-    mkdown_highlevel += oneline + '1. [Fairness Measures Results](#Fairness Measures Results)' + oneline
+    mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
+    mkdown_highlevel += oneline + '2. [Bias Metrics Results](#bias-metrics-results) \n'
+    mkdown_highlevel += oneline + '3. [Group Metrics Results](#group-metrics-results) \n' + manylines
 
     mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results'
     mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
