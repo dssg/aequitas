@@ -89,9 +89,7 @@ def uploaded_file():
                           attr_cols=group_variables)
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
-        content = markdown2.markdown(report, extras=['tables'])
-        content = content.replace('<h2>','<h2>  <a href="#">')
-        content = content.replace('</h2>','</a> </h2>')
+        content = markdown2.markdown(report, extras=['tables','header-ids'])
         content = Markup(content)
 
         print(type(content))
