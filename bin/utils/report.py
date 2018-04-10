@@ -180,14 +180,15 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results'
     mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
     mkdown_group = '  \n&nbsp;\n\n## Group Metrics Results'
+    # setup the group_value_df (colors and stuff)
+    group_value_df = setup_disparities_group_report(group_value_df, configs.fair_measures_requested,
+                                                    fairness_measures_depend)
+
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
-        # setup the group_value_df (colors and stuff)
-        group_value_df = setup_disparities_group_report(group_value_df, configs.fair_measures_requested,
-                                                        fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
