@@ -100,11 +100,22 @@ def get_highlevel_report(group_attribute_df):
     return highlevel_report
 
 
-def get_parity_group_report(group_value_df, attribute, fairness_measures):
+def get_parity_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols + fairness_measures]
+    metrics = {}
+    for par, disp in fairness_measures_depend.items():
+        if par in fairness_measures:
+            metrics[disp] = par
+    # getting a reference group label
+    for col in aux_df.columns:
+        if col in metrics.keys():
+            ref_group = col.replace('_disparity', '_ref_group_value')
+            group_value_df.loc[(group_value_df[metrics[col]] == 'True') & (group_value_df['attribute_value'] == group_value_df[
+                ref_group]), col] = ['Reference'] * group_value_df.count
+
     map = {}
     for col in aux_df.columns:
         if col == 'attribute_value':
@@ -218,7 +229,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
+        mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested, fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
