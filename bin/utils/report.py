@@ -164,6 +164,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
         map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
+
     disparities_group = tabulate(aux_df,
                                  headers='keys',
                                  tablefmt='pipe', showindex='never')
@@ -178,6 +179,11 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols]
     aux_df = aux_df.round(2)
+    # fixing the same order of columns every time!
+    cols_order = ['attribute_value', 'ppr', 'pprev', 'fdr', 'fpr', 'for', 'fnr']
+    new_order = [col for col in cols_order if col in aux_df.columns]
+    aux_df.reindex(columns=new_order)
+    #
     map = {}
     for col in aux_df.columns:
         if col == 'attribute_value':
