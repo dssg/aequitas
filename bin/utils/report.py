@@ -103,7 +103,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     aux_df = aux_df[def_cols + fairness_measures]
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        map[col] = col  # + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
     aux_df = aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df,
@@ -142,7 +142,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     aux_df = aux_df[def_cols + list(metrics.keys())]
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        map[col] = col  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
     disparities_group = tabulate(aux_df,
@@ -161,7 +161,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = aux_df.round(2)
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        map[col] = col  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
