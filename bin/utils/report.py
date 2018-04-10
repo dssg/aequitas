@@ -115,17 +115,25 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
-    metrics = []
+    metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
-            metrics.append(disp)
-    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
-    aux_df = aux_df[def_cols + metrics]
+            metrics[disp] = par
     map = {}
-    for col in aux_df.columns:
+    for col in group_value_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        if col in metrics:
-            aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
+        if col in metrics.keys():
+            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '<green> ' + group_value_df[col][group_value_df[
+                                                                                                                   metrics[
+                                                                                                                       col]] == 'True']
+
+            group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '<red> ' + group_value_df[col][group_value_df[
+                                                                                                                  metrics[
+                                                                                                                      col]] == 'False']
+
+            group_value_df[col] = '[' + group_value_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    aux_df = aux_df[def_cols + list(metrics.keys())]
     aux_df = aux_df.rename(index=str, columns=map)
     disparities_group = tabulate(aux_df,
                                  headers='keys',
