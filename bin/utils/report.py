@@ -121,6 +121,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
 
 
 def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_depend):
+    print(group_value_df.columns)
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     metrics = {}
@@ -128,11 +129,12 @@ def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_de
         if par in fairness_measures:
             metrics[disp] = par
             metrics[disp.replace('_disparity', '')] = par
+
     for col in group_value_df.columns:
         if col in metrics.keys():
-            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
-                                                                                                                     metrics[
-                                                                                                                         col]] == 'True']
+            group_value_df.loc[(group_value_df[metrics[col]] == 'True') & (group_value_df['attribute_value'] != group_value_df[
+                col.replace('_disparity', '_ref_group_value')]), col] = '##green## ' + group_value_df[col][
+                group_value_df[metrics[col]] == 'True']
 
             group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
