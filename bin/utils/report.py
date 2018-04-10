@@ -132,9 +132,13 @@ def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_de
 
     for col in group_value_df.columns:
         if col in metrics.keys():
+            # we want to keep the ref group without green/red so we need to know the name of the column to search for
+            if not col.endswith('_disparity'):
+                ref_group = col + '_ref_group_value'
+            else:
+                ref_group = col.replace('_disparity', '_ref_group_value')
             group_value_df.loc[(group_value_df[metrics[col]] == 'True') & (group_value_df['attribute_value'] != group_value_df[
-                col.replace('_disparity', '_ref_group_value')]), col] = '##green## ' + group_value_df[col][
-                group_value_df[metrics[col]] == 'True']
+                ref_group]), col] = '##green## ' + group_value_df[col][group_value_df[metrics[col]] == 'True']
 
             group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
