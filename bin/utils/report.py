@@ -218,8 +218,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
-    report_html = report_html.replace('>False', ' style="color:red">False')
-    report_html = report_html.replace('>True', ' style="color:green">True')
+    report_html = report_html.replace('>False', ' style="color:red">Not Fair!')
+    report_html = report_html.replace('>True', ' style="color:green">Fair!')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
     report_html = report_html.replace('<table>', '<table class="table">')
