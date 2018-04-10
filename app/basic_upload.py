@@ -43,7 +43,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             df = pd.read_csv(request.files.get('file'))
-            df.to_csv('tmp.csv')
+            df.to_csv('tmp.csv',index=False)
             #session['df'] = df.to_json()
             return redirect(url_for("uploaded_file"))
     return render_template("file_upload.html")
