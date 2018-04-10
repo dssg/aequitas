@@ -112,13 +112,14 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     return parity_group
 
 
-def setup_disparities_group_report(group_value_df, fairness_measures, fairness_measures_depend):
+def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
             metrics[disp] = par
+            metrics[disp.replace('_disparity', '')] = par
     for col in group_value_df.columns:
         if col in metrics.keys():
             group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
@@ -131,13 +132,13 @@ def setup_disparities_group_report(group_value_df, fairness_measures, fairness_m
     return group_value_df
 
 
-def get_disparities_group_report(group_value_df_ready, attribute, fairness_measures, fairness_measures_depend):
+def get_disparities_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
     def_cols = ['attribute_value']
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
             metrics[disp] = par
-    aux_df = group_value_df_ready.loc[group_value_df_ready['attribute_name'] == attribute]
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols + list(metrics.keys())]
     map = {}
     for col in aux_df.columns:
@@ -182,8 +183,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
     mkdown_group = '  \n&nbsp;\n\n## Group Metrics Results'
     # setup the group_value_df (colors and stuff)
-    group_value_df = setup_disparities_group_report(group_value_df, configs.fair_measures_requested,
-                                                    fairness_measures_depend)
+    group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
+                                          fairness_measures_depend)
 
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
