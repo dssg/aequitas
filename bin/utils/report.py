@@ -85,9 +85,12 @@ def get_highlevel_report(group_attribute_df):
     for col in group_attribute_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         # to be able to click on true/false and redirect to the next section
-        for attr in attr_list:
-            group_attribute_df.loc[group_attribute_df['attribute_name'] == attr, col] = '[' + group_attribute_df[col][
-                group_attribute_df['attribute_name'] == attr] + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')'
+        if col != 'attribute_name':
+            for attr in attr_list:
+                group_attribute_df.loc[group_attribute_df['attribute_name'] == attr, col] = '[' + group_attribute_df[col][
+                    group_attribute_df['attribute_name'] == attr] + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')'
+    for attr in attr_list:
+        group_attribute_df = group_attribute_df.replace(attr, '[' + attr + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')')
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
     highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
     return highlevel_report
