@@ -185,7 +185,6 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     # setup the group_value_df (colors and stuff)
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
-
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
@@ -206,6 +205,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report_html = report_html.replace('>True', ' style="color:green">True')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
+    report_html = report_html.replace('<table>', '<table class="table">')
 
     return report_html
 
