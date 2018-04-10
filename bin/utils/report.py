@@ -83,7 +83,11 @@ def get_highlevel_report(group_attribute_df):
     map = {}
     attr_list = group_attribute_df['attribute_name'].unique()
     for col in group_attribute_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col == 'attribute_name':
+            colstr = 'Attribute'
+        else:
+            colstr = col
+        map[col] = colstr + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         # to be able to click on true/false and redirect to the next section
         if col != 'attribute_name':
             for attr in attr_list:
@@ -103,7 +107,11 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     aux_df = aux_df[def_cols + fairness_measures]
     map = {}
     for col in aux_df.columns:
-        map[col] = col  # + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
+        else:
+            colstr = col
+        map[col] = colstr + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
     aux_df = aux_df.rename(index=str, columns=map)
     parity_group = tabulate(aux_df,
@@ -142,11 +150,11 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     aux_df = aux_df[def_cols + list(metrics.keys())]
     map = {}
     for col in aux_df.columns:
-        col_str = col
-        if col.endswith('_disparity'):
-            col_str = col.split('_')[0].upper() + ' Disparity'
+        colstr = col.replace('_', ' ')
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
         else:
-            colstr = col.capitalize()
+            colstr = colstr.split(' ')[0].upper() + ' Disparity'
         map[col] = colstr + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
@@ -166,7 +174,11 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = aux_df.round(2)
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
+        else:
+            colstr = col.upper()
+        map[col] = colstr + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
