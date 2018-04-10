@@ -111,29 +111,37 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures):
     return parity_group
 
 
-def get_disparities_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
+def setup_disparities_group_report(group_value_df, fairness_measures, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
+    metrics = {}
+    for par, disp in fairness_measures_depend.items():
+        if par in fairness_measures:
+            metrics[disp] = par
+    for col in group_value_df.columns:
+        if col in metrics.keys():
+            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
+                                                                                                                     metrics[
+                                                                                                                         col]] == 'True']
+
+            group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
+                                                                                                                   metrics[
+                                                                                                                       col]] == 'False']
+    return group_value_df
+
+
+def get_disparities_group_report(group_value_df_ready, attribute, fairness_measures, fairness_measures_depend):
     def_cols = ['attribute_value']
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
             metrics[disp] = par
-    map = {}
-    for col in group_value_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        if col in metrics.keys():
-            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
-                                                                                                                   metrics[
-                                                                                                                       col]] == 'True']
-
-            group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
-                                                                                                                  metrics[
-                                                                                                                      col]] == 'False']
-
-            group_value_df[col] = '[' + group_value_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
-    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    aux_df = group_value_df_ready.loc[group_value_df_ready['attribute_name'] == attribute]
     aux_df = aux_df[def_cols + list(metrics.keys())]
+    map = {}
+    for col in aux_df.columns:
+        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
     disparities_group = tabulate(aux_df,
                                  headers='keys',
@@ -177,6 +185,9 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
+        # setup the group_value_df (colors and stuff)
+        group_value_df = setup_disparities_group_report(group_value_df, configs.fair_measures_requested,
+                                                        fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
