@@ -123,11 +123,11 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     for col in group_value_df.columns:
         map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         if col in metrics.keys():
-            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '<green> ' + group_value_df[col][group_value_df[
+            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
                                                                                                                        col]] == 'True']
 
-            group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '<red> ' + group_value_df[col][group_value_df[
+            group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                   metrics[
                                                                                                                       col]] == 'False']
 
@@ -188,8 +188,10 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
-    # report_html = report_html.replace('>False', ' style="color:red">False')
-    # report_html = report_html.replace('>True', ' style="color:green">True')
+    report_html = report_html.replace('>False', ' style="color:red">False')
+    report_html = report_html.replace('>True', ' style="color:green">True')
+    report_html = report_html.replace('>##red##', ' style="color:red">')
+    report_html = report_html.replace('>##green##', ' style="color:green">')
 
     return report_html
 
