@@ -220,11 +220,22 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     return group_group
 
 
+def get_sentence_highlevel(fair_results):
+    sent = 'The Bias Report has found that model under assessment is '
+    if fair_results['Overall Fairness'] is True:
+        is_fair = '**FAIR**'
+    else:
+        is_fair = '**UNFAIR**'
+    sent += is_fair
+
+    return sent
+
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
     mkdown_highlevel = '    \n&nbsp;\n\n## Fairness Overview' + oneline
-    mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
+    mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
+    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + manylines
     mkdown_highlevel += oneline + '### Table of Contents:\n'
     mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
     mkdown_highlevel += '2. [Bias Metrics Results](#bias-metrics-results) \n'
