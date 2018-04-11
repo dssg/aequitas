@@ -245,10 +245,10 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                fairness_measures_depend)
-        mkdown_parity += '[Go to Top](#)' + manylines
-        mkdown_disparities += '[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
+        mkdown_parity += '\n\n[Go to Top](#)' + manylines
+        mkdown_disparities += '\n\n[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
                               ')' + '\n\n' + '[Go to Top](#)' + manylines
-        mkdown_group += '[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
+        mkdown_group += '\n\n[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
                         '-2)' + '\n\n' + '[Go to Top](#)' + manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
