@@ -221,11 +221,11 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = 'The Bias Report has found that model under assessment is '
+    sent = 'The Bias Report has found that model under assessment is'
     if fair_results['Overall Fairness'] is True:
-        is_fair = '**FAIR**'
+        is_fair = ' FAIR'
     else:
-        is_fair = '**UNFAIR**'
+        is_fair = ' UNFAIR'
     sent += is_fair
 
     return sent
@@ -270,6 +270,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
     report_html = report_html.replace('<table>', '<table class="table">')
+    report_html = report_html.replace(' UNFAIR', '<span style="color:red"><b> UNFAIR</b></span>')
+    report_html = report_html.replace(' FAIR', '<span style="color:green"><b> FAIR</b></span>')
 
     return report_html
 
