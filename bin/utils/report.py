@@ -245,9 +245,9 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                fairness_measures_depend)
-        mkdown_parity += manylines
-        mkdown_disparities += manylines
-        mkdown_group += manylines
+        mkdown_parity += oneline + '[Go to Top](#)' + manylines
+        mkdown_disparities += oneline + '[Go to Top](#)' + manylines
+        mkdown_group += oneline + '[Go to Top](#)' + manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
