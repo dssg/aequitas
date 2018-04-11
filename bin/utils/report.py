@@ -116,6 +116,10 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
             idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
             aux_df.at[idx, col] = 'Ref'
 
+    cols_order = ['attribute_value', 'Statistical Parity', 'Impact Parity', 'FDR Parity', 'FPR Parity', 'FOR Parity',
+                  'FNR Parity']
+    new_order = [col for col in cols_order if col in aux_df.columns]
+    aux_df = aux_df[new_order]
     map = {}
     aux_df = aux_df[def_cols + fairness_measures]
     for col in aux_df.columns:
@@ -201,7 +205,6 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     cols_order = ['attribute_value', 'ppr', 'pprev', 'fdr', 'fpr', 'for', 'fnr']
     new_order = [col for col in cols_order if col in aux_df.columns]
     aux_df = aux_df[new_order]
-
     map = {}
     for col in aux_df.columns:
         if col == 'attribute_value':
