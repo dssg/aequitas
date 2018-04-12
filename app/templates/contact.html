@@ -23,6 +23,9 @@
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="../static/assets/js/ie-emulation-modes-warning.js"></script>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="../static/js/toggle_radio.js"></script>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -30,41 +33,29 @@
     <![endif]-->
   </head>
 
+
   <body>
 
     <div class="container">
       <div class="header clearfix">
         <nav>
           <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="{{ url_for('upload_file')}}">Home</a></li>
+            <li role="presentation"><a href="{{ url_for('upload_file')}}">Home</a></li>
             <li role="presentation"><a href="{{ url_for('about')}}">About</a></li>
-            <li role="presentation"><a href="{{ url_for('contact')}}">Contact</a></li>
+            <li role="presentation" class="active"><a href="{{ url_for('contact')}}">Contact</a></li>
           </ul>
         </nav>
         <h3 class="text-muted">The Bias Report</h3>
       </div>
 
-      <div class="jumbotron">
-        <h2>Upload new file</h2>
+      <div class="row marketing">
 
-    <form method=post enctype=multipart/form-data>
-                <input type=file name=file><input type=submit value=Upload>
-</div>
-    <div class="row marketing">
-    <h3> Sample Datasets </h3>
+      <h1>Contact Us</h1>
+      Abby + Pedro et al.
 
-    <div>
-    <a href="{{ url_for('uploaded_file', filetype='sample1') }}">Sample 1</a><br>
-    <a href="{{ url_for('uploaded_file', filetype='sample2') }}">Sample 2</a><br>
-    <a href="{{ url_for('uploaded_file', filetype='sample3') }}">Sample 3</a><br>
-    </div>
-
-   </div>
-   </form>
     </div> <!-- /container -->
 
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../static/assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
-</html>

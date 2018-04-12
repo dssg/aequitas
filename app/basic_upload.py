@@ -18,6 +18,9 @@ from bin.aequitas_audit import audit
 from bin.utils.configs_loader import Configs
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
+sample_data = {'sample1':'app/sample_data/sample1.csv',
+               'sample2':'app/sample_data/sample2.csv',
+               'sample3':'app/sample_data/sample1.csv' }
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -44,14 +47,26 @@ def upload_file():
         if file and allowed_file(file.filename):
             df = pd.read_csv(request.files.get('file'))
             df.to_csv('tmp.csv',index=False)
+            filetype='upload'
             #session['df'] = df.to_json()
-            return redirect(url_for("uploaded_file"))
+            return redirect(url_for("uploaded_file", filetype=filetype))
     return render_template("file_upload.html")
 
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+    return render_template("about.html")
 
-@app.route('/customize', methods=['get', 'post'])
-def uploaded_file():
-    df = pd.read_csv('tmp.csv')
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    return render_template("contact.html")
+
+
+@app.route('/customize/<filetype>', methods=['get', 'post'])
+def uploaded_file(filetype):
+    if filetype=='custom':
+        df = pd.read_csv('tmp.csv')
+    else:
+        df = pd.read_csv(sample_data[filetype])
     df, groups = preprocess_input_df(df)
     subgroups = {}
     for col in groups:
