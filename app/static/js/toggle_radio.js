@@ -7,12 +7,7 @@ $(document).ready(function () {
         $('#div1').hide();
         $('#div2').show();
     });
-
-    if ($('#id1').prop("checked") == true) {
-        $('#div2').hide();
-        $('#div1').show();
-    } else {
+    $('#id3').click(function () {
         $('#div1').hide();
         $('#div2').show();
-    }
-});
+    });
