@@ -1,9 +1,9 @@
-======
-aequitas
-======
+===============
+aequitas webapp
+===============
 
-Bias and Fairness web app.
+Bias and Fairness web app
 
-To run:
-In aequitas-public directory, run
-python3 -m app.basic_upload
+To run::
+
+    python -m aequitas_webapp.basic_upload
