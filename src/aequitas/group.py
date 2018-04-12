@@ -107,6 +107,7 @@ class Group(object):
                            'fn': false_neg_count,
                            'tn': true_neg_count,
                            'tp': true_pos_count}
+
         return group_functions
 
     def get_crosstabs(self, df, score_thresholds=None, model_id=1, attr_cols=None):

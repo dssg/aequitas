@@ -83,7 +83,11 @@ def get_highlevel_report(group_attribute_df):
     map = {}
     attr_list = group_attribute_df['attribute_name'].unique()
     for col in group_attribute_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col == 'attribute_name':
+            colstr = 'Attribute'
+        else:
+            colstr = col
+        map[col] = colstr  # + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         # to be able to click on true/false and redirect to the next section
         if col != 'attribute_name':
             for attr in attr_list:
@@ -96,16 +100,37 @@ def get_highlevel_report(group_attribute_df):
     return highlevel_report
 
 
-def get_parity_group_report(group_value_df, attribute, fairness_measures):
+def get_parity_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
-    aux_df = aux_df[def_cols + fairness_measures]
-    map = {}
+    metrics = {}
+    for par, disp in fairness_measures_depend.items():
+        if par in fairness_measures:
+            metrics[par] = disp
+
+    # getting a reference group label
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col in metrics.keys():
+            ref_group = metrics[col].replace('_disparity', '_ref_group_value')
+            idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
+            aux_df.at[idx, col] = 'Ref'
+
+    map = {}
+    aux_df = aux_df[def_cols + fairness_measures]
+    for col in aux_df.columns:
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
+        else:
+            colstr = col
+        map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
     aux_df = aux_df.rename(index=str, columns=map)
+    cols_order = ['Attribute Value', 'Statistical Parity', 'Impact Parity', 'FDR Parity', 'FPR Parity', 'FOR Parity',
+                  'FNR Parity']
+    new_order = [col for col in cols_order if col in aux_df.columns]
+    aux_df = aux_df[new_order]
+
     parity_group = tabulate(aux_df,
                             headers='keys',
                             tablefmt='pipe', showindex='never')
@@ -120,11 +145,16 @@ def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_de
         if par in fairness_measures:
             metrics[disp] = par
             metrics[disp.replace('_disparity', '')] = par
+
     for col in group_value_df.columns:
         if col in metrics.keys():
-            group_value_df.loc[group_value_df[metrics[col]] == 'True', col] = '##green## ' + group_value_df[col][group_value_df[
-                                                                                                                     metrics[
-                                                                                                                         col]] == 'True']
+            # we want to keep the ref group without green/red so we need to know the name of the column to search for
+            if not col.endswith('_disparity'):
+                ref_group = col + '_ref_group_value'
+            else:
+                ref_group = col.replace('_disparity', '_ref_group_value')
+            group_value_df.loc[(group_value_df[metrics[col]] == 'True') & (group_value_df['attribute_value'] != group_value_df[
+                ref_group]), col] = '##green## ' + group_value_df[col][group_value_df[metrics[col]] == 'True']
 
             group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
@@ -140,11 +170,24 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
             metrics[disp] = par
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols + list(metrics.keys())]
+
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        colstr = col.replace('_', ' ')
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
+        else:
+            colstr = colstr.split(' ')[0].upper() + ' Disparity'
+        map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
         aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
+
     aux_df = aux_df.rename(index=str, columns=map)
+    # this is hardcoded. If metrics supported by aequitas change this needs to change
+    cols_order = ['Attribute Value', 'PPR Disparity', 'PPREV Disparity', 'FDR Disparity', 'FPR Disparity', 'FOR Disparity',
+                  'FNR Disparity']
+    new_order = [col for col in cols_order if col in aux_df.columns]
+    aux_df = aux_df[new_order]
+
     disparities_group = tabulate(aux_df,
                                  headers='keys',
                                  tablefmt='pipe', showindex='never')
@@ -159,9 +202,17 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols]
     aux_df = aux_df.round(2)
+    # fixing the same order of columns every time!
+    cols_order = ['attribute_value', 'ppr', 'pprev', 'fdr', 'fpr', 'for', 'fnr']
+    new_order = [col for col in cols_order if col in aux_df.columns]
+    aux_df = aux_df[new_order]
     map = {}
     for col in aux_df.columns:
-        map[col] = col + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        if col == 'attribute_value':
+            colstr = 'Attribute Value'
+        else:
+            colstr = col.upper()
+        map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
@@ -169,11 +220,22 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     return group_group
 
 
+def get_sentence_highlevel(fair_results):
+    sent = 'The Bias Report has found that model under assessment is'
+    if fair_results['Overall Fairness'] is True:
+        is_fair = ' FAIR'
+    else:
+        is_fair = ' UNFAIR'
+    sent += is_fair
+
+    return sent
+
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
     mkdown_highlevel = '    \n&nbsp;\n\n## Fairness Overview' + oneline
-    mkdown_highlevel += get_highlevel_report(group_attribute_df) + manylines
+    mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
+    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + manylines
     mkdown_highlevel += oneline + '### Table of Contents:\n'
     mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
     mkdown_highlevel += '2. [Bias Metrics Results](#bias-metrics-results) \n'
@@ -185,27 +247,31 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     # setup the group_value_df (colors and stuff)
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
-
     for attr in configs.attr_cols:
         mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
         mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested)
+        mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested, fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
         mkdown_group += get_group_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                fairness_measures_depend)
-        mkdown_parity += manylines
-        mkdown_disparities += manylines
-        mkdown_group += manylines
+        mkdown_parity += '\n\n[Go to Top](#)' + manylines
+        mkdown_disparities += '\n\n[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
+                              ')' + '\n\n' + '[Go to Top](#)' + manylines
+        mkdown_group += '\n\n[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
+                        '-2)' + '\n\n' + '[Go to Top](#)' + manylines
 
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
-    report_html = report_html.replace('>False', ' style="color:red">False')
-    report_html = report_html.replace('>True', ' style="color:green">True')
+    report_html = report_html.replace('>False', ' style="color:red"><b>Not Fair</b>')
+    report_html = report_html.replace('>True', ' style="color:green"><b>Fair</b>')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
+    report_html = report_html.replace('<table>', '<table class="table">')
+    report_html = report_html.replace(' UNFAIR', '<span style="color:red"><b> UNFAIR</b></span>')
+    report_html = report_html.replace(' FAIR', '<span style="color:green"><b> FAIR</b></span>')
 
     return report_html
 
