@@ -65,7 +65,12 @@ def uploaded_file():
                                            subcategories = subgroups,
                                            fairness = fairness_measures)
     else:
-        group_variables = request.form.getlist('group_variable')
+        print(request.form)
+        rgm = request.form["ref_groups_method"]
+        if rgm == 'predefined':
+            group_variables = request.form.getlist('group_variable1')
+        else:
+            group_variables = request.form.getlist('group_variable2')
         # check if user forgot to select anything; return all
         if len(group_variables)==0:
             group_variables = groups
@@ -74,7 +79,7 @@ def uploaded_file():
         majority_groups = request.form.getlist('use_majority_group')
         fairness_measures = request.form.getlist('fairness_measures')
         fairness_pct = request.form['fairness_pct']
-        rgm = request.form["ref_groups_method"]
+
 
         try:
             fp = 1.0 - float(fairness_pct) / 100.0
@@ -91,12 +96,6 @@ def uploaded_file():
         content = Markup(report)
         #os.remove('tmp.csv')
         return render_template('report.html', content=content)
-
-    '''
-    <!doctype html>
-    <title>Good job</title>
-    <h1>u did it</h1>
-    '''
 
 if __name__ == "__main__":
     app.run()

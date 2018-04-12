@@ -56,7 +56,7 @@
     <div>
     <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
     <input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type='radio' name='ref_groups_method' value='min_metric' id='id2'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
     </div>
     <br>
     <p><b>Select variables that should be used to check for bias and the reference group for each group:</b></p>
@@ -65,7 +65,7 @@
     <div id="div1">
      {% for cat in categories %}
      <p>
-        <input type="checkbox" name="group_variable" value="{{cat}}">{{cat}}
+        <input type="checkbox" name="group_variable1" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}
         <select name="{{cat}}" method="GET" action="/", float>
             <option value="{{subcategories[cat][0]}}" selected>{{subcategories[cat][0]}}</option>
             {% for sc2 in subcategories[cat][1:] %}
@@ -78,7 +78,7 @@
     <div id="div2">
     {% for cat in categories %}
      <p>
-        <input type="checkbox" name="group_variable" value="{{cat}}">{{cat}}
+        <input type="checkbox" name="group_variable2" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}
     </p>
     {% endfor %}
    </div>
@@ -91,7 +91,7 @@
     <p><b>Select Fairness measures that should be computed:</b></p>
 
     {% for fm in fairness %}
-        <input type="checkbox" name="fairness_measures" value="{{fm}}">{{fm}}<br>
+        <input type="checkbox" name="fairness_measures" value="{{fm}}" checked="checked">&nbsp;&nbsp;{{fm}}<br>
     {% endfor %}
     <br>
 
