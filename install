@@ -81,7 +81,7 @@ require $PROJECT \
 # python libs
 
 install_lib() {
-  pip install -r requirement/dev.txt
+  pip install -r requirements.dev
 }
 
 # no great way to check that python libs installed;
@@ -90,16 +90,16 @@ require lib \
   icli::always_install \
   install_lib
 
-# # environment variables
-#
-# EXPECTED_ENVVARS="PGHOST PGPORT PGUSER PGDATABASE"
-#
-# check_envvars() {
-#   icli::check_envvars $EXPECTED_ENVVARS
-# }
-#
-# require envvars \
-#   check_envvars \
-#   --fail-prefix="one or more of these environment variables missing ($EXPECTED_ENVVARS)"
+# environment variables
+
+EXPECTED_ENVVARS=AWS_EB_PROFILE
+
+check_envvars() {
+  icli::check_envvars $EXPECTED_ENVVARS
+}
+
+require envvars \
+  check_envvars \
+  --fail-prefix="one or more of these environment variables missing ($EXPECTED_ENVVARS)"
 
 # end project check/install

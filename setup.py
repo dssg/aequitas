@@ -9,7 +9,7 @@ LICENSE_PATH = ROOT_PATH / 'LICENSE'
 
 README_PATH = ROOT_PATH / 'README.rst'
 
-REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
+REQUIREMENTS_PATH = ROOT_PATH / 'requirements.txt'
 
 
 def stream_requirements(fd):
@@ -53,7 +53,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'aequitas-audit=aequitas_cli.aequitas_audit:main',
+            'aequitas-report=aequitas_cli.aequitas_audit:main',
         ],
     },
     # test_suite='tests',
