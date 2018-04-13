@@ -345,7 +345,7 @@ def get_highlevel_table():
                             'Each group is represented proportional to their representation in the overall population.',
                             'Each group has equal false positive errors made by the model',
                             'Each group has equal false negative errors made by the model'],
-        'Unfairly Affected Groups': ['a', 'b', 'c', 'd']
+        'Unfairly Affected Groups': ['a', 'b', 'c', 'd,e,f']
     }
     landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups', 'criteri'])
     highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
