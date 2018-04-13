@@ -1,5 +1,6 @@
 import logging
 
+import pandas as pd
 from markdown2 import markdown
 from tabulate import tabulate
 
@@ -221,11 +222,11 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = 'The Bias Report has found that model under assessment is'
+    sent = 'The Bias Report has found that based omodel under assessment is'
     if fair_results['Overall Fairness'] is True:
-        is_fair = ' fair.'
+        is_fair = ' fair'
     else:
-        is_fair = ' unfair.'  # ' unfair to the following groups: '
+        is_fair = ' unfair'  # ' unfair to the following groups: '
     sent += is_fair
     return sent
 
@@ -316,7 +317,7 @@ def get_impact_text(group_value_df, fairness_measures_depend):
         ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
                                            (group_value_df['attribute_value'] == row[ref_group_col])]
 
-        sentence = '{group_metric_value}% of the group \"{attribute_name} = {attribute_value}\" is considered positive,' \
+        sentence = '{group_metric_value}% of the group \"{attribute_name}:{attribute_value}\" is considered positive,' \
                    ' in comparison to {ref_group_metric_value}% of positives within the reference group \"{attribute_name} = {' \
                    'ref_group_value}\"' \
                    ''.format(
@@ -333,13 +334,37 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     return text_detail
 
 
+def get_highlevel_table():
+    raw = {
+        'criteria': ['Demographic Parity', 'Proportional Parity', 'False Positive Parity', 'False Negative Parity'],
+
+        'Fairness Criteria': ['[Demographic Parity](#demographic-parity)', '[Proportional Parity](#proportional-parity)',
+                              '[False Positive Parity](#false-positive-parity)',
+                              '[False Negative Parity](#false-negative-parity)'],
+        'Desired Outcome': ['Each group is represented equally.',
+                            'Each group is represented proportional to their representation in the overall population.',
+                            'Each group has equal false positive errors made by the model',
+                            'Each group has equal false negative errors made by the model'],
+        'Unfairly Affected Groups': ['a', 'b', 'c', 'd']
+    }
+    landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups', 'criteri'])
+    highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
+                               tablefmt='pipe',
+                               showindex='never')
+    return highlevel_table
+
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
     mkdown_highlevel = '    \n&nbsp;\n\n# Fairness Overview' + oneline
 
     #mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
-    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + manylines
+    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + oneline
+
+    mkdown_highlevel += get_highlevel_table() + '.' + manylines
+
+    """
+    
     if 'TypeI Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Type I Parity - False Positives\n\n'
         if 'FPR Parity' in group_value_df.columns:
@@ -362,7 +387,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     if 'Impact Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Impact Parity\n\n'
         mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
-
+    """
     mkdown_highlevel += oneline + '### Table of Contents:\n'
 
     mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
