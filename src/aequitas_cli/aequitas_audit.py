@@ -3,7 +3,6 @@ import logging
 from sys import exit
 
 import pandas as pd
-
 from aequitas.bias import Bias
 from aequitas.fairness import Fairness
 from aequitas.group import Group
@@ -64,7 +63,7 @@ def parse_args():
     parser.add_argument('--config',
                         action='store',
                         dest='config_file',
-                        default='configs/configs.yaml',
+                        default='aequitas_cli/configs/configs.yaml',
                         help='Absolute filepath for input yaml config file. Default is configs/configs.yaml')
 
     parser.add_argument('--output-folder',

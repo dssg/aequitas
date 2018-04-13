@@ -1,4 +1,5 @@
 import logging
+import os
 
 import yaml
 
@@ -21,11 +22,14 @@ class Configs(object):
         self.project_description = project_description
 
     @staticmethod
-    def load_configs(configs_path='bin/configs/config.yaml'):
+    def load_configs(configs_path='aequitas_cli/configs/config.yaml'):
         try:
+
             with open(configs_path, 'r') as stream:
                 configs_fromfile = yaml.load(stream)
         except FileNotFoundError:
-            logging.error('Could not find configurations! Please set path to configs.yaml file using --config')
+            logging.error('**Could not find configurations! Please set path to configs.yaml file using --config')
+            print(configs_path)
+            print(os.getcwd())
             exit(1)
         return Configs(**configs_fromfile)
