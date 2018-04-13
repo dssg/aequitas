@@ -2,26 +2,20 @@
 aequitas
 ========
 
-Bias and Fairness audit tool
+Bias and Fairness library
 
-Runs audits on predictions of machine learning models to calculate a variety of bias metrics, combines the results, and displays a report to select tradeoffs between performance and bias.
 
-Requirements
+Installation
 ============
 
-Requires the following information:
+ python setup.py install
 
-1. prediction scores gvien by a model
-2. true labels for those examples
-3. performance metrics of interest
-4. bias metrics of interest
-5. variables to calculate bias for (gender, race, ethnicity, etc.)
+and/or named as a Python install requirement (_e.g._ in a requirements file).
 
-Currently we support the DSAPP schemas for the information above thart contain the following tables:
+And that you can then execute the auditor with:
 
-1. predictions
-2. evaluations
-3. models
-4. model_groups
+    aequitas-audit
 
-The output gets stored in the bias_raw and bias_complete tables.
+And we might add a separate section, expressly for developers, that you can set up your local environment by executing:
+
+    ./install
