@@ -13,5 +13,6 @@ Contributors
 - Abby Stevens
 - Ari Anisfeld
 - Benedict Kuester
+- Jesse London
 - Pedro Saleiro
 - Rayid Ghani
