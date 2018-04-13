@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; aequitas  documentation</title>
+  <title>API &mdash; aequitas  documentation</title>
   
 
   
@@ -25,15 +25,15 @@
   
 
   
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="30 seconds to the webapp" href="30_seconds_webapp.html" />
-    <link rel="prev" title="30 seconds to aequitas-report:" href="30_seconds_aequitas.html" /> 
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="aequitas api" href="aequitas.html" />
+    <link rel="prev" title="Understanding Output" href="../output_data.html" /> 
 
   
-  <script src="_static/js/modernizr.min.js"></script>
+  <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> aequitas
+            <a href="../index.html" class="icon icon-home"> aequitas
           
 
           
@@ -62,7 +62,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -80,13 +80,16 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html">aequitas api</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -101,7 +104,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">aequitas</a>
+          <a href="../index.html">aequitas</a>
         
       </nav>
 
@@ -130,15 +133,15 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>API</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/installation.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -185,23 +188,19 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="Installation">
-<h1>Installation<a class="headerlink" href="#Installation" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/dssg/aequitas.git
-cd aequitas
-python setup.py install
-</pre></div>
-</div>
-<p>and/or named as a Python install requirement (<em>e.g.</em> in a requirements
-file).</p>
-<p>And that you can then execute the auditor with:</p>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>aequitas-audit
-</pre></div>
-</div>
-<p>And we might add a separate section, expressly for developers, that you
-can set up your local environment by executing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">install</span>
-</pre></div>
+<div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>This is the aequitas API documentation, autogenerated from the source code.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aequitas.html">aequitas api</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.group"><code class="docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.bias"><code class="docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.fairness"><code class="docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.preprocessing"><code class="docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 
@@ -213,10 +212,10 @@ can set up your local environment by executing:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="30_seconds_webapp.html" class="btn btn-neutral float-right" title="30 seconds to the webapp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="aequitas.html" class="btn btn-neutral float-right" title="aequitas api" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="30_seconds_aequitas.html" class="btn btn-neutral" title="30 seconds to aequitas-report:" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../output_data.html" class="btn btn-neutral" title="Understanding Output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -246,7 +245,7 @@ can set up your local environment by executing:</p>
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
+            URL_ROOT:'../',
             VERSION:'',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
@@ -255,15 +254,15 @@ can set up your local environment by executing:</p>
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
 
   
 
   
   
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
   
 
   <script type="text/javascript">

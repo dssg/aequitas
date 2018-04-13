@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>src.aequitas.bias &mdash; aequitas  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> aequitas
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aequitas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>src.aequitas.bias</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for src.aequitas.bias</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">exit</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Authors: Pedro Saleiro &lt;saleiro@uchicago.edu&gt;</span>
+<span class="c1">#          Rayid Ghani</span>
+<span class="c1">#</span>
+<span class="c1"># License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.</span>
+
+<div class="viewcode-block" id="Bias"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias">[docs]</a><span class="k">class</span> <span class="nc">Bias</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param key_columns:</span>
+<span class="sd">        :param input_group_metrics:</span>
+<span class="sd">        :param fill_divbyzero:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="n">key_columns</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ppr&#39;</span><span class="p">,</span> <span class="s1">&#39;pprev&#39;</span><span class="p">,</span> <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span> <span class="o">=</span> <span class="n">input_group_metrics</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="mf">10.00000</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="n">fill_divbyzero</span>
+
+<div class="viewcode-block" id="Bias.get_disparity_min_metric"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_min_metric">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_min_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculates several ratios using the group metrics value and dividing by the minimum</span>
+<span class="sd">            group metric value among all groups defined by each attribute</span>
+<span class="sd">        :param df: the resulting dataframe from the group get_crosstabs</span>
+<span class="sd">        :param input_group_metrics: the columns list corresponding to the group metrics for each</span>
+<span class="sd">        we want to calculate the Disparity values</span>
+<span class="sd">        :return: a dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_min_metric()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
+            <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_min_metric&#39;</span><span class="p">)</span>
+        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">group_metric</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">fill_zeros</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.000000</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># this groupby is being called every cycle. maybe we can create a list of df_groups</span>
+                <span class="c1"># and merge df at the end? it can not be simply put outside the loop(the merge...)</span>
+                <span class="n">df_min_idx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)[</span><span class="n">group_metric</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()]</span>
+                <span class="c1"># but we also want to get the group_value of the reference group for each bias metric</span>
+                <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+                <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">,</span> <span class="n">group_metric</span> <span class="o">+</span>
+                                           <span class="s1">&#39;_ref_group_value&#39;</span><span class="p">]]</span> <span class="o">=</span> \
+                    <span class="n">df_min_idx</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">group_metric</span><span class="p">,</span> <span class="s1">&#39;attribute_value&#39;</span><span class="p">]]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s1">&#39;get_bias_min_metric:: one of the following columns is not on the input &#39;</span>
+                    <span class="s1">&#39;dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics &#39;</span>
+                    <span class="s1">&#39;list&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
+            <span class="c1"># creating disparity by dividing each group metric value by the corresponding min</span>
+            <span class="c1"># value from the groups of the target attribute</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span>
+        <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">fill_zeros</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="Bias.get_disparity_major_group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_major_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_major_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculates the bias (disparity) metrics for the predefined list of group metrics</span>
+<span class="sd">            using the majority group within each attribute as the reference group (denominator)</span>
+
+<span class="sd">        :param df: the returning dataframe from the group.get_crosstabs</span>
+<span class="sd">        :return: a dataframe with the bias metrics as new columns and the ref group,</span>
+<span class="sd">                it must have the same number of rows as the input dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_major_group()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
+            <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">df_major_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)[</span><span class="s1">&#39;group_size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_bias_major_group:: one of the following columns is not on the input &#39;</span>
+                          <span class="s1">&#39;dataframe : model_id ,parameter,attribute_name, group_size &#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">disparity_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">]</span>
+        <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing the target ref</span>
+        <span class="c1"># group values which are now labeled as _disparity but we still need to perform the division</span>
+        <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_major_group</span><span class="p">[</span>
+            <span class="n">key_columns</span> <span class="o">+</span> <span class="n">input_group_metrics</span><span class="p">]</span>
+        <span class="c1"># we now need to create the ref_group_value columns in the df_to_merge</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">df_to_merge</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref_group_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_major_group</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
+        <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
+        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">fill_zeros</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+    <span class="k">def</span> <span class="nf">verify_ref_groups_dict_len</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_groups_dict</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+    <span class="k">def</span> <span class="nf">verify_ref_group_loc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_slice</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+<div class="viewcode-block" id="Bias.get_disparity_predefined_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_predefined_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculates the bias (disparity) metrics for the predefined list of input group metrics</span>
+<span class="sd">            using a predefined reference group value for each attribute which is passed using</span>
+<span class="sd">            ref_groups_dict ({&#39;attr1&#39;:&#39;val1&#39;, &#39;attr2&#39;:&#39;val2&#39;})</span>
+
+<span class="sd">        :param df: the output dataframe of the group.get_crosstabs</span>
+<span class="sd">        :param ref_groups_dict: a dictionary {attribute_name:attribute_value, ...}</span>
+<span class="sd">        :param key_columns: optional, the key columns to use on joins</span>
+<span class="sd">        :param input_group_metrics: optional, the group metrics to be used for creating the new</span>
+<span class="sd">        disparity metrics</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero</span>
+<span class="sd">        :return: a dataframe with same number of rows as the input but with additional</span>
+<span class="sd">        disparity metrics columns and ref_group_values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_group()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
+            <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verify_ref_groups_dict_len</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Bias.get_disparity_predefined_groups(): the number of predefined group &#39;</span>
+                          <span class="s1">&#39;values to use as reference is less than the actual number of &#39;</span>
+                          <span class="s1">&#39;attributes in the input dataframe.&#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df_ref_group</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ref_groups_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">group_slice</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">verify_ref_group_loc</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span>
+                <span class="n">df_ref_group</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_ref_group</span><span class="p">,</span> <span class="n">group_slice</span><span class="p">])</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_groups(): reference groups and values provided &#39;</span>
+                          <span class="s1">&#39;do not exist as columns/values in the input dataframe.(Note: check for syntax errors)&#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">disparity_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">]</span>
+        <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing the target ref</span>
+        <span class="c1"># group values which are now labeled as _disparity but we still need to perform the division</span>
+        <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ref_group</span><span class="p">[</span>
+            <span class="n">key_columns</span> <span class="o">+</span> <span class="n">input_group_metrics</span><span class="p">]</span>
+        <span class="c1"># we now need to create the ref_group_value columns in the df_to_merge</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">:</span>
+            <span class="n">df_to_merge</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref_group_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ref_group</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
+        <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
+        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">fill_zeros</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Center for Data Science and Public Policy.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

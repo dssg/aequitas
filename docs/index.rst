@@ -1,9 +1,9 @@
-.. Aequitas documentation master file, created by
+.. aequitas documentation master file, created by
    sphinx-quickstart on Fri Apr 13 15:28:32 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Aequitas's documentation!
+Welcome to aequitas's documentation!
 ====================================
 
 .. toctree::
@@ -16,10 +16,4 @@ Welcome to Aequitas's documentation!
    input_data.ipynb
    config.ipynb
    output_data.ipynb
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api/index

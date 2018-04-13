@@ -6,7 +6,7 @@
    "source": [
     "# Understanding Output\n",
     "\n",
-    "Here we provide a highlevel overview of the bias and fairness metrics output by Aequitas. For detailed definitions of the metrics see [Understanding our metrics]()"
+    "Here we provide a highlevel overview of the bias and fairness metrics output by aequitas. For detailed definitions of the metrics see [Understanding our metrics]()"
    ]
   }
  ],
