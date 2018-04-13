@@ -369,7 +369,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_highlevel += '2. [Bias Metrics Results](#bias-metrics-results) \n'
     mkdown_highlevel += '3. [Group Metrics Results](#group-metrics-results) \n' + manylines
 
-    mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results'
+    mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results' + oneline
     # do we want to show this?
     mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
@@ -396,8 +396,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
-    report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b>')
-    report_html = report_html.replace('>True<', ' style="color:green"><b>Fair</b>')
+    report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b><')
+    report_html = report_html.replace('>True<', ' style="color:green"><b>Fair</b><')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
     report_html = report_html.replace('<table>', '<table class="table">')
