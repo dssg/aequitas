@@ -393,7 +393,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_group += '\n\n[Go to Previous]' + '(#' + '-'.join(attr.lower().split(' ')) + \
                         '-2)' + '\n\n' + '[Go to Top](#)' + manylines
 
-    report = mkdown_highlevel + '----'  #+ mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
+    report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
     report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b>')
