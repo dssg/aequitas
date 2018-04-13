@@ -1,21 +1,21 @@
-
 import argparse
 import logging
 from sys import exit
 
 import pandas as pd
 
-from bin.utils.configs_loader import Configs
-from bin.utils.io import get_csv_data
-from bin.utils.io import get_db_data
-from bin.utils.io import get_engine
-from bin.utils.io import push_tocsv
-from bin.utils.io import push_todb
-from bin.utils.report import audit_report_markdown
-from src.aequitas.bias import Bias
-from src.aequitas.fairness import Fairness
-from src.aequitas.group import Group
-from src.aequitas.preprocessing import preprocess_input_df
+from aequitas.bias import Bias
+from aequitas.fairness import Fairness
+from aequitas.group import Group
+from aequitas.preprocessing import preprocess_input_df
+
+from .utils.configs_loader import Configs
+from .utils.io import get_csv_data
+from .utils.io import get_db_data
+from .utils.io import get_engine
+from .utils.io import push_tocsv
+from .utils.io import push_todb
+from .utils.report import audit_report_markdown
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -27,21 +27,21 @@ about = """
 ##   Center for Data Science and Public Policy                            ##
 ##   http://dsapp.uchicago.edu                                            ##
 ##                                                                        ##
-##   Copyright \xa9 2018. The University of Chicago. All Rights Reserved.    ## 
+##   Copyright \xa9 2018. The University of Chicago. All Rights Reserved.    ##
 ############################################################################
 ____________________________________________________________________________
 
 
-  _______ _            ____  _             _____                       _   
- |__   __| |          |  _ \(_)           |  __ \                     | |  
-    | |  | |__   ___  | |_) |_  __ _ ___  | |__) |___ _ __   ___  _ __| |_ 
+  _______ _            ____  _             _____                       _
+ |__   __| |          |  _ \(_)           |  __ \                     | |
+    | |  | |__   ___  | |_) |_  __ _ ___  | |__) |___ _ __   ___  _ __| |_
     | |  | '_ \ / _ \ |  _ <| |/ _` / __| |  _  // _ \ '_ \ / _ \| '__| __|
-    | |  | | | |  __/ | |_) | | (_| \__ \ | | \ \  __/ |_) | (_) | |  | |_ 
+    | |  | | | |  __/ | |_) | | (_| \__ \ | | \ \  __/ |_) | (_) | |  | |_
     |_|  |_| |_|\___| |____/|_|\__,_|___/ |_|  \_\___| .__/ \___/|_|   \__|
-                                                     | |                   
-                                                     |_|                   
+                                                     | |
+                                                     |_|
 
-____________________________________________________________________________  
+____________________________________________________________________________
 
                     Bias and Fairness Analysis
 
@@ -66,7 +66,6 @@ def parse_args():
                         dest='config_file',
                         default='configs/configs.yaml',
                         help='Absolute filepath for input yaml config file. Default is configs/configs.yaml')
-
 
     parser.add_argument('--output-folder',
                         action='store',
@@ -160,6 +159,7 @@ def run(df, configs, preprocessed=False):
         exit(1)
     print(report)
     return group_value_df
+
 
 def main():
     args = parse_args()
