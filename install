@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#
+# install-cli
+#
+# Copy this file into your project to enable easy, guided
+# installation/bootstrapping.
+#
+# Don't like sh/bash/etc? Sure.
+#
+# Love sh/bash/etc? Yeah, but....
+#
+# Let's use it here, to bootstrap whatever tools/libraries/etc. we
+# *really* love for our project.
+#
+# You can name your implementation of this script whatever you like,
+# such as: install
+#
+
+# Update INSTALL_VERSION to require the version of install-cli this
+# script expects
+INSTALL_VERSION=0.0.4
+
+#
+# start bootstrap installation lib
+#
+# This is a *bit* of boilerplate to ensure we've downloaded the correct
+# version of install-cli. (You probably don't need to touch this.)
+#
+
+INSTALL_FILE=.install.${INSTALL_VERSION//./-}.bash.inc
+
+INSTALL_URL=https://raw.githubusercontent.com/dssg/install-cli/$INSTALL_VERSION/install.bash.inc
+
+[ -f $INSTALL_FILE ] || curl -#L $INSTALL_URL -o $INSTALL_FILE
+
+. $INSTALL_FILE
+
+#
+# end bootstrap installation lib
+#
+
+#
+# start project check/install
+#
+# This is your time to shine!
+# Invoke 'require' to ensure your project's basic requirements are met.
+#
+
+# pyenv
+
+exists_pyenv() {
+  icli::check_command pyenv
+}
+
+install_pyenv() {
+  curl -#L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+}
+
+require pyenv \
+  exists_pyenv \
+  install_pyenv \
+  --fail-prefix="not found"
+
+# virtualenv
+
+PROJECT=$(<.python-version)
+
+exists_virtualenv() {
+  test "$(pyenv version-name 2> /dev/null)" == "$PROJECT"
+}
+
+install_virtualenv() {
+  pyenv virtualenv 3.6.3 $PROJECT
+}
+
+require $PROJECT \
+  exists_virtualenv \
+  install_virtualenv \
+  --fail-prefix="project virtual environment not found"
+
+# python libs
+
+install_lib() {
+  pip install -r requirement/dev.txt
+}
+
+# no great way to check that python libs installed;
+# rather, always fail check and let pip figure it out
+require lib \
+  icli::always_install \
+  install_lib
+
+# # environment variables
+#
+# EXPECTED_ENVVARS="PGHOST PGPORT PGUSER PGDATABASE"
+#
+# check_envvars() {
+#   icli::check_envvars $EXPECTED_ENVVARS
+# }
+#
+# require envvars \
+#   check_envvars \
+#   --fail-prefix="one or more of these environment variables missing ($EXPECTED_ENVVARS)"
+
+# end project check/install

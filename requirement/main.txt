@@ -1,0 +1,7 @@
+Flask==0.12.2
+Flask-Bootstrap==3.3.7.1
+pandas==0.21.0
+tabulate==0.8.2
+markdown2==2.3.5
+pyYAML==3.12
+SQLAlchemy==1.1.1
