@@ -67,7 +67,7 @@ def contact():
 
 @app.route('/customize/<filetype>', methods=['get', 'post'])
 def uploaded_file(filetype):
-    if filetype == 'custom':
+    if filetype == 'upload':
         df = pd.read_csv('tmp.csv')
     else:
         df = pd.read_csv(sample_data[filetype])
