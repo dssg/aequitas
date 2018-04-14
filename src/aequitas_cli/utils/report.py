@@ -359,7 +359,7 @@ def get_highlevel_table(group_value_df, fairness_measures):
                 sublist.append('{group_attr}:{group_val}'.format(group_attr=row['attribute_name'], group_val=row[
                     'attribute_value']))
             if len(sublist) > 0:
-                groups_affected.append('\n'.join(sublist))
+                groups_affected.append(', '.join(sublist))
             else:
                 groups_affected.append('No Unfair Groups Found')
     raw['Unfairly Affected Groups'] = groups_affected
