@@ -334,7 +334,9 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     return text_detail
 
 
-def get_highlevel_table():
+# this method has tons of bad decisions, starting with the supported_fairs variable (it should be an or between fdr-fpr, for-fnr
+def get_highlevel_table(group_value_df, fairness_measures):
+    supported = ['Statistical Parity', 'Impact Parity', 'FPR Parity', 'FNR Parity']
     raw = {
         'criteria': ['Demographic Parity', 'Proportional Parity', 'False Positive Parity', 'False Negative Parity'],
 
@@ -343,10 +345,24 @@ def get_highlevel_table():
                               '[False Negative Parity](#false-negative-parity)'],
         'Desired Outcome': ['Each group is represented equally.',
                             'Each group is represented proportional to their representation in the overall population.',
-                            'Each group has equal false positive errors made by the model',
-                            'Each group has equal false negative errors made by the model'],
-        'Unfairly Affected Groups': ['a', 'b', 'c', 'd,e,f']
+                            'Each group has proportionally equal false positive errors made by the model.',
+                            'Each group has proportionally equal false negative errors made by the model.'],
+        'Unfairly Affected Groups': []
     }
+    groups_affected = []
+    # the order is very important, should check if its reliable
+    for measure in supported:
+        if measure in fairness_measures:
+            false_df = group_value_df.loc[group_value_df[measure] == False]
+            sublist = []
+            for index, row in false_df.iterrows():
+                sublist.append('{group_attr}:{group_val}'.format(group_attr=row['attribute_name'], group_val=row[
+                    'attribute_value']))
+            if len(sublist) > 0:
+                groups_affected.append(', '.join(sublist))
+            else:
+                groups_affected.append('No Unfair Groups Found')
+    raw['Unfairly Affected Groups'] = groups_affected
     landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups', 'criteri'])
     highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
                                tablefmt='pipe',
@@ -361,7 +377,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     #mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + oneline
 
-    mkdown_highlevel += get_highlevel_table() + '.' + manylines
+    mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + manylines
 
     """
     
@@ -390,16 +406,16 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     """
     mkdown_highlevel += oneline + '### Table of Contents:\n'
 
-    mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
-    mkdown_highlevel += '2. [Bias Metrics Results](#bias-metrics-results) \n'
-    mkdown_highlevel += '3. [Group Metrics Results](#group-metrics-results) \n' + manylines
+    mkdown_highlevel += oneline + '1. [Fairness Criteria Assessments](#fairness-criteria-assessments) \n'
+    mkdown_highlevel += '2. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics) \n'
+    mkdown_highlevel += '3. [More Numbers: Group Metrics](#more-numbers:-group-metrics) \n' + manylines
 
-    mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results' + oneline
+    mkdown_parity = '  \n&nbsp;\n\n## Fairness Criteria Assessments' + oneline
     # do we want to show this?
     mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
-    mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
-    mkdown_group = '  \n&nbsp;\n\n## Group Metrics Results'
+    mkdown_disparities = '  \n&nbsp;\n\n## Some Numbers - Bias Metrics'
+    mkdown_group = '  \n&nbsp;\n\n## More Numbers - Group Metrics'
     # setup the group_value_df (colors and stuff)
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
