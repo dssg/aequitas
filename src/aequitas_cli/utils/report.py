@@ -227,7 +227,8 @@ def get_sentence_highlevel(fair_results):
         is_fair = ' fair'
     else:
         is_fair = ' unfair'  # ' unfair to the following groups: '
-    sent += is_fair
+    sent += is_fair + ' using the following fairness criteria:\n\n'
+
     return sent
 
 
@@ -371,11 +372,11 @@ def get_highlevel_table(group_value_df, fairness_measures):
     return highlevel_table
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
-    manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
-    oneline = '  \n&nbsp;\n\n'
-    mkdown_highlevel = '    \n&nbsp;\n\n# The Bias Report' + oneline
+    manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
+    oneline = ' \n\n&nbsp;\n\n'
+    mkdown_highlevel = '# The Bias Report' + oneline
 
-    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + oneline
+    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
 
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
 
@@ -395,6 +396,8 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                             from all races, then you care about this criteria.\n\n""" + oneline
         mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
         mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+
     if 'Impact Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Proportional Parity\n\n'
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have proportional parity if every group is 
@@ -405,6 +408,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                             proportionally on people from all races, then you care about this criteria.\n\n""" + oneline
         mkdown_highlevel += '**The Bias Report has found that the following groups do not have Proportional Parity:**\n\n'
         mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
 
     if 'TypeI Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### False Positive Parity\n\n'
@@ -421,6 +425,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Discovery Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
     if 'TypeII Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### False Negative Parity\n\n'
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have False Negative parity if every group 
@@ -436,10 +441,11 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Omission Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
 
     mkdown_parity = '\n\n## Fairness Criteria Assessments' + oneline
     # do we want to show this?
-    mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
+    # mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
     mkdown_disparities = '\n\n## Some Numbers: Bias Metrics'
     mkdown_group = '\n\n## More Numbers: Group Metrics'
