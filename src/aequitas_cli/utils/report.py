@@ -259,7 +259,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             .format(attribute_name=row['attribute_name'],
                     attribute_value=row['attribute_value'],
                     group_metric_name=names[group_metric],
-                    bias_metric_value=str(round(float(row[bias_metric]) * 100), 2),
+                    bias_metric_value='%.20f' % (float(row[bias_metric]) * 100),
                     ref_group_value=row[ref_group_col],
                     group_metric_value=row[group_metric],
                     ref_group_metric_value=ref_group_row[group_metric].values[0])
@@ -292,8 +292,8 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
                    'correspond to {ref_group_metric_value}% of the total positives.' \
                    ''.format(attribute_name=row['attribute_name'],
                              attribute_value=row['attribute_value'],
-                             group_metric_value=str(round(float(row[group_metric]) * 100), 2),
-                             ref_group_metric_value=str(round(float(ref_group_row[group_metric].values[0]) * 100), 2),
+                             group_metric_value='%.20f' % (float(row[group_metric]) * 100),
+                             ref_group_metric_value='%.20f' % (float(ref_group_row[group_metric].values[0]) * 100),
                              ref_group_value=row[ref_group_col])
         text_detail += sentence + '\n\n'
     if false_df.empty:
@@ -321,10 +321,10 @@ def get_impact_text(group_value_df, fairness_measures_depend):
                    ' in comparison to {ref_group_metric_value}% of positives within the reference group \"{attribute_name} = {' \
                    'ref_group_value}\"' \
                    ''.format(
-            group_metric_value=str(round(float(row[group_metric]) * 100), 2),
+            group_metric_value='%.20f' % (float(row[group_metric]) * 100),
             attribute_name=row['attribute_name'],
             attribute_value=row['attribute_value'],
-            ref_group_metric_value=str(round(float(ref_group_row[group_metric].values[0]) * 100), 2),
+            ref_group_metric_value='%.20f' % (float(ref_group_row[group_metric].values[0]) * 100),
             ref_group_value=row[ref_group_col])
 
         text_detail += sentence + '\n\n'
