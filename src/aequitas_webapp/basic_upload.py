@@ -18,9 +18,9 @@ from aequitas_cli.aequitas_audit import audit
 from aequitas_cli.utils.configs_loader import Configs
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
-sample_data = {'sample1': 'app/sample_data/sample1.csv',
-               'sample2': 'app/sample_data/sample2.csv',
-               'sample3': 'app/sample_data/sample1.csv'}
+sample_data = {'sample1': 'aequitas_webapp/sample_data/sample1.csv',
+               'sample2': 'aequitas_webapp/sample_data/sample2.csv',
+               'sample3': 'aequitas_webapp/sample_data/sample1.csv'}
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'

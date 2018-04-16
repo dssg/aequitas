@@ -1,13 +1,23 @@
-$(document).ready(function () {
-    $('#id1').click(function () {
-        $('#div2').hide();
-        $('#div1').show();
+document.addEventListener("DOMContentLoaded", function(event) {
+    const customGroupRadio = document.getElementById('id1');
+    const majorityGroupRadio = document.getElementById('id2');
+    const minimumGroupRadio = document.getElementById('id3');
+
+    const dropDownElement = document.getElementById('div1');
+    const regularElement = document.getElementById('div2');
+
+    customGroupRadio.addEventListener('click', () => {
+        dropDownElement.style.display = 'block';
+        regularElement.style.display = 'none';
     });
-    $('#id2').click(function () {
-        $('#div1').hide();
-        $('#div2').show();
+
+    majorityGroupRadio.addEventListener('click', () => {
+        dropDownElement.style.display = 'none';
+        regularElement.style.display = 'block';
     });
-    $('#id3').click(function () {
-        $('#div1').hide();
-        $('#div2').show();
+
+    minimumGroupRadio.addEventListener('click', () => {
+        dropDownElement.style.display = 'none';
+        regularElement.style.display = 'block';
     });
+});

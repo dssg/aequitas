@@ -1,5 +1,6 @@
 import logging
 
+import pandas as pd
 from markdown2 import markdown
 from tabulate import tabulate
 
@@ -221,12 +222,13 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = 'The Bias Report has found that model under assessment is'
+    sent = 'The Bias Report evaluates the current model as'
     if fair_results['Overall Fairness'] is True:
-        is_fair = ' fair.'
+        is_fair = ' fair'
     else:
-        is_fair = ' unfair.'  # ' unfair to the following groups: '
-    sent += is_fair
+        is_fair = ' unfair'  # ' unfair to the following groups: '
+    sent += is_fair + ' using the following fairness criteria:\n\n'
+
     return sent
 
 
@@ -258,7 +260,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             .format(attribute_name=row['attribute_name'],
                     attribute_value=row['attribute_value'],
                     group_metric_name=names[group_metric],
-                    bias_metric_value=str(float(row[bias_metric]) * 100),
+                    bias_metric_value='%.2f' % (float(row[bias_metric]) * 100),
                     ref_group_value=row[ref_group_col],
                     group_metric_value=row[group_metric],
                     ref_group_metric_value=ref_group_row[group_metric].values[0])
@@ -291,8 +293,8 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
                    'correspond to {ref_group_metric_value}% of the total positives.' \
                    ''.format(attribute_name=row['attribute_name'],
                              attribute_value=row['attribute_value'],
-                             group_metric_value=str(float(row[group_metric]) * 100),
-                             ref_group_metric_value=str(float(ref_group_row[group_metric].values[0]) * 100),
+                             group_metric_value='%.2f' % (float(row[group_metric]) * 100),
+                             ref_group_metric_value='%.2f' % (float(ref_group_row[group_metric].values[0]) * 100),
                              ref_group_value=row[ref_group_col])
         text_detail += sentence + '\n\n'
     if false_df.empty:
@@ -305,7 +307,7 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
 def get_impact_text(group_value_df, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
-    fairness_metric = 'Statistical Parity'
+    fairness_metric = 'Impact Parity'
     false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
     print(group_value_df.columns)
     bias_metric = fairness_measures_depend[fairness_metric]
@@ -316,14 +318,14 @@ def get_impact_text(group_value_df, fairness_measures_depend):
         ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
                                            (group_value_df['attribute_value'] == row[ref_group_col])]
 
-        sentence = '{group_metric_value}% of the group \"{attribute_name} = {attribute_value}\" is considered positive,' \
+        sentence = '{group_metric_value}% of the group \"{attribute_name}:{attribute_value}\" is considered positive,' \
                    ' in comparison to {ref_group_metric_value}% of positives within the reference group \"{attribute_name} = {' \
                    'ref_group_value}\"' \
                    ''.format(
-            group_metric_value=str(float(row[group_metric]) * 100),
+            group_metric_value='%.2f' % (float(row[group_metric]) * 100),
             attribute_name=row['attribute_name'],
             attribute_value=row['attribute_value'],
-            ref_group_metric_value=str(float(ref_group_row[group_metric].values[0]) * 100),
+            ref_group_metric_value='%.2f' % (float(ref_group_row[group_metric].values[0]) * 100),
             ref_group_value=row[ref_group_col])
 
         text_detail += sentence + '\n\n'
@@ -333,55 +335,131 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     return text_detail
 
 
-def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
-    manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
-    oneline = '  \n&nbsp;\n\n'
-    mkdown_highlevel = '    \n&nbsp;\n\n# Fairness Overview' + oneline
+# this method has tons of bad decisions, starting with the supported_fairs variable (it should be an or between fdr-fpr, for-fnr
+def get_highlevel_table(group_value_df, fairness_measures):
+    supported_name = {'Statistical Parity': '[Equal Parity](#equal-parity)',
+                      'Impact Parity': '[Proportional Parity](#proportional-parity)',
+                      'FPR Parity': '[False Positive Parity](#false-positive-parity)',
+                      'FNR Parity': '[False Negative Parity](#false-negative-parity)'}
+    supported_outcome = {'Statistical Parity': 'Each group is represented equally.',
+                         'Impact Parity': 'Each group is represented proportional to their representation in the overall population.',
+                         'FPR Parity': 'Each group has proportionally equal false positive errors made by the model.',
+                         'FNR Parity': 'Each group has proportionally equal false negative errors made by the model.'}
+    supported_order = ['Statistical Parity', 'Impact Parity', 'FPR Parity', 'FNR Parity']
+    raw = {
+        'Fairness Criteria': [],
+        'Desired Outcome': [],
+        'Unfairly Affected Groups': []
+    }
+    for measure in supported_order:
+        if measure in fairness_measures:
+            raw['Fairness Criteria'].append(supported_name[measure])
+            raw['Desired Outcome'].append(supported_outcome[measure])
+            false_df = group_value_df.loc[group_value_df[measure] == False]
+            sublist = []
+            for index, row in false_df.iterrows():
+                sublist.append('{group_attr}:{group_val}'.format(group_attr=row['attribute_name'], group_val=row[
+                    'attribute_value']))
+            if len(sublist) > 0:
+                raw['Unfairly Affected Groups'].append(', '.join(sublist))
+            else:
+                raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
 
-    #mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
-    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + manylines
+    highlevel_table = '\n\n'
+    if len(raw['Fairness Criteria']) > 0:
+        landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups'])
+        # keep the same order!!
+        # krrp
+        highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
+                               tablefmt='pipe',
+                               showindex='never')
+    return highlevel_table
+
+def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
+    manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
+    oneline = ' \n\n&nbsp;\n\n'
+    mkdown_highlevel = '# The Bias Report' + oneline
+
+    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
+
+    mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
+
+    mkdown_highlevel += oneline + '### Table of Contents:\n\n'
+    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)\n\n'
+    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)\n\n'
+    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics)\n\n'
+    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics)\n\n' + oneline + '----' + manylines
+
+    mkdown_highlevel += '## Fairness Overview' + oneline
+    if 'Statistical Parity' in group_value_df.columns:
+        mkdown_highlevel += '\n\n### Equal Parity\n\n' + oneline
+        mkdown_highlevel += """**What is it?** This criteria considers an attribute to have equal parity is every group is equally 
+                            represented in the selected set. For example, if race (with possible values of white, black, other) 
+                            has equal parity, it implies that all three races are equally represented (33% each) 
+                            in the selected/intervention set.\n\n**When should I care about Equal Parity?** If your desired outcome is to intervene equally on people 
+                            from all races, then you care about this criteria.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
+        mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+
+    if 'Impact Parity' in group_value_df.columns:
+        mkdown_highlevel += '\n\n### Proportional Parity\n\n'
+        mkdown_highlevel += """**What is it?** This criteria considers an attribute to have proportional parity if every group is 
+                            represented proportionally to their share of the population. For example, if race 
+                            (with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has 
+                            proportional parity, it implies that all three races are represented in the same proportions 
+                            (50%, 30%, 20%) in the selected set.\n\n**When should I care about Proportional Parity?** If your desired outcome is to intervene 
+                            proportionally on people from all races, then you care about this criteria.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have Proportional Parity:**\n\n'
+        mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+
     if 'TypeI Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Type I Parity - False Positives\n\n'
+        mkdown_highlevel += '\n\n### False Positive Parity\n\n'
+        mkdown_highlevel += """**What is it?** This criteria considers an attribute to have False Positive parity if every group 
+        has the same False Positive Error Rate. For example, if race has false positive parity, it implies that all three 
+        races have the same False Positive Error Rate.\n\n**When should I care about False Positive Parity?** If your desired outcome is to make false positive errors equally on 
+        people from all races, then you care about this criteria. This is important in cases where your intervention is punitive 
+        and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that 
+        you’re not making mistakes about any single group disproportionately. """ + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Positive Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Positive Rate\n\n'
-            mkdown_highlevel += get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend) + oneline
+            mkdown_highlevel += get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Discovery Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
     if 'TypeII Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Type II Parity - False Negatives\n\n'
+        mkdown_highlevel += '\n\n### False Negative Parity\n\n'
+        mkdown_highlevel += """**What is it?** This criteria considers an attribute to have False Negative parity if every group 
+        has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three races 
+        have the same False Negative Error Rate.\n\n**When should I care about False Negative Parity?** If your desired outcome is to make false negative errors equally on 
+        people from all races, then you care about this criteria. This is important in cases where your intervention is 
+        assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure 
+        that you’re not missing people from certain groups disproportionately.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Negative Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Negative Rate\n\n'
-            mkdown_highlevel += get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend) + oneline
+            mkdown_highlevel += get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Omission Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend) + oneline
-    if 'Statistical Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Statistical Parity\n\n'
-        mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
-    if 'Impact Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Impact Parity\n\n'
-        mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
 
-    mkdown_highlevel += oneline + '### Table of Contents:\n'
-
-    mkdown_highlevel += oneline + '1. [Fairness Measures Results](#fairness-measures-results) \n'
-    mkdown_highlevel += '2. [Bias Metrics Results](#bias-metrics-results) \n'
-    mkdown_highlevel += '3. [Group Metrics Results](#group-metrics-results) \n' + manylines
-
-    mkdown_parity = '  \n&nbsp;\n\n## Fairness Measures Results' + oneline
+    mkdown_parity = '\n\n## Fairness Criteria Assessments' + oneline
     # do we want to show this?
-    mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
+    # mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
-    mkdown_disparities = '  \n&nbsp;\n\n## Bias Metrics Results'
-    mkdown_group = '  \n&nbsp;\n\n## Group Metrics Results'
+    mkdown_disparities = '\n\n## Some Numbers: Bias Metrics'
+    mkdown_group = '\n\n## More Numbers: Group Metrics'
     # setup the group_value_df (colors and stuff)
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
     for attr in configs.attr_cols:
-        mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
+        mkdown_parity += '\n\n### ' + attr + oneline
+        mkdown_disparities += '\n\n### ' + attr + oneline
+        mkdown_group += '\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested, fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
@@ -402,7 +480,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report_html = report_html.replace('>##green##', ' style="color:green">')
     report_html = report_html.replace('<table>', '<table class="table">')
     report_html = report_html.replace(' unfair', '<span style="color:red"><b> unfair</b></span>')
-    report_html = report_html.replace(' fair', '<span style="color:green"><b>fair</b></span>')
+    report_html = report_html.replace(' fair', '<span style="color:green"><b> fair</b></span>')
 
     return report_html
 
