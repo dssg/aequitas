@@ -222,7 +222,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = 'The Bias Report has found that based omodel under assessment is'
+    sent = 'The Bias Report evaluates the current model as'
     if fair_results['Overall Fairness'] is True:
         is_fair = ' fair'
     else:
