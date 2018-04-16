@@ -97,6 +97,8 @@ def audit(df, configs, model_id=1, preprocessed=False):
         if not configs.attr_cols:
             configs.attr_cols = attr_cols_input
     g = Group()
+    print('Welcome to Aequitas-Audit')
+    print('Fairness measures requested:', ','.join(configs.fair_measures_requested))
     groups_model, attr_cols = g.get_crosstabs(df, score_thresholds=configs.score_thresholds, model_id=model_id,
                                               attr_cols=configs.attr_cols)
     print('audit: df shape from the crosstabs:', groups_model.shape)
