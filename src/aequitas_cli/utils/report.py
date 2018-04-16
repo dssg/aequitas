@@ -385,8 +385,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have equal parity is every group is equally 
                             represented in the selected set. For example, if race (with possible values of white, black, other) 
                             has equal parity, it implies that all three races are equally represented (33% each) 
-                            in the selected/intervention set.\n\n
-                            **When should I care about Equal Parity?** If your desired outcome is to intervene equally on people 
+                            in the selected/intervention set.\n\n**When should I care about Equal Parity?** If your desired outcome is to intervene equally on people 
                             from all races, then you care about this criteria.\n\n""" + oneline
         mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
     if 'Impact Parity' in group_value_df.columns:
@@ -395,8 +394,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                             represented proportionally to their share of the population. For example, if race 
                             (with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has 
                             proportional parity, it implies that all three races are represented in the same proportions 
-                            (50%, 30%, 20%) in the selected set.\n\n
-                            **When should I care about Proportional Parity?** If your desired outcome is to intervene 
+                            (50%, 30%, 20%) in the selected set.\n\n**When should I care about Proportional Parity?** If your desired outcome is to intervene 
                             proportionally on people from all races, then you care about this criteria.\n\n""" + oneline
         mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
 
@@ -404,8 +402,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_highlevel += '\n\n### False Positive Parity\n\n'
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have False Positive parity if every group 
         has the same False Positive Error Rate. For example, if race has false positive parity, it implies that all three 
-        races have the same False Positive Error Rate.\n\n
-        **When should I care about False Positive Parity?** If your desired outcome is to make false positive errors equally on 
+        races have the same False Positive Error Rate.\n\n**When should I care about False Positive Parity?** If your desired outcome is to make false positive errors equally on 
         people from all races, then you care about this criteria. This is important in cases where your intervention is punitive 
         and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that 
         you’re not making mistakes about any single group disproportionately. """ + oneline
@@ -419,8 +416,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_highlevel += '\n\n### False Negative Parity\n\n'
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have False Negative parity if every group 
         has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three races 
-        have the same False Negative Error Rate.\n\n
-        **When should I care about False Negative Parity?** If your desired outcome is to make false negative errors equally on 
+        have the same False Negative Error Rate.\n\n**When should I care about False Negative Parity?** If your desired outcome is to make false negative errors equally on 
         people from all races, then you care about this criteria. This is important in cases where your intervention is 
         assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure 
         that you’re not missing people from certain groups disproportionately.\n\n""" + oneline
