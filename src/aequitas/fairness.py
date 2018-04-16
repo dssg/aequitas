@@ -95,6 +95,7 @@ class Fairness(object):
                 bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
                 logging.info('No Parity measure input found on bias_df')
+        print('#########################, ', bias_df.columns)
         for fair, input in self.high_level_fairness_depend.items():
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
