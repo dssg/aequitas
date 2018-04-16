@@ -13,10 +13,11 @@ ref_groups:
 # fairness threshold to be used for assessing fairness
 fairness_threshold: 0.8
 
-fairness_measures: ["FPR Parity", "FNR Parity","Impact Parity"]
+# available fairness_measeure "Impact Parity", "Statistical Parity", "FPR Parity", "FDR Parity", "FNR Parity", "FOR Parity"
+fairness_measures: ["FPR Parity", "FNR Parity"]
 
 #db:
-  # Database containing predictions, evaluations, staging data (DSAPP schema):
+  # Database access credentials, the input query to get the input table and schema to write results:
     #db_credentials:
         #host: your_host
         #database: your_db
@@ -24,8 +25,9 @@ fairness_measures: ["FPR Parity", "FNR Parity","Impact Parity"]
         #password: your_pass
         #port: 5432
 
-    # the output schema is optional, default=public
-    #output_schema: results
 
     # the input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis
     #input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
+
+    # the output schema is optional, default=public
+    #output_schema: results
