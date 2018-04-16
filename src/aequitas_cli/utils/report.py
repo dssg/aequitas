@@ -337,7 +337,7 @@ def get_impact_text(group_value_df, fairness_measures_depend):
 
 # this method has tons of bad decisions, starting with the supported_fairs variable (it should be an or between fdr-fpr, for-fnr
 def get_highlevel_table(group_value_df, fairness_measures):
-    supported_name = {'Statistical Parity': '[Equal Parity](#demographic-parity)',
+    supported_name = {'Statistical Parity': '[Equal Parity](#equal-parity)',
                       'Impact Parity': '[Proportional Parity](#proportional-parity)',
                       'FPR Parity': '[False Positive Parity](#false-positive-parity)',
                       'FNR Parity': '[False Negative Parity](#false-negative-parity)'}
