@@ -368,7 +368,7 @@ def get_highlevel_table(group_value_df, fairness_measures):
     highlevel_table = '\n\n'
     if len(raw['Fairness Criteria']) > 0:
         landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups'])
-        # keep the same order!
+        # keep the same order!!
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
                                tablefmt='pipe',
                                showindex='never')
