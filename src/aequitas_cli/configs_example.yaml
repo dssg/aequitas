@@ -1,0 +1,29 @@
+# Thresholds for positive class (absolutes top k and top k %)
+# column:value pairs, where the column needs to exist in the
+# input_query resulting table, and the values are the thresholds to be applied for
+# that column. Check top of this module for an examples
+score_thresholds:
+    rank_abs: [150, 300]
+    rank_pct: [1.0, 2.0, 5.0, 10.0 ]
+ref_groups_method: "predefined"
+ref_groups:
+  "attribute_1": "<0.30"
+
+fairness_threshold: 0.8
+
+fairness_measures: ["FPR Parity", "FNR Parity","Impact Parity"]
+
+#db:
+  # Database containing predictions, evaluations, staging data (DSAPP schema):
+    #db_credentials:
+        #host: your_host
+        #database: your_db
+        #user: your_user
+        #password: your_pass
+        #port: 5432
+
+    # the output schema is optional, default=public
+    #output_schema: results
+
+	# the input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis
+    #input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
