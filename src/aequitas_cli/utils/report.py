@@ -380,10 +380,10 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
 
     mkdown_highlevel += oneline + '### Table of Contents:\n\n'
-    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)'
-    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)'
-    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics)'
-    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics)' + '----' + manylines
+    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)\n\n'
+    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)\n\n'
+    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics)\n\n'
+    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics)\n\n' + oneline + '----' + manylines
 
     mkdown_highlevel += '## Fairness Overview' + oneline
     if 'Statistical Parity' in group_value_df.columns:
