@@ -364,9 +364,12 @@ def get_highlevel_table(group_value_df, fairness_measures):
                 raw['Unfairly Affected Groups'].append(', '.join(sublist))
             else:
                 raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
+
     landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups'])
     # keep the same order!
-    highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
+    highlevel_table = '\n\n'
+    if len(highlevel_table) > 0:
+        highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
                                tablefmt='pipe',
                                showindex='never')
     return highlevel_table
