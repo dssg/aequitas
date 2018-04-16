@@ -259,7 +259,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             .format(attribute_name=row['attribute_name'],
                     attribute_value=row['attribute_value'],
                     group_metric_name=names[group_metric],
-                    bias_metric_value=str(float(row[bias_metric]) * 100),
+                    bias_metric_value=str(round(float(row[bias_metric]) * 100), 2),
                     ref_group_value=row[ref_group_col],
                     group_metric_value=row[group_metric],
                     ref_group_metric_value=ref_group_row[group_metric].values[0])
@@ -292,8 +292,8 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
                    'correspond to {ref_group_metric_value}% of the total positives.' \
                    ''.format(attribute_name=row['attribute_name'],
                              attribute_value=row['attribute_value'],
-                             group_metric_value=str(float(row[group_metric]) * 100),
-                             ref_group_metric_value=str(float(ref_group_row[group_metric].values[0]) * 100),
+                             group_metric_value=str(round(float(row[group_metric]) * 100), 2),
+                             ref_group_metric_value=str(round(float(ref_group_row[group_metric].values[0]) * 100), 2),
                              ref_group_value=row[ref_group_col])
         text_detail += sentence + '\n\n'
     if false_df.empty:
@@ -321,10 +321,10 @@ def get_impact_text(group_value_df, fairness_measures_depend):
                    ' in comparison to {ref_group_metric_value}% of positives within the reference group \"{attribute_name} = {' \
                    'ref_group_value}\"' \
                    ''.format(
-            group_metric_value=str(float(row[group_metric]) * 100),
+            group_metric_value=str(round(float(row[group_metric]) * 100), 2),
             attribute_name=row['attribute_name'],
             attribute_value=row['attribute_value'],
-            ref_group_metric_value=str(float(ref_group_row[group_metric].values[0]) * 100),
+            ref_group_metric_value=str(round(float(ref_group_row[group_metric].values[0]) * 100), 2),
             ref_group_value=row[ref_group_col])
 
         text_detail += sentence + '\n\n'
@@ -387,6 +387,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                             has equal parity, it implies that all three races are equally represented (33% each) 
                             in the selected/intervention set.\n\n**When should I care about Equal Parity?** If your desired outcome is to intervene equally on people 
                             from all races, then you care about this criteria.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
         mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
     if 'Impact Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Proportional Parity\n\n'
@@ -396,6 +397,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
                             proportional parity, it implies that all three races are represented in the same proportions 
                             (50%, 30%, 20%) in the selected set.\n\n**When should I care about Proportional Parity?** If your desired outcome is to intervene 
                             proportionally on people from all races, then you care about this criteria.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have Proportional Parity:**\n\n'
         mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
 
     if 'TypeI Parity' in group_value_df.columns:
@@ -406,6 +408,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         people from all races, then you care about this criteria. This is important in cases where your intervention is punitive 
         and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that 
         you’re not making mistakes about any single group disproportionately. """ + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Positive Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Positive Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend) + oneline
@@ -420,6 +423,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         people from all races, then you care about this criteria. This is important in cases where your intervention is 
         assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure 
         that you’re not missing people from certain groups disproportionately.\n\n""" + oneline
+        mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Negative Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Negative Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend) + oneline
