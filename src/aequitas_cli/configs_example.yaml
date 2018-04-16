@@ -27,5 +27,5 @@ fairness_measures: ["FPR Parity", "FNR Parity","Impact Parity"]
     # the output schema is optional, default=public
     #output_schema: results
 
-	# the input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis
+    # the input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis
     #input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
