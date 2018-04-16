@@ -81,7 +81,7 @@ require $PROJECT \
 # python libs
 
 install_lib() {
-  pip install -r requirements.dev
+  pip install -r requirement/dev.txt
 }
 
 # no great way to check that python libs installed;

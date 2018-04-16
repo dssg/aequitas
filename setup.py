@@ -9,7 +9,7 @@ LICENSE_PATH = ROOT_PATH / 'LICENSE'
 
 README_PATH = ROOT_PATH / 'README.rst'
 
-REQUIREMENTS_PATH = ROOT_PATH / 'requirements.txt'
+REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
 
 def stream_requirements(fd):
