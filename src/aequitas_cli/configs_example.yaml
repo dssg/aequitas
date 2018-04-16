@@ -16,8 +16,8 @@ fairness_threshold: 0.8
 # available fairness_measeure "Impact Parity", "Statistical Parity", "FPR Parity", "FDR Parity", "FNR Parity", "FOR Parity"
 fairness_measures: ["FPR Parity", "FNR Parity"]
 
+# to connect to a database instead of using "--input <filename>", please uncomment the db key, credentials, and input_query
 #db:
-  # Database access credentials, the input query to get the input table and schema to write results:
     #db_credentials:
         #host: your_host
         #database: your_db
