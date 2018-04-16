@@ -55,7 +55,7 @@ def push_todb(engine, output_schema, create_tables, output_df):
     """
     logging.info('pushing to db aequitas table...')
     try:
-        output_df.set_index(['model_id', 'group_variable']).to_sql(
+        output_df.set_index(['model_id', 'attribute_name']).to_sql(
             schema=output_schema,
             name='aequitas_group',
             con=engine,
@@ -76,7 +76,10 @@ def push_tocsv(input_file, output_folder, output_df):
     logging.info('pushing to csv...')
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
     ipath, input_name = path.split(input_file)
-    outpath = output_folder + input_name[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
+    # outpath = output_folder + input_name[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
+    # for now we are saving the csv in same folder as the input file
+    outpath = ipath + input_name[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
+
     try:
         output_df.to_csv(outpath, encoding='utf-8', index=False)
     except IOError:
