@@ -69,8 +69,8 @@ def parse_args():
     parser.add_argument('--output-folder',
                         action='store',
                         dest='output_folder',
-                        default='output/',
-                        help='Folder name to be created inside aequitas/output/')
+                        default='',
+                        help='Folder name to be created inside aequitas')
 
     parser.add_argument('--create-tables',
                         action='store_true',
