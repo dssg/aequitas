@@ -373,13 +373,19 @@ def get_highlevel_table(group_value_df, fairness_measures):
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '  \n&nbsp;\n\n      \n&nbsp;\n\n'
     oneline = '  \n&nbsp;\n\n'
-    mkdown_highlevel = '    \n&nbsp;\n\n# Fairness Overview' + oneline
+    mkdown_highlevel = '    \n&nbsp;\n\n# The Bias Report' + oneline
 
-    #mkdown_highlevel += get_highlevel_report(group_attribute_df) + '\n\n'
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + oneline
 
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + manylines
 
+    mkdown_highlevel += oneline + '### Table of Contents:\n\n'
+    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments) \n\n'
+    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments) \n\n'
+    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics) \n\n'
+    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics) \n\n' + manylines
+
+    mkdown_parity = '  \n&nbsp;\n\n## Fairness Overview' + oneline
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Equal Parity\n\n' + oneline
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have equal parity is every group is equally 
@@ -411,7 +417,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Positive Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Positive Rate\n\n'
-            mkdown_highlevel += get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend) + oneline
+            mkdown_highlevel += get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Discovery Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend) + oneline
@@ -426,16 +432,10 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
         mkdown_highlevel += '**The Bias Report has found that the following groups do not have False Negative Parity:**\n\n'
         if 'FPR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Negative Rate\n\n'
-            mkdown_highlevel += get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend) + oneline
+            mkdown_highlevel += get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
         if 'FDR Parity' in group_value_df.columns:
             mkdown_highlevel += '\n\n##### False Omission Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend) + oneline
-
-    mkdown_highlevel += oneline + '### Table of Contents:\n'
-
-    mkdown_highlevel += oneline + '1. [Fairness Criteria Assessments](#fairness-criteria-assessments) \n'
-    mkdown_highlevel += '2. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics) \n'
-    mkdown_highlevel += '3. [More Numbers: Group Metrics](#more-numbers:-group-metrics) \n' + manylines
 
     mkdown_parity = '  \n&nbsp;\n\n## Fairness Criteria Assessments' + oneline
     # do we want to show this?
