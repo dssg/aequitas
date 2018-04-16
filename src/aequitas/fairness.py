@@ -105,7 +105,7 @@ class Fairness(object):
             elif input[1] in bias_df.columns:
                 bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
-                logging.error('No high level measure input found on bias_df')
+                logging.error('No high level measure input found on bias_df' + input[1])
         return bias_df
 
     def get_group_attribute_fairness(self, group_value_df, fair_measures_requested=None):
