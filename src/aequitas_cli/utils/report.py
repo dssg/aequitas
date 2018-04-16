@@ -377,15 +377,15 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
 
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + '.' + oneline
 
-    mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + manylines
+    mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
 
     mkdown_highlevel += oneline + '### Table of Contents:\n\n'
-    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments) \n\n'
-    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments) \n\n'
-    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics) \n\n'
-    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics) \n\n' + manylines
+    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)'
+    mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)'
+    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics)'
+    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics)' + '----' + manylines
 
-    mkdown_parity = '  \n&nbsp;\n\n## Fairness Overview' + oneline
+    mkdown_highlevel += '## Fairness Overview' + oneline
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Equal Parity\n\n' + oneline
         mkdown_highlevel += """**What is it?** This criteria considers an attribute to have equal parity is every group is equally 
@@ -437,19 +437,19 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
             mkdown_highlevel += '\n\n##### False Omission Rate\n\n'
             mkdown_highlevel += get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend) + oneline
 
-    mkdown_parity = '  \n&nbsp;\n\n## Fairness Criteria Assessments' + oneline
+    mkdown_parity = '\n\n## Fairness Criteria Assessments' + oneline
     # do we want to show this?
     mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
-    mkdown_disparities = '  \n&nbsp;\n\n## Some Numbers: Bias Metrics'
-    mkdown_group = '  \n&nbsp;\n\n## More Numbers: Group Metrics'
+    mkdown_disparities = '\n\n## Some Numbers: Bias Metrics'
+    mkdown_group = '\n\n## More Numbers: Group Metrics'
     # setup the group_value_df (colors and stuff)
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
     for attr in configs.attr_cols:
-        mkdown_parity += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_disparities += '  \n&nbsp;\n\n### ' + attr + oneline
-        mkdown_group += '  \n&nbsp;\n\n### ' + attr + oneline
+        mkdown_parity += '\n\n### ' + attr + oneline
+        mkdown_disparities += '\n\n### ' + attr + oneline
+        mkdown_group += '\n\n### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested, fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
