@@ -12,7 +12,8 @@ logging.getLogger(__name__)
 # License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
 
 class Bias(object):
-
+    """
+    """
     def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
         """
 

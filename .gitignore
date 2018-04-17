@@ -4,6 +4,7 @@ __pycache__/
 /dist/
 
 /.install.*.bash.inc
+*.ipynb_checkpoint*
 
 .envrc
 
