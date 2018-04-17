@@ -10,6 +10,7 @@ from flask import (
 )
 from flask_bootstrap import Bootstrap
 import pandas as pd
+import os
 
 from aequitas.fairness import Fairness
 from aequitas.preprocessing import preprocess_input_df
@@ -49,7 +50,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             df = pd.read_csv(request.files.get('file'))
-            df.to_csv('tmp.csv', index=False)
+            df.to_csv(os.path.join(HERE, 'static/output/tmp.csv'), index=False)
             filetype = 'upload'
             # session['df'] = df.to_json()
             return redirect(url_for("uploaded_file", filetype=filetype))
@@ -64,7 +65,7 @@ def about():
 @application.route('/customize/<filetype>', methods=['get', 'post'])
 def uploaded_file(filetype):
     if filetype == 'upload':
-        df = pd.read_csv('tmp.csv')
+        df = pd.read_csv(os.path.join(HERE, 'static/output/tmp.csv'))
     else:
         df = pd.read_csv(sample_data[filetype])
     df, groups = preprocess_input_df(df)
@@ -116,7 +117,8 @@ def uploaded_file(filetype):
                           attr_cols=group_variables)
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
-        with open('tmpreport.txt', 'w') as f:
+
+        with open(os.path.join(HERE, 'static/output/tmpreport.txt'), 'w') as f:
             f.write(report)
 
         # os.remove('tmp.csv')
@@ -125,7 +127,7 @@ def uploaded_file(filetype):
 
 @application.route('/report/<filetype>', methods=['GET', 'POST'])
 def report(filetype):
-    with open('tmpreport.txt', 'r') as f:
+    with open(os.path.join(HERE, 'static/output/tmpreport.txt'), 'r') as f:
         report2 = f.read()
     content = Markup(report2)
     back_url = url_for('uploaded_file', filetype=filetype)
