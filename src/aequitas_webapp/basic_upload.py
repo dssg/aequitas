@@ -60,11 +60,6 @@ def about():
     return render_template("about.html")
 
 
-@app.route('/contact', methods=['GET', 'POST'])
-def contact():
-    return render_template("contact.html")
-
-
 @app.route('/customize/<filetype>', methods=['get', 'post'])
 def uploaded_file(filetype):
     if filetype == 'upload':
@@ -77,14 +72,13 @@ def uploaded_file(filetype):
         subgroups[col] = (list(set(df[col])))
 
     if "submit" not in request.form:
-        f = Fairness()
-        fairness_measures = f.fair_measures_supported
+        fairness_measures = ['Equal Parity', 'Proportional Parity', 'False Positive Parity', 'False Negative Parity']
         return render_template("customize_report2.html",
                                            categories=groups,
                                            subcategories=subgroups,
                                            fairness=fairness_measures)
     else:
-        print(request.form)
+        f = Fairness()
         rgm = request.form["ref_groups_method"]
         if rgm == 'predefined':
             group_variables = request.form.getlist('group_variable1')
@@ -96,7 +90,17 @@ def uploaded_file(filetype):
         # remove unwanted cols from df
         subgroups = {g: request.form[g] for g in group_variables}
         # majority_groups = request.form.getlist('use_majority_group')
-        fairness_measures = request.form.getlist('fairness_measures')
+        raw_fairness_measures = request.form.getlist('fairness_measures')
+        if len(raw_fairness_measures)==0:
+            fairness_measures = f.fair_measures_supported
+        else:
+        # map selected measures to input
+            fair_map = {'Equal Parity':['Statistical Parity'],
+                        'Proportional Parity': ['Impact Parity'],
+                        'False Positive Parity': ['FPR Parity', 'FDR Parity'],
+                        'False Negative Parity': ['FNR Parity', 'FOR Parity']
+                        }
+            fairness_measures = [y for x in raw_fairness_measures for y in fair_map[x]]
         fairness_pct = request.form['fairness_pct']
 
         try:
@@ -111,9 +115,20 @@ def uploaded_file(filetype):
                           attr_cols=group_variables)
 
         gv_df, report = audit(df, model_id=1, configs=configs, preprocessed=True)
-        content = Markup(report)
+        with open('tmpreport.txt', 'w') as f:
+            f.write(report)
+
         # os.remove('tmp.csv')
-        return render_template('report.html', content=content)
+        return redirect(url_for("report", filetype=filetype))
+
+@app.route('/report/<filetype>', methods=['GET', 'POST'])
+def report(filetype):
+    with open('tmpreport.txt', 'r') as f:
+        report2 = f.read()
+    content = Markup(report2)
+    back_url = url_for('uploaded_file', filetype=filetype)
+    return render_template('report.html', content=content, go_back=back_url)
+
 
 if __name__ == "__main__":
     app.run()
