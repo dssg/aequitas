@@ -92,7 +92,7 @@ def uploaded_file(filetype):
         # majority_groups = request.form.getlist('use_majority_group')
         raw_fairness_measures = request.form.getlist('fairness_measures')
         if len(raw_fairness_measures)==0:
-            fairness_measures = f.fair_measures_supported
+            fairness_measures = list(f.fair_measures_supported)
         else:
         # map selected measures to input
             fair_map = {'Equal Parity':['Statistical Parity'],
