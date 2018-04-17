@@ -1,5 +1,5 @@
 ========
-aequitas
+Aequitas
 ========
 
 The machine learning Bias and Fairness library
