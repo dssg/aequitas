@@ -8,6 +8,8 @@ The machine learning Bias and Fairness library
 Installation
 ============
 
+Aequitas requires Python 3.
+
 Install this Python library from source::
 
     python setup.py install
