@@ -32,7 +32,7 @@ setup(
     name='aequitas',
     version='0.1.0',
     # description="",
-    long_description=README_PATH.read_text(),
+    long_description=README_PATH.read_text(encoding='utf8'),
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
     url='https://github.com/dssg/aequitas-public',
@@ -40,7 +40,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    license=LICENSE_PATH.read_text(),
+    license=LICENSE_PATH.read_text(encoding='utf8'),
     zip_safe=False,
     keywords='bias aequitas',
     classifiers=[
