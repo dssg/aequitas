@@ -63,7 +63,7 @@ def parse_args():
     parser.add_argument('--config',
                         action='store',
                         dest='config_file',
-                        default='aequitas_cli/configs/configs.yaml',
+                        default=None,
                         help='Absolute filepath for input yaml config file. Default is configs/configs.yaml')
 
     parser.add_argument('--output-folder',
@@ -121,6 +121,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
     group_attribute_df = f.get_group_attribute_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     print('_______________\nGroup Variable level:')
     print(group_attribute_df)
+    print(group_value_df[['fpr', 'fdr', 'fnr', 'for', 'group_label_neg', 'group_label_pos']])
     fair_results = f.get_overall_fairness(group_attribute_df)
     print('_______________\nModel level:')
     print(fair_results)

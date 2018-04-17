@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+from numpy import nan
 
 logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class Group(object):
         :return:
         """
 
-        divide = lambda x, y: x / y if y != 0 else 0.0
+        divide = lambda x, y: x / y if y != 0 else nan
 
         predicted_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
             (x[rank_col] <= thres).sum()
