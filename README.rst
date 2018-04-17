@@ -1,21 +1,41 @@
 ========
-aequitas
+Aequitas
 ========
 
-Bias and Fairness library
+The machine learning Bias and Fairness library
 
 
 Installation
 ============
 
- python setup.py install
+Aequitas requires Python 3.
 
-and/or named as a Python install requirement (_e.g._ in a requirements file).
+Install this Python library from source::
 
-And that you can then execute the auditor with:
+    python setup.py install
 
-    aequitas-audit
+...or named as an installation requirement, *e.g.* via ``pip``::
 
-And we might add a separate section, expressly for developers, that you can set up your local environment by executing:
+    pip install git+https://github.com/dssg/aequitas.git
+
+Use
+===
+
+You may then import the ``aequitas`` module from Python::
+
+    import aequitas
+
+...and execute the auditor from the command line::
+
+    aequitas-report
+
+Development
+===========
+
+Provision your development environment via ``install``::
 
     ./install
+
+Common development tasks, such as deploying the webapp, may then be handled via ``manage``::
+
+    manage --help

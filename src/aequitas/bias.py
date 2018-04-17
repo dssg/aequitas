@@ -77,7 +77,7 @@ class Bias(object):
             df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(np.inf, fill_divbyzero)
-        df = df.fillna(value=fill_zeros)
+        # df = df.fillna(value=fill_zeros)
         return df
 
     def get_disparity_major_group(self, df, key_columns=None, input_group_metrics=None,
@@ -119,7 +119,7 @@ class Bias(object):
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        df = df.fillna(value=fill_zeros)
+        #df = df.fillna(value=fill_zeros)
         return df
 
     def verify_ref_groups_dict_len(self, df, ref_groups_dict):
@@ -186,5 +186,5 @@ class Bias(object):
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        df = df.fillna(value=fill_zeros)
+        #df = df.fillna(value=fill_zeros)
         return df

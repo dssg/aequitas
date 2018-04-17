@@ -171,6 +171,6 @@ class Fairness(object):
         elif True in fair_vals:
             overall_fairness['Overall Fairness'] = True
         else:
-            overall_fairness['Overall Fairness'] = 'Unknown!'
+            overall_fairness['Overall Fairness'] = 'Undefined'
         return overall_fairness
 

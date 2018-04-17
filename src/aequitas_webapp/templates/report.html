@@ -17,7 +17,7 @@
     <link href="../static/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/css/jumbotron.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -36,14 +36,19 @@
         <nav>
           <ul class="nav nav-pills pull-right">
             <li role="presentation" class="active"><a href="{{ url_for('upload_file')}}">Home</a></li>
-            <li role="presentation"><a href="{{ url_for('about')}}">About</a></li>
-            <li role="presentation"><a href="{{ url_for('contact')}}">Contact</a></li>
+            <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
           </ul>
         </nav>
-        <h3 class="text-muted">Aequitas</h3>
+        <img src="../static/images/aequitas_header.png" width="200" height="80">
       </div>
 
+    <a href="{{go_back}}">Back to customize</a><br>
     {{ content }}
+
+      <footer class="footer">
+        <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
+  </footer>
   </body>
   <script src="../static/assets/js/ie10-viewport-bug-workaround.js"></script>
+
 </html>

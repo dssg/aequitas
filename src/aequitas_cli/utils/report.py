@@ -245,7 +245,6 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
-    print(group_value_df.columns)
     bias_metric = fairness_measures_depend[fairness_metric]
     group_metric = bias_metric.replace('_disparity', '')
     ref_group_col = group_metric + '_ref_group_value'
@@ -253,7 +252,6 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
     for index, row in false_df.iterrows():
         ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
                                            (group_value_df['attribute_value'] == row[ref_group_col])]
-
         sentence = 'The {group_metric_name} for \"{attribute_name} = {attribute_value}\" is {bias_metric_value}% ' \
                    'of the {group_metric_name} of the reference group \"{attribute_name} = {ref_group_value}\",' \
                    ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
@@ -267,8 +265,8 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
         text_detail += sentence + '\n\n'
     if false_df.empty:
         text_detail += 'Based on the fairness threshold used, there is no disparate values in {group_metric_name} between ' \
-                       'the each group and the respective reference group.\n\n' \
-            .format(group_group_metric_name=names[group_metric])
+                       'the each group and the respective reference group.\n\n'.format(group_metric_name=names[
+            group_metric])
     return text_detail
 
 
@@ -474,6 +472,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report = mkdown_highlevel + '----' + mkdown_parity + '----' + mkdown_disparities + '----' + mkdown_group
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
+    report_html = report_html.replace('nan', 'Undefined')
     report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b><')
     report_html = report_html.replace('>True<', ' style="color:green"><b>Fair</b><')
     report_html = report_html.replace('>##red##', ' style="color:red">')
