@@ -21,9 +21,9 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
 sample_data = {'sample1': 'aequitas_webapp/sample_data/compas_for_aequitas.csv',
                'sample2': 'aequitas_webapp/sample_data/adult_rf_binary.csv'}
 
-app = Flask(__name__)
-app.secret_key = 'super secret key'
-Bootstrap(app)
+application = Flask(__name__)
+application.secret_key = 'super secret key'
+Bootstrap(application)
 
 
 def allowed_file(filename):
@@ -31,7 +31,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/', methods=['GET', 'POST'])
+@application.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         session.clear()
@@ -54,12 +54,12 @@ def upload_file():
     return render_template("file_upload.html")
 
 
-@app.route('/about', methods=['GET', 'POST'])
+@application.route('/about', methods=['GET', 'POST'])
 def about():
     return render_template("about.html")
 
 
-@app.route('/customize/<filetype>', methods=['get', 'post'])
+@application.route('/customize/<filetype>', methods=['get', 'post'])
 def uploaded_file(filetype):
     if filetype == 'upload':
         df = pd.read_csv('tmp.csv')
@@ -90,11 +90,11 @@ def uploaded_file(filetype):
         subgroups = {g: request.form[g] for g in group_variables}
         # majority_groups = request.form.getlist('use_majority_group')
         raw_fairness_measures = request.form.getlist('fairness_measures')
-        if len(raw_fairness_measures)==0:
+        if len(raw_fairness_measures) == 0:
             fairness_measures = list(f.fair_measures_supported)
         else:
-        # map selected measures to input
-            fair_map = {'Equal Parity':['Statistical Parity'],
+            # map selected measures to input
+            fair_map = {'Equal Parity': ['Statistical Parity'],
                         'Proportional Parity': ['Impact Parity'],
                         'False Positive Parity': ['FPR Parity', 'FDR Parity'],
                         'False Negative Parity': ['FNR Parity', 'FOR Parity']
@@ -120,7 +120,8 @@ def uploaded_file(filetype):
         # os.remove('tmp.csv')
         return redirect(url_for("report", filetype=filetype))
 
-@app.route('/report/<filetype>', methods=['GET', 'POST'])
+
+@application.route('/report/<filetype>', methods=['GET', 'POST'])
 def report(filetype):
     with open('tmpreport.txt', 'r') as f:
         report2 = f.read()
@@ -129,6 +130,5 @@ def report(filetype):
     return render_template('report.html', content=content, go_back=back_url)
 
 
-
 if __name__ == "__main__":
-    app.run()
+    application.run()
