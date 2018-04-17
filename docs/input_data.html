@@ -193,11 +193,18 @@
 </style>
 <div class="section" id="Understanding-Input">
 <h1>Understanding Input<a class="headerlink" href="#Understanding-Input" title="Permalink to this headline">¶</a></h1>
-<p>Input data must have columns: - <code class="docutils literal notranslate"><span class="pre">score</span></code> - <code class="docutils literal notranslate"><span class="pre">label_value</span></code> - at least
-one group. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</p>
+<p>Input data must have columns:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
+<li>at least one group. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
+</ul>
 <p>All columns in the input data are assumed to be groups with the
 exception of the following reserved columns.</p>
-<p>Reserved column name: - <code class="docutils literal notranslate"><span class="pre">model_id</span></code> ____</p>
+<p>Reserved column name:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">model_id</span></code></li>
+</ul>
 <div class="section" id="score">
 <h2><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h2>
 <p>By default, aequitas_audit assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary
@@ -220,7 +227,8 @@ continuous, …</p>
 <h2><code class="docutils literal notranslate"><span class="pre">model_id</span></code><a class="headerlink" href="#model_id" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">model_id</span></code> is an identifier tied to the output of a specific model.
 With a <code class="docutils literal notranslate"><span class="pre">model_id</span></code> column you can test the bias of multiple models at
-once.</p>
+once. This feature is available in CLI only. The webapp does not
+currently support multiple models.</p>
 </div>
 </div>
 

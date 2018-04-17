@@ -7,16 +7,17 @@
     "# Understanding Input\n",
     "\n",
     "Input data must have columns:\n",
-    "- `score`\n",
-    "- `label_value`\n",
-    "- at least one group. e.g. `race`, `sex` and `age_cat`.\n",
+    "\n",
+    "* `score`\n",
+    "* `label_value`\n",
+    "* at least one group. e.g. `race`, `sex` and `age_cat`.\n",
     "\n",
     "\n",
     "All columns in the input data are assumed to be groups with the exception of the following reserved columns.\n",
     "\n",
     "Reserved column name:\n",
-    "- `model_id`\n",
-    "____\n",
+    "\n",
+    "* `model_id`\n",
     "\n",
     "## `score`\n",
     "\n",
@@ -32,8 +33,7 @@
     "\n",
     "## `model_id`\n",
     "\n",
-    "`model_id` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once.\n",
-    "\n"
+    "`model_id` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once. This feature is available in CLI only. The webapp does not currently support multiple models.\n"
    ]
   }
  ],

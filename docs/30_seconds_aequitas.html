@@ -195,29 +195,29 @@
 }
 </style>
 <p><img alt="image0" src="https://raw.githubusercontent.com/dssg/aequitas/master/src/aequitas_cli/utils/img/aequitas_report_header.png" /></p>
-<p>Practitioners face the challenge of determining whether or not such
-patterns reflect bias or not. The fact that we have multiple ways to
-measure bias adds complexity to the decisionmaking process. With
-aequitas, we provide a tool that automates the reporting of various
-fairnes metrics to aid in this process.</p>
-<p>aequitas is compatible with: <strong>Python X.X</strong>.</p>
-<p><a class="reference external" href="https://jzo5v1.axshare.com/home.html">Try it now</a> or <a class="reference external" href="https://github.com/dssg/aequitas">Install on
-your computer</a></p>
+<p><strong>An open source bias audit toolkit for machine learning developers,
+analysts, and policymakers to audit machine learning models for
+discrimination and bias, and make informed and equitable decisions
+around developing and deploying predictive risk-assessment tools.</strong></p>
+<p><a class="reference external" href="http://dsapp.uchicago.edu/aequitas/">Learn more about the project</a></p>
+<p><a class="reference external" href="http://aequitas.dssg.io">Try it now</a> or <a class="reference external" href="https://github.com/dssg/aequitas">Install on your
+computer</a></p>
+<p>aequitas is compatible with: <strong>Python 3.6</strong>.</p>
 <div class="section" id="30-seconds-to-aequitas-report:">
 <h1>30 seconds to <em>aequitas-report</em>:<a class="headerlink" href="#30-seconds-to-aequitas-report:" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li>With aequitas-report uncovering bias is as simple as running a single
-command on a csv.</li>
-</ul>
+<p>With aequitas-report uncovering bias is as simple as running a single
+command on a csv.</p>
 <div class="section" id="Input-machine-learning-predictions">
 <h2>Input machine learning predictions<a class="headerlink" href="#Input-machine-learning-predictions" title="Permalink to this headline">¶</a></h2>
-<div class="line-block">
-<div class="line">The input data at least has:</div>
-<div class="line">- score - label_value - group columns: e.g.&nbsp;race, sex</div>
-</div>
-<p><a class="reference external" href="./input_data">Getting started with input data</a></p>
+<p>The input data at least has:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
+<li>at least one group. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
+</ul>
+<p><a class="reference external" href="./input_data.html">Getting started with input data</a></p>
 <p>Additionally, disparity is always defined in relation to a base group.
-By default, we use majority as the base group. <a class="reference external" href="./base_groups">Defining a base
+By default, we use majority as the base group. <a class="reference external" href="./config.html">Defining a base
 group</a></p>
 </div>
 <div class="section" id="Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">
@@ -280,7 +280,7 @@ levels:</p>
 <li>Overall fairness</li>
 <li><em>``attribute`` level</em></li>
 </ul>
-<p><a class="reference external" href="./output_data">understanding output</a></p>
+<p><a class="reference external" href="./output_data.html">understanding output</a></p>
 </div>
 </div>
 </div>
