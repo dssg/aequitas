@@ -32,7 +32,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name='aequitas',
-    version='0.2.0',
+    version='0.3.0',
     # description="",
     long_description=README_PATH.read_text(encoding='utf8'),
     author="Center for Data Science and Public Policy",
