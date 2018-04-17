@@ -28,6 +28,8 @@ with REQUIREMENTS_PATH.open() as requirements_file:
     REQUIREMENTS = list(stream_requirements(requirements_file))
 
 
+# (Read files with explicit encoding for targets like Elastic Beanstalk)
+
 setup(
     name='aequitas',
     version='0.1.0',
