@@ -18,8 +18,10 @@ from aequitas_cli.aequitas_audit import audit
 from aequitas_cli.utils.configs_loader import Configs
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'csv'])
-sample_data = {'sample1': 'aequitas_webapp/sample_data/compas_for_aequitas.csv',
-               'sample2': 'aequitas_webapp/sample_data/adult_rf_binary.csv'}
+HERE = os.path.dirname(os.path.abspath(__file__))
+
+sample_data = {'sample1': os.path.join(HERE, 'sample_data/compas_for_aequitas.csv'),
+               'sample2': os.path.join(HERE, 'sample_data/adult_rf_binary.csv')}
 
 application = Flask(__name__)
 application.secret_key = 'super secret key'
