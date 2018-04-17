@@ -90,16 +90,16 @@ require lib \
   icli::always_install \
   install_lib
 
-# # environment variables
-#
-# EXPECTED_ENVVARS="PGHOST PGPORT PGUSER PGDATABASE"
-#
-# check_envvars() {
-#   icli::check_envvars $EXPECTED_ENVVARS
-# }
-#
-# require envvars \
-#   check_envvars \
-#   --fail-prefix="one or more of these environment variables missing ($EXPECTED_ENVVARS)"
+# environment variables
+
+EXPECTED_ENVVARS=AWS_EB_PROFILE
+
+check_envvars() {
+  icli::check_envvars $EXPECTED_ENVVARS
+}
+
+require envvars \
+  check_envvars \
+  --fail-prefix="one or more of these environment variables missing ($EXPECTED_ENVVARS)"
 
 # end project check/install
