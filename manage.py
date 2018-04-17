@@ -13,7 +13,10 @@ class Web(Local):
         """run the web development server"""
 
         def prepare(self):
-            return self.local['python']['-m', 'aequitas_webapp.basic_upload']
+            return (
+                self.local.FG,
+                self.local['python']['-m', 'aequitas_webapp.basic_upload']
+            )
 
     class Env(Local):
         """manage the webapp environment"""
