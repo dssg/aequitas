@@ -1,0 +1,15 @@
+__pycache__/
+*.egg-info/
+/build/
+/dist/
+
+/.install.*.bash.inc
+*.ipynb_checkpoint*
+
+.envrc
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/config.yml
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
