@@ -9,6 +9,12 @@ class Aequitas(LocalRoot):
 class Web(Local):
     """manage the aequitas webapp"""
 
+    class Dev(Local):
+        """run the web development server"""
+
+        def prepare(self):
+            return self.local['python']['-m', 'aequitas_webapp.basic_upload']
+
     class Env(Local):
         """manage the webapp environment"""
 
