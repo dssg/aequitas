@@ -5,3 +5,4 @@ tabulate==0.8.2
 markdown2==2.3.5
 pyYAML==3.12
 SQLAlchemy==1.1.1
+xhtml2pdf==0.2.2
