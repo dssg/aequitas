@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Understanding Input" href="input_data.html" />
+    <link rel="next" title="Understanding Input Data" href="input_data.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 
   
@@ -80,18 +80,15 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Learn more about the project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-report">Bias report</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Command-line-output:-baseline-measures">Command line output: baseline measures</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Commandline-output:-Bias-and-Disparity-Metrics">Commandline output: Bias and Disparity Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">30 seconds to the webapp</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Load-data">Load data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Customize-report">Customize report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Get-Fairness-Report">Get Fairness Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Get-‘The-Bias-Report’">Get ‘The Bias Report’</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a></li>
@@ -198,10 +195,11 @@
 <p>You can run the same <a class="reference external" href="http://aequitas.dssg.io">webapp available
 online</a> locally.</p>
 <p>After installing Aequitas, run the following command in your terminal.</p>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>python aequitas_webapp.basic_upload
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">aequitas_webapp</span><span class="o">.</span><span class="n">basic_upload</span>
 </pre></div>
 </div>
-<div class="highlight-{output} notranslate"><div class="highlight"><pre><span></span>* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+<p>You should see th output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Running</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span><span class="o">/</span> <span class="p">(</span><span class="n">Press</span> <span class="n">CTRL</span><span class="o">+</span><span class="n">C</span> <span class="n">to</span> <span class="n">quit</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="section" id="Load-data">
@@ -212,16 +210,37 @@ online</a> locally.</p>
 <div class="section" id="Customize-report">
 <h2>Customize report<a class="headerlink" href="#Customize-report" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>choose attributes</li>
-<li>choose reference group by attribute</li>
-<li>choose metrics</li>
+<li>choose attributes<ul>
+<li>these are automatically pulled out from the CSV</li>
+</ul>
+</li>
+<li>choose reference group<ul>
+<li>majority: for a given attribute use the majority group</li>
+<li>min metric: for a given attribute use the group with the lowest
+scores as a baseline</li>
+<li>custom group: pick groups to serve as reference</li>
+</ul>
+</li>
+<li>choose metrics you care about<ul>
+<li>Equal Parity</li>
+<li>Proportional Parity</li>
+<li>False Positive Parity</li>
+<li>False Negative Parity</li>
+</ul>
+</li>
+<li>choose fairness threshold</li>
 </ul>
 </div>
-<div class="section" id="Get-Fairness-Report">
-<h2>Get Fairness Report<a class="headerlink" href="#Get-Fairness-Report" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Get-‘The-Bias-Report’">
+<h2>Get ‘The Bias Report’<a class="headerlink" href="#Get-‘The-Bias-Report’" title="Permalink to this headline">¶</a></h2>
 <p>The webapp returns descriptive interpretation of the results along with
-three sets of tables. * Fairness Measures Results * Bias Metrics
-Results * Group Metrics Results</p>
+three sets of tables.</p>
+<ul class="simple">
+<li>Fairness Measures Results</li>
+<li>Bias Metrics Results</li>
+<li>Group Metrics Results</li>
+</ul>
+<p>More information about output <a class="reference external" href="./output_data.html">here</a>.</p>
 </div>
 </div>
 
@@ -233,7 +252,7 @@ Results * Group Metrics Results</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="input_data.html" class="btn btn-neutral float-right" title="Understanding Input" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="input_data.html" class="btn btn-neutral float-right" title="Understanding Input Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

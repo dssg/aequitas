@@ -1,9 +1,9 @@
 branch-defaults:
   master:
+    environment: aequitas-pro
 global:
   application_name: aequitas
   branch: null
-  environment: aequitas-pro
   default_ec2_keyname: aequitas
   default_platform: Python 3.6
   default_region: us-west-2

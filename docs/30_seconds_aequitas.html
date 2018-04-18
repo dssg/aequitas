@@ -83,16 +83,15 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">30 seconds to <em>aequitas-report</em>:</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Input-machine-learning-predictions">Input machine learning predictions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">Get out measures of bias that you can tailor to your problem</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Bias-report">Bias report</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Command-line-output:-baseline-measures">Command line output: baseline measures</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Commandline-output:-Bias-and-Disparity-Metrics">Commandline output: Bias and Disparity Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-Bias-Report-output">The Bias Report output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Commandline-output">Commandline output</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a></li>
@@ -195,13 +194,12 @@
 }
 </style>
 <p><img alt="image0" src="https://raw.githubusercontent.com/dssg/aequitas/master/src/aequitas_cli/utils/img/aequitas_report_header.png" /></p>
-<p><strong>An open source bias audit toolkit for machine learning developers,
+<p>An open source bias audit toolkit for machine learning developers,
 analysts, and policymakers to audit machine learning models for
 discrimination and bias, and make informed and equitable decisions
-around developing and deploying predictive risk-assessment tools.</strong></p>
+around developing and deploying predictive risk-assessment tools.</p>
 <p><a class="reference external" href="http://dsapp.uchicago.edu/aequitas/">Learn more about the project</a></p>
-<p><a class="reference external" href="http://aequitas.dssg.io">Try it now</a> or <a class="reference external" href="https://github.com/dssg/aequitas">Install on your
-computer</a></p>
+<p><a class="reference external" href="http://aequitas.dssg.io">Try it now</a></p>
 <p>aequitas is compatible with: <strong>Python 3.6</strong>.</p>
 <div class="section" id="30-seconds-to-aequitas-report:">
 <h1>30 seconds to <em>aequitas-report</em>:<a class="headerlink" href="#30-seconds-to-aequitas-report:" title="Permalink to this headline">¶</a></h1>
@@ -209,41 +207,91 @@ computer</a></p>
 command on a csv.</p>
 <div class="section" id="Input-machine-learning-predictions">
 <h2>Input machine learning predictions<a class="headerlink" href="#Input-machine-learning-predictions" title="Permalink to this headline">¶</a></h2>
+<p>After <a class="reference external" href="./installation.html">installing on your computer</a></p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">aequitas-report</span></code> on <a class="reference external" href="https://github.com/dssg/aequitas/tree/master/examples">COMPAS
+data</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aequitas</span><span class="o">-</span><span class="n">report</span> <span class="o">--</span><span class="nb">input</span> <span class="n">compas_for_aequitas</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="22%" />
+<col width="30%" />
+<col width="13%" />
+<col width="23%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">score</th>
+<th class="head">label_value</th>
+<th class="head">race</th>
+<th class="head">sex</th>
+<th class="head">age_cat</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>African-American</td>
+<td>Male</td>
+<td>25 - 45</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>1</td>
+<td>Native American</td>
+<td>Female</td>
+<td>Less than 25</td>
+</tr>
+</tbody>
+</table>
 <p>The input data at least has:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
-<li>at least one group. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
+<li>at least one attribute e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
 </ul>
 <p><a class="reference external" href="./input_data.html">Getting started with input data</a></p>
-<p>Additionally, disparity is always defined in relation to a base group.
-By default, we use majority as the base group. <a class="reference external" href="./config.html">Defining a base
-group</a></p>
+<p>Additionally, disparity is always defined in relation to a reference
+group. By default, Aequitas uses majority as the reference. <a class="reference external" href="./config.html">Defining a
+reference group</a></p>
 </div>
 <div class="section" id="Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">
 <h2>Get out measures of bias that you can tailor to your problem<a class="headerlink" href="#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="Bias-report">
-<h3>Bias report<a class="headerlink" href="#Bias-report" title="Permalink to this headline">¶</a></h3>
-<p>&lt; PDF &gt;</p>
+<div class="section" id="The-Bias-Report-output">
+<h3>The Bias Report output<a class="headerlink" href="#The-Bias-Report-output" title="Permalink to this headline">¶</a></h3>
+<p>The Bias Report produces a pdf that returns descriptive interpretation
+of the results along with three sets of tables.</p>
+<ul class="simple">
+<li>Fairness Measures Results</li>
+<li>Bias Metrics Results</li>
+<li>Group Metrics Results</li>
+</ul>
+<p>Additionally, a csv is produced that contains the relevant data. More
+information about output <a class="reference external" href="./output_data.html">here</a>.</p>
 </div>
-<div class="section" id="Command-line-output:-baseline-measures">
-<h3>Command line output: baseline measures<a class="headerlink" href="#Command-line-output:-baseline-measures" title="Permalink to this headline">¶</a></h3>
-<hr class="docutils" />
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                        _ _
-  __ _  ___  __ _ _   _(_) |_ __ _ ___
- / _` |/ _ \/ _` | | | | | __/ _` / __|
-| (_| |  __/ (_| | |_| | | || (_| \__ \
- \__,_|\___|\__, |\__,_|_|\__\__,_|___/
-               |_|
-</pre></div>
-</div>
-<hr class="docutils" />
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Bias</span> <span class="ow">and</span> <span class="n">Fairness</span> <span class="n">Analysis</span>
-</pre></div>
-</div>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>INFO:root:loading csv data...
-model_id, thresholds 1 {&#39;rank_abs&#39;: [383]}
-Feature Columns (Groups): [&#39;race&#39; &#39;sex&#39; &#39;age_cat&#39;]
+<div class="section" id="Commandline-output">
+<h3>Commandline output<a class="headerlink" href="#Commandline-output" title="Permalink to this headline">¶</a></h3>
+<p>In the command line you will see The Bias Report, which returns counts
+for each attribute by group and then computes various fairness metrics.
+This is the same information that is captured in the csv output.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  _______ _            ____                _____                       _
+ |__   __| |          |  _ \              |  __ \                     | |
+    | |  | |__   ___  | |_) |_  __ _ ___  | |__) |___ _ __   ___  _ __| |_
+    | |  | &#39;_ \ / _ \ |  _ &lt;| |/ _` / __| |  _  // _ \ &#39;_ \ / _ \| &#39;__| __|
+    | |  | | | |  __/ | |_) | | (_| \__ \ | | \ \  __/ |_) | (_) | |  | |_
+    |_|  |_| |_|\___| |____/|_|\__,_|___/ |_|  \_\___| .__/ \___/|_|   \__|
+                                                     | |
+                                                     |_|
+
+____________________________________________________________________________
+
+                    Bias and Fairness Analysis
+
+
+
+Welcome to Aequitas-Audit
+Fairness measures requested: Statistical Parity,Impact Parity,FDR Parity,FPR Parity,FNR Parity,FOR Parity
+model_id, score_thresholds 1 {&#39;rank_abs&#39;: [3317]}
 COUNTS::: race
 African-American    3696
 Asian                 32
@@ -251,36 +299,27 @@ Caucasian           2454
 Hispanic             637
 Native American       18
 Other                377
-Name: entity_id, dtype: int64
+dtype: int64
 COUNTS::: sex
 Female    1395
 Male      5819
-Name: entity_id, dtype: int64
+dtype: int64
 COUNTS::: age_cat
 25 - 45            4109
 Greater than 45    1576
 Less than 25       1529
-Name: entity_id, dtype: int64
-df shape from the crosstabs: (11, 26)
+dtype: int64
+audit: df shape from the crosstabs: (11, 26)
 get_disparity_major_group()
 number of rows after bias majority ref group: 11
 Any NaN?:  False
-df shape after bias minimum per metric ref group: (11, 38)
+bias_df shape: (11, 38)
+Fairness Threshold: 0.8
+Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;FDR Parity&#39;, &#39;FPR Parity&#39;, &#39;FNR Parity&#39;, &#39;FOR Parity&#39;]
+
+...
 </pre></div>
 </div>
-<hr class="docutils" />
-<p>The first section of the commandline outputs provides an overview of
-counts by subgroups.</p>
-</div>
-<div class="section" id="Commandline-output:-Bias-and-Disparity-Metrics">
-<h3>Commandline output: Bias and Disparity Metrics<a class="headerlink" href="#Commandline-output:-Bias-and-Disparity-Metrics" title="Permalink to this headline">¶</a></h3>
-<p>The bias metrics table includes measures of bias and disparity at three
-levels:</p>
-<ul class="simple">
-<li>Overall fairness</li>
-<li><em>``attribute`` level</em></li>
-</ul>
-<p><a class="reference external" href="./output_data.html">understanding output</a></p>
 </div>
 </div>
 </div>

@@ -81,7 +81,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API</a></li>
@@ -151,7 +151,6 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">exit</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -226,7 +225,7 @@
             <span class="c1"># value from the groups of the target attribute</span>
             <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span>
         <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
         <span class="c1"># df = df.fillna(value=fill_zeros)</span>
         <span class="k">return</span> <span class="n">df</span></div>
 
@@ -265,7 +264,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
         <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
         <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
         <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
@@ -332,7 +331,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
         <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
         <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
         <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
