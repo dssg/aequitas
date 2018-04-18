@@ -14,6 +14,7 @@ Welcome to aequitas's documentation!
    installation.ipynb
    30_seconds_webapp.ipynb
    input_data.ipynb
-   config.ipynb
    output_data.ipynb
+   config.ipynb
+   using_python.ipynb
    api/index

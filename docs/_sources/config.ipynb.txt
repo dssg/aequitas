@@ -72,7 +72,7 @@
     "You can manually set attribute columns to be assessed for fairness. \n",
     "\n",
     "```\n",
-    "attr_cols: fairness_measures: [\"zipcode_pct_black\", \"zipcode_median_income\"]\n",
+    "attr_cols: [\"zipcode_pct_black\", \"zipcode_median_income\"]\n",
     "    \n",
     "```\n",
     "\n",
