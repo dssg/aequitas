@@ -1,4 +1,16 @@
-from argcmdr import Local, LocalRoot, localmethod
+import functools
+
+from argcmdr import cmd, Local, LocalRoot
+
+
+class BeanstalkCommand(Local):
+
+    @property
+    def eb(self):
+        return self.local['.manage/bin/eb']
+
+
+ebmethod = functools.partial(cmd, base=BeanstalkCommand)
 
 
 class Aequitas(LocalRoot):
@@ -23,13 +35,13 @@ class Web(Local):
 
         ENV = 'aequitas-pro'
 
-        @localmethod('-n', '--name', default=ENV,
-                    help=f"environment console to open (default: {ENV})")
+        @ebmethod('-n', '--name', default=ENV,
+                  help=f"environment console to open (default: {ENV})")
         def console(self, args):
             """open the environment web console"""
-            return self.local['eb']['console', args.name]
+            return self.eb['console', args.name]
 
-        class Create(Local):
+        class Create(BeanstalkCommand):
             """create an environment"""
 
             def __init__(self, parser):
@@ -45,7 +57,7 @@ class Web(Local):
 
             def prepare(self, args):
                 # AWS_EB_PROFILE=dsapp-ddj
-                command = self.local['eb'][
+                command = self.eb[
                     'create',
                     '-nh', # return immediately
                     '-s',  # stand-alone for now (no ELB)
@@ -57,7 +69,7 @@ class Web(Local):
 
                 yield command
 
-        class Deploy(Local):
+        class Deploy(BeanstalkCommand):
             """deploy to an environment"""
 
             def __init__(self, parser):
@@ -72,7 +84,7 @@ class Web(Local):
                 )
 
             def prepare(self, args):
-                return self.local['eb'][
+                return self.eb[
                     'deploy',
                     '-nh',
                     '-l', args.version,

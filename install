@@ -81,7 +81,8 @@ require $PROJECT \
 # python libs
 
 install_lib() {
-  pip install -Ur requirement/dev.txt && pip install -e .
+  pip install -Ur requirement/dev.txt && \
+  pip install -e .
 }
 
 # no great way to check that python libs installed;
@@ -89,6 +90,17 @@ install_lib() {
 require lib \
   icli::always_install \
   install_lib
+
+# management environment
+
+install_management() {
+  virtualenv -p python --clear .manage && \
+  .manage/bin/pip install -r requirement/management.txt
+}
+
+require manage \
+  icli::always_install \
+  install_management
 
 # environment variables
 
