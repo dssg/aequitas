@@ -1,7 +1,6 @@
 import logging
 from sys import exit
 
-import numpy as np
 import pandas as pd
 
 logging.getLogger(__name__)
@@ -76,7 +75,7 @@ class Bias(object):
             # value from the groups of the target attribute
             df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
         # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(np.inf, fill_divbyzero)
+        df = df.replace(pd.np.inf, fill_divbyzero)
         # df = df.fillna(value=fill_zeros)
         return df
 
@@ -115,7 +114,7 @@ class Bias(object):
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(np.inf, fill_divbyzero)
+        df = df.replace(pd.np.inf, fill_divbyzero)
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
@@ -182,7 +181,7 @@ class Bias(object):
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
         # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(np.inf, fill_divbyzero)
+        df = df.replace(pd.np.inf, fill_divbyzero)
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}

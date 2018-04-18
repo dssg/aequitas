@@ -22,8 +22,10 @@ class Fairness(object):
         :param fair_measures: a dictionary containing fairness measures as keys and the
         corresponding input bias metric as values
         """
+
         if not fair_eval:
-            self.fair_eval = lambda tau: lambda x: True if tau <= x <= 1 / tau else False
+            self.fair_eval = lambda tau: lambda x: pd.np.nan if pd.np.isnan(x) else \
+                (True if tau <= x <= 1 / tau else False)
         else:
             self.fair_eval = fair_eval
         # tau is the fairness_threshold and should be a real ]0.0 and 1.0]
@@ -32,9 +34,12 @@ class Fairness(object):
         else:
             self.tau = tau
 
-        self.high_level_pair_eval = lambda col1, col2: lambda x: True if (x[col1] is True and x[col2] is
-                                                                          True) else False
-        self.high_level_single_eval = lambda col: lambda x: True if x[col] is True else False
+        self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
+            else \
+            (True if (x[col1] is True and x[col2] is True) else False)
+
+        self.high_level_single_eval = lambda col: lambda x: pd.np.nan if pd.np.isnan(x[col]) else (True if x[col] is True else
+        False)
 
         # the fair_measures_depend define the bias metrics that serve as input to the fairness evaluation and respective
         # fairness measure. basically these are the fairness measures supported by the current version of aequitas.
@@ -123,31 +128,52 @@ class Fairness(object):
         group_attribute_df = pd.DataFrame()
         key_columns = ['model_id', 'score_threshold', 'attribute_name']
         groupby_variable = group_value_df.groupby(key_columns)
-        init = 0
+        # We need to do this beacause of NaNs. idxmin() on pandas raises keyerror if there is a NaN...
         for key in fair_measures_requested:
-            df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
-            if init == 0:
-                group_attribute_df[key_columns + [key]] = df_min_idx[key_columns + [key]]
+            rows = []
+            for group, values in groupby_variable:
+                group_df = groupby_variable.get_group(group)
+                if group_df[key].isnull().all():
+                    row = group_df.iloc[0][key_columns + [key]]
+                else:
+                    group_df = group_df[group_df[key].notnull()][key_columns + [key]]
+                    row = group_df.loc[group_df[key].astype(bool).idxmin()]
+                rows.append(row)
+            key_df = pd.DataFrame(rows)  # , index=key_columns + [key])
+            if group_attribute_df.empty:
+                group_attribute_df = key_df
             else:
-                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
-                                                              on=key_columns)
-            init = 1
+                group_attribute_df = group_attribute_df.merge(key_df, on=key_columns)
         # todo throw exception instead of exiting
         if group_attribute_df.empty:
             logging.error('get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns')
             exit(1)
         for key in self.type_parity_depend:
-            if key in group_value_df.columns:
-                df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
-                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
-                                                              on=key_columns)
+            rows = []
+            for group, values in groupby_variable:
+                group_df = groupby_variable.get_group(group)
+                if group_df[key].isnull().all():
+                    row = group_df.iloc[0][key_columns + [key]]
+                else:
+                    group_df = group_df[group_df[key].notnull()][key_columns + [key]]
+                    row = group_df.loc[group_df[key].astype(bool).idxmin()]
+                rows.append(row)
+            key_df = pd.DataFrame(rows)  # , index=key_columns + [key])
+            group_attribute_df = group_attribute_df.merge(key_df, on=key_columns)
         for key in self.high_level_fairness_depend:
-            if key in group_value_df.columns:
-                df_min_idx = group_value_df.loc[groupby_variable[key].idxmin()]
-                group_attribute_df = group_attribute_df.merge(df_min_idx[key_columns + [key]],
-                                                              on=key_columns)
+            rows = []
+            for group, values in groupby_variable:
+                group_df = groupby_variable.get_group(group)
+                if group_df[key].isnull().all():
+                    row = group_df.iloc[0][key_columns + [key]]
+                else:
+                    group_df = group_df[group_df[key].notnull()][key_columns + [key]]
+                    row = group_df.loc[group_df[key].astype(bool).idxmin()]
+                rows.append(row)
+            key_df = pd.DataFrame(rows)  # , index=key_columns + [key])
+            group_attribute_df = group_attribute_df.merge(key_df, on=key_columns)
 
-        return group_attribute_df
+            return group_attribute_df
 
     def get_overall_fairness(self, group_attribute_df):
         """

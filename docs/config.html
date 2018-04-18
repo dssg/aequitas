@@ -30,7 +30,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Understanding Output" href="output_data.html" />
-    <link rel="prev" title="Understanding Input" href="input_data.html" /> 
+    <link rel="prev" title="Understanding Input Data" href="input_data.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -80,19 +80,18 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Learn more about the project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-report">Bias report</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Command-line-output:-baseline-measures">Command line output: baseline measures</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Commandline-output:-Bias-and-Disparity-Metrics">Commandline output: Bias and Disparity Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configurations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Define-reference-groups">Define reference groups</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Score-threshholds">Score threshholds</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Choosing-Metrics">Choosing Metrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Fairness-threshold">Fairness threshold</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Controlling-data-flow">Controlling data flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Attribute-columns">Attribute columns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Project-information">Project information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Databases">Databases</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
@@ -197,23 +196,29 @@
 </style>
 <div class="section" id="Configurations">
 <h1>Configurations<a class="headerlink" href="#Configurations" title="Permalink to this headline">¶</a></h1>
-<p>Configurations can be set in .yml file. See example <a href="#id1"><span class="problematic" id="id2">`config.yml &lt;&gt;`__</span></a></p>
+<p>Configurations can be set in .yml file. See example
+<a class="reference external" href="https://github.com/dssg/aequitas/tree/master/src/aequitas_cli">config.yml</a>
+on github.</p>
 <div class="section" id="Define-reference-groups">
 <h2>Define reference groups<a class="headerlink" href="#Define-reference-groups" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">--ref-group</span>&#160; <span class="pre">&lt;type&gt;</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">--ref-group-method</span> <span class="pre">&lt;type&gt;</span></code></p>
 <p>Fairness is always determined in relation to a reference group. By
 default, aequitas uses the majority group level for a given group as the
 reference group.</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">majority</span></code> Define fairness in relation to the majority in a group.</li>
-<li><code class="docutils literal notranslate"><span class="pre">min_metric</span></code> Define fairness in relation to the subgroup with the
+<li><code class="docutils literal notranslate"><span class="pre">&quot;majority&quot;</span></code> Define fairness in relation to the majority in a
+group.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;min_metric&quot;</span></code> Define fairness in relation to the subgroup with the
 lowest value on a given metric.</li>
-<li><code class="docutils literal notranslate"><span class="pre">predefined</span></code> Define fairness in relation to groups of your choice.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;predefined&quot;</span></code> Define fairness in relation to groups of your
+choice.</li>
 </ul>
 <p>The predefined reference groups are set in the configuration file.</p>
-<div class="highlight-{yaml} notranslate"><div class="highlight"><pre><span></span>reference_groups:
-  &quot;gender&quot;: &quot;male&quot;
-  &quot;age_cat&quot;: &quot;35-50&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_groups_method</span><span class="p">:</span> <span class="s2">&quot;predefind&quot;</span>
+
+<span class="n">reference_groups</span><span class="p">:</span>
+  <span class="s2">&quot;gender&quot;</span><span class="p">:</span> <span class="s2">&quot;male&quot;</span>
+  <span class="s2">&quot;age_cat&quot;</span><span class="p">:</span> <span class="s2">&quot;35-50&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -233,18 +238,64 @@ the rest as 0.</p>
 </div>
 <div class="section" id="Choosing-Metrics">
 <h2>Choosing Metrics<a class="headerlink" href="#Choosing-Metrics" title="Permalink to this headline">¶</a></h2>
-<p><em>development in progress</em></p>
+<p>Choose from:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">'Statistical</span> <span class="pre">Parity'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'Impact</span> <span class="pre">Parity'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'FOR</span> <span class="pre">Parity'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'FDR</span> <span class="pre">Parity'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'FPR</span> <span class="pre">Parity'</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">'FNR</span> <span class="pre">Parity'</span></code></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fairness_measures</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;FPR Parity&quot;</span><span class="p">,</span> <span class="s2">&quot;FNR Parity&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="Fairness-threshold">
 <h2>Fairness threshold<a class="headerlink" href="#Fairness-threshold" title="Permalink to this headline">¶</a></h2>
-<p><em>development in progress</em></p>
+<p>Disparity is determined in terms of ratios. When the disparity ratio
+cross the fairness threshold, the decision is deemed unfair on that
+metric.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fairness_threshold</span><span class="p">:</span> <span class="mf">0.8</span>
+</pre></div>
 </div>
-<div class="section" id="Controlling-data-flow">
-<h2>Controlling data flow<a class="headerlink" href="#Controlling-data-flow" title="Permalink to this headline">¶</a></h2>
-<p>How much information here …</p>
+</div>
+<div class="section" id="Attribute-columns">
+<h2>Attribute columns<a class="headerlink" href="#Attribute-columns" title="Permalink to this headline">¶</a></h2>
+<p>You can manually set attribute columns to be assessed for fairness.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">attr_cols</span><span class="p">:</span> <span class="n">fairness_measures</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;zipcode_pct_black&quot;</span><span class="p">,</span> <span class="s2">&quot;zipcode_median_income&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Project-information">
+<h2>Project information<a class="headerlink" href="#Project-information" title="Permalink to this headline">¶</a></h2>
+<p>Your project title and goal will be inserted into the report.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">project_description</span><span class="p">:</span>
     <span class="n">title</span><span class="p">:</span> <span class="s2">&quot;Insert project title&quot;</span>
     <span class="n">goal</span><span class="p">:</span> <span class="s2">&quot;Insert project goal.&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Databases">
+<h2>Databases<a class="headerlink" href="#Databases" title="Permalink to this headline">¶</a></h2>
+<p>To connect to a database instead of using “–input ”, use the db key,
+credentials, and input_query. These are set in config.yaml.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">:</span>
+    <span class="n">db_credentials</span><span class="p">:</span>
+        <span class="n">host</span><span class="p">:</span> <span class="n">your_host</span>
+        <span class="n">database</span><span class="p">:</span> <span class="n">your_db</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">your_user</span>
+        <span class="n">password</span><span class="p">:</span> <span class="n">your_pass</span>
+        <span class="n">port</span><span class="p">:</span> <span class="mi">5432</span>
+</pre></div>
+</div>
+<p>The input query should return a table with score, label_value columns
+and then each attribute you want to use for bias analysis</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_query</span><span class="p">:</span> <span class="s2">&quot;select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ...&quot;</span>
+</pre></div>
+</div>
+<p>The output schema is optional, default=public</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">output_schema</span><span class="p">:</span> <span class="n">results</span>
 </pre></div>
 </div>
 </div>
@@ -261,7 +312,7 @@ the rest as 0.</p>
         <a href="output_data.html" class="btn btn-neutral float-right" title="Understanding Output" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="input_data.html" class="btn btn-neutral" title="Understanding Input" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="input_data.html" class="btn btn-neutral" title="Understanding Input Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

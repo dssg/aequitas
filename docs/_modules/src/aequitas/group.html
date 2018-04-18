@@ -81,7 +81,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API</a></li>
@@ -151,7 +151,6 @@
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">nan</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -179,7 +178,7 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nan</span>
+        <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="n">predicted_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
             <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -308,7 +307,7 @@
         <span class="c1"># for each group variable do</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
             <span class="c1"># find the priors_df</span>
-            <span class="n">col_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="s1">&#39;nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">col_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="s1">&#39;pd.np.nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
             <span class="n">counts</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;COUNTS:::&#39;</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
             <span class="c1"># distinct entities within group value</span>

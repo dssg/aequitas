@@ -97,7 +97,7 @@ def get_highlevel_report(group_attribute_df):
     for attr in attr_list:
         group_attribute_df = group_attribute_df.replace(attr, '[' + attr + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')')
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
-    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
+    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe')  # , showindex='never')
     return highlevel_report
 
 
@@ -135,7 +135,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
 
     parity_group = tabulate(aux_df,
                             headers='keys',
-                            tablefmt='pipe', showindex='never')
+                            tablefmt='pipe')  #, showindex='never')
     return parity_group
 
 
@@ -191,7 +191,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
 
     disparities_group = tabulate(aux_df,
                                  headers='keys',
-                                 tablefmt='pipe', showindex='never')
+                                 tablefmt='pipe')  #, showindex='never')
     return disparities_group
 
 
@@ -217,7 +217,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
-                           tablefmt='pipe', showindex='never')
+                           tablefmt='pipe')  #, showindex='never')
     return group_group
 
 
@@ -361,7 +361,10 @@ def get_highlevel_table(group_value_df, fairness_measures):
             if len(sublist) > 0:
                 raw['Unfairly Affected Groups'].append(', '.join(sublist))
             else:
-                raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
+                if group_value_df[measure].isnull().all():
+                    raw['Unfairly Affected Groups'].append('Undefined')
+                else:
+                    raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
 
     highlevel_table = '\n\n'
     if len(raw['Fairness Criteria']) > 0:
@@ -369,8 +372,7 @@ def get_highlevel_table(group_value_df, fairness_measures):
         # keep the same order!!
         # krrp
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
-                               tablefmt='pipe',
-                               showindex='never')
+                                   tablefmt='pipe')  #, showindex='never')
     return highlevel_table
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
@@ -478,89 +480,7 @@ def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
     report_html = report_html.replace('<table>', '<table class="table">')
-    report_html = report_html.replace(' unfair', '<span style="color:red"><b> unfair</b></span>')
-    report_html = report_html.replace(' fair', '<span style="color:green"><b> fair</b></span>')
+    report_html = report_html.replace(' unfair ', '<span style="color:red"><b> unfair </b></span>')
+    report_html = report_html.replace(' fair ', '<span style="color:green"><b> fair </b></span>')
 
     return report_html
-
-
-"""
-def audit_report_pdf(model_id, parameter, model_eval, configs, fair_results, fair_measures,
-                 group_value_df):
-
-    group_value_report = get_group_value_report(group_value_df)
-    project_description = configs.project_description
-    if project_description is None:
-        project_description = {'title': ' ', 'goal': ' '}
-    if project_description['title'] is None:
-        project_description['title'] = ' '
-    if project_description['goal'] is None:
-        project_description['goal'] = ' '
-    print('\n\n\n:::::: REPORT ::::::\n')
-    print('Project Title: ', project_description['title'])
-    print('Project Goal: ', project_description['goal'])
-    print('Bias Results:', str(fair_results))
-    pdf = PDF()
-    pdf.set_margins(left=20, right=15, top=10)
-    pdf.alias_nb_pages()
-    pdf.add_page()
-    pdf.set_font('Arial', '', 16)
-    pdf.cell(0, 5, project_description['title'], 0, 1, 'C')
-    pdf.set_font('Helvetica', '', 11)
-    pdf.cell(0, 10, datetime.now().strftime("%Y-%m-%d"), 0, 1, 'C')
-    pdf.multi_cell(0, 5, 'Project Goal: ' + project_description['goal'], 0, 1)
-    pdf.ln(2)
-    model_metric = 'Precision at top ' + parameter
-    pdf.multi_cell(0, 5, 'Model Perfomance Metric: ' + model_metric, 0, 1)
-    pdf.multi_cell(0, 5, 'Fairness Measures: ' + ', '.join(fair_measures), 0, 1)
-    pdf.ln(2)
-    pdf.set_font('Helvetica', 'B', 11)
-    pdf.multi_cell(0, 5, 'Model Audited: #' + str(model_id) + '\t Performance: ' + str(model_eval),
-                   0, 1)
-    pdf.set_font('Helvetica', '', 11)
-
-    ref_groups = ''
-    if configs.ref_groups_method == 'predefined':
-        if configs.ref_groups:
-            ref_groups = str(configs.ref_groups)
-    elif configs.ref_groups_method == 'majority':
-        ref_groups = ''
-    elif configs.ref_groups_method == 'min_metric':
-        ref_groups = ''
-    else:
-        logging.error('audit_report(): wrong reference group method!')
-        exit(1)
-    pdf.multi_cell(0, 5, 'Group attributes provided for auditing: ' + ', '.join(configs.attr_cols), 0, 1)
-    pdf.multi_cell(0, 5, 'Reference groups used: ' + configs.ref_groups_method + ':   '
-                                                                         '' + ref_groups, 0, 1)
-    pdf.ln(4)
-    results_text = 'aequitas has found that model #' + str(model_id) + ' is '
-    if fair_results['Overall Fairness'] is True:
-        is_fair = 'FAIR'
-        pdf.set_text_color(0, 128, 0)
-        pdf.cell(0, 5, results_text + is_fair + '.', 0, 1)
-    else:
-        is_fair = 'UNFAIR'
-        pdf.image('utils/img/danger.png', x=20, w=7, h=7)
-        pdf.cell(73, 5, results_text, 0, 0)
-        pdf.set_font('Helvetica', 'B', 11)
-        pdf.set_text_color(255, 0, 0)
-        pdf.cell(0, 5, is_fair + '.', 0, 1)
-        pdf.set_font('Helvetica', '', 11)
-        pdf.set_text_color(0, 0, 0)
-        pdf.ln(2)
-        for key, value in sorted(group_value_report.items()):
-            pdf.ln(2)
-            pdf.multi_cell(0, 5, value[0], 0, 1)
-            pdf.ln(2)
-            pdf.set_x(40.0)
-            pdf.multi_cell(0, 5, '\t' + ', '.join(value[1]), 0, 1)
-            pdf.ln(4)
-            pdf.set_x(20.0)
-
-    datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
-    report_filename = 'aequitas_report_' + str(model_id) + '_' + project_description['title'].replace(' ',
-                                                                                            '_') + '_' + datestr
-    pdf.output('output/' + report_filename + '.pdf', 'F')
-    return None
-"""
