@@ -35,11 +35,27 @@ class Web(Local):
 
         ENV = 'aequitas-pro'
 
-        @ebmethod('-n', '--name', default=ENV,
-                  help=f"environment console to open (default: {ENV})")
+        def __init__(self, parser):
+            parser.add_argument(
+                '-n', '--name',
+                default=self.ENV,
+                help=f"environment name (default: {self.ENV})",
+            )
+
+        @ebmethod
         def console(self, args):
             """open the environment web console"""
-            return self.eb['console', args.name]
+            return (self.local.FG, self.eb['console', args.name])
+
+        @ebmethod
+        def logs(self, args):
+            """read environment logs"""
+            return (self.local.FG, self.eb['logs', args.name])
+
+        @ebmethod
+        def ssh(self, args):
+            """ssh into the EC2 instance"""
+            return (self.local.FG, self.eb['ssh', args.name])
 
         class Create(BeanstalkCommand):
             """create an environment"""
@@ -48,11 +64,6 @@ class Web(Local):
                 parser.add_argument(
                     '-v', '--version',
                     help='previous version label to deploy to new environment',
-                )
-                parser.add_argument(
-                    '-n', '--name',
-                    default=Web.Env.ENV,
-                    help=f"name the environment (default: {Web.Env.ENV})",
                 )
 
             def prepare(self, args):
@@ -73,11 +84,6 @@ class Web(Local):
             """deploy to an environment"""
 
             def __init__(self, parser):
-                parser.add_argument(
-                    '-n', '--name',
-                    default=Web.Env.ENV,
-                    help=f"environment to which to deploy (default: {Web.Env.ENV})",
-                )
                 parser.add_argument(
                     'version',
                     help='version label to apply',

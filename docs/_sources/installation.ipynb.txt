@@ -6,23 +6,18 @@
    "source": [
     "# Installation\n",
     "\n",
-    "To install aequitas, enter the following code in your terminal.\n",
+    "Aequitas requires Python 3.\n",
     "\n",
-    "```{bash}\n",
-    "git clone https://github.com/dssg/aequitas.git\n",
-    "cd aequitas\n",
-    "python setup.py install\n",
+    "Install this Python library from source\n",
+    "\n",
     "```\n",
-    "and/or named as a Python install requirement (_e.g._ in a requirements file).\n",
-    "\n",
-    "And that you can then execute the auditor with:\n",
-    "\n",
-    "```{bash}\n",
-    "aequitas-audit\n",
+    "    python setup.py install\n",
     "```\n",
-    "In the future we may add a separate section, expressly for developers, that you can set up your local environment by executing:\n",
     "\n",
-    "    ./install"
+    "...or named as an installation requirement, *e.g.* via ``pip``\n",
+    "```\n",
+    "    pip install git+https://github.com/dssg/aequitas.git\n",
+    "```"
    ]
   }
  ],

@@ -1,0 +1,1482 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>COMPAS Analysis using Aequitas &mdash; aequitas  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Examples" href="index.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> aequitas
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">COMPAS Analysis using Aequitas</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Exploratory-Analysis">Exploratory Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Putting-Aequitas-to-the-task">Putting Aequitas to the task</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Group()">Group()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Bias()">Bias()</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Fairness()">Fairness()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aequitas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Examples</a> &raquo;</li>
+        
+      <li>COMPAS Analysis using Aequitas</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/compas_demo.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="COMPAS-Analysis-using-Aequitas">
+<h1>COMPAS Analysis using Aequitas<a class="headerlink" href="#COMPAS-Analysis-using-Aequitas" title="Permalink to this headline">¶</a></h1>
+<p>In 2016, Propublica reported on racial inequality in automated criminal
+risk assessment algorithms. The
+<a class="reference external" href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing">report</a>
+is based off of <a class="reference external" href="https://github.com/propublica/compas-analysis">this
+analysis</a>. Using a
+clean version of the COMPAS dataset, found in the Propublica repo, we
+demostrate the use of the Aequitas bias reporting tool.</p>
+<p>Northpointe’s COMPAS (Correctional Offender Management Profiling for
+Alternative Sanctions) is one of the widest used risk assessment tools,
+algorithms which are used in the criminal justice system to guide
+decisions such as how to set bail. The ProPublica dataset represents two
+years of COMPAS predicitons from Broward County, FL.</p>
+<p>The data was preprocess for compatibility with Aequitas.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">aequitas.group</span> <span class="k">import</span> <span class="n">Group</span>
+<span class="kn">from</span> <span class="nn">aequitas.bias</span> <span class="k">import</span> <span class="n">Bias</span>
+<span class="kn">from</span> <span class="nn">aequitas.fairness</span> <span class="k">import</span> <span class="n">Fairness</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../../../examples/data/compas_for_aequitas.csv&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>entity_id</th>
+      <th>score</th>
+      <th>label_value</th>
+      <th>race</th>
+      <th>sex</th>
+      <th>age_cat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>Other</td>
+      <td>Male</td>
+      <td>Greater than 45</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>25 - 45</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>Less than 25</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>Less than 25</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>Other</td>
+      <td>Male</td>
+      <td>25 - 45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="Exploratory-Analysis">
+<h2>Exploratory Analysis<a class="headerlink" href="#Exploratory-Analysis" title="Permalink to this headline">¶</a></h2>
+<p>** Risk assessment by race**</p>
+<p>COMPAS produces a risk score that predicts a person’s likelihood of
+commiting a crime in the next two years. The output is a score between 0
+and 10 that maps to low, medium or high. For Aequitas, we collapse this
+to a binary prediction. A score of 0 indicates a prediction of low risk
+according to COMPAS, while a 1 indicates high or medium risk.</p>
+<p>This is based on ProPublica’s interpretation of Northpointe’s practioner
+guide.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&quot;According to Northpointe’s practitioners guide, COMPAS “scores in the medium and high range
+garner more interest from supervision agencies than low scores, as a low score would suggest
+there is little risk of general recidivism,” so we considered scores any higher than “low” to
+indicate a risk of recidivism.&quot;
+</pre></div>
+</div>
+<p>We see a large difference in how these scores are distributed by race,
+with a majority of white and Hispanic people predicted as low risk
+(score = 0) and a majority of black people predicted high and medium
+risk.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;race&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">race</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;African-American&#39;</span><span class="p">,</span> <span class="s1">&#39;Caucasian&#39;</span><span class="p">,</span> <span class="s1">&#39;Hispanic&#39;</span><span class="p">])])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_compas_demo_4_0.png" src="../_images/examples_compas_demo_4_0.png" />
+</div>
+</div>
+<p>** Levels of recidivism **</p>
+<p>This dataset includes information about whether or not the subject
+recidivated, and so we can directly test the accuracy of the
+predictions. First, we visualize the recidivsm rates across race.</p>
+<p>Following ProPublica, we defined recidivism as a new arrest within two
+years. (If a person recidivates, <code class="docutils literal notranslate"><span class="pre">two_year_recid</span></code> = 1). They “based
+this decision on Northpointe’s practitioners guide, which says that its
+recidivism score is meant to predict ‘a new misdemeanor or felony
+offense within two years of the COMPAS administration date.’”</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;race&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;label_value&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">race</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;African-American&#39;</span><span class="p">,</span> <span class="s1">&#39;Caucasian&#39;</span><span class="p">,</span> <span class="s1">&#39;Hispanic&#39;</span><span class="p">])])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_compas_demo_6_0.png" src="../_images/examples_compas_demo_6_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Putting-Aequitas-to-the-task">
+<h2>Putting Aequitas to the task<a class="headerlink" href="#Putting-Aequitas-to-the-task" title="Permalink to this headline">¶</a></h2>
+<p>The graph above shows the base rates for recidivism are higher for black
+defendants compared to white defendants (.51 vs .39). The prior graph
+shows that the predictions do not match the base rates.</p>
+<p>Practitioners face the challenge of determining whether or not such
+patterns reflect bias or not. The fact that we have multiple ways to
+measure bias adds complexity to the decisionmaking process. With
+Aequitas, we provide a tool that automates the reporting of various
+fairnes metrics to aid in this process.</p>
+<p>Applying Aequitas is a three step process represented by three python
+classes:</p>
+<p><code class="docutils literal notranslate"><span class="pre">Group()</span></code>: Define groups</p>
+<p><code class="docutils literal notranslate"><span class="pre">Bias()</span></code>: Calculate disparities</p>
+<p><code class="docutils literal notranslate"><span class="pre">Fairness()</span></code>: Assert fairness</p>
+<p>Each class builds on the previous one expanding the output DataFrame.</p>
+<div class="section" id="Group()">
+<h3>Group()<a class="headerlink" href="#Group()" title="Permalink to this headline">¶</a></h3>
+<p>Now, using the Aequitas bias detection tool, we calculate precise bias
+and disparity metrics for this dataset. First, we modify the dataframe
+to be compatible with the tool.</p>
+<p>Aequitas expects a dataframe expects predefined columns <code class="docutils literal notranslate"><span class="pre">score</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">label_value</span></code> and treats all other columns, with few exceptions, as
+attributes against which to test for disparities. In this cases we
+include <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">g</span> <span class="o">=</span> <span class="n">Group</span><span class="p">()</span>
+<span class="n">xtab</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">get_crosstabs</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+model_id, score_thresholds 1 {&#39;rank_abs&#39;: [3317]}
+COUNTS::: race
+African-American    3696
+Asian                 32
+Caucasian           2454
+Hispanic             637
+Native American       18
+Other                377
+dtype: int64
+COUNTS::: sex
+Female    1395
+Male      5819
+dtype: int64
+COUNTS::: age_cat
+25 - 45            4109
+Greater than 45    1576
+Less than 25       1529
+dtype: int64
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">get_crosstabs()</span></code> command tabulates a confusion matrix for each
+subgroup and calculates commonly used metrics such as false positive
+rate and false omission rate. It also provides counts by group and group
+prevelances.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Here&#39;s a subset of the crosstab data</span>
+<span class="n">xtab</span><span class="p">[[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_value&#39;</span><span class="p">,</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;group_size&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>attribute_name</th>
+      <th>attribute_value</th>
+      <th>fpr</th>
+      <th>fnr</th>
+      <th>tpr</th>
+      <th>tnr</th>
+      <th>for</th>
+      <th>fdr</th>
+      <th>group_size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>race</td>
+      <td>African-American</td>
+      <td>0.45</td>
+      <td>0.28</td>
+      <td>0.72</td>
+      <td>0.55</td>
+      <td>0.35</td>
+      <td>0.37</td>
+      <td>3696</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>race</td>
+      <td>Asian</td>
+      <td>0.09</td>
+      <td>0.33</td>
+      <td>0.67</td>
+      <td>0.91</td>
+      <td>0.12</td>
+      <td>0.25</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>race</td>
+      <td>Caucasian</td>
+      <td>0.23</td>
+      <td>0.48</td>
+      <td>0.52</td>
+      <td>0.77</td>
+      <td>0.29</td>
+      <td>0.41</td>
+      <td>2454</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>race</td>
+      <td>Hispanic</td>
+      <td>0.21</td>
+      <td>0.56</td>
+      <td>0.44</td>
+      <td>0.79</td>
+      <td>0.29</td>
+      <td>0.46</td>
+      <td>637</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>race</td>
+      <td>Native American</td>
+      <td>0.38</td>
+      <td>0.10</td>
+      <td>0.90</td>
+      <td>0.62</td>
+      <td>0.17</td>
+      <td>0.25</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>race</td>
+      <td>Other</td>
+      <td>0.15</td>
+      <td>0.68</td>
+      <td>0.32</td>
+      <td>0.85</td>
+      <td>0.30</td>
+      <td>0.46</td>
+      <td>377</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>sex</td>
+      <td>Female</td>
+      <td>0.32</td>
+      <td>0.39</td>
+      <td>0.61</td>
+      <td>0.68</td>
+      <td>0.24</td>
+      <td>0.49</td>
+      <td>1395</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>sex</td>
+      <td>Male</td>
+      <td>0.32</td>
+      <td>0.37</td>
+      <td>0.63</td>
+      <td>0.68</td>
+      <td>0.33</td>
+      <td>0.36</td>
+      <td>5819</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>age_cat</td>
+      <td>25 - 45</td>
+      <td>0.33</td>
+      <td>0.37</td>
+      <td>0.63</td>
+      <td>0.67</td>
+      <td>0.32</td>
+      <td>0.39</td>
+      <td>4109</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>age_cat</td>
+      <td>Greater than 45</td>
+      <td>0.17</td>
+      <td>0.57</td>
+      <td>0.43</td>
+      <td>0.83</td>
+      <td>0.24</td>
+      <td>0.46</td>
+      <td>1576</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>age_cat</td>
+      <td>Less than 25</td>
+      <td>0.54</td>
+      <td>0.26</td>
+      <td>0.74</td>
+      <td>0.46</td>
+      <td>0.42</td>
+      <td>0.36</td>
+      <td>1529</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p><strong>Interpreting the crosstab</strong></p>
+<p>We see that African-Americans have a false positive rate (<code class="docutils literal notranslate"><span class="pre">fpr</span></code>) of
+45%, while Caucasians have a false positive rate of only 23%. This means
+that black people are far more likely to be falsely labeled as high-risk
+than white people. On the otherhand false ommision rates (<code class="docutils literal notranslate"><span class="pre">for</span></code>) and
+false discovery rates (<code class="docutils literal notranslate"><span class="pre">fdr</span></code>) are much closer for those two groups.</p>
+</div>
+<div class="section" id="Bias()">
+<h3>Bias()<a class="headerlink" href="#Bias()" title="Permalink to this headline">¶</a></h3>
+<p>We calculate disparities as a ratio of a metric for a group of interest
+compared to a base group. For example, the False Negative Rate Disparity
+for black defendants vis-a-vis whites is:</p>
+<div class="math">
+<p><img src="../_images/math/a58e2b1db903b318b9026919ab72c288cd567a10.png" alt="Disparity_{FNR} =  \frac{FNR_{black}}{FNR_{white}}"/></p>
+</div><p>Below, we use <code class="docutils literal notranslate"><span class="pre">get_disparity_predefined_groups</span></code> which allows us to
+choose base groups that clarify the output for the practitioner.
+Aequitas <code class="docutils literal notranslate"><span class="pre">Bias()</span></code> class includes two additional get disparity
+functions, which automate base group selection.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">b</span> <span class="o">=</span> <span class="n">Bias</span><span class="p">()</span>
+<span class="n">bdf</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get_disparity_predefined_groups</span><span class="p">(</span><span class="n">xtab</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;race&#39;</span><span class="p">:</span><span class="s1">&#39;Caucasian&#39;</span><span class="p">,</span> <span class="s1">&#39;sex&#39;</span><span class="p">:</span><span class="s1">&#39;Male&#39;</span><span class="p">,</span> <span class="s1">&#39;age_cat&#39;</span><span class="p">:</span><span class="s1">&#39;25 - 45&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+get_disparity_predefined_group()
+</pre></div></div>
+</div>
+<p>The results are appended to the crosstab dataframe. We see a slice of
+this below.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bdf</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[29]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Index([&#39;attribute_name&#39;, &#39;attribute_value&#39;, &#39;k&#39;, &#39;model_id&#39;, &#39;score_threshold&#39;,
+       &#39;tpr&#39;, &#39;tnr&#39;, &#39;for&#39;, &#39;fdr&#39;, &#39;fpr&#39;, &#39;fnr&#39;, &#39;npv&#39;, &#39;precision&#39;, &#39;pp&#39;,
+       &#39;pn&#39;, &#39;ppr&#39;, &#39;pprev&#39;, &#39;fp&#39;, &#39;fn&#39;, &#39;tn&#39;, &#39;tp&#39;, &#39;group_label_neg&#39;,
+       &#39;group_label_pos&#39;, &#39;group_size&#39;, &#39;total_entities&#39;, &#39;prev&#39;,
+       &#39;ppr_disparity&#39;, &#39;pprev_disparity&#39;, &#39;fdr_disparity&#39;, &#39;for_disparity&#39;,
+       &#39;fpr_disparity&#39;, &#39;fnr_disparity&#39;, &#39;ppr_ref_group_value&#39;,
+       &#39;pprev_ref_group_value&#39;, &#39;fdr_ref_group_value&#39;, &#39;for_ref_group_value&#39;,
+       &#39;fpr_ref_group_value&#39;, &#39;fnr_ref_group_value&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bdf</span><span class="p">[[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_value&#39;</span><span class="p">,</span> <span class="s1">&#39;ppr_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;pprev_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;fdr_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;for_disparity&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;fpr_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[30]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>attribute_name</th>
+      <th>attribute_value</th>
+      <th>ppr_disparity</th>
+      <th>pprev_disparity</th>
+      <th>fdr_disparity</th>
+      <th>for_disparity</th>
+      <th>fpr_disparity</th>
+      <th>fnr_disparity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>race</td>
+      <td>African-American</td>
+      <td>2.545667</td>
+      <td>1.690224</td>
+      <td>0.906085</td>
+      <td>1.213154</td>
+      <td>1.912093</td>
+      <td>0.586416</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>race</td>
+      <td>Asian</td>
+      <td>0.009368</td>
+      <td>0.718384</td>
+      <td>0.611748</td>
+      <td>0.433839</td>
+      <td>0.370749</td>
+      <td>0.698482</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>race</td>
+      <td>Caucasian</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>race</td>
+      <td>Hispanic</td>
+      <td>0.222482</td>
+      <td>0.857099</td>
+      <td>1.120464</td>
+      <td>1.001616</td>
+      <td>0.915887</td>
+      <td>1.165140</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>race</td>
+      <td>Native American</td>
+      <td>0.014052</td>
+      <td>1.915691</td>
+      <td>0.611748</td>
+      <td>0.578453</td>
+      <td>1.598854</td>
+      <td>0.209544</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>race</td>
+      <td>Other</td>
+      <td>0.092506</td>
+      <td>0.602147</td>
+      <td>1.115085</td>
+      <td>1.048203</td>
+      <td>0.629057</td>
+      <td>1.417970</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>sex</td>
+      <td>Female</td>
+      <td>0.216801</td>
+      <td>0.904348</td>
+      <td>1.336425</td>
+      <td>0.734738</td>
+      <td>0.990343</td>
+      <td>1.055810</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>sex</td>
+      <td>Male</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>age_cat</td>
+      <td>25 - 45</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>age_cat</td>
+      <td>Greater than 45</td>
+      <td>0.204782</td>
+      <td>0.533914</td>
+      <td>1.192804</td>
+      <td>0.746232</td>
+      <td>0.503031</td>
+      <td>1.531238</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>age_cat</td>
+      <td>Less than 25</td>
+      <td>0.519231</td>
+      <td>1.395369</td>
+      <td>0.935673</td>
+      <td>1.313873</td>
+      <td>1.621868</td>
+      <td>0.696781</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>The differences in False Positive Rates, noted above, are clarified
+using the disparity ratio (<code class="docutils literal notranslate"><span class="pre">fpr_disparity</span></code>). Black people are falsely
+identified as being high or medium risks 1.9 times the rate for white
+people. As seen above, False Discovery Rates have much less disparity
+(<code class="docutils literal notranslate"><span class="pre">fdr_disparity</span></code>). False discovery is the fraction of false postives
+in a group within those predicted positive in the group. COMPAS is
+calibrated to have these balanced over groups.</p>
+<p>Notice that reference groups have disparity = 1 by design.</p>
+</div>
+<div class="section" id="Fairness()">
+<h3>Fairness()<a class="headerlink" href="#Fairness()" title="Permalink to this headline">¶</a></h3>
+<p>Finally, the <code class="docutils literal notranslate"><span class="pre">Fairness()</span></code> class provides three functions that provide
+a high level summary. Using FPR disparity as an example and the default
+fairness threshold, we have:</p>
+<div class="math">
+<p><img src="../_images/math/cea32d9e388b2ad0f8ee81632e538e1d3907f242.png" alt="0.8 &lt; Disparity_{FNR} =  \frac{FPR_{group}}{FPR_{base group}} &lt; 1.25"/></p>
+</div><p>The <code class="docutils literal notranslate"><span class="pre">Fairness().get_group_value_fairness()</span></code> function builds on the
+previous dataframe.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">f</span> <span class="o">=</span> <span class="n">Fairness</span><span class="p">()</span>
+<span class="n">fdf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_group_value_fairness</span><span class="p">(</span><span class="n">bdf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can assess fairness at various levels of detail.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gaf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_group_attribute_fairness</span><span class="p">(</span><span class="n">fdf</span><span class="p">)</span>
+<span class="n">gaf</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[47]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>model_id</th>
+      <th>score_threshold</th>
+      <th>attribute_name</th>
+      <th>Statistical Parity</th>
+      <th>Impact Parity</th>
+      <th>FDR Parity</th>
+      <th>FPR Parity</th>
+      <th>FOR Parity</th>
+      <th>FNR Parity</th>
+      <th>TypeI Parity</th>
+      <th>TypeII Parity</th>
+      <th>Unsupervised Fairness</th>
+      <th>Supervised Fairness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>binary 0/1</td>
+      <td>age_cat</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>binary 0/1</td>
+      <td>race</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>binary 0/1</td>
+      <td>sex</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fdf</span><span class="p">[[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_value&#39;</span><span class="p">,</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Impact Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FDR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FPR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FOR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FNR Parity&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;TypeI Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Unsupervised Fairness&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[46]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>attribute_name</th>
+      <th>attribute_value</th>
+      <th>Statistical Parity</th>
+      <th>Impact Parity</th>
+      <th>FDR Parity</th>
+      <th>FPR Parity</th>
+      <th>FOR Parity</th>
+      <th>FNR Parity</th>
+      <th>TypeI Parity</th>
+      <th>TypeII Parity</th>
+      <th>Unsupervised Fairness</th>
+      <th>Supervised Fairness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>race</td>
+      <td>African-American</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>race</td>
+      <td>Asian</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>race</td>
+      <td>Caucasian</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>race</td>
+      <td>Hispanic</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>race</td>
+      <td>Native American</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>race</td>
+      <td>Other</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>sex</td>
+      <td>Female</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>sex</td>
+      <td>Male</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>age_cat</td>
+      <td>25 - 45</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>age_cat</td>
+      <td>Greater than 45</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>age_cat</td>
+      <td>Less than 25</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>In this case, our base groups are Caucasian for race, Male for gender,
+and 25-45 for age_cat. By construction, the base group has supervised
+fairness. (The disparity ratio is 1). Relative to the base groups, the
+COMPAS predictions only provide supervised fairness to one group,
+Hispanic.</p>
+<p>Above, the African-American false omission and false discovemry are
+within the bounds of fairness. This result is expected because COMPAS is
+calibrated. (Given calibration, it is surprising that Asian and Native
+American rates are so low. This may be a matter of having few
+observations for these groups.)</p>
+<p>On the other hand, African-Americans are roughly twice as likely to have
+false positives and 40 percent less likely to false negatives. In real
+terms, 44.8% of African-Americans who did not recidivate were marked
+high or medium risk (with potential for associated penalties), compared
+with 23.4% of Caucasian non-reoffenders. This is unfair and is marked
+False below.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Center for Data Science and Public Policy.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

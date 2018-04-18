@@ -1,0 +1,45 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Using the CLI\n",
+    "\n",
+    "Aequitas command line interface allows you to generate 'The Bias Report' with one line in the terminal.\n",
+    "\n",
+    "[30 Seconds to *aequitas-report*](./30_seconds_aequitas.html) shows the CLI in action. Here we detail the command.\n",
+    "\n",
+    "## `--input   < path to .csv file >`\n",
+    "\n",
+    "Absolute filepath for input dataset in csv format. If no input is provided we assume there is a db configuration in the configs.yaml file.\n",
+    "\n",
+    "## `--config   < path to config.yaml >`\n",
+    "\n",
+    "To change default behavior uniformly across applications use a configuration file.\n",
+    "\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

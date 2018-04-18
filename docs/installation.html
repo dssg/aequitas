@@ -84,8 +84,9 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a></li>
 </ul>
 
@@ -187,21 +188,13 @@
 </style>
 <div class="section" id="Installation">
 <h1>Installation<a class="headerlink" href="#Installation" title="Permalink to this headline">¶</a></h1>
-<p>To install aequitas, enter the following code in your terminal.</p>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/dssg/aequitas.git
-cd aequitas
-python setup.py install
+<p>Aequitas requires Python 3.</p>
+<p>Install this Python library from source</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p>and/or named as a Python install requirement (<em>e.g.</em> in a requirements
-file).</p>
-<p>And that you can then execute the auditor with:</p>
-<div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>aequitas-audit
-</pre></div>
-</div>
-<p>In the future we may add a separate section, expressly for developers,
-that you can set up your local environment by executing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">install</span>
+<p>…or named as an installation requirement, <em>e.g.</em> via <code class="docutils literal notranslate"><span class="pre">pip</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dssg</span><span class="o">/</span><span class="n">aequitas</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </div>
