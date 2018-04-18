@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to aequitas's documentation!
+Welcome to Aequitas documentation!
 ====================================
 
 .. toctree::
@@ -15,6 +15,10 @@ Welcome to aequitas's documentation!
    30_seconds_webapp.ipynb
    input_data.ipynb
    output_data.ipynb
+   metrics.ipynb
+   cli.ipynb
    config.ipynb
    using_python.ipynb
-   api/index
+   api/aequitas
+   examples/index
+

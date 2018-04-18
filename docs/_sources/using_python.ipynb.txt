@@ -18,7 +18,8 @@
     "* `Fairness()`\n",
     "\n",
     "See it in action [here](./examples/compas_demo.html)\n",
-    "See the [API](./api/index.html) for more details.\n"
+    "\n",
+    "See the [API](./api/aequitas.html) for more details.\n"
    ]
   }
  ],

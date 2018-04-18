@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Using Aequitas with Python &mdash; aequitas  documentation</title>
+  <title>Using the CLI &mdash; aequitas  documentation</title>
   
 
   
@@ -28,9 +28,7 @@
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API" href="api/index.html" />
-    <link rel="prev" title="Configurations" href="config.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,15 +77,17 @@
               
             
             
-              <ul class="current">
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Aequitas with Python</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 </ul>
 
             
@@ -133,13 +133,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Using Aequitas with Python</li>
+      <li>Using the CLI</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/using_python.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/CLI.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -186,20 +186,22 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="Using-Aequitas-with-Python">
-<h1>Using Aequitas with Python<a class="headerlink" href="#Using-Aequitas-with-Python" title="Permalink to this headline">¶</a></h1>
-<p>You can use Aequitas commands in a python enviroment using</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">aequitas</span>
-</pre></div>
+<div class="section" id="Using-the-CLI">
+<h1>Using the CLI<a class="headerlink" href="#Using-the-CLI" title="Permalink to this headline">¶</a></h1>
+<p>Aequitas command line interface allows you to generate ‘The Bias Report’
+with one line in the terminal.</p>
+<p><a class="reference external" href="./30_seconds_aequitas.html">30 Seconds to *aequitas-report*</a> shows
+the CLI in action. Here we detail the command.</p>
+<div class="section" id="--input---&lt;-path-to-.csv-file-&gt;">
+<h2><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--input---<-path-to-.csv-file->" title="Permalink to this headline">¶</a></h2>
+<p>Absolute filepath for input dataset in csv format. If no input is
+provided we assume there is a db configuration in the configs.yaml file.</p>
 </div>
-<p>The workflow relies on three class which build on each other.</p>
-<ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">Group()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">Bias()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">Fairness()</span></code></li>
-</ul>
-<p>See it in action <a class="reference external" href="./examples/compas_demo.html">here</a></p>
-<p>See the <a class="reference external" href="./api/aequitas.html">API</a> for more details.</p>
+<div class="section" id="--config---&lt;-path-to-config.yaml-&gt;">
+<h2><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--config---<-path-to-config.yaml->" title="Permalink to this headline">¶</a></h2>
+<p>To change default behavior uniformly across applications use a
+configuration file.</p>
+</div>
 </div>
 
 
@@ -207,15 +209,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="api/index.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="config.html" class="btn btn-neutral" title="Configurations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

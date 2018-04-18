@@ -1,4 +1,4 @@
-aequitas api 
+Aequitas API
 ====================================
 
 :mod:`src.aequitas.group`
