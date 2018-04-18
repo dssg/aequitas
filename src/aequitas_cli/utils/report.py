@@ -14,6 +14,12 @@ logging.getLogger(__name__)
 # License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
 
 
+#
+#  DISCLAIMER: these methods were developed with a particular version of the webapp in mind. They lack flexibility (lots of
+# hardcoded options)!!!
+#             If new features(fairness measures, etc..) are added to the webapp this needs to change a lot...
+#
+
 def get_group_value_report(group_value_df):
     """
 
@@ -116,7 +122,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
             idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
-            # aux_df.at[idx, col] = 'Ref'
+            aux_df.loc[idx, col] = 'Ref'
 
     map = {}
     aux_df = aux_df[def_cols + fairness_measures]
@@ -331,24 +337,33 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     return text_detail
 
 
-# this method has tons of bad decisions, starting with the supported_fairs variable (it should be an or between fdr-fpr, for-fnr
 def get_highlevel_table(group_value_df, fairness_measures):
     supported_name = {'Statistical Parity': '[Equal Parity](#equal-parity)',
                       'Impact Parity': '[Proportional Parity](#proportional-parity)',
-                      'FPR Parity': '[False Positive Parity](#false-positive-parity)',
-                      'FNR Parity': '[False Negative Parity](#false-negative-parity)'}
+                      'TypeI Parity': '[False Positive Parity](#false-positive-parity)',
+                      'TypeII Parity': '[False Negative Parity](#false-negative-parity)'}
     supported_outcome = {'Statistical Parity': 'Each group is represented equally.',
                          'Impact Parity': 'Each group is represented proportional to their representation in the overall population.',
-                         'FPR Parity': 'Each group has proportionally equal false positive errors made by the model.',
-                         'FNR Parity': 'Each group has proportionally equal false negative errors made by the model.'}
-    supported_order = ['Statistical Parity', 'Impact Parity', 'FPR Parity', 'FNR Parity']
+                         'TypeI Parity': 'Each group has proportionally equal false positive errors made by the model.',
+                         'TypeII Parity': 'Each group has proportionally equal false negative errors made by the model.'}
+    supported_order = ['Statistical Parity', 'Impact Parity', 'TypeI Parity', 'TypeII Parity']
+    fairness_measures_edited = []
+    for meas in fairness_measures:
+        if meas in ['FPR Parity', 'FDR Parity']:
+            fairness_measures_edited.append('TypeI Parity')
+        elif meas in ['FNR Parity', 'FOR Parity']:
+            fairness_measures_edited.append('TypeII Parity')
+        else:
+            fairness_measures_edited.append(meas)
+    fairness_measures_edited = set(fairness_measures_edited)
+
     raw = {
         'Fairness Criteria': [],
         'Desired Outcome': [],
         'Unfairly Affected Groups': []
     }
     for measure in supported_order:
-        if measure in fairness_measures:
+        if measure in fairness_measures_edited:
             raw['Fairness Criteria'].append(supported_name[measure])
             raw['Desired Outcome'].append(supported_outcome[measure])
             false_df = group_value_df.loc[group_value_df[measure] == False]
