@@ -1,5 +1,5 @@
 ========
-Aequitas
+[Aequitas](http://dsapp.uchicago.edu/aequitas/)
 ========
 
 The machine learning Bias and Fairness library
@@ -44,3 +44,5 @@ Provision your development environment via ``install``::
 Common development tasks, such as deploying the webapp, may then be handled via ``manage``::
 
     manage --help
+
+Find documentation at https://dssg.github.io/aequitas/
