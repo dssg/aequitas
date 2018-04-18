@@ -1,16 +1,4 @@
-import functools
-
-from argcmdr import cmd, Local, LocalRoot
-
-
-class BeanstalkCommand(Local):
-
-    @property
-    def eb(self):
-        return self.local['.manage/bin/eb']
-
-
-ebmethod = functools.partial(cmd, base=BeanstalkCommand)
+from argcmdr import Local, LocalRoot, localmethod
 
 
 class Aequitas(LocalRoot):
@@ -42,22 +30,22 @@ class Web(Local):
                 help=f"environment name (default: {self.ENV})",
             )
 
-        @ebmethod
+        @localmethod
         def console(self, args):
             """open the environment web console"""
-            return (self.local.FG, self.eb['console', args.name])
+            return (self.local.FG, self.local['eb']['console', args.name])
 
-        @ebmethod
+        @localmethod
         def logs(self, args):
             """read environment logs"""
-            return (self.local.FG, self.eb['logs', args.name])
+            return (self.local.FG, self.local['eb']['logs', args.name])
 
-        @ebmethod
+        @localmethod
         def ssh(self, args):
             """ssh into the EC2 instance"""
-            return (self.local.FG, self.eb['ssh', args.name])
+            return (self.local.FG, self.local['eb']['ssh', args.name])
 
-        class Create(BeanstalkCommand):
+        class Create(Local):
             """create an environment"""
 
             def __init__(self, parser):
@@ -68,10 +56,10 @@ class Web(Local):
 
             def prepare(self, args):
                 # AWS_EB_PROFILE=dsapp-ddj
-                command = self.eb[
+                command = self.local['eb'][
                     'create',
-                    '-nh', # return immediately
-                    '-s',  # stand-alone for now (no ELB)
+                    '-nh',  # return immediately
+                    '-s',   # stand-alone for now (no ELB)
                     args.name,
                 ]
 
@@ -80,7 +68,7 @@ class Web(Local):
 
                 yield command
 
-        class Deploy(BeanstalkCommand):
+        class Deploy(Local):
             """deploy to an environment"""
 
             def __init__(self, parser):
@@ -90,7 +78,7 @@ class Web(Local):
                 )
 
             def prepare(self, args):
-                return self.eb[
+                return self.local['eb'][
                     'deploy',
                     '-nh',
                     '-l', args.version,

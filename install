@@ -46,6 +46,50 @@ INSTALL_URL=https://raw.githubusercontent.com/dssg/install-cli/$INSTALL_VERSION/
 # Invoke 'require' to ensure your project's basic requirements are met.
 #
 
+# direnv
+
+exists_direnv() {
+  icli::check_command direnv
+}
+
+apt_install_direnv() {
+  sudo apt install direnv
+}
+
+yum_install_direnv() {
+  sudo yum install direnv
+}
+
+brew_install_direnv() {
+  brew install direnv
+}
+
+if icli::check_command apt; then
+  install_direnv=apt_install_direnv
+elif icli::check_command yum; then
+  install_direnv=yum_install_direnv
+elif icli::check_command brew; then
+  install_direnv=brew_install_direnv
+else
+  install_direnv=""
+fi
+
+require direnv \
+  exists_direnv \
+  $install_direnv \
+  --fail-prefix="not found"
+
+icli::set_context direnv
+if ! exists_direnv && [ -z $install_direnv ]
+then
+  icli::message "${T_FRED}error: could not determine how to install direnv on your system"
+elif [ ! -e .envrc ]
+then
+  cp .envrc.example .envrc
+  icli::message "${T_FYELLOW}customize .envrc with your credentials"
+fi
+icli::unset_context
+
 # pyenv
 
 exists_pyenv() {
@@ -81,7 +125,6 @@ require $PROJECT \
 # python libs
 
 install_lib() {
-  pip install -Ur requirement/dev.txt && \
   pip install -e .
 }
 
