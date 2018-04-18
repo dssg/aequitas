@@ -7,6 +7,7 @@ __pycache__/
 *.ipynb_checkpoint*
 
 .envrc
+.manage
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

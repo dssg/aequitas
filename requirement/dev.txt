@@ -1,3 +1,1 @@
--r main.txt
 argcmdr==0.5.0
-awsebcli==3.12.4
