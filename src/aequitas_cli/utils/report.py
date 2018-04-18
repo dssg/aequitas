@@ -97,7 +97,7 @@ def get_highlevel_report(group_attribute_df):
     for attr in attr_list:
         group_attribute_df = group_attribute_df.replace(attr, '[' + attr + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')')
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
-    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe')  # , showindex='never')
+    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
     return highlevel_report
 
 
@@ -135,7 +135,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
 
     parity_group = tabulate(aux_df,
                             headers='keys',
-                            tablefmt='pipe')  #, showindex='never')
+                            tablefmt='pipe', showindex='never')
     return parity_group
 
 
@@ -191,7 +191,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
 
     disparities_group = tabulate(aux_df,
                                  headers='keys',
-                                 tablefmt='pipe')  #, showindex='never')
+                                 tablefmt='pipe', showindex='never')
     return disparities_group
 
 
@@ -217,7 +217,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
-                           tablefmt='pipe')  #, showindex='never')
+                           tablefmt='pipe', showindex='never')
     return group_group
 
 
@@ -370,7 +370,7 @@ def get_highlevel_table(group_value_df, fairness_measures):
         # keep the same order!!
         # krrp
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
-                                   tablefmt='pipe')  #, showindex='never')
+                                   tablefmt='pipe', showindex='never')
     return highlevel_table
 
 def audit_report_markdown(configs, group_value_df, group_attribute_df, fairness_measures_depend, overall_fairness, model_id=1):
