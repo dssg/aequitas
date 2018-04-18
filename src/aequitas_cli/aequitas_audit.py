@@ -14,6 +14,7 @@ from .utils.io import get_db_data
 from .utils.io import get_engine
 from .utils.io import push_tocsv
 from .utils.io import push_todb
+from .utils.io import push_topdf
 from .utils.report import audit_report_markdown
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
@@ -31,18 +32,22 @@ about = """
 ____________________________________________________________________________
 
 
-  _______ _            ____  _             _____                       _
- |__   __| |          |  _ \(_)           |  __ \                     | |
-    | |  | |__   ___  | |_) |_  __ _ ___  | |__) |___ _ __   ___  _ __| |_
-    | |  | '_ \ / _ \ |  _ <| |/ _` / __| |  _  // _ \ '_ \ / _ \| '__| __|
-    | |  | | | |  __/ | |_) | | (_| \__ \ | | \ \  __/ |_) | (_) | |  | |_
-    |_|  |_| |_|\___| |____/|_|\__,_|___/ |_|  \_\___| .__/ \___/|_|   \__|
-                                                     | |
-                                                     |_|
+                    
+                    ___                    _ __            
+                   /   | ___  ____ ___  __(_) /_____ ______
+                  / /| |/ _ \/ __ `/ / / / / __/ __ `/ ___/
+                 / ___ /  __/ /_/ / /_/ / / /_/ /_/ (__  ) 
+                /_/  |_\___/\__, /\__,_/_/\__/\__,_/____/  
+                              /_/                          
+
+
 
 ____________________________________________________________________________
 
-                    Bias and Fairness Analysis
+                      Bias and Fairness Audit Tool
+____________________________________________________________________________
+
+
 
 
 """
@@ -125,8 +130,6 @@ def audit(df, configs, model_id=1, preprocessed=False):
     fair_results = f.get_overall_fairness(group_attribute_df)
     print('_______________\nModel level:')
     print(fair_results)
-    parameter = 'xyz_abs'
-    model_eval = 'xx.yy'
     report = None
     if configs.report is True:
         report = audit_report_markdown(configs, group_value_df, group_attribute_df, f.fair_measures_depend, fair_results)
@@ -146,21 +149,22 @@ def run(df, configs, preprocessed=False):
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
-            report_list = []
+            report_list = ''
             for model_id in df.model_id.unique():
                 model_df, model_report = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
                                                preprocessed=preprocessed)
                 model_df_list.append(model_df)
                 report_list.append(model_report)
             group_value_df = pd.concat(model_df_list)
-            report = report_list
+            report = '\n'.join(report_list)
+
         else:
             group_value_df, report = audit(df, configs=configs, preprocessed=preprocessed)
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
-    print(report)
-    return group_value_df
+    # print(report)
+    return group_value_df, report
 
 
 def main():
@@ -182,12 +186,13 @@ def main():
             create_tables = 'replace'
         input_query = configs.db['input_query']
         df = get_db_data(engine, input_query)
-        group_value_df = run(df, configs=configs, preprocessed=False)
+        group_value_df, report = run(df, configs=configs, preprocessed=False)
         push_todb(engine, output_schema, create_tables, group_value_df)
     else:
         df = get_csv_data(args.input_file)
-        group_value_df = run(df, configs=configs, preprocessed=False)
-        push_tocsv(args.input_file, args.output_folder, group_value_df)
+        group_value_df, report = run(df, configs=configs, preprocessed=False)
+        push_tocsv(args.input_file, group_value_df)
+        push_topdf(args.input_file, report)
 
 
 if __name__ == '__main__':

@@ -275,7 +275,6 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
     group_value_df = group_value_df.applymap(str)
     fairness_metric = 'Statistical Parity'
     false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
-    print(group_value_df.columns)
     bias_metric = fairness_measures_depend[fairness_metric]
     group_metric = bias_metric.replace('_disparity', '')
     ref_group_col = group_metric + '_ref_group_value'
@@ -307,7 +306,6 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     group_value_df = group_value_df.applymap(str)
     fairness_metric = 'Impact Parity'
     false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
-    print(group_value_df.columns)
     bias_metric = fairness_measures_depend[fairness_metric]
     group_metric = bias_metric.replace('_disparity', '')
     ref_group_col = group_metric + '_ref_group_value'

@@ -6,6 +6,7 @@ from sys import exit
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+from xhtml2pdf import pisa
 
 logging.getLogger(__name__)
 
@@ -61,11 +62,10 @@ def push_todb(engine, output_schema, create_tables, output_df):
             con=engine,
             if_exists=create_tables)
     except SQLAlchemyError:
-        logging.error('push_db_data: Could not push results to the target database.')
-        exit(1)
+        logging.info('push_db_data: Could not push results to the target database.')
 
 
-def push_tocsv(input_file, output_folder, output_df):
+def push_tocsv(input_file, output_df):
     """
 
     :param input_file:
@@ -83,10 +83,24 @@ def push_tocsv(input_file, output_folder, output_df):
     try:
         output_df.to_csv(outpath, encoding='utf-8', index=False)
     except IOError:
-        logging.error('push_csv_data: Could not push results to a csv file.')
-        exit(1)
+        logging.info('push_csv_data: Could not push results to a csv file.')
 
 
+def push_topdf(input_file, report):
+    datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
+    ipath, input_name = path.split(input_file)
+    # outpath = output_folder + input_name[:input_file.find('.')] + '_aequitas_' + datestr + '.csv'
+    # for now we are saving the csv in same folder as the input file
+    try:
+        outpath = ipath + input_name[:input_file.find('.')] + '_aequitas_' + datestr + '.pdf'
+        logging.info('Saving bias report to pdf on ' + outpath)
+
+        result_pdf = open(outpath, 'w+b')
+        pisaStatus = pisa.CreatePDF(report, dest=result_pdf)
+        result_pdf.close()
+    except IOError:
+        logging.info('Failed! Not able to save Aequitas Report pdf on ' + outpath)
+    return
 
 
 def get_engine(configs):
