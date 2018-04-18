@@ -11,7 +11,8 @@ logging.getLogger(__name__)
 
 
 class Fairness(object):
-
+    """
+    """
     def __init__(self, fair_eval=None, tau=None, fair_measures_depend=None, type_parity_depend=None,
                  high_level_fairness_depend=None):
         """

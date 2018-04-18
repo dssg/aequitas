@@ -11,8 +11,11 @@ logging.getLogger(__name__)
 # License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved
 
 class Group(object):
+    """
+    """
     def __init__(self):
-
+        """
+        """
         self.label_neg_count = lambda label_col: lambda x: \
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \

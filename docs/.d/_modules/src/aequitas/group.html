@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>src.aequitas.group &mdash; aequitas  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> aequitas
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aequitas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>src.aequitas.group</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for src.aequitas.group</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">nan</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Authors: Pedro Saleiro &lt;saleiro@uchicago.edu&gt;</span>
+<span class="c1">#          Rayid Ghani</span>
+<span class="c1">#          Benedict Kuester</span>
+<span class="c1">#</span>
+<span class="c1"># License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved</span>
+
+<div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_neg_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">label_col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">label_col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_group_functions</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Group.get_group_functions"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_group_functions">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nan</span>
+
+        <span class="n">predicted_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">predicted_neg_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">predicted_pos_ratio_k</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">k</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">predicted_pos_ratio_g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">false_neg_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">false_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">true_neg_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">true_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">fpr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+                   <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                       <span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">tnr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span>
+                                                                         <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">fnr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+                   <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                       <span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">tpr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span>
+                                                                          <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">fomr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span>
+                                                                         <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">npv</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+                   <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+                       <span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">precision</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span>
+                                                                          <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">fdr</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
+            <span class="n">divide</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span>
+                                                                          <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">group_functions</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tpr&#39;</span><span class="p">:</span> <span class="n">tpr</span><span class="p">,</span>
+                           <span class="s1">&#39;tnr&#39;</span><span class="p">:</span> <span class="n">tnr</span><span class="p">,</span>
+                           <span class="s1">&#39;for&#39;</span><span class="p">:</span> <span class="n">fomr</span><span class="p">,</span>
+                           <span class="s1">&#39;fdr&#39;</span><span class="p">:</span> <span class="n">fdr</span><span class="p">,</span>
+                           <span class="s1">&#39;fpr&#39;</span><span class="p">:</span> <span class="n">fpr</span><span class="p">,</span>
+                           <span class="s1">&#39;fnr&#39;</span><span class="p">:</span> <span class="n">fnr</span><span class="p">,</span>
+                           <span class="s1">&#39;npv&#39;</span><span class="p">:</span> <span class="n">npv</span><span class="p">,</span>
+                           <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span>
+                           <span class="s1">&#39;pp&#39;</span><span class="p">:</span> <span class="n">predicted_pos_count</span><span class="p">,</span>
+                           <span class="s1">&#39;pn&#39;</span><span class="p">:</span> <span class="n">predicted_neg_count</span><span class="p">,</span>
+                           <span class="s1">&#39;ppr&#39;</span><span class="p">:</span> <span class="n">predicted_pos_ratio_k</span><span class="p">,</span>
+                           <span class="s1">&#39;pprev&#39;</span><span class="p">:</span> <span class="n">predicted_pos_ratio_g</span><span class="p">,</span>
+                           <span class="s1">&#39;fp&#39;</span><span class="p">:</span> <span class="n">false_pos_count</span><span class="p">,</span>
+                           <span class="s1">&#39;fn&#39;</span><span class="p">:</span> <span class="n">false_neg_count</span><span class="p">,</span>
+                           <span class="s1">&#39;tn&#39;</span><span class="p">:</span> <span class="n">true_neg_count</span><span class="p">,</span>
+                           <span class="s1">&#39;tp&#39;</span><span class="p">:</span> <span class="n">true_pos_count</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">group_functions</span></div>
+
+<div class="viewcode-block" id="Group.get_crosstabs"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_crosstabs">[docs]</a>    <span class="k">def</span> <span class="nf">get_crosstabs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates univariate groups and calculates group metrics.</span>
+
+<span class="sd">        :param df: a dataframe containing the following required columns [score,  label_value]</span>
+<span class="sd">        :param score_thresholds: a dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
+<span class="sd">        :param model_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;entity_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_abs&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_pct&#39;</span><span class="p">]</span>
+            <span class="n">attr_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_attr_cols</span><span class="p">)]</span>  <span class="c1"># index of the columns that are</span>
+        <span class="c1"># check if all attr_cols exist in df</span>
+        <span class="n">check</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">]</span>
+        <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">check</span><span class="p">:</span>
+            <span class="c1"># todo: create separate check method that raises exception...</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: not all attribute columns provided exist in input dataframe!&#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># check if all columns are strings:</span>
+        <span class="n">non_string_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">object</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">))]</span>
+        <span class="k">if</span> <span class="n">non_string_cols</span><span class="o">.</span><span class="n">empty</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!&#39;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column</span>
+        <span class="n">count_ones</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># it also serves as flag to set parameter to &#39;binary&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">score_thresholds</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">count_ones</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="mf">1.0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">count_ones</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: No threshold provided and there is no 1s in the score column.&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">score_thresholds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">count_ones</span><span class="p">]}</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;model_id, score_thresholds&#39;</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">prior_dfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># calculate the bias for these columns</span>
+        <span class="c1"># not default(non_attr_cols), therefore represent the group variables!</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;getcrosstabs: attribute columns to perform crosstabs:&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">))</span>
+        <span class="c1"># for each group variable do</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="c1"># find the priors_df</span>
+            <span class="n">col_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="s1">&#39;nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;COUNTS:::&#39;</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
+            <span class="c1"># distinct entities within group value</span>
+            <span class="n">this_prior_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                <span class="s1">&#39;model_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span>
+                <span class="s1">&#39;attribute_name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span>
+                <span class="s1">&#39;attribute_value&#39;</span><span class="p">:</span> <span class="n">counts</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="s1">&#39;group_label_pos&#39;</span><span class="p">:</span> <span class="n">col_group</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_pos_count</span><span class="p">(</span>
+                    <span class="s1">&#39;label_value&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="s1">&#39;group_label_neg&#39;</span><span class="p">:</span> <span class="n">col_group</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_neg_count</span><span class="p">(</span>
+                    <span class="s1">&#39;label_value&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="s1">&#39;group_size&#39;</span><span class="p">:</span> <span class="n">counts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="s1">&#39;total_entities&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+            <span class="p">})</span>
+            <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;group_label_pos&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;group_size&#39;</span><span class="p">]</span>
+            <span class="c1"># for each model_id and as_of_date the priors_df has length attribute_names * attribute_values</span>
+            <span class="n">prior_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_prior_df</span><span class="p">)</span>
+            <span class="c1"># we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)</span>
+            <span class="k">for</span> <span class="n">thres_unit</span><span class="p">,</span> <span class="n">thres_values</span> <span class="ow">in</span> <span class="n">score_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">thres_val</span> <span class="ow">in</span> <span class="n">thres_values</span><span class="p">:</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">thres_unit</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres_val</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                    <span class="n">score_threshold</span> <span class="o">=</span> <span class="s1">&#39;binary 0/1&#39;</span> <span class="k">if</span> <span class="n">count_ones</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">thres_val</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">thres_unit</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">thres_unit</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="n">thres_val</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                        <span class="n">feat_bias</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+                        <span class="n">metrics_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+                            <span class="s1">&#39;model_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">feat_bias</span><span class="p">),</span>
+                            <span class="s1">&#39;score_threshold&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">score_threshold</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">feat_bias</span><span class="p">),</span>
+                            <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">feat_bias</span><span class="p">),</span>
+                            <span class="s1">&#39;attribute_name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">feat_bias</span><span class="p">),</span>
+                            <span class="s1">&#39;attribute_value&#39;</span><span class="p">:</span> <span class="n">feat_bias</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                            <span class="n">name</span><span class="p">:</span> <span class="n">feat_bias</span><span class="o">.</span><span class="n">values</span>
+                        <span class="p">})</span>
+                        <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">this_group_df</span> <span class="o">=</span> <span class="n">metrics_df</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">this_group_df</span> <span class="o">=</span> <span class="n">this_group_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">metrics_df</span><span class="p">)</span>
+                        <span class="c1"># print(this_group_df.head(1))</span>
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_group_df</span><span class="p">)</span>
+        <span class="c1"># precision@	25_abs</span>
+        <span class="n">groups_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">priors_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">prior_dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">groups_df</span> <span class="o">=</span> <span class="n">groups_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">priors_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;attribute_value&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">groups_df</span><span class="p">,</span> <span class="n">attr_cols</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Center for Data Science and Public Policy.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>
