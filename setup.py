@@ -28,13 +28,11 @@ with REQUIREMENTS_PATH.open() as requirements_file:
     REQUIREMENTS = list(stream_requirements(requirements_file))
 
 
-# (Read files with explicit encoding for targets like Elastic Beanstalk)
-
 setup(
     name='aequitas',
     version='0.4.0',
     # description="",
-    long_description=README_PATH.read_text(encoding='utf8'),
+    long_description=README_PATH.read_text(),
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
     url='https://github.com/dssg/aequitas-public',
@@ -42,7 +40,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    license=LICENSE_PATH.read_text(encoding='utf8'),
+    license=LICENSE_PATH.read_text(),
     zip_safe=False,
     keywords='bias aequitas',
     classifiers=[
