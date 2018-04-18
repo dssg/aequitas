@@ -2,9 +2,16 @@
 Aequitas
 ========
 
+----------------------------------------------
 The machine learning Bias and Fairness library
+----------------------------------------------
 
-An open-source bias audit toolkit for machine learning developers, analysts, and  policymakers to audit machine learning models for discrimination and bias, and make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
+An open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
+
+Demo
+====
+
+See what Aequitas can do at http://aequitas.dssg.io/.
 
 Learn more about the project at http://dsapp.uchicago.edu/aequitas/
 
@@ -21,18 +28,11 @@ Install this Python library from source::
 
     pip install git+https://github.com/dssg/aequitas.git
 
-Use
-===
-
-You can use Aequitas in three ways:
-
-1. Web App at http://aequitas.dssg.io
-
-2. Python library: You may then import the ``aequitas`` module from Python::
+You may then import the ``aequitas`` module from Python::
 
     import aequitas
 
-3. Execute the auditor from the command line::
+...or execute the auditor from the command line::
 
     aequitas-report
 
