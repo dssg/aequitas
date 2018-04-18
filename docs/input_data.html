@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Understanding Input &mdash; aequitas  documentation</title>
+  <title>Understanding Input Data &mdash; aequitas  documentation</title>
   
 
   
@@ -83,10 +83,10 @@
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Understanding Input</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Understanding Input Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#score"><code class="docutils literal notranslate"><span class="pre">score</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#label_value"><code class="docutils literal notranslate"><span class="pre">label_value</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#groups-e.g.-race,-sex,-age_cat">groups e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age_cat</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#attributes-e.g.-race,-sex,-age,income">attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#model_id"><code class="docutils literal notranslate"><span class="pre">model_id</span></code></a></li>
 </ul>
 </li>
@@ -138,7 +138,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Understanding Input</li>
+      <li>Understanding Input Data</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -191,37 +191,77 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="Understanding-Input">
-<h1>Understanding Input<a class="headerlink" href="#Understanding-Input" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Understanding-Input-Data">
+<h1>Understanding Input Data<a class="headerlink" href="#Understanding-Input-Data" title="Permalink to this headline">¶</a></h1>
 <p>Input data must have columns:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
-<li>at least one group. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
+<li>at least one attribute. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code>.</li>
 </ul>
 <p>All columns in the input data are assumed to be groups with the
 exception of the following reserved columns.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="23%" />
+<col width="32%" />
+<col width="11%" />
+<col width="9%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">score</th>
+<th class="head">label_value</th>
+<th class="head">race</th>
+<th class="head">sex</th>
+<th class="head">age</th>
+<th class="head">income</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>1</td>
+<td>African-American</td>
+<td>Male</td>
+<td>25</td>
+<td>180000</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>1</td>
+<td>Caucasian</td>
+<td>Male</td>
+<td>37</td>
+<td>34000</td>
+</tr>
+</tbody>
+</table>
 <p>Reserved column name:</p>
 <ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">id</span></code></li>
 <li><code class="docutils literal notranslate"><span class="pre">model_id</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">entity_id</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">rank_abs</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">rank_pct</span></code></li>
 </ul>
 <div class="section" id="score">
 <h2><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h2>
-<p>By default, aequitas_audit assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary
-decision (0 or 1). Alternatively, the <code class="docutils literal notranslate"><span class="pre">score</span></code> column can contain the
-raw output of a machine learning algorithm applied to the data. In this
-case, the user sets a <a href="#id1"><span class="problematic" id="id2">`threshold &lt;&gt;`__</span></a> to determine the binary decision.</p>
+<p>By default, Aequitas assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary decision
+(0 or 1). Alternatively, the <code class="docutils literal notranslate"><span class="pre">score</span></code> column can contain the score
+(e.g.&nbsp;the output from a logistic regression applied to the data). In
+this case, the user sets a threshold to determine the binary decision.
+See <a class="reference external" href="./config.html">configurations</a> for more on thresholds.</p>
 </div>
 <div class="section" id="label_value">
 <h2><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h2>
 <p>This is the ground truth value of a binary decision. The data must be 0
 or 1.</p>
 </div>
-<div class="section" id="groups-e.g.-race,-sex,-age_cat">
-<h2>groups e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age_cat</span></code><a class="headerlink" href="#groups-e.g.-race,-sex,-age_cat" title="Permalink to this headline">¶</a></h2>
-<p>Group columns can be categorical or continuous. If categorical, aequitas
+<div class="section" id="attributes-e.g.-race,-sex,-age,income">
+<h2>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h2>
+<p>Group columns can be categorical or continuous. If categorical, Aequitas
 will produce crosstabs with bias metrics for each group_level. If
-continuous, …</p>
+continuous, Aequitas will first bin the data into quartiles.</p>
 </div>
 <div class="section" id="model_id">
 <h2><code class="docutils literal notranslate"><span class="pre">model_id</span></code><a class="headerlink" href="#model_id" title="Permalink to this headline">¶</a></h2>
