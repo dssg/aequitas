@@ -125,7 +125,8 @@ require $PROJECT \
 # python libs
 
 install_lib() {
-  pip install -e .
+  pip install -e . && \
+  pip install -Ur requirement/dev.txt
 }
 
 # no great way to check that python libs installed;
