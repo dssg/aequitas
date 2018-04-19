@@ -116,7 +116,6 @@ def audit(df, configs, model_id=1, preprocessed=False):
         bias_df = b.get_disparity_major_group(groups_model)
     else:
         bias_df = b.get_disparity_min_metric(groups_model)
-    print('number of rows after bias majority ref group:', len(bias_df))
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
     f = Fairness(tau=configs.fairness_threshold)
@@ -124,15 +123,11 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print('Fairness Measures:', configs.fair_measures_requested)
     group_value_df = f.get_group_value_fairness(bias_df, fair_measures_requested=configs.fair_measures_requested)
     group_attribute_df = f.get_group_attribute_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
-    print('_______________\nGroup Variable level:')
-    print(group_attribute_df)
-    print(group_value_df[['fpr', 'fdr', 'fnr', 'for', 'group_label_neg', 'group_label_pos']])
     fair_results = f.get_overall_fairness(group_attribute_df)
-    print('_______________\nModel level:')
     print(fair_results)
     report = None
     if configs.report is True:
-        report = audit_report_markdown(configs, group_value_df, group_attribute_df, f.fair_measures_depend, fair_results)
+        report = audit_report_markdown(configs, group_value_df, f.fair_measures_depend, fair_results)
     return group_value_df, report
 
 
@@ -149,7 +144,7 @@ def run(df, configs, preprocessed=False):
     if df is not None:
         if 'model_id' in df.columns:
             model_df_list = []
-            report_list = ''
+            report_list = []
             for model_id in df.model_id.unique():
                 model_df, model_report = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
                                                preprocessed=preprocessed)

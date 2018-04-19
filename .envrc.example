@@ -1,0 +1,20 @@
+# AWS authentication
+#
+# Set the name you've given to your AWS credential profile for the dsapp-ddj
+# account (in $HOME/.aws/credentials)
+#
+# This is necessary to manage the project's AWS resources, such as its Elastic
+# Beanstalk environment for the demo webapp.
+#
+# E.g.: export AWS_EB_PROFILE=dsapp-ddj
+# export AWS_EB_PROFILE=
+
+# Command path
+#
+# You probably don't need to touch this!
+#
+# This enables invocation of commands in manage.py, via "manage", (without
+# cluttering the project's Python environment with the potentially-conflicting
+# requirements of the project management library).
+#
+export PATH=$PATH:$PWD/.manage/bin
