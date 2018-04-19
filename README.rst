@@ -21,7 +21,7 @@ Sample Jupyter Notebook
 Explore bias analysis of the COMPAS data using the Aequitas library (https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb)
 
 Documentation
-===
+====
 
 Find documentation at https://dssg.github.io/aequitas/
 
