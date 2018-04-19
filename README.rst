@@ -1,6 +1,6 @@
 
 ======
-The Bias and Fairness Audit Toolkit for Machine Learning Systems
+The Bias and Fairness Audit Toolkit for Machine Learning
 ======
 
 
