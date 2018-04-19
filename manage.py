@@ -34,7 +34,7 @@ class Web(Local):
         def prepare(self):
             return (
                 self.local.FG,
-                project_local['python']['-m', 'aequitas_webapp.main']
+                project_local['python']['-m', 'serve']
             )
 
     class Env(Local):

@@ -11,7 +11,7 @@
     "After installing Aequitas, run the following command in your terminal.\n",
     "\n",
     "```\n",
-    "python -m aequitas_webapp.main\n",
+    "python -m serve\n",
     "```\n",
     "You should see th output:\n",
     "```\n",
