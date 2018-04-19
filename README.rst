@@ -8,12 +8,12 @@ Bias and Fairness Audit Library for Machine Learning Systems
 
 An open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
 
-Learn more about the project at http://dsapp.uchicago.edu/aequitas/
+`Learn more about the project <http://dsapp.uchicago.edu/aequitas/>`_.
 
 Demo
 ====
 
-See what Aequitas can do at http://aequitas.dssg.io/.
+`See what Aequitas can do <http://aequitas.dssg.io/>`_.
 
 Sample Jupyter Notebook
 ====
