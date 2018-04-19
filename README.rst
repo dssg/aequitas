@@ -55,13 +55,14 @@ You may then import the ``aequitas`` module from Python::
 Development
 ===========
 
-Provision your development environment via ``install``::
+Provision your development environment via ``develop``::
 
-    ./install
+    ./develop
 
 Common development tasks, such as deploying the webapp, may then be handled via ``manage``::
 
     manage --help
+
 
 `Find more at the documentation  <https://dssg.github.io/aequitas/>`_.
 

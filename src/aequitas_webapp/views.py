@@ -50,7 +50,7 @@ def home():
         file_.save(os.path.join(dirpath, filename))
         return redirect(url_for("uploaded_file",
                                 dirname=os.path.basename(dirpath),
-                                filename=name))
+                                name=name))
 
     return render_template("file_upload.html")
 
