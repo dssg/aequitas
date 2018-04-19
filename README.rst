@@ -38,7 +38,7 @@ Aequitas requires Python 3.
 
 Install this Python library from source::
 
-    python setup.py install
+    python3 setup.py install
 
 ...or named as an installation requirement, *e.g.* via ``pip``::
 
