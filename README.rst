@@ -2,6 +2,9 @@
 Aequitas
 ==========
 
+.. figure:: aequitas/src/aequitas_webapp/static/images/aequitas_header.png
+
+
 ----------------------------------------------
 Bias and Fairness Audit Library for Machine Learning Systems
 ----------------------------------------------
