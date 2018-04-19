@@ -1,6 +1,7 @@
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
+   :scale: 75 %
 
 
 ----------------------------------------------
