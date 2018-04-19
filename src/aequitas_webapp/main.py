@@ -1,6 +1,6 @@
 import importlib
 
-from . import app as application
+from aequitas_webapp import app as application
 
 
 importlib.import_module('aequitas_webapp.views')
