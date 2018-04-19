@@ -16,7 +16,7 @@ logging.getLogger(__name__)
 
 #
 #  DISCLAIMER: these methods were developed with a particular version of the webapp in mind. They lack flexibility (lots of
-# hardcoded options)!!!
+# hardcoded things)!!!
 #             If new features(fairness measures, etc..) are added to the webapp this needs to change a lot...
 #
 
@@ -229,7 +229,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = 'The Bias Report evaluates the current model as'
+    sent = '#### The Bias Report evaluates the current model as'
     if fair_results['Overall Fairness'] is True:
         is_fair = ' fair'
     else:
@@ -337,7 +337,7 @@ def get_impact_text(group_value_df, fairness_measures_depend):
     return text_detail
 
 
-def get_highlevel_table(group_value_df, fairness_measures):
+def get_highlevel_table(group_value_df, fairness_measures, ):
     supported_name = {'Statistical Parity': '[Equal Parity](#equal-parity)',
                       'Impact Parity': '[Proportional Parity](#proportional-parity)',
                       'TypeI Parity': '[False Positive Parity](#false-positive-parity)',
@@ -347,6 +347,13 @@ def get_highlevel_table(group_value_df, fairness_measures):
                          'TypeI Parity': 'Each group has proportionally equal false positive errors made by the model.',
                          'TypeII Parity': 'Each group has proportionally equal false negative errors made by the model.'}
     supported_order = ['Statistical Parity', 'Impact Parity', 'TypeI Parity', 'TypeII Parity']
+    # once again this is hardcoded because it's easy now, in the future make it mapped automatically
+
+    map_ref_groups = {'Statistical Parity': ['ppr_ref_group_value'],
+                      'Impact Parity': ['pprev_ref_group_value'],
+                      'TypeI Parity': ['fpr_ref_group_value', 'fdr_ref_group_value'],
+                      'TypeII Parity': ['fnr_ref_group_value', 'for_ref_group_value']}
+
     fairness_measures_edited = []
     for meas in fairness_measures:
         if meas in ['FPR Parity', 'FDR Parity']:
@@ -360,19 +367,54 @@ def get_highlevel_table(group_value_df, fairness_measures):
     raw = {
         'Fairness Criteria': [],
         'Desired Outcome': [],
+        'Reference Groups Selected': [],
         'Unfairly Affected Groups': []
     }
+    print('*****sssssssssssssS', group_value_df.columns)
+
     for measure in supported_order:
         if measure in fairness_measures_edited:
             raw['Fairness Criteria'].append(supported_name[measure])
             raw['Desired Outcome'].append(supported_outcome[measure])
             false_df = group_value_df.loc[group_value_df[measure] == False]
-            sublist = []
+            ref_dict = {}
+            false_dict = {}
+
+            for index, row in group_value_df.iterrows():
+                for ref in map_ref_groups[measure]:
+                    try:
+                        ref_dict[row['attribute_name']].add('[' + row[ref] + '](' + '-'.join(supported_name[measure]
+                                                                                             .lower().split(' ')) + ')')
+                    except KeyError:
+                        ref_dict[row['attribute_name']] = set()
+                        ref_dict[row['attribute_name']].add('[' + row[ref] + '](' + '-'.join(supported_name[
+                                                                                                 measure].lower().split(
+                            ' ')) + ')')
+            cellref = ''
+            for key in ref_dict.keys():
+                cellref += '**{attribute_name}:** ##br##&emsp;&emsp;&emsp;'.format(attribute_name=key)
+                cellref += '##br##&emsp;&emsp;&emsp;'.join(ref_dict[key]) + ' ##br##'
+
+            raw['Reference Groups Selected'].append(cellref)
+
             for index, row in false_df.iterrows():
-                sublist.append('{group_attr}:{group_val}'.format(group_attr=row['attribute_name'], group_val=row[
-                    'attribute_value']))
-            if len(sublist) > 0:
-                raw['Unfairly Affected Groups'].append(', '.join(sublist))
+                try:
+
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](' + '-'.join(supported_name[measure]
+                                                                                                         .lower().split(
+                        ' ')) + ')')
+                except KeyError:
+                    false_dict[row['attribute_name']] = set()
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](' + '-'.join(supported_name[
+                                                                                                             measure].lower().split(
+                        ' ')) + ')')
+            if len(false_dict) > 0:
+                cell = ''
+                for key in false_dict.keys():
+                    cell += '**{attribute_name}:** ##br##&emsp;&emsp;&emsp;'.format(attribute_name=key)
+                    cell += '##br##&emsp;&emsp;&emsp;'.join(false_dict[key]) + ' ##br##'
+
+                raw['Unfairly Affected Groups'].append(cell)
             else:
                 if group_value_df[measure].isnull().all():
                     raw['Unfairly Affected Groups'].append('Undefined')
@@ -381,20 +423,23 @@ def get_highlevel_table(group_value_df, fairness_measures):
 
     highlevel_table = '\n\n'
     if len(raw['Fairness Criteria']) > 0:
-        landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups'])
+        landf = pd.DataFrame(raw, columns=['Fairness Criteria', 'Desired Outcome', 'Reference Groups Selected',
+                                           'Unfairly Affected Groups'])
         # keep the same order!!
         # krrp
-        highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Unfairly Affected Groups']], headers='keys',
+        highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Reference Groups Selected',
+                                          'Unfairly Affected Groups']], headers='keys',
                                    tablefmt='pipe', showindex='never')
+        print(highlevel_table)
     return highlevel_table
 
 
 def audit_report_markdown(configs, group_value_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
     oneline = ' \n\n&nbsp;\n\n'
-    mkdown_highlevel = '# The Bias Report' + oneline
+    mkdown_highlevel = '# The Bias Report' + manylines + oneline
+    mkdown_highlevel += '#### Fairness Threshold: {thres}%'.format(thres=str(configs.fairness_threshold * 100)) + oneline
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
-
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
 
     mkdown_highlevel += oneline + '### Table of Contents:\n\n'
@@ -490,10 +535,16 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace('nan', 'Undefined')
     report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b><')
     report_html = report_html.replace('>True<', ' style="color:green"><b>Fair</b><')
+
+    report_html = report_html.replace('##br##', '<br>')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
-    report_html = report_html.replace('<table>', '<table class="table">')
+
     report_html = report_html.replace(' unfair ', '<span style="color:red"><b> unfair </b></span>')
     report_html = report_html.replace(' fair ', '<span style="color:green"><b> fair </b></span>')
+
+    report_html = report_html.replace('<table>', '<table class="table table-striped">')
+    report_html = report_html.replace('<h1', '<br><h1 align="center" ')
+
 
     return report_html
