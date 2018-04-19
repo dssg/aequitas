@@ -104,7 +104,16 @@
 
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/static/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script src="../static/assets/js/ie10-viewport-bug-workaround.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
   </body>
   <footer class="footer">
         <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
