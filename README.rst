@@ -18,12 +18,12 @@ Demo
 Sample Jupyter Notebook
 ====
 
-Explore `bias analysis of the COMPAS data <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using the Aequitas library.
+ `Explore bias analysis of the COMPAS data <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using the Aequitas library.
 
 Documentation
 ====
 
-Find documentation at https://dssg.github.io/aequitas/
+Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
 Installation
 ============
@@ -57,4 +57,4 @@ Common development tasks, such as deploying the webapp, may then be handled via 
 
     manage --help
 
-Find documentation at https://dssg.github.io/aequitas/
+`Find more at the documentation  <https://dssg.github.io/aequitas/>`_.
