@@ -64,3 +64,9 @@ Common development tasks, such as deploying the webapp, may then be handled via 
     manage --help
 
 `Find more at the documentation  <https://dssg.github.io/aequitas/>`_.
+
+
+
+----------------------------------------------
+----------------------------------------------
+© 2018 Center for Data Science and Public Policy - University of Chicago
