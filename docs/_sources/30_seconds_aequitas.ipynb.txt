@@ -4,13 +4,6 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "![](https://raw.githubusercontent.com/dssg/aequitas/master/src/aequitas_cli/utils/img/aequitas_report_header.png)\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
     "# Getting started with *aequitas-report* \n",
     "\n",
     "With aequitas-report uncovering bias is as simple as running a single command on a csv.\n",
