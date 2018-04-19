@@ -18,7 +18,8 @@ See what Aequitas can do at http://aequitas.dssg.io/.
 Sample Jupyter Notebook
 ====
 
-`Explore bias analysis of the COMPAS data`__ .. _https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb using the Aequitas library
+`Explore bias analysis of the COMPAS data`__  
+.. _https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynbusing the Aequitas library
 
 Documentation
 ===
