@@ -1,6 +1,7 @@
 
 ======
-Aequitas
+The Bias and Fairness Audit Toolkit for Machine Learning Systems
+
 ======
 
 
@@ -9,7 +10,7 @@ Aequitas
 
 
 ----------------------------------------------
-The Bias and Fairness Audit Toolkit for Machine Learning Systems
+Aequitas
 ----------------------------------------------
 
 An open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
