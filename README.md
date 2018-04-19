@@ -1,9 +1,9 @@
-========
+==========
 Aequitas
-========
+==========
 
 ----------------------------------------------
-The machine learning Bias and Fairness library
+Bias and Fairness Audit Library for Machine Learning Systems
 ----------------------------------------------
 
 An open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
@@ -18,7 +18,7 @@ See what Aequitas can do at http://aequitas.dssg.io/.
 Sample Jupyter Notebook
 ====
 
-[Explore bias analysis of the COMPAS data](https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb) using the Aequitas library
+Explore bias analysis of the COMPAS data using the Aequitas library (https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb)
 
 Documentation
 ===
