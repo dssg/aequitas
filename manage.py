@@ -1,4 +1,23 @@
-from argcmdr import Local, LocalRoot, localmethod
+from pathlib import Path
+
+from argcmdr import CacheDict, Local, LocalRoot, localmethod
+from plumbum import local
+
+
+ROOT_PATH = Path(__file__).parent
+
+VENV = '.manage'
+VENV_BIN_PATH = ROOT_PATH / VENV / 'bin'
+
+
+def get_project_local(exe):
+    (head, path) = local.env['PATH'].split(':', 1)
+    assert VENV_BIN_PATH.samefile(head)
+    with local.env(PATH=path):
+        return local[exe]
+
+
+project_local = CacheDict(get_project_local)
 
 
 class Aequitas(LocalRoot):
@@ -15,7 +34,7 @@ class Web(Local):
         def prepare(self):
             return (
                 self.local.FG,
-                self.local['python']['-m', 'aequitas_webapp.basic_upload']
+                project_local['python']['-m', 'serve']
             )
 
     class Env(Local):
@@ -78,9 +97,12 @@ class Web(Local):
                 )
 
             def prepare(self, args):
-                return self.local['eb'][
-                    'deploy',
-                    '-nh',
-                    '-l', args.version,
-                    args.name,
-                ]
+                return (
+                    self.local.FG,
+                    self.local['eb'][
+                        'deploy',
+                        '-nh',
+                        '-l', args.version,
+                        args.name,
+                    ]
+                )
