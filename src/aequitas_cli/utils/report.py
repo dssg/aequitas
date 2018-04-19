@@ -353,7 +353,7 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
                       'Impact Parity': ['pprev_ref_group_value'],
                       'TypeI Parity': ['fpr_ref_group_value', 'fdr_ref_group_value'],
                       'TypeII Parity': ['fnr_ref_group_value', 'for_ref_group_value']}
-
+    key_columns = ['model_id', 'score_threshold', 'attribute_name']
     fairness_measures_edited = []
     for meas in fairness_measures:
         if meas in ['FPR Parity', 'FDR Parity']:
@@ -370,7 +370,6 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
         'Reference Groups Selected': [],
         'Unfairly Affected Groups': []
     }
-    print('*****sssssssssssssS', group_value_df.columns)
 
     for measure in supported_order:
         if measure in fairness_measures_edited:
@@ -380,34 +379,36 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
             ref_dict = {}
             false_dict = {}
 
-            for index, row in group_value_df.iterrows():
-                for ref in map_ref_groups[measure]:
+            for ref in map_ref_groups[measure]:
+                groupby_refs = group_value_df.groupby(key_columns + [ref])
+                for group, values in groupby_refs:
                     try:
-                        ref_dict[row['attribute_name']].add('[' + row[ref] + '](' + '-'.join(supported_name[measure]
+                        ref_dict[group[key_columns.index('attribute_name')]].add('[' + group[-1] + '](' + '-'.join(
+                            supported_name[
+                                measure]
                                                                                              .lower().split(' ')) + ')')
                     except KeyError:
-                        ref_dict[row['attribute_name']] = set()
-                        ref_dict[row['attribute_name']].add('[' + row[ref] + '](' + '-'.join(supported_name[
+                        ref_dict[group[key_columns.index('attribute_name')]] = set()
+                        ref_dict[group[key_columns.index('attribute_name')]].add('[' + group[-1] + '](' + '-'.join(
+                            supported_name[
                                                                                                  measure].lower().split(
                             ' ')) + ')')
+
             cellref = ''
             for key in ref_dict.keys():
                 cellref += '**{attribute_name}:** ##br##&emsp;&emsp;&emsp;'.format(attribute_name=key)
                 cellref += '##br##&emsp;&emsp;&emsp;'.join(ref_dict[key]) + ' ##br##'
-
             raw['Reference Groups Selected'].append(cellref)
 
             for index, row in false_df.iterrows():
                 try:
 
-                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](' + '-'.join(supported_name[measure]
-                                                                                                         .lower().split(
-                        ' ')) + ')')
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
+                                                          supported_name[measure][supported_name[measure].find('('):])
                 except KeyError:
                     false_dict[row['attribute_name']] = set()
-                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](' + '-'.join(supported_name[
-                                                                                                             measure].lower().split(
-                        ' ')) + ')')
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
+                                                          supported_name[measure][supported_name[measure].find('('):])
             if len(false_dict) > 0:
                 cell = ''
                 for key in false_dict.keys():
@@ -438,7 +439,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
     oneline = ' \n\n&nbsp;\n\n'
     mkdown_highlevel = '# The Bias Report' + manylines + oneline
-    mkdown_highlevel += '#### Fairness Threshold: {thres}%'.format(thres=str(configs.fairness_threshold * 100)) + oneline
+    mkdown_highlevel += '#### Fairness Threshold: {:.0f}%'.format(float(configs.fairness_threshold) * 100) + oneline
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + '.' + oneline + '----'
 
@@ -543,7 +544,8 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace(' unfair ', '<span style="color:red"><b> unfair </b></span>')
     report_html = report_html.replace(' fair ', '<span style="color:green"><b> fair </b></span>')
 
-    report_html = report_html.replace('<table>', '<table class="table table-striped">')
+    report_html = report_html.replace('<table>', '<table class="table table-striped" >')
+    # report_html = report_html.replace('< thead >\n < tr >', '< thead >\n < tr class="table-info" >')
     report_html = report_html.replace('<h1', '<br><h1 align="center" ')
 
 
