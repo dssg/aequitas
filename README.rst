@@ -2,7 +2,7 @@
 Aequitas
 ==========
 
-.. figure:: aequitas/src/aequitas_webapp/static/images/aequitas_header.png
+.. figure:: src/aequitas_webapp/static/images/aequitas_header.png
 
 
 ----------------------------------------------
