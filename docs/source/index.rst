@@ -9,14 +9,14 @@ Welcome to Aequitas documentation!
 .. toctree::
    :maxdepth: 3
    :glob:
-
+   
    30_seconds_aequitas.ipynb
    installation.ipynb
    30_seconds_webapp.ipynb
    input_data.ipynb
    output_data.ipynb
    metrics.ipynb
-   cli.ipynb
+   CLI.ipynb
    config.ipynb
    using_python.ipynb
    api/aequitas

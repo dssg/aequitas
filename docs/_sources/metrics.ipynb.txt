@@ -11,7 +11,11 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "**Coming soon**"
+    "## Preliminary Concepts\n",
+    "![](_static/preliminary_concepts.jpg)\n",
+    "\n",
+    "## Bias Metrics\n",
+    "![](_static/metrics.jpg)"
    ]
   }
  ],

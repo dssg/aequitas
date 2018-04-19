@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="30 seconds to aequitas-report:" href="30_seconds_aequitas.html" /> 
+    <link rel="next" title="Getting started with aequitas-report" href="30_seconds_aequitas.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,12 +79,13 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a></li>
@@ -191,7 +192,7 @@
 <h1>Welcome to Aequitas documentation!<a class="headerlink" href="#welcome-to-aequitas-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_aequitas.html#Input-machine-learning-predictions">Input machine learning predictions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_aequitas.html#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">Get out measures of bias that you can tailor to your problem</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="30_seconds_aequitas.html#The-Bias-Report-output">The Bias Report output</a></li>
@@ -201,7 +202,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Load-data">Load data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Customize-report">Customize report</a></li>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Get-‘The-Bias-Report’">Get ‘The Bias Report’</a></li>
@@ -214,8 +215,23 @@
 <li class="toctree-l2"><a class="reference internal" href="input_data.html#model_id"><code class="docutils literal notranslate"><span class="pre">model_id</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="output_data.html#Fairness-overview">Fairness overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_data.html#Fairness-Criteria-Assessments">Fairness Criteria Assessments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_data.html#Disparity-and-Bias-Metrics">Disparity and Bias Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="output_data.html#Group-Metrics">Group Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html#Preliminary-Concepts">Preliminary Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html#Bias-Metrics">Bias Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="CLI.html#--input---&lt;-path-to-.csv-file-&gt;"><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="CLI.html#--config---&lt;-path-to-config.yaml-&gt;"><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="config.html#Define-reference-groups">Define reference groups</a></li>
 <li class="toctree-l2"><a class="reference internal" href="config.html#Score-threshholds">Score threshholds</a></li>
@@ -254,7 +270,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="30_seconds_aequitas.html" class="btn btn-neutral float-right" title="30 seconds to aequitas-report:" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="30_seconds_aequitas.html" class="btn btn-neutral float-right" title="Getting started with aequitas-report" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

@@ -80,12 +80,19 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Understanding Output</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Understanding Output</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Fairness-overview">Fairness overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Fairness-Criteria-Assessments">Fairness Criteria Assessments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Disparity-and-Bias-Metrics">Disparity and Bias Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Group-Metrics">Group Metrics</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a></li>
@@ -193,6 +200,87 @@
 <p>Here we provide a highlevel overview of the bias and fairness metrics
 output by aequitas. For detailed definitions of the metrics see
 <a class="reference external" href="./metrics.html">Understanding our metrics</a></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="62%" />
+<col width="24%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Output type</th>
+<th class="head">report</th>
+<th class="head">csv</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>High-level overview</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr class="row-odd"><td>Fairness</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="row-even"><td>Disparity</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="row-odd"><td>Group-level metrics</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<p>You can get Aequitas output in report form via the webapp or CLI as well
+as a csv/DataFrame using the CLI or Python. Below we reproduce the
+tables found in the output using</p>
+<div class="section" id="Fairness-overview">
+<h2>Fairness overview<a class="headerlink" href="#Fairness-overview" title="Permalink to this headline">¶</a></h2>
+<p>The webapp and pdf report begins with a high level analysis of fairness.
+If all fairness metrics are <code class="docutils literal notranslate"><span class="pre">fair</span></code>, The Bias Report will evalutate the
+current model as fair. Otherwise, it will deem it unfair and list groups
+unfairly affected under given fairness criteria. <img alt="image0" src="_images/overview_adult_output.jpg" /></p>
+<p>In the above example, we see the model has Proportional Parity and False
+Positive Parity, but does not meet the False Negative Parity criteria
+for the race Amer-Indian-Eskimo and does not have Equal Parity for many
+race groups. On the webapp, you can click on the names of the fairness
+criteria for explanations of the criteria, an example of why you care
+and more detailed statistics explaining why a group does not have
+parity.</p>
+</div>
+<div class="section" id="Fairness-Criteria-Assessments">
+<h2>Fairness Criteria Assessments<a class="headerlink" href="#Fairness-Criteria-Assessments" title="Permalink to this headline">¶</a></h2>
+<p>Fairness is defined in relation to a reference group. In the Fairness
+Criteria Assessments, a group meets parity if</p>
+<div class="math">
+<p><img src="_images/math/35d289bd2433590e686fbe29fc9eaf55c8ca54a0.png" alt="(1 - \tau) \leq Disparity Measure_{group_i} \leq \frac{1}{(1 - \tau)}"/></p>
+</div><p>where <img class="math" src="_images/math/557d5fad862c9046d26e1a930f45a550c146d592.png" alt="\tau"/> is the fairness threshold defined in the webapp.</p>
+<p><img alt="image1" src="_images/fairness_adult_output.jpg" /></p>
+<p>In our example <img class="math" src="_images/math/2cae6566416dd1cce9cc7a8f336273d1f7a7ec6b.png" alt="\tau = 20\%"/>, so any disparity measure between 0.8
+and 1.25 will be deemed fair. (This is inline with the 80 percent rule
+for determining <a class="reference external" href="https://en.wikipedia.org/wiki/Disparate_impact">disparate
+impact</a>).</p>
+<p>Clicking on the word fair or unfair will bring you to the next table.</p>
+</div>
+<div class="section" id="Disparity-and-Bias-Metrics">
+<h2>Disparity and Bias Metrics<a class="headerlink" href="#Disparity-and-Bias-Metrics" title="Permalink to this headline">¶</a></h2>
+<p>Above Fairness was determined by the size of a disparity measure. In
+this table, you see the disparity measures value. Disparity is a ratio
+of a groups metric compared to a reference group. Notice the reference
+group will always have disparity of 1.</p>
+<p><img alt="image2" src="_images/disparity_adult_output.jpg" /></p>
+<p>From the high-level overview, we saw that many groups did not have Equal
+or Statistical Parity. Here we see that the ratio of those groups
+Predicted Postive Rates compared to the reference group are very low.</p>
+</div>
+<div class="section" id="Group-Metrics">
+<h2>Group Metrics<a class="headerlink" href="#Group-Metrics" title="Permalink to this headline">¶</a></h2>
+<p>The disparities above are derived from group level metrics. <img alt="image3" src="_images/group_adult_output.jpg" /></p>
+<p>For example, the False Positive Rate Disparity for black people compared
+to white people is calculated as follows.</p>
+<div class="math">
+<p><img src="_images/math/415d4072338f02c8fea6f528f140de4e728c22df.png" alt="FPR Disparity_{black} = \frac{FPR_{black}}{FPR_{white}} = \frac{.95}{.9} = 1.06"/></p>
+</div></div>
 </div>
 
 
