@@ -8,7 +8,7 @@
     "\n",
     "Aequitas command line interface allows you to generate 'The Bias Report' with one line in the terminal.\n",
     "\n",
-    "[30 Seconds to *aequitas-report*](./30_seconds_aequitas.html) shows the CLI in action. Here we detail the command.\n",
+    "[Getting starte with *aequitas-report*](./30_seconds_aequitas.html) shows the CLI in action. Here we detail the command.\n",
     "\n",
     "## `--input   < path to .csv file >`\n",
     "\n",

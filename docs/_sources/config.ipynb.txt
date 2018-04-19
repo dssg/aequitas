@@ -61,7 +61,7 @@
     "```\n",
     "\n",
     "## Fairness threshold\n",
-    "Disparity is determined in terms of ratios. When the disparity ratio cross the fairness threshold, the decision is deemed unfair on that metric.\n",
+    "Disparity is determined in terms of ratios. When the disparity ratio cross the fairness threshold, the decision is deemed unfair on that metric. Notice this is different from the webapp, which is `1 - fairness_threshold`\n",
     "\n",
     "```\n",
     "fairness_threshold: 0.8\n",
