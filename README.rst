@@ -8,12 +8,22 @@ The machine learning Bias and Fairness library
 
 An open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
 
+Learn more about the project at http://dsapp.uchicago.edu/aequitas/
+
 Demo
 ====
 
 See what Aequitas can do at http://aequitas.dssg.io/.
 
-Learn more about the project at http://dsapp.uchicago.edu/aequitas/
+Sample Jupyter Notebook
+====
+
+[Explore bias analysis of the COMPAS data](https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb) using the Aequitas library
+
+Documentation
+===
+
+Find documentation at https://dssg.github.io/aequitas/
 
 Installation
 ============
