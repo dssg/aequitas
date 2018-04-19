@@ -1,0 +1,7 @@
+include LICENSE
+
+recursive-include requirement *.txt
+
+recursive-include src/aequitas_webapp/sample_data *
+recursive-include src/aequitas_webapp/static *
+recursive-include src/aequitas_webapp/templates *
