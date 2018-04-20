@@ -46,8 +46,19 @@ def discretize(df, target_cols):
     :return:
     """
     for col in target_cols:
-        bins, values = pd.qcut(df[col], 4, precision=2, labels=False, duplicates='drop', retbins=True)
-        df[col] = bins.map(lambda x: '%0.2f' % values[x] + '-' + '%0.2f' % values[x + 1])
+        if len(df[col].unique()) > 1:
+            bins, values = pd.qcut(df[col], 4, precision=2, labels=False, duplicates='drop', retbins=True)
+            try:
+                df[col] = bins.map(lambda x: '%0.2f' % values[x] + '-' + '%0.2f' % values[x + 1])
+            except Exception as e:
+                logging.info('Something strange with a column in the input_df ' + str(e))
+                df = df.drop(col)
+        else:
+            try:
+                df[col] = df[col].astype(str)
+            except Exception as e:
+                logging.info('Something strange with a column in the input_df ' + str(e))
+                df = df.drop(col)
     return df
 
 
@@ -71,7 +82,7 @@ def preprocess_input_df(df, required_cols=None):
     try:
         attr_cols_input = get_attr_cols(df, non_attr_cols)
     except ValueError:
-        logging.error('preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required '
+        logging.info('preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required '
                       'columns. Please add attribute columns to the input df.')
         exit(1)
     return df, attr_cols_input
