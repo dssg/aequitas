@@ -28,58 +28,68 @@ SAMPLE_DATA = {
 }
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def home():
-    if request.method == 'POST':
-        file_ = request.files.get('file')
-
-        if not file_ or not file_.filename:
-            flash('No selected file')
-            return redirect(request.url)
-
-        (name, ext) = os.path.splitext(file_.filename)
-        if not ext.lower() == '.csv':
-            flash('Bad file type')
-            return redirect(request.url)
-
-        dirpath = tempfile.mkdtemp(prefix='')
-        filename = secure_filename(file_.filename)
-        file_.save(os.path.join(dirpath, filename))
-        return redirect(url_for("uploaded_file",
-                                dirname=os.path.basename(dirpath),
-                                name=name))
-
-    return render_template("file_upload.html")
+    return render_template('file_upload.html')
 
 
 @app.route('/about.html', methods=['GET'])
 def about():
-    return render_template("about.html")
+    return render_template('about.html')
+
+
+@app.route('/audit/', methods=['POST'])
+def upload_file():
+    referer = request.headers.get('referer')
+    redirect_url = referer or url_for('home')
+
+    file_ = request.files.get('file')
+
+    if not file_ or not file_.filename:
+        flash('Please select a file', 'warning')
+        return redirect(redirect_url)
+
+    (name, ext) = os.path.splitext(file_.filename)
+    if not ext.lower() == '.csv':
+        flash('Bad file type – CSV required', 'warning')
+        return redirect(redirect_url)
+
+    dirpath = tempfile.mkdtemp(prefix='')
+    filename = secure_filename(file_.filename)
+    file_.save(os.path.join(dirpath, filename))
+    return redirect(url_for('uploaded_file',
+                            dirname=os.path.basename(dirpath),
+                            name=name))
+
+
+@app.route('/audit/<name>/', methods=['GET'])
+def audit_sample(name):
+    if name not in SAMPLE_DATA:
+        abort(404)
+
+    source_path = SAMPLE_DATA[name]
+    filename = os.path.basename(source_path)
+    (name, _ext) = os.path.splitext(filename)
+    dirpath = tempfile.mkdtemp(prefix='')
+    os.symlink(source_path, os.path.join(dirpath, filename))
+    return redirect(url_for('uploaded_file',
+                            dirname=os.path.basename(dirpath),
+                            name=name))
 
 
 @app.route('/audit/<dirname>/<name>/', methods=['GET', 'POST'])
-@app.route('/audit/<name>/', methods=['GET'])
-def uploaded_file(name, dirname='sample'):
-    if dirname == 'sample':
-        if name not in SAMPLE_DATA:
-            abort(404)
-
-        source_path = SAMPLE_DATA[name]
-        filename = os.path.basename(source_path)
-        (name, _ext) = os.path.splitext(filename)
-        dirpath = tempfile.mkdtemp(prefix='')
-        os.symlink(source_path, os.path.join(dirpath, filename))
-
-        return redirect(url_for('uploaded_file',
-                                dirname=os.path.basename(dirpath),
-                                name=name))
-
+def uploaded_file(name, dirname):
     upload_path = os.path.join(tempfile.gettempdir(), dirname)
     data_path = os.path.join(upload_path, name + '.csv')
     if not os.path.exists(data_path):
         abort(404)
 
-    df = pd.read_csv(data_path)
+    try:
+        df = pd.read_csv(data_path)
+    except pd.errors.ParserError:
+        flash('Bad CSV file – could not parse', 'warning')
+        return redirect(url_for('home'))
+
     (df, groups) = preprocess_input_df(df)
     subgroups = {col: list(set(df[col])) for col in groups}
 
