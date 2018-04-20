@@ -238,6 +238,44 @@ def get_sentence_highlevel(fair_results):
     return sent
 
 
+def get_false_text_old(group_value_df, fairness_metric, fairness_measures_depend):
+    names = {
+
+        'fpr': 'false positive rate',
+        'fnr': 'false negative rate',
+        'fdr': 'false discovery rate',
+        'for': 'false omission rate',
+        'ppr': 'predicted positive ratio',
+        'pprev': 'predicted prevalence (base rate)'
+    }
+    group_value_df = group_value_df.round(2)
+    group_value_df = group_value_df.applymap(str)
+    false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
+    bias_metric = fairness_measures_depend[fairness_metric]
+    group_metric = bias_metric.replace('_disparity', '')
+    ref_group_col = group_metric + '_ref_group_value'
+    text_detail = ''
+    for index, row in false_df.iterrows():
+        ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
+                                           (group_value_df['attribute_value'] == row[ref_group_col])]
+        sentence = 'The {group_metric_name} for \"{attribute_name} = {attribute_value}\" is {bias_metric_value}% ' \
+                   'of the {group_metric_name} of the reference group \"{attribute_name} = {ref_group_value}\",' \
+                   ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
+            .format(attribute_name=row['attribute_name'],
+                    attribute_value=row['attribute_value'],
+                    group_metric_name=names[group_metric],
+                    bias_metric_value='%.2f' % (float(row[bias_metric]) * 100),
+                    ref_group_value=row[ref_group_col],
+                    group_metric_value=row[group_metric],
+                    ref_group_metric_value=ref_group_row[group_metric].values[0])
+        text_detail += sentence + '\n\n'
+    if false_df.empty:
+        text_detail += 'Based on the fairness threshold used, there is no disparate values in {group_metric_name} between ' \
+                       'the each group and the respective reference group.\n\n'.format(group_metric_name=names[
+            group_metric])
+    return text_detail
+
+
 def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
     names = {
 
@@ -274,6 +312,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
                        'the each group and the respective reference group.\n\n'.format(group_metric_name=names[
             group_metric])
     return text_detail
+
 
 
 def get_statpar_text_old(group_value_df, fairness_measures_depend):
@@ -518,7 +557,9 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
 def audit_report_markdown(configs, group_value_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
     oneline = ' \n\n&nbsp;\n\n'
-    mkdown_highlevel = '# The Bias Report' + manylines + oneline
+    mkdown_highlevel = ''
+    # mkdown_highlevel = '# The Bias Report'
+    mkdown_highlevel += manylines + oneline
     mkdown_highlevel += '#### Fairness Threshold: {:.0f}%'.format(float(configs.fairness_threshold) * 100) + oneline
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----'
@@ -642,7 +683,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace(' unfair ', '<span style="color:red"><b> unfair </b></span>')
     report_html = report_html.replace(' fair ', '<span style="color:green"><b> fair </b></span>')
 
-    report_html = report_html.replace('<table>', '<table class="table table-striped" >')
+    report_html = report_html.replace('<table>', '<table class="table table-striped" padding=5 >')
     # report_html = report_html.replace('< thead >\n < tr >', '< thead >\n < tr class="table-info" >')
     report_html = report_html.replace('<h1', '<br><h1 align="center" ')
 
@@ -662,6 +703,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
   <th align="left" width="25%">When should I care about Equal Parity?</th>\n
   <th align="left" width="40%">Unfairly Affected Groups</th>\n
 </tr>\n"""
+
     report_html = report_html.replace(width_statspar, width_statspar_new)
 
     return report_html

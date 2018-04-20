@@ -8,7 +8,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Aequitas - The Bias Report</title>
+
+      <title>Aequitas - The Bias Report</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -31,21 +32,51 @@
   </head>
   <body>
 
-    <div class="container">
-      <div class="header clearfix">
-        <nav>
+  <div class="container">
+      &lt;<div class="header clearfix">
+      <nav class="navbar navbar-default navbar-fixed-top">
+
+          <!--<img alt="Brand" src="/static/images/aequitas_header.png" width="300" height="113"> -->
+          <div class="col-lg-1 col-left">
+              <a href="{{ url_for('home')}}">
+                  <img alt="Brand" src="/static/images/aequitas_header.png" class="img-fluid" alt="Responsive image">
+              </a>
+          </div>
+
+
           <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="{{ url_for('home')}}">Home</a></li>
+              <li role="presentation" class="active"><a href="{{go_back}}">Back to Customize</a><br>
+
+              </li>
+              <li role="presentation" target="_blank"><a href="{{ url_for('home')}}">Home</a></li>
             <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
+              <li></li>
+
           </ul>
-        </nav>
-        <img src="/static/images/aequitas_header.png" width="200" height="80">
+      </nav>
+  </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+
+      <div class="row">
+          <div class="col-lg-1 col-centered">
+              <img src="/static/images/bias_report.png" class="img-fluid" alt="Responsive image">
+
+          </div>
       </div>
 
-    <a href="{{go_back}}">Back to customize</a><br>
-    {{ content }}
 
-      <footer class="footer">
+      {{ content }}
+
+  </div>
+  </div>
+
+  <footer class="footer">
         <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
   </footer>
   </body>

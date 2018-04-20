@@ -36,21 +36,52 @@
 
   <body>
 
-    <div class="container">
-      <div class="header clearfix">
-        <nav>
+
+  <div class="container">
+      &lt;<div class="header clearfix">
+      <nav class="navbar navbar-default navbar-fixed-top">
+
+          <!--<img alt="Brand" src="/static/images/aequitas_header.png" width="300" height="113"> -->
+          <div class="col-lg-1 col-left">
+              <a href="{{ url_for('home')}}">
+                  <img alt="Brand" src="/static/images/aequitas_header.png" class="img-fluid" alt="Responsive image">
+              </a>
+          </div>
+
+
           <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="{{ url_for('home')}}">Home</a></li>
+              </li>
+              <li role="presentation" class="active"><a href="{{ url_for('home')}}">Home</a></li>
             <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
+              <li></li>
+
           </ul>
-        </nav>
-        <img src="/static/images/aequitas_header.png" width="200" height="80">
+      </nav>
+  </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+
+      <div class="row">
+          <div class="col-lg-1 col-centered">
+              <img src="/static/images/customize_header.png" class="img-fluid" alt="Responsive image">
+
+          </div>
       </div>
+
+      <br>
+      <br>
+      <br>
+
 
       <div class="row marketing">
 
-      <h1>Customize report</h1>
-<form method="post">
+
+          <form method="post">
     <p><b>Select method of determining reference group:</b></p>
     <div>
     <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
