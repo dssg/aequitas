@@ -149,8 +149,10 @@ def uploaded_file(name, dirname='sample'):
 
     # majority_groups = request.form.getlist('use_majority_group')
     raw_fairness_measures = request.form.getlist('fairness_measures')
+    print('00000000000000', raw_fairness_measures)
     if len(raw_fairness_measures) == 0:
         fairness_measures = list(Fairness().get_fairness_measures_supported(df))
+        print('11111111111111', fairness_measures)
     else:
         # map selected measures to input
         fair_map = {'Equal Parity': ['Statistical Parity'],
@@ -161,35 +163,35 @@ def uploaded_file(name, dirname='sample'):
         fairness_measures = [y for x in raw_fairness_measures
                              for y in fair_map[x]]
 
-        fairness_pct = request.form['fairness_pct']
-        try:
-            fp = 1.0 - float(fairness_pct) / 100.0
-        except:
+    fairness_pct = request.form['fairness_pct']
+    try:
+        fp = 1.0 - float(fairness_pct) / 100.0
+    except:
             fp = 0.8
 
-        configs = Configs(ref_groups=subgroups,
-                          ref_groups_method=rgm,
-                          fairness_threshold=fp,
-                          fairness_measures=fairness_measures,
-                          attr_cols=group_variables)
+    configs = Configs(ref_groups=subgroups,
+                      ref_groups_method=rgm,
+                      fairness_threshold=fp,
+                      fairness_measures=fairness_measures,
+                      attr_cols=group_variables)
 
-        (_gv_df, report) = audit(df,
-                                 model_id=1,
-                                 configs=configs,
-                                 preprocessed=True)
+    (_gv_df, report) = audit(df,
+                             model_id=1,
+                             configs=configs,
+                             preprocessed=True)
 
-        for reportid in itertools.count(1):
-            report_path = os.path.join(upload_path, str(reportid))
-            if not os.path.exists(report_path):
-                break
+    for reportid in itertools.count(1):
+        report_path = os.path.join(upload_path, str(reportid))
+        if not os.path.exists(report_path):
+            break
 
-        with open(report_path, 'w') as fd:
-            fd.write(report)
+    with open(report_path, 'w') as fd:
+        fd.write(report)
 
-        return redirect(url_for("report",
-                                dirname=dirname,
-                                name=name,
-                                reportid=reportid))
+    return redirect(url_for("report",
+                            dirname=dirname,
+                            name=name,
+                            reportid=reportid))
 
 
 @app.route('/audit/<dirname>/<name>/report-<reportid>.html', methods=['GET'])
