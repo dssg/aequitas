@@ -70,6 +70,11 @@ class Fairness(object):
         else:
             self.high_level_fairness_depend = high_level_fairness_depend
 
+    def get_fairness_measures_supported(self, input_df):
+        if 'label_value' not in input_df.columns:
+            self.fair_measures_depend = ['Statistical Parity', 'Impact Parity']
+            return self.fair_measures_depend
+
     def get_group_value_fairness(self, bias_df, tau=None, fair_measures_requested=None):
         """
             Calculates the fairness measures defined in the fair_measures dictionary and adds

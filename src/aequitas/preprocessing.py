@@ -59,13 +59,13 @@ def preprocess_input_df(df, required_cols=None):
     :return:
     """
     if not required_cols:
-        required_cols = ['score', 'label_value']
+        required_cols = ['score']
     try:
         check_required_cols(df, required_cols)
     except ValueError:
         logging.error('preprocessing.preprocess_input_df: input dataframe does not have all the required columns.')
         exit(1)
-    non_attr_cols = required_cols + ['model_id', 'as_of_date', 'entity_id', 'rank_abs', 'rank_pct', 'id']
+    non_attr_cols = required_cols + ['model_id', 'as_of_date', 'entity_id', 'rank_abs', 'rank_pct', 'id', 'label_value']
     non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (~df.columns.isin(non_attr_cols))]
     df = discretize(df, non_string_cols)
     try:
