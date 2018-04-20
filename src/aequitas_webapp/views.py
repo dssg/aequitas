@@ -30,7 +30,7 @@ SAMPLE_DATA = {
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('file_upload.html')
+    return render_template('home.html')
 
 
 @app.route('/about.html', methods=['GET'])
@@ -57,7 +57,7 @@ def upload_file():
     dirpath = tempfile.mkdtemp(prefix='')
     filename = secure_filename(file_.filename)
     file_.save(os.path.join(dirpath, filename))
-    return redirect(url_for('uploaded_file',
+    return redirect(url_for('audit_file',
                             dirname=os.path.basename(dirpath),
                             name=name))
 
@@ -72,13 +72,26 @@ def audit_sample(name):
     (name, _ext) = os.path.splitext(filename)
     dirpath = tempfile.mkdtemp(prefix='')
     os.symlink(source_path, os.path.join(dirpath, filename))
-    return redirect(url_for('uploaded_file',
+    return redirect(url_for('audit_file',
                             dirname=os.path.basename(dirpath),
                             name=name))
 
 
+FAIR_MAP = {'Equal Parity': ['Statistical Parity'],
+            'Proportional Parity': ['Impact Parity'],
+            'False Positive Parity': ['FPR Parity', 'FDR Parity'],
+            'False Negative Parity': ['FNR Parity', 'FOR Parity']}
+
+REVERSE_FAIR_MAP = {'Statistical Parity': 'Equal Parity',
+                    'Impact Parity': 'Proportional Parity',
+                    'FPR Parity': 'False Positive Parity',
+                    'FDR Parity': 'False Positive Parity',
+                    'FNR Parity': 'False Negative Parity',
+                    'FOR Parity': 'False Negative Parity'}
+
+
 @app.route('/audit/<dirname>/<name>/', methods=['GET', 'POST'])
-def uploaded_file(name, dirname):
+def audit_file(name, dirname):
     upload_path = os.path.join(tempfile.gettempdir(), dirname)
     data_path = os.path.join(upload_path, name + '.csv')
     if not os.path.exists(data_path):
@@ -91,52 +104,25 @@ def uploaded_file(name, dirname):
         return redirect(url_for('home'))
 
     (df, groups) = preprocess_input_df(df)
-    subgroups = {col: list(set(df[col])) for col in groups}
-
-    # set defaults
-    if 'race' in subgroups:
-        race = subgroups['race']
-        if 'White' in race:
-            race.insert(0, race.pop(race.index('White')))
-            subgroups['race'] = race
-        elif 'Caucasian' in race:
-            race.insert(0, race.pop(race.index('Caucasian')))
-            subgroups['race'] = race
-
-    if 'sex' in subgroups:
-        sex = subgroups['sex']
-        if 'Male' in sex:
-            sex.insert(0, sex.pop(sex.index('Male')))
-            subgroups['sex'] = sex
-
-    if 'gender' in subgroups:
-        sex = subgroups['gender']
-        if 'Male' in sex:
-            sex.insert(0, sex.pop(sex.index('Male')))
-            subgroups['gender'] = sex
-
-    if 'age_cat' in subgroups:
-        age = subgroups['age_cat']
-        if '25 - 45' in age:
-            age.insert(0, age.pop(age.index('25 - 45')))
-            subgroups['age_cat'] = age
-
-    if 'education' in subgroups:
-        ed = subgroups['education']
-        if 'HS-grad' in ed:
-            ed.insert(0, ed.pop(ed.index('HS-grad')))
-            subgroups['education'] = ed
 
     if "submit" not in request.form:
-        supported_fairness_measures = list(Fairness().get_fairness_measures_supported(df))
-        reverse_fair_map = {'Statistical Parity': 'Equal Parity',
-                            'Impact Parity': 'Proportional Parity',
-                            'FPR Parity': 'False Positive Parity',
-                            'FDR Parity': 'False Positive Parity',
-                            'FNR Parity': 'False Negative Parity',
-                            'FOR Parity': 'False Negative Parity'}
-        fairness_measures = list(set([reverse_fair_map[x] for x in supported_fairness_measures]))
-        return render_template("customize_report2.html",
+        subgroups = {col: list(set(df[col])) for col in groups}
+
+        # set defaults
+        for (key, values) in (
+            ('race', ('White', 'Caucasian')),
+            ('sex', ('Male',)),
+            ('gender', ('Male',)),
+            ('age_cat', ('25 - 45',)),
+            ('education', ('HS-grad',)),
+        ):
+            if key in subgroups:
+                subgroups[key].sort(key=lambda value: int(value not in values))
+
+        supported_fairness_measures = Fairness().get_fairness_measures_supported(df)
+        fairness_measures = {REVERSE_FAIR_MAP[x] for x in supported_fairness_measures}
+
+        return render_template('audit.html',
                                categories=groups,
                                subcategories=subgroups,
                                fairness=fairness_measures)
@@ -160,19 +146,14 @@ def uploaded_file(name, dirname):
         fairness_measures = list(Fairness().get_fairness_measures_supported(df))
     else:
         # map selected measures to input
-        fair_map = {'Equal Parity': ['Statistical Parity'],
-                    'Proportional Parity': ['Impact Parity'],
-                    'False Positive Parity': ['FPR Parity', 'FDR Parity'],
-                    'False Negative Parity': ['FNR Parity', 'FOR Parity']
-                    }
-        fairness_measures = [y for x in raw_fairness_measures
-                             for y in fair_map[x]]
+        fairness_measures = [y for x in raw_fairness_measures for y in FAIR_MAP[x]]
 
-    fairness_pct = request.form['fairness_pct']
     try:
-        fp = float(fairness_pct) / 100.0
-    except:
-            fp = 0.8
+        fv = float(request.form['fairness_pct'])
+    except (KeyError, ValueError):
+        fp = 0.8
+    else:
+        fp = fv / 100.0
 
     configs = Configs(ref_groups=subgroups,
                       ref_groups_method=rgm,
@@ -211,5 +192,5 @@ def report(dirname, name, reportid):
     return render_template(
         'report.html',
         content=Markup(report),
-        go_back=url_for('uploaded_file', dirname=dirname, name=name),
+        go_back=url_for('audit_file', dirname=dirname, name=name),
     )
