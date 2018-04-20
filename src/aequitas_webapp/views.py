@@ -86,14 +86,53 @@ def uploaded_file(name, dirname='sample'):
     (df, groups) = preprocess_input_df(df)
     subgroups = {col: list(set(df[col])) for col in groups}
 
+    # set defaults
+    if 'race' in subgroups:
+        race = subgroups['race']
+        if 'White' in race:
+            race.insert(0, race.pop(race.index('White')))
+            subgroups['race'] = race
+        elif 'Caucasian' in race:
+            race.insert(0, race.pop(race.index('Caucasian')))
+            subgroups['race'] = race
+
+    if 'sex' in subgroups:
+        sex = subgroups['sex']
+        if 'Male' in sex:
+            sex.insert(0, sex.pop(sex.index('Male')))
+            subgroups['sex'] = sex
+
+    if 'gender' in subgroups:
+        sex = subgroups['gender']
+        if 'Male' in sex:
+            sex.insert(0, sex.pop(sex.index('Male')))
+            subgroups['gender'] = sex
+
+    if 'age_cat' in subgroups:
+        age = subgroups['age_cat']
+        if '25 - 45' in age:
+            age.insert(0, age.pop(age.index('25 - 45')))
+            subgroups['age_cat'] = age
+
+    if 'education' in subgroups:
+        ed = subgroups['education']
+        if 'HS-grad' in ed:
+            ed.insert(0, ed.pop(ed.index('HS-grad')))
+            subgroups['education'] = ed
+
     if "submit" not in request.form:
+        supported_fairness_measures = list(Fairness().get_fairness_measures_supported(df))
+        reverse_fair_map = {'Statistical Parity': 'Equal Parity',
+                            'Impact Parity': 'Proportional Parity',
+                            'FPR Parity': 'False Positive Parity',
+                            'FDR Parity': 'False Positive Parity',
+                            'FNR Parity': 'False Negative Parity',
+                            'FOR Parity': 'False Negative Parity'}
+        fairness_measures = list(set([reverse_fair_map[x] for x in supported_fairness_measures]))
         return render_template("customize_report2.html",
                                categories=groups,
                                subcategories=subgroups,
-                               fairness=('Equal Parity',
-                                         'Proportional Parity',
-                                         'False Positive Parity',
-                                         'False Negative Parity'))
+                               fairness=fairness_measures)
 
     rgm = request.form["ref_groups_method"]
     if rgm == 'predefined':
@@ -111,7 +150,7 @@ def uploaded_file(name, dirname='sample'):
     # majority_groups = request.form.getlist('use_majority_group')
     raw_fairness_measures = request.form.getlist('fairness_measures')
     if len(raw_fairness_measures) == 0:
-        fairness_measures = list(Fairness().fair_measures_supported)
+        fairness_measures = list(Fairness().get_fairness_measures_supported(df))
     else:
         # map selected measures to input
         fair_map = {'Equal Parity': ['Statistical Parity'],
