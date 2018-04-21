@@ -234,12 +234,9 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = '#### The Bias Report evaluates the current model as'
-    if fair_results['Overall Fairness'] is True:
-        is_fair = ' fair'
-    else:
-        is_fair = ' unfair'  # ' unfair to the following groups: '
-    sent += is_fair + ' using the following fairness criteria:\n\n'
+    sent = '**The Bias Report evaluates the current model as'
+    is_fair = ' fair' if fair_results['Overall Fairness'] is True else ' unfair'
+    sent += is_fair + ' using the following fairness criteria:**\n\n'
     return sent
 
 
@@ -479,8 +476,8 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     mkdown_highlevel = manylines + '# The Bias Report'
     mkdown_highlevel += oneline
     number_rows = group_value_df['total_entities'].values[0]
-    mkdown_highlevel += '#### {:.0f} rows were used to audit bias and fairness.'.format(number_rows) + oneline
-    mkdown_highlevel += '#### {:.0f}% is the selected fairness threshold, meaning the fairness range is between {:.0f}% and ' \
+    mkdown_highlevel += '{:.0f} rows were used to audit bias and fairness.'.format(number_rows) + oneline
+    mkdown_highlevel += '{:.0f}% is the selected fairness threshold, meaning the fairness range is between {:.0f}% and ' \
                         '{' \
                         ':.0f}% of ' \
                         ' the value of the respective reference group (e.g. gender:male) on each group metric (e.g. False ' \
