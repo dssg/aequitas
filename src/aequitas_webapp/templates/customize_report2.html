@@ -36,60 +36,44 @@
 
   <body>
 
-
   <div class="container">
-      &lt;<div class="header clearfix">
-      <nav class="navbar navbar-default navbar-fixed-top">
-
-          <!--<img alt="Brand" src="/static/images/aequitas_header.png" width="300" height="113"> -->
-          <div class="col-lg-1 col-left">
-              <a href="{{ url_for('home')}}">
-                  <img alt="Brand" src="/static/images/aequitas_header.png" class="img-fluid" alt="Responsive image">
-              </a>
-          </div>
-
-
+      <div class="header clearfix">
+          <nav>
           <ul class="nav nav-pills pull-right">
-              </li>
-              <li role="presentation" class="active"><a href="{{ url_for('home')}}">Home</a></li>
+              <li role="presentation" class="active"><a href="http://dssg.uchicago.edu/aequitas">Home</a></li>
             <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
-              <li></li>
-
           </ul>
-      </nav>
-  </div>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-
-      <div class="row">
-          <div class="col-lg-1 col-centered">
-              <img src="/static/images/customize_header.png" class="img-fluid" alt="Responsive image">
-
-          </div>
+          </nav>
+          <a href="{{ url_for('home')}}">
+              <img alt="Brand" src="/static/images/aequitas_header.png" class="img-fluid" alt="Responsive image">
+          </a>
       </div>
 
-      <br>
-      <br>
-      <br>
+
+
 
 
       <div class="row marketing">
+          <h1>Customize This Audit</h1>
 
 
           <form method="post">
-    <p><b>Select method of determining reference group:</b></p>
+              <br>
+              <br>
+
+              <p><b>Select method of determining reference group:</b></p>
     <div>
     <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
     <input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group &nbsp;&nbsp;&nbsp;&nbsp;
     <input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
     </div>
     <br>
-    <p><b>Select variables that should be used to check for bias and the reference group for each group:</b></p>
+              <br>
+
+              <p><b>Select attributes that should be used to check for bias. If predefined was selected previously, then you can
+                  also
+                  define the value for each reference group.
+              </b></p>
 
     <div>
     <div id="div1">
@@ -115,7 +99,7 @@
 </div>
 
 
-
+              <br>
 
 
     <p><b>Select Fairness measures that should be computed:</b></p>
@@ -124,10 +108,10 @@
         <input type="checkbox" name="fairness_measures" value="{{fm}}" checked="checked">&nbsp;&nbsp;{{fm}}<br>
     {% endfor %}
     <br>
-
-              <p><b>Enter percentage difference in the measures that constitutes Fairness or Unfairness:</b>
+              <br>
+              <p><b>Enter percentage ratio in the measures that constitutes the limits of Fairness:</b>
               <p>
-    <input type="text" name="fairness_pct" placeholder='20'>%
+                  <input type="text" name="fairness_pct" placeholder='80'>%
 
     <p><input type="submit" name="submit", value="Generate Fairness Report"></p>
     </form>
@@ -147,7 +131,7 @@
             });
         </script>
   </body>
-  <footer class="footer">
+  <footer align="center" class="footer">
         <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
   </footer>
   </html>

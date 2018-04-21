@@ -45,7 +45,7 @@ def get_group_value_report(group_value_df):
                 ref_group_value = group_value_df.loc[(group_value_df['group_variable'] == row[
                     'group_variable']) & (group_value_df['group_value'] == row[
                     'ppr_ref_group_value'])]['ppr'].values[0]
-                ppr_text = '{:.2f}% of the group is selected, compared to {:.2f} % of the ' \
+                ppr_text = '{:.0f}% of the group is selected, compared to {:.0f} % of the ' \
                            'reference group '.format(row['ppr'] * 100, ref_group_value * 100) + \
                            row['group_variable'] + ' = ' + row['ppr_ref_group_value']
                 metrics.append(ppr_text)
@@ -94,7 +94,7 @@ def get_highlevel_report(group_attribute_df):
             colstr = 'Attribute'
         else:
             colstr = col
-        map[col] = colstr  # + ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+        map[col] = colstr
         # to be able to click on true/false and redirect to the next section
         if col != 'attribute_name':
             for attr in attr_list:
@@ -103,7 +103,7 @@ def get_highlevel_report(group_attribute_df):
     for attr in attr_list:
         group_attribute_df = group_attribute_df.replace(attr, '[' + attr + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')')
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
-    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never')
+    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never', numalign="left")
     return highlevel_report
 
 
@@ -141,21 +141,20 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
 
     parity_group = tabulate(aux_df,
                             headers='keys',
-                            tablefmt='pipe', showindex='never')
+                            tablefmt='pipe', showindex='never', numalign="left")
     return parity_group
 
 
 def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
+    group_size = group_value_df['group_size_pct']
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
             metrics[disp] = par
             metrics[disp.replace('_disparity', '')] = par
     aux_df = group_value_df[['attribute_name', 'attribute_value'] + list(metrics.keys())]
-    print('\n\n', aux_df)
-
     for col in group_value_df.columns:
         if col in metrics.keys():
             # we want to keep the ref group without green/red so we need to know the name of the column to search for
@@ -169,6 +168,8 @@ def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_de
             group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
                                                                                                                        col]] == 'False']
+    group_value_df['group_size_pct'] = group_size
+    print('******************', group_value_df['group_size_pct'])
     return group_value_df
 
 
@@ -197,34 +198,38 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     aux_df = aux_df[new_order]
     disparities_group = tabulate(aux_df,
                                  headers='keys',
-                                 tablefmt='pipe', showindex='never')
+                                 tablefmt='pipe', showindex='never', numalign="left")
 
     return disparities_group
 
 
 def get_group_group_report(group_value_df, attribute, fairness_measures, fairness_measures_depend):
-    def_cols = ['attribute_value']
+    # defining how to display stuff
+    names = {'attribute_value': 'Attribute Value',
+             'group_size_pct': 'Group Size Ratio'}
+    def_cols = ['attribute_value', 'group_size_pct']
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
             def_cols.append(disp.replace('_disparity', ''))
     aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     aux_df = aux_df[def_cols]
     aux_df = aux_df.round(2)
+    aux_df = aux_df.astype(str)
     # fixing the same order of columns every time!
-    cols_order = ['attribute_value', 'ppr', 'pprev', 'fdr', 'fpr', 'for', 'fnr']
+    cols_order = ['attribute_value', 'group_size_pct', 'ppr', 'pprev', 'fdr', 'fpr', 'for', 'fnr']
     new_order = [col for col in cols_order if col in aux_df.columns]
     aux_df = aux_df[new_order]
     map = {}
     for col in aux_df.columns:
-        if col == 'attribute_value':
-            colstr = 'Attribute Value'
+        if col in names:
+            colstr = names[col]
         else:
             colstr = col.upper()
         map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
-                           tablefmt='pipe', showindex='never')
+                           tablefmt='pipe', showindex='never', numalign="left")
     return group_group
 
 
@@ -236,44 +241,6 @@ def get_sentence_highlevel(fair_results):
         is_fair = ' unfair'  # ' unfair to the following groups: '
     sent += is_fair + ' using the following fairness criteria:\n\n'
     return sent
-
-
-def get_false_text_old(group_value_df, fairness_metric, fairness_measures_depend):
-    names = {
-
-        'fpr': 'false positive rate',
-        'fnr': 'false negative rate',
-        'fdr': 'false discovery rate',
-        'for': 'false omission rate',
-        'ppr': 'predicted positive ratio',
-        'pprev': 'predicted prevalence (base rate)'
-    }
-    group_value_df = group_value_df.round(2)
-    group_value_df = group_value_df.applymap(str)
-    false_df = group_value_df.loc[group_value_df[fairness_metric] == 'False']
-    bias_metric = fairness_measures_depend[fairness_metric]
-    group_metric = bias_metric.replace('_disparity', '')
-    ref_group_col = group_metric + '_ref_group_value'
-    text_detail = ''
-    for index, row in false_df.iterrows():
-        ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
-                                           (group_value_df['attribute_value'] == row[ref_group_col])]
-        sentence = 'The {group_metric_name} for \"{attribute_name} = {attribute_value}\" is {bias_metric_value}% ' \
-                   'of the {group_metric_name} of the reference group \"{attribute_name} = {ref_group_value}\",' \
-                   ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
-            .format(attribute_name=row['attribute_name'],
-                    attribute_value=row['attribute_value'],
-                    group_metric_name=names[group_metric],
-                    bias_metric_value='%.2f' % (float(row[bias_metric]) * 100),
-                    ref_group_value=row[ref_group_col],
-                    group_metric_value=row[group_metric],
-                    ref_group_metric_value=ref_group_row[group_metric].values[0])
-        text_detail += sentence + '\n\n'
-    if false_df.empty:
-        text_detail += 'Based on the fairness threshold used, there is no disparate values in {group_metric_name} between ' \
-                       'the each group and the respective reference group.\n\n'.format(group_metric_name=names[
-            group_metric])
-    return text_detail
 
 
 
@@ -294,7 +261,7 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
                    ' **{group_metric_value}**% of positive class.' \
                    '' \
                    ''.format(
-            group_metric_value='%.2f' % (float(row[group_metric]) * 100),
+            group_metric_value='%.0f' % (float(row[group_metric]) * 100),
         )
 
         try:
@@ -304,7 +271,7 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
             false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#equal-parity)' + sentence)
 
     if false_df.empty:
-        cellref = 'Based on the fairness threshold used, the number of selected positives is similar across ' \
+        cellref = '##green##Based on the fairness threshold used, the number of selected positives is similar across ' \
                   'different ' \
                   'groups.\n\n'
     else:
@@ -316,7 +283,6 @@ def get_statpar_text(group_value_df, fairness_measures_depend):
     return cellref
 
 
-# this methods are almost repeated from the getstatpartext but for now it's the way it is
 def get_impact_text(group_value_df, fairness_measures_depend):
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
@@ -335,19 +301,19 @@ def get_impact_text(group_value_df, fairness_measures_depend):
                    ' in comparison to {ref_group_metric_value}% from the reference group \"{' \
                    'ref_group_value}\"' \
                    ''.format(
-            group_metric_value='%.2f' % (float(row[group_metric]) * 100),
+            group_metric_value='%.0f' % (float(row[group_metric]) * 100),
             attribute_value=row['attribute_value'],
-            ref_group_metric_value='%.2f' % (float(ref_group_row[group_metric].values[0]) * 100),
+            ref_group_metric_value='%.0f' % (float(ref_group_row[group_metric].values[0]) * 100),
             ref_group_value=row[ref_group_col])
 
         try:
-            false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#equal-parity)' + sentence)
+            false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#proportional-parity)' + sentence)
         except KeyError:
             false_dict[row['attribute_name']] = set()
-            false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#equal-parity)' + sentence)
+            false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#proportional-parity)' + sentence)
 
     if false_df.empty:
-        cellref = 'Based on the fairness threshold used, the percentage of selected elements from ' \
+        cellref = '##green##Based on the fairness threshold used, the percentage of selected elements from ' \
                   'each group is not disparate to the percentage of selected elements of the respective reference group.\n\n'
     else:
         cellref = ''
@@ -384,7 +350,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
                    ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
             .format(
             group_metric_name=names[group_metric],
-            bias_metric_value='%.2f' % (float(row[bias_metric]) * 100),
+            bias_metric_value='%.0f' % (float(row[bias_metric]) * 100),
             ref_group_value=row[ref_group_col],
             group_metric_value=row[group_metric],
             ref_group_metric_value=ref_group_row[group_metric].values[0])
@@ -395,7 +361,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#false-positive-parity)' + sentence)
 
     if false_df.empty:
-        cellref = 'Based on the fairness threshold used, the percentage of selected elements from ' \
+        cellref = '##green##Based on the fairness threshold used, the percentage of selected elements from ' \
                   'each group is not disparate to the percentage of selected elements of the respective reference group.\n\n'
     else:
         cellref = ''
@@ -432,14 +398,12 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
         else:
             fairness_measures_edited.append(meas)
     fairness_measures_edited = set(fairness_measures_edited)
-
     raw = {
         'Fairness Criteria': [],
         'Desired Outcome': [],
         'Reference Groups Selected': [],
         'Unfairly Affected Groups': []
     }
-
     for measure in supported_order:
         if measure in fairness_measures_edited:
             raw['Fairness Criteria'].append(supported_name[measure])
@@ -447,6 +411,28 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
             false_df = group_value_df.loc[group_value_df[measure] == False]
             ref_dict = {}
             false_dict = {}
+            for index, row in false_df.iterrows():
+                try:
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
+                                                          supported_name[measure][supported_name[measure].find('('):])
+                except KeyError:
+                    false_dict[row['attribute_name']] = set()
+                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
+                                                          supported_name[measure][supported_name[measure].find('('):])
+            attr_order = []
+            if len(false_dict) > 0:
+                cell = ''
+                attr_order = false_dict.keys()
+                for key in attr_order:
+                    cell += '**{attribute_name}:**'.format(attribute_name=key)
+                    cell += '##br##&emsp;&emsp;&emsp;'
+                    cell += '##br##&emsp;&emsp;&emsp;'.join(false_dict[key]) + ' ##br##'
+                raw['Unfairly Affected Groups'].append(cell)
+            else:
+                if group_value_df[measure].isnull().all():
+                    raw['Unfairly Affected Groups'].append('Undefined')
+                else:
+                    raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
 
             for ref in map_ref_groups[measure]:
                 groupby_refs = group_value_df.groupby(key_columns + [ref])
@@ -455,41 +441,26 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
                         ref_dict[group[key_columns.index('attribute_name')]].add('[' + group[-1] + '](' + '-'.join(
                             supported_name[
                                 measure]
-                                                                                             .lower().split(' ')) + ')')
+                                .lower().split(' ')) + ')')
                     except KeyError:
                         ref_dict[group[key_columns.index('attribute_name')]] = set()
                         ref_dict[group[key_columns.index('attribute_name')]].add('[' + group[-1] + '](' + '-'.join(
                             supported_name[
-                                                                                                 measure].lower().split(
-                            ' ')) + ')')
-
+                                measure].lower().split(
+                                ' ')) + ')')
             cellref = ''
-            for key in ref_dict.keys():
-                cellref += '**{attribute_name}:** ##br##&emsp;&emsp;&emsp;'.format(attribute_name=key)
-                cellref += '##br##&emsp;&emsp;&emsp;'.join(ref_dict[key]) + ' ##br##'
-            raw['Reference Groups Selected'].append(cellref)
-
-            for index, row in false_df.iterrows():
-                try:
-
-                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
-                                                          supported_name[measure][supported_name[measure].find('('):])
-                except KeyError:
-                    false_dict[row['attribute_name']] = set()
-                    false_dict[row['attribute_name']].add('[' + row['attribute_value'] + ']' + \
-                                                          supported_name[measure][supported_name[measure].find('('):])
-            if len(false_dict) > 0:
-                cell = ''
-                for key in false_dict.keys():
-                    cell += '**{attribute_name}:** ##br##&emsp;&emsp;&emsp;'.format(attribute_name=key)
-                    cell += '##br##&emsp;&emsp;&emsp;'.join(false_dict[key]) + ' ##br##'
-
-                raw['Unfairly Affected Groups'].append(cell)
-            else:
-                if group_value_df[measure].isnull().all():
-                    raw['Unfairly Affected Groups'].append('Undefined')
+            align_rows = True if attr_order else False
+            refs_order = attr_order if attr_order else ref_dict.keys()
+            newline = '##br##'
+            idented = '&emsp;&emsp;&emsp;'
+            for key in refs_order:
+                cellref += '**{attribute_name}:**'.format(attribute_name=key) + newline
+                cellref += idented + list(ref_dict[key])[0] + ' ##br##'
+                if align_rows:
+                    cellref += ''.join([newline] * (len(false_dict[key]) - 1))  # this is the number of lines to skip in cell
                 else:
-                    raw['Unfairly Affected Groups'].append('No Unfair Groups Found')
+                    cellref += newline
+            raw['Reference Groups Selected'].append(cellref)
 
     highlevel_table = '\n\n'
     if len(raw['Fairness Criteria']) > 0:
@@ -499,27 +470,35 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
         # krrp
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Reference Groups Selected',
                                           'Unfairly Affected Groups']], headers='keys',
-                                   tablefmt='pipe', showindex='never')
+                                   tablefmt='pipe', showindex='never', numalign="left")
     return highlevel_table
-
 
 def audit_report_markdown(configs, group_value_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
     oneline = ' \n\n&nbsp;\n\n'
-    mkdown_highlevel = ''
-    # mkdown_highlevel = '# The Bias Report'
-    mkdown_highlevel += manylines + oneline
-    mkdown_highlevel += '#### Fairness Threshold: {:.0f}%'.format(float(configs.fairness_threshold) * 100) + oneline
+    mkdown_highlevel = manylines + '# The Bias Report'
+    mkdown_highlevel += oneline
+    number_rows = group_value_df['total_entities'].values[0]
+    mkdown_highlevel += '#### {:.0f} rows were used to audit bias and fairness.'.format(number_rows) + oneline
+    mkdown_highlevel += '#### {:.0f}% is the selected fairness threshold, meaning the fairness range is between {:.0f}% and ' \
+                        '{' \
+                        ':.0f}% of ' \
+                        ' the value of the respective reference group (e.g. gender:male) on each group metric (e.g. False ' \
+                        'Positive Rate). ' \
+                        ''.format(
+        float(configs.fairness_threshold) * 100, float(configs.fairness_threshold) * 100,
+        float(1.0 / configs.fairness_threshold) * 100) + oneline
     mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
     mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----' + oneline
 
     mkdown_highlevel += '### Table of Contents:\n\n'
     mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)\n\n'
     mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)\n\n'
-    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers:-bias-metrics)\n\n'
-    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers:-group-metrics)\n\n' + oneline + '----' + oneline
+    mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers-bias-metrics)\n\n'
+    mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers-group-metrics)\n\n' + oneline + '----' + oneline
 
     mkdown_highlevel += '## Fairness Overview' + oneline
+
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Equal Parity\n\n'
         raw = {}
@@ -534,14 +513,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Equal Parity?', 'Unfairly Affected Groups']],
                                      headers='keys',
-                                     tablefmt='pipe', showindex='never') + \
+                                     tablefmt='pipe', showindex='never', numalign="left") + \
                             oneline
         # mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
         #mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'Impact Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Proportional Parity\n\n'
+        mkdown_highlevel += '\n\n## Proportional Parity\n\n'
         raw = {}
         raw['What is it?'] = ['This criteria considers an attribute to have proportional parity if every group is ' \
                               'represented proportionally to their share of the population. For example, if race ' \
@@ -555,14 +534,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Equal Parity?', 'Unfairly Affected Groups']],
                                      headers='keys',
-                                     tablefmt='pipe', showindex='never') + \
+                                     tablefmt='pipe', showindex='never', numalign="left") + \
                             oneline
 
         #mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'TypeI Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### False Positive Parity\n\n'
+        mkdown_highlevel += '\n\n## False Positive Parity\n\n'
         mkdown_highlevel += 'False Positive Parity is concerned with Type I errors (False Positives). In cases ' \
                             'of punitive ' \
                             'interventions on the selected set' \
@@ -571,9 +550,11 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                             'Set Size).\n\n'
 
         if 'FPR Parity' in group_value_df.columns:
-            mkdown_highlevel += '\n\n##### False Positive Rate\n\n'
+            mkdown_highlevel += oneline + '\n\n#### False Positive Rate\n\n'
             raw = {}
-            raw['What is it?'] = ['This criteria considers an attribute to have False Positive parity if every group ' \
+            raw['What is it?'] = ['This criteria considers an attribute to have False Positive '
+                                  'parity if '
+                                  'every group ' \
                                   'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
                                   'it implies that all three races have the same False Positive Error Rate.']
             raw['When should I care about False Positive Parity?'] = ['If your desired outcome is to make false positive errors ' \
@@ -587,13 +568,13 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
             mkdown_highlevel += tabulate(
                 dft[['What is it?', 'When should I care about False Positive Parity?', 'Unfairly Affected Groups']],
                 headers='keys',
-                tablefmt='pipe', showindex='never') + \
+                tablefmt='pipe', showindex='never', numalign="left") + \
                                 oneline
 
             mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
 
         if 'FDR Parity' in group_value_df.columns:
-            mkdown_highlevel += '\n\n##### False Discovery Rate\n\n'
+            mkdown_highlevel += oneline + '\n\n#### False Discovery Rate\n\n'
             raw = {}
             raw['What is it?'] = ['This criteria considers an attribute to have False Positive parity if every group ' \
                                   'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
@@ -609,14 +590,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
             mkdown_highlevel += tabulate(
                 dft[['What is it?', 'When should I care about False Positive Parity?', 'Unfairly Affected Groups']],
                 headers='keys',
-                tablefmt='pipe', showindex='never') + \
+                tablefmt='pipe', showindex='never', numalign="left") + \
                                 oneline
 
             mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
         mkdown_highlevel += oneline + '----' + oneline
 
     if 'TypeII Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### False Negative Parity\n\n'
+        mkdown_highlevel += '\n\n## False Negative Parity\n\n'
         mkdown_highlevel += 'False Negative Parity is concerned with Type II errors (False Negatives). In cases ' \
                             'of assistive or preventive ' \
                             'interventions on the selected set' \
@@ -625,7 +606,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                             'Set Size).\n\n'
 
         if 'FNR Parity' in group_value_df.columns:
-            mkdown_highlevel += '\n\n##### False Negative Rate\n\n'
+            mkdown_highlevel += oneline + '\n\n#### False Negative Rate\n\n'
             raw = {}
             raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
                                   'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
@@ -643,13 +624,13 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
             mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Parity?',
                                               'Unfairly Affected Groups']],
                                          headers='keys',
-                                         tablefmt='pipe', showindex='never') + \
+                                         tablefmt='pipe', showindex='never', numalign="left") + \
                                 oneline
 
             mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
 
         if 'FOR Parity' in group_value_df.columns:
-            mkdown_highlevel += '\n\n##### False Omission Rate\n\n'
+            mkdown_highlevel += oneline + '\n\n#### False Omission Rate\n\n'
             raw = {}
             raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
                                   'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
@@ -668,7 +649,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
             mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Parity?',
                                               'Unfairly Affected Groups']],
                                          headers='keys',
-                                         tablefmt='pipe', showindex='never') + \
+                                         tablefmt='pipe', showindex='never', numalign="left") + \
                                 oneline
 
             mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
@@ -681,6 +662,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     mkdown_disparities = '\n\n## Some Numbers: Bias Metrics'
     mkdown_group = '\n\n## More Numbers: Group Metrics'
     # setup the group_value_df (colors and stuff)
+    group_value_df['group_size_pct'] = group_value_df['group_size'].divide(group_value_df['total_entities'])
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
     for attr in configs.attr_cols:
@@ -714,7 +696,6 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
     report_html = report_html.replace('<table>', '<table class="table table-striped" padding=5 >')
     # report_html = report_html.replace('< thead >\n < tr >', '< thead >\n < tr class="table-info" >')
-    report_html = report_html.replace('<h1', '<br><h1 align="center" ')
 
     report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal Parity</a>')
 
