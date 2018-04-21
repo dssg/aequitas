@@ -3,6 +3,10 @@ import os.path
 import tempfile
 
 import pandas as pd
+from aequitas.fairness import Fairness
+from aequitas.preprocessing import preprocess_input_df
+from aequitas_cli.aequitas_audit import audit
+from aequitas_cli.utils.configs_loader import Configs
 from flask import (
     abort,
     Markup,
@@ -14,14 +18,7 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from aequitas.fairness import Fairness
-from aequitas.preprocessing import preprocess_input_df
-
-from aequitas_cli.aequitas_audit import audit
-from aequitas_cli.utils.configs_loader import Configs
-
 from . import app
-
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -149,10 +146,8 @@ def uploaded_file(name, dirname='sample'):
 
     # majority_groups = request.form.getlist('use_majority_group')
     raw_fairness_measures = request.form.getlist('fairness_measures')
-    print('00000000000000', raw_fairness_measures)
     if len(raw_fairness_measures) == 0:
         fairness_measures = list(Fairness().get_fairness_measures_supported(df))
-        print('11111111111111', fairness_measures)
     else:
         # map selected measures to input
         fair_map = {'Equal Parity': ['Statistical Parity'],
@@ -165,7 +160,7 @@ def uploaded_file(name, dirname='sample'):
 
     fairness_pct = request.form['fairness_pct']
     try:
-        fp = 1.0 - float(fairness_pct) / 100.0
+        fp = float(fairness_pct) / 100.0
     except:
             fp = 0.8
 
