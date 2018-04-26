@@ -224,6 +224,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="n">high_level_fairness_depend</span>
 
+    <span class="k">def</span> <span class="nf">get_fairness_measures_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_df</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;label_value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Impact Parity&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span>
+
 <div class="viewcode-block" id="Fairness.get_group_value_fairness"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_group_value_fairness">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_value_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bias_df</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fair_measures_requested</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Calculates the fairness measures defined in the fair_measures dictionary and adds</span>
