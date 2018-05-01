@@ -55,12 +55,21 @@ def helper(input_filename, expected_filename, config_file):
 	EPS = 1e-6
 	for col in shared_columns:
 		if col not in {'attribute_value','attribute_name'}:
-			if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
-				exp_mean = np.mean(combined_data[col + "_x"])
-				aeq_mean = np.mean(combined_data[col + "_y"])
-				s += "{} fails: Expected {}, but aequitas returned {}\n".format(col, exp_mean, aeq_mean)
+			print('testing {} ...'.format(col))
 
-				pytest.fail(s)
+			try:
+				if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
+						exp_mean = np.mean(combined_data[col + "_x"])
+						aeq_mean = np.mean(combined_data[col + "_y"])
+						s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean, aeq_mean)
+						
+						pytest.fail(s)
+			except:
+				if not all(combined_data[col + "_x"]==combined_data[col + "_y"]):
+					s += "{} fails: at least one entry was not the same between data sets\n".format(col)
+			
+					pytest.fail(s)
+
 
 # simplest tests
 def test_group_class_1():
@@ -71,14 +80,13 @@ def test_bias_class_1():
 	# test that the results from bias are as expected (note it also tests group)
 	return helper('test_1.csv', 'expected_output_bias_test_1.csv', None)
 
-#def test_fairness_class_1():
-	# test that the results from fairness are as expected (note it also tests bias and group)
-	#return helper('test_1.csv', 'expected_output_fairness_test_1.csv', None)
+def test_fairness_class_1():
+	#test that the results from fairness are as expected (note it also tests bias and group)
+	return helper('test_1.csv', 'expected_output_fairness_test_1.csv', None)
 
 
 if __name__=='__main__':
 	import pandas as pd
-
 	#helper('./src/tests/test_1.csv', './src/tests/expected_output_test_1.csv', None)
 	helper('test_1.csv', 'expected_output_test_1.csv', 'test_1.yaml')
 
