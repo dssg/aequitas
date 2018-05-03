@@ -26,8 +26,8 @@ def get_db_data(engine, input_query):
     logging.info('querying db...')
     try:
         df = pd.read_sql(input_query, engine)
-    except SQLAlchemyError:
-        logging.error('PG: could not get the resulting table. Please check your input_query.')
+    except SQLAlchemyError as e:
+        logging.error('PG: could not get the resulting table. Please check your input_query. ' + e)
         exit(1)
     return df
 
@@ -61,8 +61,8 @@ def push_todb(engine, output_schema, create_tables, output_df):
             name='aequitas_group',
             con=engine,
             if_exists=create_tables)
-    except SQLAlchemyError:
-        logging.info('push_db_data: Could not push results to the target database.')
+    except SQLAlchemyError as e:
+        logging.error('push_db_data: Could not push results to the target database.' + e)
 
 
 def push_tocsv(input_file, output_df):
