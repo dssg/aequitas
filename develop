@@ -64,15 +64,23 @@ brew_install_direnv() {
   brew install direnv
 }
 
-if icli::check_command apt; then
-  install_direnv=apt_install_direnv
-elif icli::check_command yum; then
-  install_direnv=yum_install_direnv
-elif icli::check_command brew; then
+install_direnv=""
+case $(uname -s) in
+Linux)
+  [ -f /etc/os-release ] && . /etc/os-release
+  case $ID_LIKE in
+  *debian*)
+    install_direnv=apt_install_direnv
+    ;;
+  *fedora*|*rhel*)
+    install_direnv=yum_install_direnv
+    ;;
+  esac
+  ;;
+Darwin)
   install_direnv=brew_install_direnv
-else
-  install_direnv=""
-fi
+  ;;
+esac
 
 require direnv \
   exists_direnv \
@@ -105,6 +113,23 @@ require pyenv \
   install_pyenv \
   --fail-prefix="not found"
 
+# python
+
+PY_VERSION=3.6.3
+
+exists_python() {
+  pyenv versions | grep -E "^ *${PY_VERSION}$" > /dev/null
+}
+
+install_python() {
+  pyenv install -s $PY_VERSION
+}
+
+require "python-${PY_VERSION}" \
+  exists_python \
+  install_python \
+  --fail-prefix="v${PY_VERSION} not found"
+
 # virtualenv
 
 PROJECT=$(<.python-version)
@@ -117,34 +142,56 @@ install_virtualenv() {
   pyenv virtualenv 3.6.3 $PROJECT
 }
 
-require $PROJECT \
+require "env-${PROJECT}" \
   exists_virtualenv \
   install_virtualenv \
   --fail-prefix="project virtual environment not found"
 
 # python libs
 
-install_lib() {
-  pip install -e . && \
-  pip install -Ur requirement/dev.txt
+py_version=$(python - <<<"
+import sys
+print(*sys.version_info[:3], sep='.')
+")
+
+py_version_error() {
+  # when something went really wrong
+  icli::set_context $1
+  icli::message "${T_FRED}unexpected python version – will not install ✗"
+  icli::unset_context
 }
 
-# no great way to check that python libs installed;
-# rather, always fail check and let pip figure it out
-require lib \
-  icli::always_install \
-  install_lib
+install_lib() {
+  python -m pip install -e . && \
+  python -m pip install -Ur requirement/dev.txt
+}
+
+if [[ $py_version == $PY_VERSION ]]; then
+  # no great way to check that python libs installed;
+  # rather, always fail check and let pip figure it out
+  require lib \
+    icli::always_install \
+    install_lib
+else
+  echo
+  py_version_error lib
+fi
 
 # management environment
 
 install_management() {
-  virtualenv -p python --clear .manage && \
+  python -m venv --clear --prompt=manage .manage && \
   .manage/bin/pip install -r requirement/management.txt
 }
 
-require manage \
-  icli::always_install \
-  install_management
+if [[ $py_version == $PY_VERSION ]]; then
+  require manage \
+    icli::always_install \
+    install_management
+else
+  echo
+  py_version_error manage
+fi
 
 # environment variables
 
