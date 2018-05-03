@@ -33,6 +33,7 @@ def home():
     return render_template('home.html')
 
 
+# FIXME: This is not used
 @app.route('/about.html', methods=['GET'])
 def about():
     return render_template('about.html')
