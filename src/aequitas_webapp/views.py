@@ -121,7 +121,7 @@ def audit_file(name, dirname):
                 subgroups[key].sort(key=lambda value: int(value not in values))
 
         supported_fairness_measures = Fairness().get_fairness_measures_supported(df)
-        fairness_measures = {REVERSE_FAIR_MAP[x] for x in supported_fairness_measures}
+        fairness_measures = {REVERSE_FAIR_MAP[x] for x in supported_fairness_measures if x in REVERSE_FAIR_MAP}
 
         return render_template('audit.html',
                                categories=groups,
