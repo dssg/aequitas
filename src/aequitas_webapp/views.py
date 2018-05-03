@@ -152,11 +152,9 @@ def audit_file(name, dirname):
     try:
         fv = float(request.form['fairness_pct'])
     except (KeyError, ValueError):
-        fp = 0.8
-    else:
-        fp = fv / 100.0
-    if fv == 0:
-        fp = 0.8
+        fv = None
+
+    fp = fv / 100.0 if fv else 0.8
 
     configs = Configs(ref_groups=subgroups,
                       ref_groups_method=rgm,
