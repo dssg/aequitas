@@ -155,6 +155,8 @@ def audit_file(name, dirname):
         fp = 0.8
     else:
         fp = fv / 100.0
+    if fv == 0:
+        fp = 0.8
 
     configs = Configs(ref_groups=subgroups,
                       ref_groups_method=rgm,
