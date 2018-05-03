@@ -163,6 +163,8 @@ def uploaded_file(name, dirname='sample'):
         fp = float(fairness_pct) / 100.0
     except:
             fp = 0.8
+    if float(fairness_pct) == 0:
+        fp = 0.8
 
     configs = Configs(ref_groups=subgroups,
                       ref_groups_method=rgm,
