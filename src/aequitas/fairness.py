@@ -50,7 +50,12 @@ class Fairness(object):
                                          'FDR Parity': 'fdr_disparity',
                                          'FPR Parity': 'fpr_disparity',
                                          'FOR Parity': 'for_disparity',
-                                         'FNR Parity': 'fnr_disparity'}
+                                         'FNR Parity': 'fnr_disparity',
+                                         'TPR Parity': 'tpr_disparity',
+                                         'TNR Parity': 'tnr_disparity',
+                                         'NPV Parity': 'npv_disparity',
+                                         'Precision Parity': 'precision_disparity'
+                                         }
         else:
             self.fair_measures_depend = fair_measures_depend
         # the self.fair_measures represents the list of fairness_measures to be calculated by default
@@ -58,7 +63,8 @@ class Fairness(object):
 
         if not type_parity_depend:
             self.type_parity_depend = {'TypeI Parity': ['FDR Parity', 'FPR Parity'],
-                                       'TypeII Parity': ['FOR Parity', 'FNR Parity']}
+                                       'TypeII Parity': ['FOR Parity', 'FNR Parity'],
+                                       'Equalized Odds': ['FPR Parity', 'TPR Parity']}
         else:
             self.type_parity_depend = type_parity_depend
 
@@ -66,7 +72,8 @@ class Fairness(object):
         if not high_level_fairness_depend:
             self.high_level_fairness_depend = {
                 'Unsupervised Fairness': ['Statistical Parity', 'Impact Parity'],
-                'Supervised Fairness': ['TypeI Parity', 'TypeII Parity']}
+                'Supervised Fairness': ['TypeI Parity', 'TypeII Parity']
+            }
         else:
             self.high_level_fairness_depend = high_level_fairness_depend
 
@@ -92,11 +99,11 @@ class Fairness(object):
             tau = self.tau
         if not fair_measures_requested:
             fair_measures_requested = self.fair_measures_supported
-
         for fair, input in self.fair_measures_depend.items():
             if fair in fair_measures_requested:
                 bias_df[fair] = bias_df[input].apply(self.fair_eval(tau))
         for fair, input in self.type_parity_depend.items():
+
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
                     bias_df[fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
@@ -105,7 +112,7 @@ class Fairness(object):
             elif input[1] in bias_df.columns:
                 bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
-                logging.info('get_group_value_fairness: No Parity measure input found on bias_df')
+                print('get_group_value_fairness: No Parity measure input found on bias_df')
         for fair, input in self.high_level_fairness_depend.items():
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:

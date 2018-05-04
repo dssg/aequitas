@@ -22,40 +22,41 @@ from .utils.report import audit_report_markdown
 #
 # License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
 
-about = """
-############################################################################
-##   Center for Data Science and Public Policy                            ##
-##   http://dsapp.uchicago.edu                                            ##
-##                                                                        ##
-##   Copyright \xa9 2018. The University of Chicago. All Rights Reserved.    ##
-############################################################################
+about = '\n'.join(
+    [
+        '############################################################################',
+        '##   Center for Data Science and Public Policy                            ##',
+        '##   http://dsapp.uchicago.edu                                            ##',
+        '##                                                                        ##',
+        '##   Copyright \xa9 2018. The University of Chicago. All Rights Reserved.    ##',
+        '############################################################################',
+        '____________________________________________________________________________',
+        '',
+        '                    ___                    _ __            ',
+        '                   /   | ___  ____ ___  __(_) /_____ ______',
+        '                  / /| |/ _ \/ __ `/ / / / / __/ __ `/ ___/',
+        '                 / ___ /  __/ /_/ / /_/ / / /_/ /_/ (__  ) ',
+        '                /_/  |_\___/\__, /\__,_/_/\__/\__,_/____/  ',
+        '                              /_/    ',
+        '',
+        '',
+        '',
+        '____________________________________________________________________________',
+        '',
+        '                      Bias and Fairness Audit Tool                           ',
+        '____________________________________________________________________________']
+)
+
+about2 = """
 ____________________________________________________________________________
 
-
-                    
-                    ___                    _ __            
-                   /   | ___  ____ ___  __(_) /_____ ______
-                  / /| |/ _ \/ __ `/ / / / / __/ __ `/ ___/
-                 / ___ /  __/ /_/ / /_/ / / /_/ /_/ (__  ) 
-                /_/  |_\___/\__, /\__,_/_/\__/\__,_/____/  
-                              /_/                          
-
-
-
+                      Aequitas: Bias and Fairness Audit Tool
 ____________________________________________________________________________
-
-                      Bias and Fairness Audit Tool
-____________________________________________________________________________
-
-
-
-
 """
-
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description=about + 'Runs audits on predictions of machine learning models '
+        description=about2 + 'Runs audits on predictions of machine learning models '
                             'to calculate a variety of bias and fairness metrics.\n')
 
     parser.add_argument('--input',
