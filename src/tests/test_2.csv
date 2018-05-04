@@ -1,0 +1,11 @@
+label_value,score,class,not_class
+1,1,High,High
+1,0,Low,Low
+1,0,High,High
+1,1,Low,Low
+1,1,High,High
+0,1,Low,Low
+0,0,High,High
+0,0,Low,Low
+0,1,High,High
+0,1,Low,Low
