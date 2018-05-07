@@ -42,7 +42,7 @@ Install this Python library from source::
 
 ...or named as an installation requirement, *e.g.* via ``pip``::
 
-    pip install git+https://github.com/dssg/aequitas.git
+    pip3 install git+https://github.com/dssg/aequitas.git
 
 You may then import the ``aequitas`` module from Python::
 
