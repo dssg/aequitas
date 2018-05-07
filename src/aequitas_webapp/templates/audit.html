@@ -41,6 +41,8 @@
           <nav>
           <ul class="nav nav-pills pull-right">
               <li role="presentation" class="active"><a href="{{ url_for('home')}}">Home</a></li>
+                          <li role="presentation"><a href="http://github.com/dssg/aequitas" target="_blank">Code</a></li>
+
             <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
           </ul>
           </nav>
@@ -54,40 +56,50 @@
 
 
       <div class="row marketing">
-          <h1>Customize This Audit</h1>
+          <h1 style="margin-bottom: 50px;">Configure the Bias Audit</h1>
+          <img src="/static/images/flow-2.png" width="80%" class="img-fluid center-block">
 
 
-          <form method="post">
-              <br>
-              <br>
+      <h4 style="margin-top: 50px; margin-bottom: 20px; color: #286da8">1. Select method for determining reference group:</h4>
+      <p style="margin-bottom: 40px;">
+      <b>Reference groups</b> are used to calculate relative disparities in our Bias Audit. For example, you might select <b>Male</b> as the reference group for Gender. Aequitas will then use <b>Male</b> as the baseline to calculate any biases for other groups in the attribute Gender (for <b>Female</b> and <b>Other</b> for example) The groups you select for each attribute will be used.
+    </p>
 
-              <p><b>Select method of determining reference group:</b></p>
+
+
+          <form method="post">          
     <div>
-    <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group &nbsp;&nbsp;&nbsp;&nbsp;
-    <input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Min metric &nbsp;&nbsp;&nbsp;&nbsp;
+       <p>
+    <input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group (Select your own) <p>
+    <input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group (Automatically select the largest group for every attribute)<p>
+    <input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Automatically select group with the lowest bias metric for every attribute<p>
     </div>
-    <br>
-              <br>
 
-              <p><b>Select attributes that should be used to check for bias. If predefined was selected previously, then you can
-                  also
-                  define the value for each reference group.
-              </b></p>
+     <h4 style="margin-top: 50px; margin-bottom: 50px; color: #286da8">2. Select protected attributes that need to be audited for bias.</h4>
 
-    <div>
     <div id="div1">
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Attribute</th>
+      <th scope="col">Reference Group</th>
+    </tr>
+  </thead>
+  <tbody>
+
      {% for cat in categories %}
-     <p>
-        <input type="checkbox" name="group_variable1" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}
-        <select name="{{cat}}" method="GET" action="/", float>
+     <tr><td>
+        <input type="checkbox" name="group_variable1" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}</td>
+        <td><select name="{{cat}}" method="GET" action="/", float>
             <option value="{{subcategories[cat][0]}}" selected>{{subcategories[cat][0]}}</option>
             {% for sc2 in subcategories[cat][1:] %}
                 <option value="{{sc2}}">{{sc2}}</option>
             {% endfor %}
-        </select>
-    </p>
+        </select> </td>
+  </tr>
     {% endfor %}
+  </tbody>
+  </table>
     </div>
     <div id="div2" class="regular-element">
     {% for cat in categories %}
@@ -98,23 +110,34 @@
    </div>
 </div>
 
+  
+  <a class="btn btn-primary btn-lg" href="#metrics" role="button">Next!</a>
 
-              <br>
+    <div style="margin-bottom: 600px;">
+    </div>
+    <section id=”metrics”>
+    <div class="metrics"></div>
+    <div class="row marketing">
+      <a name="metrics"></a>
+          <h1 style="margin-bottom: 50px;">Configure the Bias Audit</h1>
+          <img src="/static/images/flow-3.png" width="80%" class="img-fluid center-block">
 
-
-    <p><b>Select Fairness measures that should be computed:</b></p>
+      <img style="margin-top: 50px;" src="/static/images/metrictree.png" width="100%" class="img-fluid center-block">
+      <h4 style="margin-top: 50px; margin-bottom: 50px; color: #286da8;">Select Fairness Metrics to Compute:</h4>
 
     {% for fm in fairness %}
         <input type="checkbox" name="fairness_measures" value="{{fm}}" checked="checked">&nbsp;&nbsp;{{fm}}<br>
     {% endfor %}
-    <br>
-              <br>
-              <p><b>Enter percentage ratio in the measures that constitutes the limits of Fairness:</b>
+    
+    <h4 style="margin-top: 50px; margin-bottom: 20px; color: #286da8;">Enter your Disparity Tolerance (in %):</h4>
+    If a specific bias metric for a group is within this percentage of the reference group, this audit will pass
+    <p><p><p>
               <p>
                   <input type="text" name="fairness_pct" placeholder='80'>%
 
-    <p><input type="submit" name="submit", value="Generate Fairness Report"></p>
-    </form>
+    <p><input class="btn btn-primary btn-lg" type="submit" name="submit" value="Generate Fairness Report">
+
+</p>    </form>
 
     </div> <!-- /container -->
 
@@ -130,6 +153,12 @@
                 $('[data-toggle="tooltip"]').tooltip();
             });
         </script>
+        <script> $("#button").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#metrics").offset().top},
+        'slow');
+});
+</script>
   </body>
   <footer align="center" class="footer">
         <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
