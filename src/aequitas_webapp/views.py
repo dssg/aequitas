@@ -38,6 +38,10 @@ def home():
 def about():
     return render_template('about.html')
 
+@app.route('/upload.html', methods=['GET'])
+def upload():
+    return render_template('upload.html')
+
 
 @app.route('/audit/', methods=['POST'])
 def upload_file():
