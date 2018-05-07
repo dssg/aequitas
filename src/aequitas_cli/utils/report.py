@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import pandas as pd
@@ -235,7 +236,7 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 def get_sentence_highlevel(fair_results):
     sent = '**The Bias Report evaluates the current model as'
-    is_fair = ' fair' if fair_results['Overall Fairness'] is True else ' unfair'
+    is_fair = ' passed' if fair_results['Overall Fairness'] is True else ' failed'
     sent += is_fair + ' using the following fairness criteria:**\n\n'
     return sent
 
@@ -470,23 +471,42 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
                                    tablefmt='pipe', showindex='never', numalign="left")
     return highlevel_table
 
+
+def audit_description(configs, group_value_df):
+    raw = {
+        'column1': [],
+        'column2': []
+    }
+
+    raw['column1'].append('**Audit Date:**')
+    raw['column2'].append(datetime.date.today().strftime('%d %b %Y'))
+    raw['column1'].append('**Data Audited:**')
+    raw['column2'].append('{:.0f} rows'.format(group_value_df['total_entities'].values[0]))
+    raw['column1'].append('**Attributes Audited:**')
+    raw['column2'].append(', '.join(group_value_df['attribute_name'].unique()))
+    raw['column1'].append('**Audit Goal:**')
+    raw['column2'].append('\n'.join(configs.fair_measures_requested))
+    raw['column1'].append('**Fairness Threshold:**')
+    raw['column2'].append('{:.0f}%'.format(float(configs.fairness_threshold) * 100))
+    raw['column1'].append('**Reference Groups:**')
+    raw['column2'].append(configs.ref_groups_method)
+
+    df = pd.DataFrame(raw, columns=['column1', 'column2'])
+    print(df)
+    desc_table = tabulate(df[['column1', 'column2']], headers='keys',
+                          tablefmt='pipe', showindex='never', numalign="left")
+
+    return desc_table
+
 def audit_report_markdown(configs, group_value_df, fairness_measures_depend, overall_fairness, model_id=1):
     manylines = '\n\n&nbsp;\n\n&nbsp;\n\n'
     oneline = ' \n\n&nbsp;\n\n'
-    mkdown_highlevel = manylines + '# The Bias Report'
+    mkdown_highlevel = '# The Bias Report'
     mkdown_highlevel += oneline
-    number_rows = group_value_df['total_entities'].values[0]
-    mkdown_highlevel += '{:.0f} rows were used to audit bias and fairness.'.format(number_rows) + oneline
-    mkdown_highlevel += '{:.0f}% is the selected fairness threshold, meaning the fairness range is between {:.0f}% and ' \
-                        '{' \
-                        ':.0f}% of ' \
-                        ' the value of the respective reference group (e.g. gender:male) on each group metric (e.g. False ' \
-                        'Positive Rate). ' \
-                        ''.format(
-        float(configs.fairness_threshold) * 100, float(configs.fairness_threshold) * 100,
-        float(1.0 / configs.fairness_threshold) * 100) + oneline
-    mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
-    mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----' + oneline
+    mkdown_highlevel += audit_description(configs, group_value_df) + oneline
+
+    # mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
+    # mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----' + oneline
 
     mkdown_highlevel += '### Table of Contents:\n\n'
     mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)\n\n'
@@ -681,21 +701,30 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = markdown(report, extras=['tables', 'header-ids'])
     # coloring True/False results
     report_html = report_html.replace('nan', 'Undefined')
-    report_html = report_html.replace('>False<', ' style="color:red"><b>Unfair</b><')
-    report_html = report_html.replace('>True<', ' style="color:green"><b>Fair</b><')
+    report_html = report_html.replace('>False<', ' style="color:red"><b>Failed</b><')
+    report_html = report_html.replace('>True<', ' style="color:green"><b>Passed</b><')
 
     report_html = report_html.replace('##br##', '<br>')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
 
-    report_html = report_html.replace(' unfair ', '<span style="color:red"><b> unfair </b></span>')
-    report_html = report_html.replace(' fair ', '<span style="color:green"><b> fair </b></span>')
+    report_html = report_html.replace(' failed ', '<span style="color:red"><b> failed </b></span>')
+    report_html = report_html.replace(' passed ', '<span style="color:green"><b> passed </b></span>')
 
     report_html = report_html.replace('<table>', '<table class="table table-striped" padding=5 >')
+    report_html = report_html.replace('<h1 id="the-bias-report">', '<h1 id="the-bias-report" align="center">')
     # report_html = report_html.replace('< thead >\n < tr >', '< thead >\n < tr class="table-info" >')
-
+    audit_desc = """<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">column1</th>
+  <th align="left">column2</th>
+</tr>
+</thead>"""
+    new_audit_desc = '<table>\n'
+    report_html = report_html.replace(audit_desc, new_audit_desc)
     report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal Parity</a>')
-
+    report_html = report_html.replace('<td', '<td style="padding:5px;"')
     ## widths tables
     width1_default = '<th align="left">What is it?</th>'
     width2_default = '<th align="left">Unfairly Affected Groups</th>'
