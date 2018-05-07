@@ -80,15 +80,17 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Using the CLI</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#--input---&lt;-path-to-.csv-file-&gt;"><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#--config---&lt;-path-to-config.yaml-&gt;"><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#--output-folder-&lt;path-to-folder&gt;"><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#--create-tables"><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
@@ -196,7 +198,8 @@
 <div class="section" id="Using-the-CLI">
 <h1>Using the CLI<a class="headerlink" href="#Using-the-CLI" title="Permalink to this headline">¶</a></h1>
 <p>Aequitas command line interface allows you to generate ‘The Bias Report’
-with one line in the terminal.</p>
+with one line in the terminal. At minimum:</p>
+<p><code class="docutils literal notranslate"><span class="pre">aequitas-report</span> <span class="pre">--input</span> <span class="pre">&lt;file&gt;</span></code></p>
 <p><a class="reference external" href="./30_seconds_aequitas.html">Getting starte with *aequitas-report*</a>
 shows the CLI in action. Here we detail the command.</p>
 <div class="section" id="--input---&lt;-path-to-.csv-file-&gt;">
@@ -208,6 +211,17 @@ provided we assume there is a db configuration in the configs.yaml file.</p>
 <h2><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--config---<-path-to-config.yaml->" title="Permalink to this headline">¶</a></h2>
 <p>To change default behavior uniformly across applications use a
 configuration file.</p>
+</div>
+<div class="section" id="--output-folder-&lt;path-to-folder&gt;">
+<h2><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code><a class="headerlink" href="#--output-folder-<path-to-folder>" title="Permalink to this headline">¶</a></h2>
+<p>Folder name to be created inside aequitas.</p>
+</div>
+<div class="section" id="--create-tables">
+<h2><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code><a class="headerlink" href="#--create-tables" title="Permalink to this headline">¶</a></h2>
+<p>If you are working with a database, the flag tells aequitas to create
+table from scratch and drop existing tables. Otherwise, it will append
+aequitas output. Note, database functionality must be configured in the
+config.yaml file.</p>
 </div>
 </div>
 
