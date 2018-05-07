@@ -81,13 +81,13 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 </ul>
@@ -213,12 +213,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Load-data">Load data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Customize-report">Customize report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Get-‘The-Bias-Report’">Get ‘The Bias Report’</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="input_data.html#score"><code class="docutils literal notranslate"><span class="pre">score</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="input_data.html#label_value"><code class="docutils literal notranslate"><span class="pre">label_value</span></code></a></li>
@@ -239,10 +233,19 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="CLI.html#--input---&lt;-path-to-.csv-file-&gt;"><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="CLI.html#--config---&lt;-path-to-config.yaml-&gt;"><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="CLI.html#--output-folder-&lt;path-to-folder&gt;"><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="CLI.html#--create-tables"><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="CLI.html#CLI-use-cases">CLI use cases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#Use-with-binary-scores-and-csv">Use with binary scores and csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#Use-with-continuous-scores-or-risk-scores">Use with continuous scores or risk scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#Use-with-binary-scores-from-a-database">Use with binary scores from a database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="CLI.html#CLI-flags">CLI flags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#--input---&lt;-path-to-.csv-file-&gt;"><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#--config---&lt;-path-to-config.yaml-&gt;"><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#--output-folder-&lt;path-to-folder&gt;"><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="CLI.html#--create-tables"><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a><ul>
@@ -256,6 +259,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Load-data">Load data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Customize-report">Customize report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Get-‘The-Bias-Report’">Get ‘The Bias Report’</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.group"><code class="docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.bias"><code class="docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>

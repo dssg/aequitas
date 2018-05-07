@@ -79,12 +79,13 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">30 seconds to <em>aequitas-report</em>:</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">30 seconds to the webapp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLI.html">Using the CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api/aequitas.html">Aequitas API</a></li>
@@ -382,7 +383,7 @@ years of COMPAS predicitons from Broward County, FL.</p>
 <p>The data was preprocess for compatibility with Aequitas.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -396,7 +397,7 @@ years of COMPAS predicitons from Broward County, FL.</p>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -407,7 +408,7 @@ years of COMPAS predicitons from Broward County, FL.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[4]:
+<span></span>Out[2]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -489,7 +490,7 @@ years of COMPAS predicitons from Broward County, FL.</p>
 </div>
 <div class="section" id="Exploratory-Analysis">
 <h2>Exploratory Analysis<a class="headerlink" href="#Exploratory-Analysis" title="Permalink to this headline">¶</a></h2>
-<p>** Risk assessment by race**</p>
+<p><strong>Risk assessment by race</strong></p>
 <p>COMPAS produces a risk score that predicts a person’s likelihood of
 commiting a crime in the next two years. The output is a score between 0
 and 10 that maps to low, medium or high. For Aequitas, we collapse this
@@ -509,7 +510,7 @@ with a majority of white and Hispanic people predicted as low risk
 risk.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -535,7 +536,7 @@ recidivism score is meant to predict ‘a new misdemeanor or felony
 offense within two years of the COMPAS administration date.’”</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -578,7 +579,7 @@ attributes against which to test for disparities. In this cases we
 include <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [17]:
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -618,7 +619,7 @@ rate and false omission rate. It also provides counts by group and group
 prevelances.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [25]:
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -629,7 +630,7 @@ prevelances.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[25]:
+<span></span>Out[6]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -819,7 +820,7 @@ Aequitas <code class="docutils literal notranslate"><span class="pre">Bias()</sp
 functions, which automate base group selection.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [27]:
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -840,7 +841,7 @@ get_disparity_predefined_group()
 this below.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [29]:
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -850,7 +851,7 @@ this below.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[29]:
+<span></span>Out[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -868,7 +869,7 @@ this below.</p>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [30]:
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -879,7 +880,7 @@ this below.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[30]:
+<span></span>Out[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1057,7 +1058,7 @@ fairness threshold, we have:</p>
 previous dataframe.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [40]:
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1069,7 +1070,7 @@ previous dataframe.</p>
 <p>We can assess fairness at various levels of detail.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [47]:
+<span></span>In [11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1080,7 +1081,7 @@ previous dataframe.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[47]:
+<span></span>Out[11]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1172,7 +1173,7 @@ previous dataframe.</p>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [46]:
+<span></span>In [12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1185,7 +1186,7 @@ previous dataframe.</p>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[46]:
+<span></span>Out[12]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -1407,6 +1408,13 @@ terms, 44.8% of African-Americans who did not recidivate were marked
 high or medium risk (with potential for associated penalties), compared
 with 23.4% of Caucasian non-reoffenders. This is unfair and is marked
 False below.</p>
+<p>These findings mark an inherent trade-off between FPR Fairness, FNR
+Fairness and calibration, which is present in any decision system where
+base rates are not equal. See <a class="reference external" href="https://www.andrew.cmu.edu/user/achoulde/files/disparate_impact.pdf">Chouldechova
+(2017)</a>.
+Aequitas helps bring this trade-off to the forefront with clear metrics
+and asks system designers to make a reasoned decision based on their use
+case.</p>
 </div>
 </div>
 </div>
