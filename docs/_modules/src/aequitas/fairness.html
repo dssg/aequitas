@@ -204,7 +204,12 @@
                                          <span class="s1">&#39;FDR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fdr_disparity&#39;</span><span class="p">,</span>
                                          <span class="s1">&#39;FPR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fpr_disparity&#39;</span><span class="p">,</span>
                                          <span class="s1">&#39;FOR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;for_disparity&#39;</span><span class="p">,</span>
-                                         <span class="s1">&#39;FNR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">}</span>
+                                         <span class="s1">&#39;FNR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;TPR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;tpr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;TNR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;tnr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;NPV Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;npv_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;Precision Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;precision_disparity&#39;</span>
+                                         <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span> <span class="o">=</span> <span class="n">fair_measures_depend</span>
         <span class="c1"># the self.fair_measures represents the list of fairness_measures to be calculated by default</span>
@@ -212,7 +217,8 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">type_parity_depend</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;TypeI Parity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FDR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FPR Parity&#39;</span><span class="p">],</span>
-                                       <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FOR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FNR Parity&#39;</span><span class="p">]}</span>
+                                       <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FOR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FNR Parity&#39;</span><span class="p">],</span>
+                                       <span class="s1">&#39;Equalized Odds&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FPR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TPR Parity&#39;</span><span class="p">]}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="o">=</span> <span class="n">type_parity_depend</span>
 
@@ -220,7 +226,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">high_level_fairness_depend</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;Unsupervised Fairness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Impact Parity&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TypeI Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">]}</span>
+                <span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TypeI Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="n">high_level_fairness_depend</span>
 
@@ -246,11 +253,11 @@
             <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fair_measures_requested</span><span class="p">:</span>
             <span class="n">fair_measures_requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span>
-
         <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">fair</span> <span class="ow">in</span> <span class="n">fair_measures_requested</span><span class="p">:</span>
                 <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="p">[</span><span class="nb">input</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fair_eval</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
             <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                     <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_pair_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -259,7 +266,7 @@
             <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness: No Parity measure input found on bias_df&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness: No Parity measure input found on bias_df&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>

@@ -6,9 +6,13 @@
    "source": [
     "# Using the CLI\n",
     "\n",
-    "Aequitas command line interface allows you to generate 'The Bias Report' with one line in the terminal.\n",
+    "Aequitas command line interface allows you to generate 'The Bias Report' with one line in the terminal. \n",
+    "At minimum:\n",
+    "\n",
+    "`aequitas-report --input <file>`\n",
     "\n",
     "[Getting starte with *aequitas-report*](./30_seconds_aequitas.html) shows the CLI in action. Here we detail the command.\n",
+    "\n",
     "\n",
     "## `--input   < path to .csv file >`\n",
     "\n",
@@ -17,7 +21,14 @@
     "## `--config   < path to config.yaml >`\n",
     "\n",
     "To change default behavior uniformly across applications use a configuration file.\n",
-    "\n"
+    "\n",
+    "## `--output-folder <path to folder>`\n",
+    "\n",
+    "Folder name to be created inside aequitas.\n",
+    "\n",
+    "## `--create-tables`\n",
+    "\n",
+    "If you are working with a database, the flag tells aequitas to create table from scratch and drop existing tables. Otherwise, it will append aequitas output. Note, database functionality must be configured in the config.yaml file. \n"
    ]
   }
  ],
