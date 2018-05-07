@@ -82,17 +82,13 @@ def audit_sample(name):
                             name=name))
 
 
-FAIR_MAP = {'Equal Parity': ['Statistical Parity'],
-            'Proportional Parity': ['Impact Parity'],
-            'False Positive Parity': ['FPR Parity', 'FDR Parity'],
-            'False Negative Parity': ['FNR Parity', 'FOR Parity']}
+FAIR_MAP = {'Equal Parity': {'Statistical Parity'},
+            'Proportional Parity': {'Impact Parity'},
+            'False Positive Rate Parity': {'FPR Parity'},
+            'False Negative Rate Parity': {'FNR Parity'},
+            'False Discovery Rate Parity': {'FDR Parity'},
+            'False Omission Rate Parity': {'FOR Parity'}}
 
-REVERSE_FAIR_MAP = {'Statistical Parity': 'Equal Parity',
-                    'Impact Parity': 'Proportional Parity',
-                    'FPR Parity': 'False Positive Parity',
-                    'FDR Parity': 'False Positive Parity',
-                    'FNR Parity': 'False Negative Parity',
-                    'FOR Parity': 'False Negative Parity'}
 
 
 @app.route('/audit/<dirname>/<name>/', methods=['GET', 'POST'])
@@ -125,7 +121,7 @@ def audit_file(name, dirname):
                 subgroups[key].sort(key=lambda value: int(value not in values))
 
         supported_fairness_measures = Fairness().get_fairness_measures_supported(df)
-        fairness_measures = {REVERSE_FAIR_MAP[x] for x in supported_fairness_measures if x in REVERSE_FAIR_MAP}
+        fairness_measures = {x for x in FAIR_MAP if FAIR_MAP[x].issubset(set(supported_fairness_measures))}
 
         return render_template('audit.html',
                                categories=groups,
