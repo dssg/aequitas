@@ -509,12 +509,12 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     # mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----' + oneline
 
     mkdown_highlevel += '### Table of Contents:\n\n'
-    mkdown_highlevel += '1. [Fairness Overview](#fairness-criteria-assessments)\n\n'
+    mkdown_highlevel += '1. [Audit Results: Details](#audit-results-details)\n\n'
     mkdown_highlevel += '2. [Fairness Criteria Assessments](#fairness-criteria-assessments)\n\n'
     mkdown_highlevel += '3. [Some Numbers: Bias Metrics](#some-numbers-bias-metrics)\n\n'
     mkdown_highlevel += '4. [More Numbers: Group Metrics](#more-numbers-group-metrics)\n\n' + oneline + '----' + oneline
 
-    mkdown_highlevel += '## Fairness Overview' + oneline
+    mkdown_highlevel += '## Audit Results: Details' + oneline
 
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n### Equal Parity\n\n'
@@ -703,10 +703,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace('nan', 'Undefined')
     report_html = report_html.replace('>False<', ' style="color:red"><b>Failed</b><')
     report_html = report_html.replace('>True<', ' style="color:green"><b>Passed</b><')
-
-    report_html = report_html.replace('##br##', '<br>')
     report_html = report_html.replace('>##red##', ' style="color:red">')
     report_html = report_html.replace('>##green##', ' style="color:green">')
+
+    report_html = report_html.replace('##br##', '<br>')
 
     report_html = report_html.replace(' failed ', '<span style="color:red"><b> failed </b></span>')
     report_html = report_html.replace(' passed ', '<span style="color:green"><b> passed </b></span>')
@@ -724,7 +724,11 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     new_audit_desc = '<table>\n'
     report_html = report_html.replace(audit_desc, new_audit_desc)
     report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal Parity</a>')
-    report_html = report_html.replace('<td', '<td style="padding:5px;"')
+    report_html = report_html.replace('<td align="left">', '<td align="left" style="padding:5px;">')
+
+
+
+
     ## widths tables
     width1_default = '<th align="left">What is it?</th>'
     width2_default = '<th align="left">Unfairly Affected Groups</th>'
