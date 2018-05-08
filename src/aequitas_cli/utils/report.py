@@ -397,8 +397,8 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
 
         ref_group_dict[row['attribute_name']] = ' (with reference group as **' + row[ref_group_col] + '**)'
 
-        sentence2 = ' with  {bias_metric_value}X ++span-red-end++  Disparity' \
-                    'of the {group_metric_name} of the reference group \"{ref_group_value}\",' \
+        sentence2 = '{bias_metric_value}X ' \
+                    'of the {group_metric_name} of the reference group {ref_group_value},' \
                     ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
             .format(
             group_metric_name=names[group_metric],
@@ -408,11 +408,14 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             ref_group_metric_value=ref_group_row[group_metric].values[0])
 
         try:
-            false_dict[row['attribute_name']].add('**' + row['attribute_value'] + '**' + sentence)
+            false_dict[row['attribute_name']].add('##tooltip-start-title##' + sentence2 + '##tooltip-end-title##' + row[
+                'attribute_value'] + '##tooltip-end-anchor##' +
+                                                  sentence)
         except KeyError:
             false_dict[row['attribute_name']] = set()
-            false_dict[row['attribute_name']].add('**' + row['attribute_value'] + '**' + sentence)
-
+            false_dict[row['attribute_name']].add('##tooltip-start-title##' + sentence2 + '##tooltip-end-title##' + row[
+                'attribute_value'] + '##tooltip-end-anchor##' +
+                                                  sentence)
     if false_df.empty:
         cellref = '++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric (the value of ' \
                   'each group is not disparate to the value of the reference group).++span-green-end++\n\n'
@@ -889,7 +892,8 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
 
     ##TOOLTIPS
-    report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal Parity</a>')
+    # report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal
+    # Parity</a>')
 
     ##summary table we need a different replace
     report_html = report_html.replace('<td align="left" style="color:red">', '<td align="left" style="color:red; '
@@ -903,33 +907,38 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     ## widths tables
     width1_default = '<th align="left">What is it?</th>'
     width2_default = '<th align="left">Which groups failed the audit:</th>'
-    width1_new = '<th align="left" width="30%" >What is it?</th>'
-    width3_new = '<th align="left" width="40%" >Which groups failed the audit:</th>'
+    width1_new = '<th align="left" width="40%" >What is it?</th>'
+    width3_new = '<th align="left" width="30%" >Which groups failed the audit:</th>'
     report_html = report_html.replace(width1_default, width1_new)
     report_html = report_html.replace(width2_default, width3_new)
 
-    report_html = report_html.replace('>Equal Parity<',
-                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected. '
-                                      '.">Equal Parity</a><')
+    report_html = report_html.replace('##tooltip-start-title##', '<a href="javascript:;" data-toggle="tooltip" title="')
+    report_html = report_html.replace('##tooltip-end-title##', ' ">')
+    report_html = report_html.replace('##tooltip-end-anchor##', '</a>')
+
+
+
+
+
 
     report_html = report_html.replace('>Impact Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
                                                          'title="Fail/Passed test if the Predicted Positive Group Rate '
                                                          'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
 
-    report_html = report_html.replace('>FPR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+    report_html = report_html.replace('>FPR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test '
                                                       'if the False Positive Rate Disparity of each group is within the range '
                                                       'allowed by the fairness threshold selected.">False '
                                                       'Positive '
                                                       'Rate Parity</a><')
-    report_html = report_html.replace('>FDR Parity<', '> <a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+    report_html = report_html.replace('>FDR Parity<', '> <a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test '
                                                       'if the False Discovery Rate Disparity of each group is within the range '
                                                       'allowed by the fairness threshold selected.">False Discovery '
                                                       'Rate Parity</a><')
-    report_html = report_html.replace('>FNR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+    report_html = report_html.replace('>FNR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test '
                                                       'if the False Negative Rate Disparity of each group is within the range '
                                                       'allowed by the fairness threshold selected.">False Negative '
                                                       'Rate Parity</a><')
-    report_html = report_html.replace('>FOR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+    report_html = report_html.replace('>FOR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test '
                                                       'if the False Omission Rate Disparity of each group is within the range '
                                                       'allowed by the fairness threshold selected.">False '
                                                       'Omission '
@@ -940,23 +949,23 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                                                'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
 
     report_html = report_html.replace('>False Positive Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
-                                                                      'title="Fail/Passed test '
+                                                                      'title="Fail/Pass test '
                                                                       'if the False Positive Rate Disparity of each group is within the range '
                                                                       'allowed by the fairness threshold selected.">False '
                                                                       'Positive '
                                                                       'Rate Parity</a><')
     report_html = report_html.replace('>False Discovery Rate Parity<', '> <a href="javascript:;" data-toggle="tooltip" '
-                                                                       'title="Fail/Passed test '
+                                                                       'title="Fail/Pass test '
                                                                        'if the False Discovery Rate Disparity of each group is within the range '
                                                                        'allowed by the fairness threshold selected.">False Discovery '
                                                                        'Rate Parity</a><')
     report_html = report_html.replace('>False Negative Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
-                                                                      'title="Fail/Passed test '
+                                                                      'title="Fail/Pass test '
                                                                       'if the False Negative Rate Disparity of each group is within the range '
                                                                       'allowed by the fairness threshold selected.">False Negative '
                                                                       'Rate Parity</a><')
     report_html = report_html.replace('>False Omission Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
-                                                                      'title="Fail/Passed test '
+                                                                      'title="Fail/Pass test '
                                                                       'if the False Omission Rate Disparity of each group is within the range '
                                                                       'allowed by the fairness threshold selected.">False '
                                                                       'Omission '
