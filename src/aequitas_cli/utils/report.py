@@ -235,9 +235,9 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
 
 
 def get_sentence_highlevel(fair_results):
-    sent = '**The Bias Report evaluates the current model as'
+    sent = '**The Bias Report audited the risk assessmentt system and has found that is has'
     is_fair = ' passed' if fair_results['Overall Fairness'] is True else ' failed'
-    sent += is_fair + ' using the following fairness criteria:**\n\n'
+    sent += is_fair + ' the audit with respect to the following fairness criteria:**\n\n'
     return sent
 
 
@@ -295,7 +295,7 @@ def get_impact_text(group_value_df, fairness_measures_depend):
         ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
                                            (group_value_df['attribute_value'] == row[ref_group_col])]
 
-        sentence = ': **{group_metric_value}**% of the group is classified positive,' \
+        sentence = ': **{group_metric_value}**% of the group is in the selected set (classified as positive),' \
                    ' in comparison to {ref_group_metric_value}% from the reference group \"{' \
                    'ref_group_value}\"' \
                    ''.format(
@@ -311,8 +311,8 @@ def get_impact_text(group_value_df, fairness_measures_depend):
             false_dict[row['attribute_name']].add('[' + row['attribute_value'] + '](#proportional-parity)' + sentence)
 
     if false_df.empty:
-        cellref = '##green##Based on the fairness threshold used, the percentage of selected elements from ' \
-                  'each group is not disparate to the percentage of selected elements of the respective reference group.\n\n'
+        cellref = '##green##Based on the fairness threshold used, the percentage of selected individuals from ' \
+                  'each group is not disparate to the percentage of selected individuals of the respective reference group.\n\n'
     else:
         cellref = ''
         for key in false_dict.keys():
@@ -330,7 +330,7 @@ def get_old_false_text(group_value_df, fairness_metric, fairness_measures_depend
         'fdr': 'false discovery rate',
         'for': 'false omission rate',
         'ppr': 'predicted positive ratio',
-        'pprev': 'predicted prevalence (base rate)'
+        'pprev': 'predicted prevalence (percentage of positives in the group)'
     }
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
@@ -378,7 +378,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
         'fdr': 'false discovery rate',
         'for': 'false omission rate',
         'ppr': 'predicted positive ratio',
-        'pprev': 'predicted prevalence (base rate)'
+        'pprev': 'predicted prevalence (percentage of positives in the group)'
     }
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
@@ -397,12 +397,10 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
 
         ref_group_dict[row['attribute_name']] = ' (with reference group as **' + row[ref_group_col] + '**)'
 
-        sentence2 = '{bias_metric_value}X ' \
-                    'of the {group_metric_name} of the reference group {ref_group_value},' \
-                    ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
+
+        sentence2 = '{group_metric_name} of this group is {group_metric_value} compared to {ref_group_metric_value} for the reference group {ref_group_value}.' \
             .format(
             group_metric_name=names[group_metric],
-            bias_metric_value='%.2f' % float(row[bias_metric]),
             ref_group_value=row[ref_group_col],
             group_metric_value=row[group_metric],
             ref_group_metric_value=ref_group_row[group_metric].values[0])
@@ -417,8 +415,7 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
                 'attribute_value'] + '##tooltip-end-anchor##' +
                                                   sentence)
     if false_df.empty:
-        cellref = '++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric (the value of ' \
-                  'each group is not disparate to the value of the reference group).++span-green-end++\n\n'
+        cellref = '++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric.++span-green-end++\n\n'
     else:
         cellref = ''
         for key in false_dict.keys():
@@ -539,15 +536,15 @@ def audit_summary(configs, group_value_df):
                        'FNR Parity': 'False Negative Rate Parity',
                        'FOR Parity': 'False Omission Rate Parity'}
 
-    supported_name = {'Statistical Parity': '**Equal Parity** - Ensure all protected groups are equally selected.',
+    supported_name = {'Statistical Parity': '**Equal Parity** - Ensure all protected groups are have equal representation in the selected set.',
                       'Impact Parity': '**Proportional Parity** - Ensure all protected groups are selected proportional to their '
-                                       'proportion of the population.',
-                      'FPR Parity': '**False Positive Rate Parity** - Ensure all protected groups have equal false positive '
-                                    'rates (compared to the reference group).',
+                                       'percentage of the population.',
+                      'FPR Parity': '**False Positive Rate Parity** - Ensure all protected groups have the same false positive '
+                                    'rates as the reference group).',
                       'FDR Parity': '**False Discovery Rate Parity** - Ensure all protected groups have equally proportional false '
                                     'positives within the selected set (compared to the reference group).',
-                      'FNR Parity': '**False Negative Rate Parity** - Ensure all protected groups have equal false negative rates ('
-                                    'compared to the reference group).',
+                      'FNR Parity': '**False Negative Rate Parity** - Ensure all protected groups have the same false negative rates ('
+                                    'as the reference group).',
                       'FOR Parity': '**False Omission Rate Parity** - Ensure all protected groups have equally proportional false '
                                     'negatives within the non-selected set (compared to the reference group).'}
 
@@ -582,21 +579,22 @@ def audit_summary(configs, group_value_df):
 
 
 def audit_description(configs, group_value_df):
-    supported_name = {'Statistical Parity': 'Equal Parity - Ensure all protected groups are equally selected.',
-                      'Impact Parity': 'Proportional Parity - Ensure all protected groups are selected proportional to their '
-                                       'proportion of the population.',
-                      'FPR Parity': 'False Positive Rate Parity - Ensure all protected groups have equal false positive '
-                                    'rates (compared to the reference group).',
-                      'FDR Parity': 'False Discovery Rate Parity - Ensure all protected groups have equally proportional false '
+
+    supported_name = {'Statistical Parity': '**Equal Parity** - Ensure all protected groups are have equal representation in the selected set.',
+                      'Impact Parity': '**Proportional Parity** - Ensure all protected groups are selected proportional to their '
+                                       'percentage of the population.',
+                      'FPR Parity': '**False Positive Rate Parity** - Ensure all protected groups have the same false positive '
+                                    'rates as the reference group).',
+                      'FDR Parity': '**False Discovery Rate Parity** - Ensure all protected groups have equally proportional false '
                                     'positives within the selected set (compared to the reference group).',
-                      'FNR Parity': 'False Negative Rate Parity - Ensure all protected groups have equal false negative rates ('
-                                    'compared to the reference group).',
-                      'FOR Parity': 'False Omission Rate Parity - Ensure all protected groups have equally proportional false '
+                      'FNR Parity': '**False Negative Rate Parity** - Ensure all protected groups have the same false negative rates ('
+                                    'as the reference group).',
+                      'FOR Parity': '**False Omission Rate Parity** - Ensure all protected groups have equally proportional false '
                                     'negatives within the non-selected set (compared to the reference group).'}
 
     supported_order = ['Statistical Parity', 'Impact Parity', 'FPR Parity', 'FDR Parity', 'FNR Parity', 'FOR Parity']
 
-    ref_group = {'predefined': 'Custom group - The reference groups you selected for each attribute will be used as baseline to '
+    ref_group = {'predefined': 'Custom group - The reference groups you selected for each attribute will be used  to '
                                'calculate relative disparities in this audit.',
                  'majority': 'Majority group - The largest groups on each attribute will be used as baseline to calculate '
                              'relative '
@@ -656,7 +654,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     mkdown_highlevel += '2. [Details by Fairness Measures](#audit-results-details-by-fairness-measures)\n\n'
     mkdown_highlevel += '3. [Details by Protected Attributes](#audit-results-details-by-protected-attributes)\n\n'
     mkdown_highlevel += '4. [Bias Metrics Values](#audit-results-bias-metrics-values)\n\n'
-    mkdown_highlevel += '5. [Group Metrics Values](#audit-results-group-metrics-values)\n\n' + oneline + '----' + \
+    mkdown_highlevel += '5. [Base Metrics Calculated for Each Group](#audit-results-group-metrics-values)\n\n' + oneline + '----' + \
                         oneline
 
     mkdown_highlevel += '### Audit Results: Summary' + '\n\n'
@@ -728,8 +726,8 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                                                        'errors ' \
                                                                        'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
                                                                        'punitive ' \
-                                                                       'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
-                                                                       'you are not making mistakes about any single group disproportionately.']
+                                                                       'and has a risk of adverse outcomes for individuals. Using this criteria allows you to make sure that ' \
+                                                                       'you are not making false positive mistakes about any single group disproportionately.']
         raw['Which groups failed the audit:'] = '##border##' + get_false_text(group_value_df, 'FPR Parity',
                                                                               fairness_measures_depend)
 
@@ -746,16 +744,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'FDR Parity' in group_value_df.columns:
         mkdown_highlevel += oneline + '\n\n#### False Discovery Rate Parity: ' + measures_results_dict['FDR Parity'] + '\n\n'
         raw = {}
-        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Positive parity if every group ' \
-                              'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
-                              'it implies that all three races have the same False Positive Error Rate.']
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Discovery Rate parity if every group ' \
+                              'has the same False Discovery Error Rate. For example, if race has false discovery parity, ' \
+                              'it implies that all three races have the same False Discvery Error Rate.']
         raw['When does it matter?'] = [
             '##border##If your desired outcome is to make false positive '
                                                                         'errors ' \
                                                                         'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                                                                        'punitive ' \
-                                                                        'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
-                                                                        'you are not making mistakes about any single group disproportionately.']
+                                                                        'punitive and can hurt individuals and where you are selecting a very small group for interventions.']
         raw['Which groups failed the audit:'] = '##border##' + get_false_text(group_value_df, 'FDR Parity',
                                                                               fairness_measures_depend)
 
@@ -786,7 +782,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         raw['When does it matter?'] = [
             '##border##If your desired outcome is to make false negative errors equally on ' \
             'people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-            'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
+            'assistive (providing helpful social services for example) and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
             'sure ' \
             'that you’re not missing people from certain groups '
             'disproportionately.']
@@ -805,16 +801,17 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'FOR Parity' in group_value_df.columns:
         mkdown_highlevel += oneline + '\n\n#### False Omission Rate Parity: ' + measures_results_dict['FOR Parity'] + '\n\n'
         raw = {}
-        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Negative parity if every group ' \
-                              'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Omission Rate parity if every group ' \
+                              'has the same False Omission Error Rate. For example, if race has false omission parity, it implies that all three ' \
                               'races ' \
-                              'have the same False Negative Error Rate.']
+                              'have the same False Omission Error Rate.']
         raw['When does it matter?'] = [
             '##border##If your desired outcome is to make false negative '
                                                                        'errors ' \
                                                                        'equally ' \
                                                                        'on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                                                                       'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
+                                                                       'assistive (providing help social services for example) and missing an individual could lead to adverse outcomes for them '\
+                                                                       ', and where you are selecting a very small group for interventions. Using this criteria allows you to make ' \
                                                                        'sure ' \
                                                                        'that you’re not missing people from certain groups '
                                                                        'disproportionately.']
@@ -922,7 +919,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
 
     report_html = report_html.replace('>Impact Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
-                                                         'title="Fail/Passed test if the Predicted Positive Group Rate '
+                                                         'title="Fail/Pass test if the Predicted Positive Group Rate '
                                                          'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
 
     report_html = report_html.replace('>FPR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test '
