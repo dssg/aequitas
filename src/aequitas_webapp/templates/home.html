@@ -42,7 +42,7 @@
           </ul>
           </nav>
           <a href="{{ url_for('home')}}">
-              <img alt="Brand" src="/static/images/aequitas_header.png" width="12%" class="img-fluid">
+              <img alt="Brand" src="/static/images/aequitas_header.png" width="20%" class="img-fluid">
           </a>
       </div>
 
@@ -62,8 +62,14 @@
       <h4 style="margin-top:50px; margin-bottom:50px; style="text-align: center; font-weight:400;">Try out the audit tool using your own data or one of our sample data sets.</h4>
           <br>
 
-      <div class="text-center">
-    <a class="btn btn-primary btn-lg center-block" href="{{ url_for('upload')}}" role="button">Get Started!</a>
+        <div class="container">
+    <div class="col-xs-12 col-xs-offset-0 col-sm-offset-3 col-sm-6">
+        <a class="btn btn-primary btn-lg btn-block btn-group"href="{{ url_for('upload')}}" role="button">Get Started!</a>
+    </div>
+</div>
+
+       
+    
 
     </div>
   </div>

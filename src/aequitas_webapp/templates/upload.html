@@ -70,7 +70,7 @@
           <h3 style="margin-top: 50px;">Try auditing one of the sample data sets below</h3>
           <br>
 
-          <div style="font-size: 16px;">
+          <div style="font-size: 18px;">
             <a href="{{ url_for('audit_sample', name='sample1') }}">COMPAS Recidivism Risk Assessment Data</a><a href="https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis"> [About the Data]</a><br>
             <a href="{{ url_for('audit_sample', name='sample2') }}">US Adult Income Data</a> <A href="https://archive.ics.uci.edu/ml/datasets/adult"> [About the Data]</a><br>
         </div>
@@ -80,7 +80,7 @@
       <br>
 
 
-      <div style="background:#B37D4E !important" class="jumbotron">
+      <div style="margin-left: 15%; margin-right: 15%; background:#B37D4E !important" class="jumbotron">
           <h3 align="center">Or Audit Your Own Data</h3>
 
           <form align="center" method=post enctype=multipart/form-data action="{{ url_for('upload_file') }}">
@@ -89,7 +89,7 @@
           </form>
         </div>
         <div>
-      <h5 style="margin-top:40px; margin-bottom:40px; text-align: left; font-weight:400;"> The data file should contain:
+      <h5 style="margin-left: 15%; margin-right: 15%; margin-top:40px; margin-bottom:40px; text-align: left; font-weight:400;"> The data file should contain:
       <ul>
         <li>binary assessments (0 or 1 for each row) made by the predictive model (1 denotes the individuals selected for the intervention)
         <li>columns containing attributes you want to audit for bias
