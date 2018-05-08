@@ -89,7 +89,8 @@ FAIR_MAP = {'Equal Parity': {'Statistical Parity'},
             'False Discovery Rate Parity': {'FDR Parity'},
             'False Omission Rate Parity': {'FOR Parity'}}
 
-
+FAIR_MAP_ORDER = ['Equal Parity', 'Proportional Parity', 'False Positive Rate Parity', 'False Discovery Rate Parity',
+                  'False Negative Rate Parity', 'False Omission Rate Parity']
 
 @app.route('/audit/<dirname>/<name>/', methods=['GET', 'POST'])
 def audit_file(name, dirname):
@@ -121,7 +122,7 @@ def audit_file(name, dirname):
                 subgroups[key].sort(key=lambda value: int(value not in values))
 
         supported_fairness_measures = Fairness().get_fairness_measures_supported(df)
-        fairness_measures = {x for x in FAIR_MAP if FAIR_MAP[x].issubset(set(supported_fairness_measures))}
+        fairness_measures = [x for x in FAIR_MAP_ORDER if FAIR_MAP[x].issubset(set(supported_fairness_measures))]
 
         return render_template('audit.html',
                                categories=groups,
