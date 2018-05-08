@@ -597,14 +597,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n#### Equal Parity\n\n'
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have equal parity is every group is equally '
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have equal parity is every group is equally '
                               'represented in the selected set. For example, if race (with possible values of white, black, other) '
                               'has equal parity, it implies that all three races are equally represented (33% each)'
                               'in the selected/intervention set.']
-        raw['When should I care about Equal Parity?'] = ['If your desired ' \
+        raw['When should I care about Equal Parity?'] = ['##border##If your desired ' \
                                                          'outcome is to intervene equally on people ' \
                                                          'from all races, then you care about this criteria.']
-        raw['Unfairly Affected Groups'] = get_statpar_text(group_value_df, fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_statpar_text(group_value_df, fairness_measures_depend)
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Equal Parity?', 'Unfairly Affected Groups']],
                                      headers='keys',
@@ -617,14 +617,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'Impact Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n#### Proportional Parity\n\n'
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have proportional parity if every group is ' \
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have proportional parity if every group is ' \
                               'represented proportionally to their share of the population. For example, if race ' \
                               'with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has ' \
                               'proportional parity, it implies that all three races are represented in the same proportions ' \
                               '(50%, 30%, 20%) in the selected set.']
-        raw['When should I care about Proportional Parity?'] = [' If your desired outcome is to intervene ' \
+        raw['When should I care about Proportional Parity?'] = ['##border##If your desired outcome is to intervene ' \
                                                                 'proportionally on people from all races, then you care about this criteria.']
-        raw['Unfairly Affected Groups'] = get_impact_text(group_value_df, fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_impact_text(group_value_df, fairness_measures_depend)
 
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Proportional Parity?', 'Unfairly Affected '
@@ -646,18 +646,19 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         #                     'Set Size).\n\n'
 
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have False Positive '
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Positive '
                               'parity if '
                               'every group ' \
                               'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
                               'it implies that all three races have the same False Positive Error Rate.']
-        raw['When should I care about False Positive Rate Parity?'] = ['If your desired outcome is to make false positive '
+        raw['When should I care about False Positive Rate Parity?'] = [
+            '##border##If your desired outcome is to make false positive '
                                                                        'errors ' \
                                                                        'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
                                                                        'punitive ' \
                                                                        'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
                                                                        'you are not making mistakes about any single group disproportionately.']
-        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
 
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(
@@ -672,16 +673,17 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'FDR Parity' in group_value_df.columns:
         mkdown_highlevel += oneline + '\n\n#### False Discovery Rate Parity\n\n'
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have False Positive parity if every group ' \
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Positive parity if every group ' \
                               'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
                               'it implies that all three races have the same False Positive Error Rate.']
-        raw['When should I care about False Discovery Rate Parity?'] = ['If your desired outcome is to make false positive '
+        raw['When should I care about False Discovery Rate Parity?'] = [
+            '##border##If your desired outcome is to make false positive '
                                                                         'errors ' \
                                                                         'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
                                                                         'punitive ' \
                                                                         'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
                                                                         'you are not making mistakes about any single group disproportionately.']
-        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend)
 
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(
@@ -703,18 +705,18 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
         mkdown_highlevel += oneline + '\n\n#### False Negative Rate Parity\n\n'
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Negative parity if every group ' \
                               'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
                               'races ' \
                               'have the same False Negative Error Rate.']
         raw['When should I care about False Negative Rate Parity?'] = [
-            'If your desired outcome is to make false negative errors equally on ' \
+            '##border##If your desired outcome is to make false negative errors equally on ' \
             'people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
             'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
             'sure ' \
             'that you’re not missing people from certain groups '
             'disproportionately.']
-        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Rate Parity?',
                                           'Unfairly Affected Groups']],
@@ -728,11 +730,12 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     if 'FOR Parity' in group_value_df.columns:
         mkdown_highlevel += oneline + '\n\n#### False Omission Rate Parity\n\n'
         raw = {}
-        raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
+        raw['What is it?'] = ['##border##This criteria considers an attribute to have False Negative parity if every group ' \
                               'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
                               'races ' \
                               'have the same False Negative Error Rate.']
-        raw['When should I care about False Omission Rate Parity?'] = ['If your desired outcome is to make false negative '
+        raw['When should I care about False Omission Rate Parity?'] = [
+            '##border##If your desired outcome is to make false negative '
                                                                        'errors ' \
                                                                        'equally ' \
                                                                        'on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
@@ -740,7 +743,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                                                        'sure ' \
                                                                        'that you’re not missing people from certain groups '
                                                                        'disproportionately.']
-        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend)
+        raw['Unfairly Affected Groups'] = '##border##' + get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend)
 
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Omission Rate Parity?',
@@ -813,9 +816,9 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                                                              'padding:10px;">')
     report_html = report_html.replace('<td align="left" style="color:green">', '<td align="left" style="color:green; '
                                                                                'padding:10px;">')
-    report_html = report_html.replace('<td align="left">', '<td align="left" style="padding:5px;">')
+    report_html = report_html.replace('<td align="left">', '<td align="left" style=" padding:5px;">')
 
-    # border: 15px solid white;
+    report_html = report_html.replace(';">##border##', '; border: 15px solid white;">')
 
     ## widths tables
     width1_default = '<th align="left">What is it?</th>'
