@@ -581,17 +581,18 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     # mkdown_highlevel += get_sentence_highlevel(overall_fairness) + oneline
     # mkdown_highlevel += get_highlevel_table(group_value_df, configs.fair_measures_requested) + oneline + '----' + oneline
 
-    mkdown_highlevel += '### Table of Contents:\n\n'
-    mkdown_highlevel += '1. [Audit Results: Summary](#audit-results-summary)\n\n'
-    mkdown_highlevel += '2. [Audit Results: Details](#audit-results-details)\n\n'
-    mkdown_highlevel += '3. [Fairness Criteria Assessments](#fairness-criteria-assessments)\n\n'
-    mkdown_highlevel += '4. [Some Numbers: Bias Metrics](#some-numbers-bias-metrics)\n\n'
-    mkdown_highlevel += '5. [More Numbers: Group Metrics](#more-numbers-group-metrics)\n\n' + oneline + '----' + oneline
+    mkdown_highlevel += '### Audit Results:\n\n'
+    mkdown_highlevel += '1. [Summary](#audit-results-summary)\n\n'
+    mkdown_highlevel += '2. [Details by Fairness Measures](#audit-results-details-by-fairness-measures)\n\n'
+    mkdown_highlevel += '3. [Details by Protected Attributes](#audit-results-details-by-protected-attributes)\n\n'
+    mkdown_highlevel += '4. [Bias Metrics Values](#audit-results-bias-metrics-values)\n\n'
+    mkdown_highlevel += '5. [Group Metrics Values](#audit-results-group-metrics-values)\n\n' + oneline + '----' + \
+                        oneline
 
     mkdown_highlevel += '### Audit Results: Summary' + '\n\n'
     mkdown_highlevel += audit_summary(configs, group_value_df) + oneline + '----' + oneline
 
-    mkdown_highlevel += '### Audit Results: Details' + oneline
+    mkdown_highlevel += '### Audit Results: Details by Fairness Measures' + oneline
 
     if 'Statistical Parity' in group_value_df.columns:
         mkdown_highlevel += '\n\n#### Equal Parity\n\n'
@@ -614,19 +615,20 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'Impact Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### Proportional Parity\n\n'
+        mkdown_highlevel += '\n\n#### Proportional Parity\n\n'
         raw = {}
         raw['What is it?'] = ['This criteria considers an attribute to have proportional parity if every group is ' \
                               'represented proportionally to their share of the population. For example, if race ' \
                               'with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has ' \
                               'proportional parity, it implies that all three races are represented in the same proportions ' \
                               '(50%, 30%, 20%) in the selected set.']
-        raw['When should I care about Equal Parity?'] = [' If your desired outcome is to intervene ' \
-                                                         'proportionally on people from all races, then you care about this criteria.']
+        raw['When should I care about Proportional Parity?'] = [' If your desired outcome is to intervene ' \
+                                                                'proportionally on people from all races, then you care about this criteria.']
         raw['Unfairly Affected Groups'] = get_impact_text(group_value_df, fairness_measures_depend)
 
         dft = pd.DataFrame(raw)
-        mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Equal Parity?', 'Unfairly Affected Groups']],
+        mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about Proportional Parity?', 'Unfairly Affected '
+                                                                                                          'Groups']],
                                      headers='keys',
                                      tablefmt='pipe', showindex='never', numalign="left") + \
                             oneline
@@ -635,134 +637,135 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'FPR Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n### False Positive Rate Parity\n\n'
-        mkdown_highlevel += 'False Positive Rate Parity is concerned with Type I errors (False Positives). In cases ' \
-                            'of punitive ' \
-                            'interventions on the selected set' \
-                            ' it is important to not have disparate Type I errors across groups. Aequitas audits both False ' \
-                            'Positive Rate (FP/Negative Labels of each group) and False Discovery Rates (FP/Selected ' \
-                            'Set Size).\n\n'
+        mkdown_highlevel += '\n\n#### False Positive Rate Parity\n\n'
+        # mkdown_highlevel += 'False Positive Rate Parity is concerned with Type I errors (False Positives). In cases ' \
+        #                     'of punitive ' \
+        #                     'interventions on the selected set' \
+        #                     ' it is important to not have disparate Type I errors across groups. Aequitas audits both False ' \
+        #                     'Positive Rate (FP/Negative Labels of each group) and False Discovery Rates (FP/Selected ' \
+        #                     'Set Size).\n\n'
 
-        if 'FPR Parity' in group_value_df.columns:
-            mkdown_highlevel += oneline + '\n\n#### False Positive Rate\n\n'
-            raw = {}
-            raw['What is it?'] = ['This criteria considers an attribute to have False Positive '
-                                  'parity if '
-                                  'every group ' \
-                                  'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
-                                  'it implies that all three races have the same False Positive Error Rate.']
-            raw['When should I care about False Positive Parity?'] = ['If your desired outcome is to make false positive errors ' \
-                                                                      'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                                                                      'punitive ' \
-                                                                      'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
-                                                                      'you are not making mistakes about any single group disproportionately.']
-            raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
+        raw = {}
+        raw['What is it?'] = ['This criteria considers an attribute to have False Positive '
+                              'parity if '
+                              'every group ' \
+                              'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
+                              'it implies that all three races have the same False Positive Error Rate.']
+        raw['When should I care about False Positive Rate Parity?'] = ['If your desired outcome is to make false positive '
+                                                                       'errors ' \
+                                                                       'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
+                                                                       'punitive ' \
+                                                                       'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
+                                                                       'you are not making mistakes about any single group disproportionately.']
+        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FPR Parity', fairness_measures_depend)
 
-            dft = pd.DataFrame(raw)
-            mkdown_highlevel += tabulate(
-                dft[['What is it?', 'When should I care about False Positive Parity?', 'Unfairly Affected Groups']],
-                headers='keys',
-                tablefmt='pipe', showindex='never', numalign="left") + \
-                                oneline
+        dft = pd.DataFrame(raw)
+        mkdown_highlevel += tabulate(
+            dft[['What is it?', 'When should I care about False Positive Rate Parity?', 'Unfairly Affected Groups']],
+            headers='keys',
+            tablefmt='pipe', showindex='never', numalign="left") + \
+                            oneline
 
-            mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+    mkdown_highlevel += oneline + '----' + oneline
 
-        if 'FDR Parity' in group_value_df.columns:
-            mkdown_highlevel += oneline + '\n\n#### False Discovery Rate\n\n'
-            raw = {}
-            raw['What is it?'] = ['This criteria considers an attribute to have False Positive parity if every group ' \
-                                  'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
-                                  'it implies that all three races have the same False Positive Error Rate.']
-            raw['When should I care about False Positive Parity?'] = ['If your desired outcome is to make false positive errors ' \
-                                                                      'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                                                                      'punitive ' \
-                                                                      'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
-                                                                      'you are not making mistakes about any single group disproportionately.']
-            raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend)
+    if 'FDR Parity' in group_value_df.columns:
+        mkdown_highlevel += oneline + '\n\n#### False Discovery Rate Parity\n\n'
+        raw = {}
+        raw['What is it?'] = ['This criteria considers an attribute to have False Positive parity if every group ' \
+                              'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
+                              'it implies that all three races have the same False Positive Error Rate.']
+        raw['When should I care about False Discovery Rate Parity?'] = ['If your desired outcome is to make false positive '
+                                                                        'errors ' \
+                                                                        'equally on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
+                                                                        'punitive ' \
+                                                                        'and has risk of adverse consequences for the selected set. Using this criteria allows you to make sure that ' \
+                                                                        'you are not making mistakes about any single group disproportionately.']
+        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FDR Parity', fairness_measures_depend)
 
-            dft = pd.DataFrame(raw)
-            mkdown_highlevel += tabulate(
-                dft[['What is it?', 'When should I care about False Positive Parity?', 'Unfairly Affected Groups']],
-                headers='keys',
-                tablefmt='pipe', showindex='never', numalign="left") + \
-                                oneline
+        dft = pd.DataFrame(raw)
+        mkdown_highlevel += tabulate(
+            dft[['What is it?', 'When should I care about False Discovery Rate Parity?', 'Unfairly Affected Groups']],
+            headers='keys',
+            tablefmt='pipe', showindex='never', numalign="left") + \
+                            oneline
 
-            mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
-        mkdown_highlevel += oneline + '----' + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+    mkdown_highlevel += oneline + '----' + oneline
 
-    if 'TypeII Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n## False Negative Parity\n\n'
-        mkdown_highlevel += 'False Negative Parity is concerned with Type II errors (False Negatives). In cases ' \
-                            'of assistive or preventive ' \
-                            'interventions on the selected set' \
-                            ' it is important to not have disparate Type II errors across groups. Aequitas audits both False ' \
-                            'Negative Rate (FN/Positive Labels of each group) and False Omission Rates (FN/Not Selected ' \
-                            'Set Size).\n\n'
+    if 'FNR Parity' in group_value_df.columns:
+        # mkdown_highlevel += 'False Negative Parity is concerned with Type II errors (False Negatives). In cases ' \
+        #                     'of assistive or preventive ' \
+        #                     'interventions on the selected set' \
+        #                     ' it is important to not have disparate Type II errors across groups. Aequitas audits both False ' \
+        #                     'Negative Rate (FN/Positive Labels of each group) and False Omission Rates (FN/Not Selected ' \
+        #                     'Set Size).\n\n'
 
-        if 'FNR Parity' in group_value_df.columns:
-            mkdown_highlevel += oneline + '\n\n#### False Negative Rate\n\n'
-            raw = {}
-            raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
-                                  'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
-                                  'races ' \
-                                  'have the same False Negative Error Rate.']
-            raw['When should I care about False Negative Parity?'] = [
-                'If your desired outcome is to make false negative errors equally on ' \
-                'people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
-                'sure ' \
-                'that you’re not missing people from certain groups '
-                'disproportionately.']
-            raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
-            dft = pd.DataFrame(raw)
-            mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Parity?',
-                                              'Unfairly Affected Groups']],
-                                         headers='keys',
-                                         tablefmt='pipe', showindex='never', numalign="left") + \
-                                oneline
+        mkdown_highlevel += oneline + '\n\n#### False Negative Rate Parity\n\n'
+        raw = {}
+        raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
+                              'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
+                              'races ' \
+                              'have the same False Negative Error Rate.']
+        raw['When should I care about False Negative Rate Parity?'] = [
+            'If your desired outcome is to make false negative errors equally on ' \
+            'people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
+            'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
+            'sure ' \
+            'that you’re not missing people from certain groups '
+            'disproportionately.']
+        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FNR Parity', fairness_measures_depend)
+        dft = pd.DataFrame(raw)
+        mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Rate Parity?',
+                                          'Unfairly Affected Groups']],
+                                     headers='keys',
+                                     tablefmt='pipe', showindex='never', numalign="left") + \
+                            oneline
 
-            mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+    mkdown_highlevel += oneline + '----' + oneline
 
-        if 'FOR Parity' in group_value_df.columns:
-            mkdown_highlevel += oneline + '\n\n#### False Omission Rate\n\n'
-            raw = {}
-            raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
-                                  'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
-                                  'races ' \
-                                  'have the same False Negative Error Rate.']
-            raw['When should I care about False Negative Parity?'] = ['If your desired outcome is to make false negative errors ' \
-                                                                      'equally ' \
-                                                                      'on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
-                                                                      'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
-                                                                      'sure ' \
-                                                                      'that you’re not missing people from certain groups '
-                                                                      'disproportionately.']
-            raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend)
+    if 'FOR Parity' in group_value_df.columns:
+        mkdown_highlevel += oneline + '\n\n#### False Omission Rate Parity\n\n'
+        raw = {}
+        raw['What is it?'] = ['This criteria considers an attribute to have False Negative parity if every group ' \
+                              'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
+                              'races ' \
+                              'have the same False Negative Error Rate.']
+        raw['When should I care about False Omission Rate Parity?'] = ['If your desired outcome is to make false negative '
+                                                                       'errors ' \
+                                                                       'equally ' \
+                                                                       'on people from all races, then you care about this criteria. This is important in cases where your intervention is ' \
+                                                                       'assistive and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make ' \
+                                                                       'sure ' \
+                                                                       'that you’re not missing people from certain groups '
+                                                                       'disproportionately.']
+        raw['Unfairly Affected Groups'] = get_false_text(group_value_df, 'FOR Parity', fairness_measures_depend)
 
-            dft = pd.DataFrame(raw)
-            mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Negative Parity?',
-                                              'Unfairly Affected Groups']],
-                                         headers='keys',
-                                         tablefmt='pipe', showindex='never', numalign="left") + \
-                                oneline
+        dft = pd.DataFrame(raw)
+        mkdown_highlevel += tabulate(dft[['What is it?', 'When should I care about False Omission Rate Parity?',
+                                          'Unfairly Affected Groups']],
+                                     headers='keys',
+                                     tablefmt='pipe', showindex='never', numalign="left") + \
+                            oneline
 
-            mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
-        mkdown_highlevel += oneline + '----' + oneline
+        mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
+    # mkdown_highlevel += oneline + '----' + oneline
 
-    mkdown_parity = '\n\n## Fairness Criteria Assessments' + oneline
+    mkdown_parity = '\n\n### Audit Results: Details by Protected Attributes' + oneline
     # do we want to show this?
     # mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
-    mkdown_disparities = '\n\n## Some Numbers: Bias Metrics'
-    mkdown_group = '\n\n## More Numbers: Group Metrics'
+    mkdown_disparities = '\n\n### Audit Results: Bias Metrics Values'
+    mkdown_group = '\n\n#### Audit Results: Group Metrics Values'
     # setup the group_value_df (colors and stuff)
     group_value_df['group_size_pct'] = group_value_df['group_size'].divide(group_value_df['total_entities'])
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
                                           fairness_measures_depend)
     for attr in configs.attr_cols:
-        mkdown_parity += '\n\n### ' + attr + oneline
-        mkdown_disparities += '\n\n### ' + attr + oneline
-        mkdown_group += '\n\n### ' + attr + oneline
+        mkdown_parity += '\n\n#### ' + attr + oneline
+        mkdown_disparities += '\n\n#### ' + attr + oneline
+        mkdown_group += '\n\n#### ' + attr + oneline
         mkdown_parity += get_parity_group_report(group_value_df, attr, configs.fair_measures_requested, fairness_measures_depend)
         mkdown_disparities += get_disparities_group_report(group_value_df, attr, configs.fair_measures_requested,
                                                            fairness_measures_depend)
@@ -821,5 +824,123 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     width3_new = '<th align="left" width="40%" >Unfairly Affected Groups</th>'
     report_html = report_html.replace(width1_default, width1_new)
     report_html = report_html.replace(width2_default, width3_new)
+
+    report_html = report_html.replace('>Equal Parity<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected. '
+                                      '.">Equal Parity</a><')
+
+    report_html = report_html.replace('>Impact Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                         'title="Fail/Passed test if the Predicted Positive Group Rate '
+                                                         'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
+
+    report_html = report_html.replace('>FPR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+                                                      'if the False Positive Rate Disparity of each group is within the range '
+                                                      'allowed by the fairness threshold selected.">False '
+                                                      'Positive '
+                                                      'Rate Parity</a><')
+    report_html = report_html.replace('>FDR Parity<', '> <a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+                                                      'if the False Discovery Rate Disparity of each group is within the range '
+                                                      'allowed by the fairness threshold selected.">False Discovery '
+                                                      'Rate Parity</a><')
+    report_html = report_html.replace('>FNR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+                                                      'if the False Negative Rate Disparity of each group is within the range '
+                                                      'allowed by the fairness threshold selected.">False Negative '
+                                                      'Rate Parity</a><')
+    report_html = report_html.replace('>FOR Parity<', ' ><a href="javascript:;" data-toggle="tooltip" title="Fail/Passed test '
+                                                      'if the False Omission Rate Disparity of each group is within the range '
+                                                      'allowed by the fairness threshold selected.">False '
+                                                      'Omission '
+                                                      'Rate Parity</a><')
+
+    report_html = report_html.replace('>Proportional Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                               'title="Fail/Passed test if the Predicted Positive Group Rate '
+                                                               'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
+
+    report_html = report_html.replace('>False Positive Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                                      'title="Fail/Passed test '
+                                                                      'if the False Positive Rate Disparity of each group is within the range '
+                                                                      'allowed by the fairness threshold selected.">False '
+                                                                      'Positive '
+                                                                      'Rate Parity</a><')
+    report_html = report_html.replace('>False Discovery Rate Parity<', '> <a href="javascript:;" data-toggle="tooltip" '
+                                                                       'title="Fail/Passed test '
+                                                                       'if the False Discovery Rate Disparity of each group is within the range '
+                                                                       'allowed by the fairness threshold selected.">False Discovery '
+                                                                       'Rate Parity</a><')
+    report_html = report_html.replace('>False Negative Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                                      'title="Fail/Passed test '
+                                                                      'if the False Negative Rate Disparity of each group is within the range '
+                                                                      'allowed by the fairness threshold selected.">False Negative '
+                                                                      'Rate Parity</a><')
+    report_html = report_html.replace('>False Omission Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                                      'title="Fail/Passed test '
+                                                                      'if the False Omission Rate Disparity of each group is within the range '
+                                                                      'allowed by the fairness threshold selected.">False '
+                                                                      'Omission '
+                                                                      'Rate Parity</a><')
+
+    report_html = report_html.replace('>PPREV Disparity<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="The Predicted Positive Group Ratio of each group divided by the same metric value of the reference group. '
+                                      '.">Predicted Positive '
+                                      'Group Rate Disparity'
+                                      '</a><')
+
+    report_html = report_html.replace('>PPR Disparity<', ' ><a href="javascript:;" data-toggle="tooltip" title="The Predicted '
+                                                         'Positive Rate of each group divided by the same metric value of the reference group.">Predicted '
+                                                         'Positive '
+                                                         'Rate Disparity</a><')
+
+    report_html = report_html.replace('>FPR Disparity<', ' ><a href="javascript:;" data-toggle="tooltip" title="The False '
+                                                         'Positive Rate of each group divided by the same metric value of the '
+                                                         'reference group.">False '
+                                                         'Positive '
+                                                         'Rate Disparity</a><')
+    report_html = report_html.replace('>FDR Disparity<', '> <a href="javascript:;" data-toggle="tooltip" title="The False '
+                                                         'Discovery Rate of each group divided by the same metric value of the '
+                                                         'reference group.">False Discovery '
+                                                         'Rate Disparity</a><')
+    report_html = report_html.replace('>FNR Disparity<', ' ><a href="javascript:;" data-toggle="tooltip" title="The False '
+                                                         'Negative Rate of each group divided by the same metric value of the '
+                                                         'reference group.">False Negative '
+                                                         'Rate Disparity</a><')
+    report_html = report_html.replace('>FOR Disparity<', ' ><a href="javascript:;" data-toggle="tooltip" title="The False '
+                                                         'Omission Rate of each group divided by the same '
+                                                         'metric value of the reference group.">False '
+                                                         'Omission '
+                                                         'Rate Disparity</a><')
+
+    report_html = report_html.replace('>PPREV<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Number of elements of the '
+                                      'group selected divided by the size of the group.">Predicted Positive '
+                                      'Group Rate'
+                                      '</a><')
+
+    report_html = report_html.replace('>PPR<', ' ><a href="javascript:;" data-toggle="tooltip" title="Number of elements of the '
+                                               'group selected divided by the total size of the interventation set.">Predicted '
+                                               'Positive '
+                                               'Rate</a><')
+
+    report_html = report_html.replace('>FPR<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Number of false positives of '
+                                      'the group divided by number of labeled negatives within the group.">False '
+                                      'Positive '
+                                      'Rate</a><')
+    report_html = report_html.replace('>FDR<',
+                                      '> <a href="javascript:;" data-toggle="tooltip" title="Number of false positives of '
+                                      'the group divided by the size of the intervention set of the group (predicted '
+                                      'positives within group).">False Discovery '
+                                      'Rate</a><')
+    report_html = report_html.replace('>FNR<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Number of false negative of '
+                                      'the group divided by number of labeled positives in the group">False Negative '
+                                      'Rate</a><')
+    report_html = report_html.replace('>FOR<',
+                                      ' ><a href="javascript:;" data-toggle="tooltip" title="Number of false negatives of '
+                                      'the group divided by the size of the non-selected set of the group (predicted '
+                                      'negatives within group).">False '
+                                      'Omission '
+                                      'Rate</a><')
+
+
 
     return report_html
