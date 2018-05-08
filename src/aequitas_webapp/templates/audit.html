@@ -19,7 +19,7 @@
     <link href="/static/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/static/css/jumbotron-narrow.css" rel="stylesheet">
+      <link href="/static/css/jumbotron.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="/static/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -47,7 +47,7 @@
           </ul>
           </nav>
           <a href="{{ url_for('home')}}">
-              <img alt="Brand" src="/static/images/aequitas_header.png" class="img-fluid" alt="Responsive image">
+              <img alt="Brand" src="/static/images/aequitas_header.png" width="12%" class="img-fluid">
           </a>
       </div>
 
@@ -56,9 +56,19 @@
 
 
       <div class="row marketing">
-          <h1 style="margin-bottom: 50px;">Configure the Bias Audit</h1>
-          <img src="/static/images/flow-2.png" width="80%" class="img-fluid center-block">
+          <br>
+          <h1 align="center" style="margin-bottom: 50px;">Configure the Bias Audit</h1>
+          <br>
+          <h4 style="margin-top:40px; margin-bottom:60px; font-weight:400">Configure the bias and fairness audit by
+              selecting the protected attributes to audit and
+              the method for determining the reference groups.</h4>
 
+          <br>
+          <br>
+
+          <img src="/static/images/flow-2.png" width="80%" class="img-fluid center-block">
+          <br>
+          <br>
 
       <h4 style="margin-top: 50px; margin-bottom: 20px; color: #286da8">1. Select method for determining reference group:</h4>
       <p style="margin-bottom: 40px;">
@@ -119,11 +129,22 @@
     <div class="metrics"></div>
     <div class="row marketing">
       <a name="metrics"></a>
-          <h1 style="margin-bottom: 50px;">Configure the Bias Audit</h1>
+        <br>
+        <h1 align="center" style="margin-bottom: 50px;">Configure the Bias Audit</h1>
+        <br>
+        <h4 style="margin-top:40px; margin-bottom:60px; font-weight:400">Configure the bias and fairness audit by
+            selecting the fairness measures to audit and the fairness threshold to determine when the audit passes or
+            fails.</h4>
+        <br>
+        <br>
           <img src="/static/images/flow-3.png" width="80%" class="img-fluid center-block">
+        <br>
+        <br>
 
       <img style="margin-top: 50px;" src="/static/images/metrictree.png" width="100%" class="img-fluid center-block">
-      <h4 style="margin-top: 50px; margin-bottom: 50px; color: #286da8;">Select Fairness Metrics to Compute:</h4>
+
+
+        <h4 style="margin-top: 50px; margin-bottom: 50px; color: #286da8;">Select Fairness Metrics to Compute:</h4>
 
     {% for fm in fairness %}
         <input type="checkbox" name="fairness_measures" value="{{fm}}" checked="checked">&nbsp;&nbsp;{{fm}}<br>
@@ -160,6 +181,9 @@
 });
 </script>
   </body>
+  <br>
+  <br>
+  <br>
   <footer align="center" class="footer">
         <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
   </footer>
