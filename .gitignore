@@ -9,6 +9,8 @@ __pycache__/
 .envrc
 .manage
 
+*.DS_Store*
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/config.yml

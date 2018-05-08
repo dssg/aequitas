@@ -31,13 +31,13 @@ Sample Jupyter Notebook
    
    30_seconds_aequitas.ipynb
    installation.ipynb
-   30_seconds_webapp.ipynb
    input_data.ipynb
    output_data.ipynb
    metrics.ipynb
    CLI.ipynb
    config.ipynb
    using_python.ipynb
+   30_seconds_webapp.ipynb
    api/aequitas
    examples/index
 
