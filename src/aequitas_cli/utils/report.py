@@ -913,8 +913,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace('##tooltip-end-title##', ' ">')
     report_html = report_html.replace('##tooltip-end-anchor##', '</a>')
 
-
-
+    report_html = report_html.replace('>Statistical Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                              'title="Fail/Pass test if the Predicted Positive Rate '
+                                                              'Disparity of each group is within the range allowed by the fairness '
+                                                              'threshold selected.">Equal Parity</a><')
 
 
 
@@ -941,8 +943,14 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                                       'Omission '
                                                       'Rate Parity</a><')
 
+    report_html = report_html.replace('>Equal Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
+                                                        'title="Fail/Pass test if the Predicted Positive Rate '
+                                                        'Disparity of each group is within the range allowed by the fairness '
+                                                        'threshold selected.">Equal Parity</a><')
+
+
     report_html = report_html.replace('>Proportional Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
-                                                               'title="Fail/Passed test if the Predicted Positive Group Rate '
+                                                               'title="Fail/Pass test if the Predicted Positive Group Rate '
                                                                'Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a><')
 
     report_html = report_html.replace('>False Positive Rate Parity<', ' ><a href="javascript:;" data-toggle="tooltip" '
