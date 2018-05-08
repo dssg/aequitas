@@ -392,12 +392,12 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
     for index, row in false_df.iterrows():
         ref_group_row = group_value_df.loc[(group_value_df['attribute_name'] == row['attribute_name']) &
                                            (group_value_df['attribute_value'] == row[ref_group_col])]
-        sentence = ' with ##span-red-init##{bias_metric_value}X##span-red-end## Disparity'.format(
+        sentence = ' with ++span-red-init++{bias_metric_value}X++span-red-end++ Disparity'.format(
             bias_metric_value='%.2f' % float(row[bias_metric]))
 
         ref_group_dict[row['attribute_name']] = ' (with reference group as **' + row[ref_group_col] + '**)'
 
-        sentence2 = ' with  {bias_metric_value}X ##span-red-end##  Disparity' \
+        sentence2 = ' with  {bias_metric_value}X ++span-red-end++  Disparity' \
                     'of the {group_metric_name} of the reference group \"{ref_group_value}\",' \
                     ' corresponding to a difference of {group_metric_value} vs {ref_group_metric_value}.' \
             .format(
@@ -414,8 +414,8 @@ def get_false_text(group_value_df, fairness_metric, fairness_measures_depend):
             false_dict[row['attribute_name']].add('**' + row['attribute_value'] + '**' + sentence)
 
     if false_df.empty:
-        cellref = '##span-green-init##Based on the fairness threshold used, all groups passed the audit for this metric (the value of ' \
-                  'each group is not disparate to the value of the reference group).##span-green-end##\n\n'
+        cellref = '++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric (the value of ' \
+                  'each group is not disparate to the value of the reference group).++span-green-end++\n\n'
     else:
         cellref = ''
         for key in false_dict.keys():
@@ -529,12 +529,12 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
 
 
 def audit_summary(configs, group_value_df):
-    supported_name = {'Statistical Parity': '**Equal Parity**',
-                      'Impact Parity': '**Proportional Parity**',
-                      'FPR Parity': '**False Positive Rate Parity**',
-                      'FDR Parity': '**False Discovery Rate Parity**',
-                      'FNR Parity': '**False Negative Rate Parity**',
-                      'FOR Parity': '**False Omission Rate Parity**'}
+    supported_name2 = {'Statistical Parity': 'Equal Parity',
+                       'Impact Parity': 'Proportional Parity',
+                       'FPR Parity': 'False Positive Rate Parity',
+                       'FDR Parity': 'False Discovery Rate Parity',
+                       'FNR Parity': 'False Negative Rate Parity',
+                       'FOR Parity': 'False Omission Rate Parity'}
 
     supported_name = {'Statistical Parity': '**Equal Parity** - Ensure all protected groups are equally selected.',
                       'Impact Parity': '**Proportional Parity** - Ensure all protected groups are selected proportional to their '
@@ -550,21 +550,32 @@ def audit_summary(configs, group_value_df):
 
     raw = {
         'column1': [],
-        'column2': []
+        'column2': [],
+        'column3': []
     }
     supported_order = ['Statistical Parity', 'Impact Parity', 'FPR Parity', 'FDR Parity', 'FNR Parity', 'FOR Parity']
+    measures_results_dict = {}
     for measure in supported_order:
         if measure in configs.fair_measures_requested:
             raw['column1'].append(supported_name[measure])
             false_df = group_value_df.loc[group_value_df[measure] == False]
             if false_df.empty:
-                raw['column2'].append('##green##**Passed**')
+                link = ' [Details](#' + '-'.join(supported_name2[measure].lower().split(' ')) + \
+                       '-span-green-initpassedspan-green-end)'
+                raw['column2'].append('++span-green-init++**Passed**++span-green-end++')
+                raw['column3'].append(link)
+
+                measures_results_dict[measure] = '++span-green-init++Passed++span-green-end++'
             else:
-                raw['column2'].append('##red##**Failed**')
-    df = pd.DataFrame(raw, columns=['column1', 'column2'])
-    summ_table = tabulate(df[['column1', 'column2']], headers='keys',
+                link = ' [Details](#' + '-'.join(supported_name2[measure].lower().split(' ')) + \
+                       '-span-red-initfailedspan-red-end)'
+                raw['column2'].append('++span-red-init++**Failed**++span-red-end++')
+                raw['column3'].append(link)
+                measures_results_dict[measure] = '++span-red-init++Failed++span-red-end++'
+    df = pd.DataFrame(raw, columns=['column1', 'column2', 'column3'])
+    summ_table = tabulate(df[['column1', 'column2', 'column3']], headers='keys',
                           tablefmt='pipe', showindex='never', numalign="left")
-    return summ_table
+    return summ_table, measures_results_dict
 
 
 def audit_description(configs, group_value_df):
@@ -646,12 +657,13 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                         oneline
 
     mkdown_highlevel += '### Audit Results: Summary' + '\n\n'
-    mkdown_highlevel += audit_summary(configs, group_value_df) + oneline + '----' + oneline
+    summ_table, measures_results_dict = audit_summary(configs, group_value_df)
+    mkdown_highlevel += summ_table + oneline + '----' + oneline
 
     mkdown_highlevel += '### Audit Results: Details by Fairness Measures' + oneline
 
     if 'Statistical Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n#### Equal Parity\n\n'
+        mkdown_highlevel += '\n\n#### Equal Parity: ' + measures_results_dict['Statistical Parity'] + '\n\n'
         raw = {}
         raw['What is it?'] = ['##border##This criteria considers an attribute to have equal parity is every group is equally '
                               'represented in the selected set. For example, if race (with possible values of white, black, other) '
@@ -672,7 +684,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'Impact Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n#### Proportional Parity\n\n'
+        mkdown_highlevel += '\n\n#### Proportional Parity: ' + measures_results_dict['Impact Parity'] + '\n\n'
         raw = {}
         raw['What is it?'] = ['##border##This criteria considers an attribute to have proportional parity if every group is ' \
                               'represented proportionally to their share of the population. For example, if race ' \
@@ -694,7 +706,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
 
     if 'FPR Parity' in group_value_df.columns:
-        mkdown_highlevel += '\n\n#### False Positive Rate Parity\n\n'
+        mkdown_highlevel += '\n\n#### False Positive Rate Parity: ' + measures_results_dict['FPR Parity'] + '\n\n'
         # mkdown_highlevel += 'False Positive Rate Parity is concerned with Type I errors (False Positives). In cases ' \
         #                     'of punitive ' \
         #                     'interventions on the selected set' \
@@ -729,7 +741,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     mkdown_highlevel += oneline + '----' + oneline
 
     if 'FDR Parity' in group_value_df.columns:
-        mkdown_highlevel += oneline + '\n\n#### False Discovery Rate Parity\n\n'
+        mkdown_highlevel += oneline + '\n\n#### False Discovery Rate Parity: ' + measures_results_dict['FDR Parity'] + '\n\n'
         raw = {}
         raw['What is it?'] = ['##border##This criteria considers an attribute to have False Positive parity if every group ' \
                               'has the same False Positive Error Rate. For example, if race has false positive parity, ' \
@@ -762,7 +774,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         #                     'Negative Rate (FN/Positive Labels of each group) and False Omission Rates (FN/Not Selected ' \
         #                     'Set Size).\n\n'
 
-        mkdown_highlevel += oneline + '\n\n#### False Negative Rate Parity\n\n'
+        mkdown_highlevel += oneline + '\n\n#### False Negative Rate Parity: ' + measures_results_dict['FNR Parity'] + '\n\n'
         raw = {}
         raw['What is it?'] = ['##border##This criteria considers an attribute to have False Negative parity if every group ' \
                               'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
@@ -788,7 +800,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     mkdown_highlevel += oneline + '----' + oneline
 
     if 'FOR Parity' in group_value_df.columns:
-        mkdown_highlevel += oneline + '\n\n#### False Omission Rate Parity\n\n'
+        mkdown_highlevel += oneline + '\n\n#### False Omission Rate Parity: ' + measures_results_dict['FOR Parity'] + '\n\n'
         raw = {}
         raw['What is it?'] = ['##border##This criteria considers an attribute to have False Negative parity if every group ' \
                               'has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three ' \
@@ -853,10 +865,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
     report_html = report_html.replace('##br##', '<br>')
 
-    report_html = report_html.replace('##span-red-init##', '<span style="color:red"><b>')
-    report_html = report_html.replace('##span-red-end##', '</b> </span> ')
-    report_html = report_html.replace('##span-green-init##', '<span style="color:green"><b>')
-    report_html = report_html.replace('##span-green-end##', '</b> </span> ')
+    report_html = report_html.replace('++span-red-init++', '<span style="color:red"><b>')
+    report_html = report_html.replace('++span-red-end++', '</b> </span> ')
+    report_html = report_html.replace('++span-green-init++', '<span style="color:green"><b>')
+    report_html = report_html.replace('++span-green-end++', '</b> </span> ')
 
     # report_html = report_html.replace(' failed ', '<span style="color:red"><b> failed </b></span>')
     # report_html = report_html.replace(' passed ', '<span style="color:green"><b> passed </b></span>')
@@ -864,15 +876,17 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     report_html = report_html.replace('<table>', '<table class="table table-striped" padding=5 >')
     report_html = report_html.replace('<h1 id="the-bias-report">', '<h1 id="the-bias-report" align="center">')
     # report_html = report_html.replace('< thead >\n < tr >', '< thead >\n < tr class="table-info" >')
-    audit_desc = """<table class="table table-striped" padding=5 >
-<thead>
-<tr>
-  <th align="left">column1</th>
-  <th align="left">column2</th>
-</tr>
-</thead>"""
-    new_audit_desc = '<table>\n'
-    report_html = report_html.replace(audit_desc, new_audit_desc)
+    #     audit_desc = """<table class="table table-striped" padding=5 >
+    # <thead>
+    # <tr>
+    #   <th align="left">column1</th>
+    #   <th align="left">column2</th>
+    #   <th align="left">column3</th>
+    # </tr>
+    # </thead>"""
+    #     new_audit_desc = '<table>\n'
+    #     report_html = report_html.replace(audit_desc, new_audit_desc)
+
 
     ##TOOLTIPS
     report_html = report_html.replace('Statistical Parity', ' <a href="#" data-toggle="tooltip" title="Hooray!">Equal Parity</a>')
@@ -1010,6 +1024,25 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                       'Omission '
                                       'Rate</a><')
 
+    audit_desc = """<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">column1</th>
+  <th align="left">column2</th>
+</tr>
+</thead>"""
+    new_audit_desc = '<table>\n'
+    report_html = report_html.replace(audit_desc, new_audit_desc)
 
+    audit_desc = """<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">column1</th>
+  <th align="left">column2</th>
+  <th align="left">column3</th>
+</tr>
+</thead>"""
+    new_audit_desc = '<table>\n'
+    report_html = report_html.replace(audit_desc, new_audit_desc)
 
     return report_html
