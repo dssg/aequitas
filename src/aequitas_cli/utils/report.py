@@ -622,7 +622,7 @@ def audit_description(configs, group_value_df):
 
     raw['column2'].append(ref_group[configs.ref_groups_method])
     raw['column1'].append('**Fairness Threshold:**')
-    thresh = '{:.0f}%. If a bias metric for a group is within {' \
+    thresh = '{:.0f}%. If disparity for a group is within {' \
              ':.0f}% and ' \
              '{' \
              ':.0f}% of ' \
@@ -904,7 +904,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     ## widths tables
     width1_default = '<th align="left">What is it?</th>'
     width2_default = '<th align="left">Which groups failed the audit:</th>'
-    width1_new = '<th align="left" width="40%" >What is it?</th>'
+    width1_new = '<th align="left" width="35%" >What is it?</th>'
     width3_new = '<th align="left" width="30%" >Which groups failed the audit:</th>'
     report_html = report_html.replace(width1_default, width1_new)
     report_html = report_html.replace(width2_default, width3_new)
