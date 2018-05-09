@@ -28,6 +28,12 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+      <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans"/>
+      <style>
+          body {
+              font-family: 'Open Sans', sans-serif;
+          }
+      </style>
   </head>
 
   <body>
@@ -49,7 +55,7 @@
       <div class="row marketing">
 
           <br>
-          <h1 style="text-align: center">Select Data Set to Audit</h1>
+          <h1 style="text-align:center; color: #b37d4e;">Select Data Set to Audit</h1>
           <br>
           <h4 style="margin-top:40px; margin-bottom:60px; font-weight:400">Try out the toolkit using your own data containg
               predictions and protected attributes to audit bias and fairness. Or audit out one of
@@ -67,7 +73,7 @@
       {% endfor %}
       </ul>
 
-          <h3 style="margin-top: 50px;">Try auditing one of the sample data sets below</h3>
+          <h3 style="margin-top: 50px; color:#b37d4e">Try auditing one of the sample data sets below</h3>
           <br>
 
           <div style="font-size: 18px;">
@@ -89,13 +95,21 @@
           </form>
         </div>
         <div>
-      <h5 style="margin-left: 15%; margin-right: 15%; margin-top:40px; margin-bottom:40px; text-align: left; font-weight:400;"> The data file should contain:
+            <h5 style="margin-left: 15%; margin-right: 15%; margin-top:40px; margin-bottom:40px; text-align: left; font-weight:400;">
+                The data file should contain (<a href="https://dssg.github.io/aequitas/input_data.html">see
+                documentation</a>):
       <ul>
-        <li>binary assessments (0 or 1 for each row) made by the predictive model (1 denotes the individuals selected for the intervention)
-        <li>columns containing attributes you want to audit for bias
-        <li>true future outcome for each individual (if you want to audit bias based in disparate errors)
+          <li>"score" column - binary assessments (0 or 1 for each row) made by the predictive model (1
+              denotes the
+              individuals
+              selected for the intervention)
+          <li>columns containing attributes you want to audit for bias (column name does not matter)
+          <li>"label_value" column - true future outcome for each individual (0 or 1 for each row) if
+              you want to audit bias based in disparate errors
         </li></ul>
-        Please note that any data you upload will be used to generate the audit report for you and then deleted. We do encourage you to use the <a href="http://www.github.com/dssg/aequitas">desktop version of the audit tool</a> if your data is private and sensitive.
+                Please note that any data you upload will be used to generate the audit report for you and then deleted. We do
+                encourage you to use the <a href="https://dssg.github.io/aequitas/30_seconds_webapp.html">desktop version of the
+                audit tool</a> if your data is private and sensitive.
       </div>
       
 

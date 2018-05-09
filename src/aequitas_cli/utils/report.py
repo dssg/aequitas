@@ -832,8 +832,8 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
     # do we want to show this?
     # mkdown_parity += get_highlevel_report(group_attribute_df) + '\n\n'
 
-    mkdown_disparities = '\n\n### Audit Results: Bias Metrics Values'
-    mkdown_group = '\n\n#### Audit Results: Group Metrics Values'
+    mkdown_disparities = '\n\n### Audit Results: Bias Metrics Values' + oneline
+    mkdown_group = '\n\n### Audit Results: Group Metrics Values' + oneline
     # setup the group_value_df (colors and stuff)
     group_value_df['group_size_pct'] = group_value_df['group_size'].divide(group_value_df['total_entities'])
     group_value_df = setup_group_value_df(group_value_df, configs.fair_measures_requested,
@@ -1058,5 +1058,13 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 </thead>"""
     new_audit_desc = '<table>\n'
     report_html = report_html.replace(audit_desc, new_audit_desc)
+    # change color of headers
+    report_html = report_html.replace('<h1', '<h1 style="color:#b37d4e;"')
+    report_html = report_html.replace('<h3', '<h3 style="color:#b37d4e;"')
+    report_html = report_html.replace('<h3', '<h3 style="color:#b37d4e;"')
+    report_html = report_html.replace('<h4', '<h4 style="color:#286da8;"')
+    report_html = report_html.replace('<strong ><a', '<a')
+    report_html = report_html.replace('</a></strong>', '</a>')
+    report_html = report_html.replace('<strong> <a', '<a')
 
     return report_html
