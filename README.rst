@@ -68,6 +68,8 @@ Common development tasks, such as deploying the webapp, may then be handled via 
 
 
 
+To contact the team, please email us at aequitas at uchicago dot edu
+
 ----------------------------------------------
 ----------------------------------------------
 
