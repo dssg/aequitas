@@ -9,12 +9,12 @@
     "\n",
     "Northpointe's COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) is one of the widest used risk assessment tools, algorithms which are used in the criminal justice system to guide decisions such as how to set bail. The ProPublica dataset represents two years of COMPAS predicitons from Broward County, FL.\n",
     "\n",
-    "The data was preprocess for compatibility with Aequitas."
+    "The data was preprocess for compatibility with Aequitas and analyzed by Ari Anisfeld and Abby Stevens."
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -27,102 +27,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/html": [
-       "<div>\n",
-       "<style scoped>\n",
-       "    .dataframe tbody tr th:only-of-type {\n",
-       "        vertical-align: middle;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe tbody tr th {\n",
-       "        vertical-align: top;\n",
-       "    }\n",
-       "\n",
-       "    .dataframe thead th {\n",
-       "        text-align: right;\n",
-       "    }\n",
-       "</style>\n",
-       "<table border=\"1\" class=\"dataframe\">\n",
-       "  <thead>\n",
-       "    <tr style=\"text-align: right;\">\n",
-       "      <th></th>\n",
-       "      <th>entity_id</th>\n",
-       "      <th>score</th>\n",
-       "      <th>label_value</th>\n",
-       "      <th>race</th>\n",
-       "      <th>sex</th>\n",
-       "      <th>age_cat</th>\n",
-       "    </tr>\n",
-       "  </thead>\n",
-       "  <tbody>\n",
-       "    <tr>\n",
-       "      <th>0</th>\n",
-       "      <td>1</td>\n",
-       "      <td>0.0</td>\n",
-       "      <td>0</td>\n",
-       "      <td>Other</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>Greater than 45</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>1</th>\n",
-       "      <td>3</td>\n",
-       "      <td>0.0</td>\n",
-       "      <td>1</td>\n",
-       "      <td>African-American</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>25 - 45</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>2</th>\n",
-       "      <td>4</td>\n",
-       "      <td>0.0</td>\n",
-       "      <td>1</td>\n",
-       "      <td>African-American</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>Less than 25</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>3</th>\n",
-       "      <td>5</td>\n",
-       "      <td>1.0</td>\n",
-       "      <td>0</td>\n",
-       "      <td>African-American</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>Less than 25</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>4</th>\n",
-       "      <td>6</td>\n",
-       "      <td>0.0</td>\n",
-       "      <td>0</td>\n",
-       "      <td>Other</td>\n",
-       "      <td>Male</td>\n",
-       "      <td>25 - 45</td>\n",
-       "    </tr>\n",
-       "  </tbody>\n",
-       "</table>\n",
-       "</div>"
-      ],
-      "text/plain": [
-       "   entity_id  score  label_value              race   sex          age_cat\n",
-       "0          1    0.0            0             Other  Male  Greater than 45\n",
-       "1          3    0.0            1  African-American  Male          25 - 45\n",
-       "2          4    0.0            1  African-American  Male     Less than 25\n",
-       "3          5    1.0            0  African-American  Male     Less than 25\n",
-       "4          6    0.0            0             Other  Male          25 - 45"
-      ]
-     },
-     "execution_count": 2,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "df = pd.read_csv(\"../../../examples/data/compas_for_aequitas.csv\")\n",
     "df.head()"
@@ -136,16 +43,13 @@
     "\n",
     "__Risk assessment by race__\n",
     "\n",
-    "COMPAS produces a risk score that predicts a person's likelihood of commiting a crime in the next two years. The output is a score between 0 and 10 that maps to low, medium or high. For Aequitas, we collapse this to a binary prediction. A score of 0 indicates a prediction of low risk according to COMPAS, while a 1 indicates high or medium risk.\n",
+    "COMPAS produces a risk score that predicts a person's likelihood of commiting a crime in the next two years. The output is a score between 1 and 10 that maps to low, medium or high. For Aequitas, we collapse this to a binary prediction. A score of 0 indicates a prediction of low risk according to COMPAS, while a 1 indicates high or medium risk.\n",
     "\n",
     "This is based on ProPublica's interpretation of Northpointe's practioner guide.\n",
     "\n",
-    "     \"According to Northpointe’s practitioners guide, COMPAS “scores in the medium and high range \n",
-    "     garner more interest from supervision agencies than low scores, as a low score would suggest\n",
-    "     there is little risk of general recidivism,” so we considered scores any higher than “low” to \n",
-    "     indicate a risk of recidivism.\"\n",
+    "    \"According to Northpointe’s practitioners guide, COMPAS “scores in the medium and high range garner more interest from supervision agencies than low scores, as a low score would suggest there is little risk of general recidivism,” so we considered scores any higher than “low” to indicate a risk of recidivism.\"\n",
     "\n",
-    "We see a large difference in how these scores are distributed by race, with a majority of white and Hispanic people predicted as low risk (score = 0) and a majority of black people predicted high and medium risk.\n",
+    "In the bar chart below, we see a large difference in how these scores are distributed by race, with a majority of white and Hispanic people predicted as low risk (score = 0) and a majority of black people predicted high and medium risk.\n",
     "\n"
    ]
   },
@@ -173,11 +77,11 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "** Levels of recidivism **\n",
+    "__Levels of recidivism__\n",
     "\n",
     "This dataset includes information about whether or not the subject recidivated, and so we can directly test the accuracy of the predictions. First, we visualize the recidivsm rates across race. \n",
     "\n",
-    "Following ProPublica, we defined recidivism as a new arrest within two years. (If a person recidivates, `two_year_recid` = 1). They \"based this decision on Northpointe’s practitioners guide, which says that its recidivism score is meant to predict 'a new misdemeanor or felony offense within two years of the COMPAS administration date.'\"\n"
+    "Following ProPublica, we defined recidivism as a new arrest within two years. (If a person recidivates, `label_value` = 1). They \"based this decision on Northpointe’s practitioners guide, which says that its recidivism score is meant to predict 'a new misdemeanor or felony offense within two years of the COMPAS administration date.'\"\n"
    ]
   },
   {
@@ -206,11 +110,11 @@
    "source": [
     "## Putting Aequitas to the task\n",
     "\n",
-    "The graph above shows the base rates for recidivism are higher for black defendants compared to white defendants (.51 vs .39). The prior graph shows that the predictions do not match the base rates.\n",
+    "The graph above shows the base rates for recidivism are higher for black defendants compared to white defendants (.51 vs .39). The prior graph shows that the predictions do not match the base rates. \n",
     "\n",
-    "Practitioners face the challenge of determining whether or not such patterns reflect bias or not. The fact that we have multiple ways to measure bias adds complexity to the decisionmaking process. With Aequitas, we provide a tool that automates the reporting of various fairnes metrics to aid in this process.\n",
+    "Practitioners face the challenge of determining whether or not such patterns reflect bias or not. The fact that we have multiple ways to measure bias adds complexity to the decisionmaking process. With Aequitas, we provide a tool that automates the reporting of various fairness metrics to aid in this process.\n",
     "\n",
-    "Applying Aequitas is a three step process represented by three python classes: \n",
+    "Applying Aequitas progammatically is a three step process represented by three python classes: \n",
     "\n",
     "`Group()`: Define groups \n",
     "\n",
@@ -226,10 +130,7 @@
    "metadata": {},
    "source": [
     "### Group()\n",
-    "Now, using the Aequitas bias detection tool, we calculate precise bias and disparity metrics for this dataset. \n",
-    "First, we modify the dataframe to be compatible with the tool. \n",
-    "\n",
-    "Aequitas expects a dataframe expects predefined columns `score`, and `label_value` and treats all other columns, with few exceptions, as attributes against which to test for disparities. In this cases we include `race`, `sex` and `age_cat`. "
+    "Aequitas expects a dataframe with predefined columns `score`, and `label_value` and treats other columns (with a few exceptions) as attributes against which to test for disparities. In this cases we include `race`, `sex` and `age_cat`. "
    ]
   },
   {
@@ -490,8 +391,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "**Interpreting the crosstab**\n",
-    "\n",
+    "__Interpreting the crosstab__ \n",
     "We see that African-Americans have a false positive rate (`fpr`) of 45%, while Caucasians have a false positive rate of only 23%. This means that black people are far more likely to be falsely labeled as high-risk than white people. On the otherhand false ommision rates (`for`) and false discovery rates (`fdr`) are much closer for those two groups."
    ]
   },
@@ -503,7 +403,7 @@
     "We calculate disparities as a ratio of a metric for a group of interest compared to a base group. For example, the False Negative Rate Disparity for black defendants vis-a-vis whites is:\n",
     "$$Disparity_{FNR} =  \\frac{FNR_{black}}{FNR_{white}}$$ \n",
     "\n",
-    "Below, we use `get_disparity_predefined_groups` which allows us to choose base groups that clarify the output for the practitioner. Aequitas `Bias()` class includes two additional get disparity functions, which automate base group selection.\n"
+    "Below, we use `get_disparity_predefined_groups` which allows us to choose reference groups that clarify the output for the practitioner. Aequitas `Bias()` class includes two additional get disparity functions, which automate base group selection.\n"
    ]
   },
   {
@@ -763,7 +663,8 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The differences in False Positive Rates, noted above, are clarified using the disparity ratio (`fpr_disparity`). Black people are falsely identified as being high or medium risks 1.9 times the rate for white people. As seen above, False Discovery Rates have much less disparity (`fdr_disparity`). False discovery is the fraction of false postives in a group within those predicted positive in the group. COMPAS is calibrated to have these balanced over groups.\n",
+    "__Interpreting the disparity ratios__\n",
+    "The differences in False Positive Rates, noted above, are clarified using the disparity ratio (`fpr_disparity`). Black people are falsely identified as being high or medium risks 1.9 times the rate for white people. As seen above, False Discovery Rates have much less disparity (`fdr_disparity`). False discovery is the fraction of false postives over predicted positive in a group. COMPAS is calibrated to have these balanced across groups.\n",
     "\n",
     "Notice that reference groups have disparity = 1 by design. "
    ]
@@ -1185,9 +1086,9 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "In this case, our base groups are Caucasian for race, Male for gender, and 25-45 for age_cat. By construction, the base group has supervised fairness. (The disparity ratio is 1). Relative to the base groups, the COMPAS predictions only provide supervised fairness to one group, Hispanic.\n",
+    "__Interpreting parity__ In this case, our base groups are Caucasian for race, Male for gender, and 25-45 for age_cat. By construction, the base group has supervised fairness. (The disparity ratio is 1). Relative to the base groups, the COMPAS predictions only provide supervised fairness to one group, Hispanic.\n",
     "\n",
-    "Above, the African-American false omission and false discovemry are within the bounds of fairness. This result is expected because COMPAS is calibrated. (Given calibration, it is surprising that Asian and Native American rates are so low. This may be a matter of having few observations for these groups.)\n",
+    "Above, the African-American false omission and false discovery are within the bounds of fairness. This result is expected because COMPAS is calibrated. (Given calibration, it is surprising that Asian and Native American rates are so low. This may be a matter of having few observations for these groups.)\n",
     "\n",
     "On the other hand, African-Americans are roughly twice as likely to have false positives and 40 percent less likely to false negatives. In real terms, 44.8% of African-Americans who did not recidivate were marked high or medium risk (with potential for associated penalties), compared with 23.4% of Caucasian non-reoffenders. This is unfair and is marked False below.\n",
     "\n",
