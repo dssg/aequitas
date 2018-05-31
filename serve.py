@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import importlib
-
+import sys
 # Make WSGI app available to server as "application"
 from aequitas_webapp import app as application
 
@@ -12,4 +12,4 @@ importlib.import_module('aequitas_webapp.views')
 
 if __name__ == '__main__':
     # Run development server
-    application.run()
+    application.run(host='0.0.0.0')
