@@ -196,3 +196,8 @@ def report(dirname, name, reportid):
         content=Markup(report),
         go_back=url_for('audit_file', dirname=dirname, name=name),
     )
+
+
+@app.route('/example.html', methods=['GET'])
+def example():
+    return render_template('example2.html')

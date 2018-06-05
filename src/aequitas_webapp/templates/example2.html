@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-118975934-1"></script>
+      <script>
+          window.dataLayer = window.dataLayer || [];
+
+          function gtag() {
+              dataLayer.push(arguments);
+          }
+
+          gtag('js', new Date());
+
+          gtag('config', 'UA-118975934-1');
+      </script>
+
+      <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+      <title>Aequitas - The Bias Report</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="/static/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/jumbotron.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="/static/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="/static/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+      <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans"/>
+      <style>
+          body {
+              font-family: 'Open Sans', sans-serif;
+          }
+      </style>
+  </head>
+
+
+  <body>
+
+  <div class="container">
+      <div class="header clearfix">
+          <nav navbar-fixed-top>
+          <ul class="nav nav-pills pull-right">
+              <li role="presentation" class="active"><a href="/audit/eg20cip9/compas_for_aequitas/">Back to Customize</a><br></li>
+              <li role="presentation" target="_blank"><a href="/">Home</a></li>
+            <li role="presentation"><a href="http://dsapp.uchicago.edu/aequitas" target="_blank">About</a></li>
+              <li></li>
+          </ul>
+          </nav>
+          <a href="/">
+              <img alt="Brand" src="/static/images/aequitas_header.png" width="15%" class="img-fluid">
+          </a>
+      </div>
+      <br>
+      <h1> The Bias Report in Action </h1>
+
+     Using a clean version of the <a href="https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis">COMPAS dataset</a>, we demostrate the use of The Bias Report web app.
+     <h2> Background</h2>
+
+     In 2016, Propublica <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing">reported on racial inequality</a> in  COMPAS, a risk assessment tool. They showed the algorithm led to unfair disparities in False Negative and False Positive Rates. In particular, they showed black defendants who would not go on to recidivate faced disproportionately high risk scores, while white defendants who would recidivate received disproportionately low risk scores. Northpointe, the company responsible for the algorithm, <a href="https://www.documentcloud.org/documents/2998e91-ProPublica-Commentary-Final-070616.html">responded</a> by arguing they callibrated the algorithm to be fair in terms of False Discovery Rate, also known as calibration. With the Bias Report, we get metrics on each type of disparity, adding clarity to the bias auditing process.
+
+     <h2>The Process</h2>
+
+     <h3> Upload data </h3>
+
+     First, we upload the data. The cleaned dataset is available on the upload page and follows the format described <a href="https://dssg.github.io/aequitas/input_data.html"> here</a>.
+
+     <h3> Select Protected Groups</h3>
+
+     Following the Propublica-Northpointe debate we focus on race. We select a custom reference group and use Caucasian as the reference group. Our metrics will thus reflect fairness in relation to the historically dominant group.
+
+     <h3> Select Fairness Metrics</h3>
+
+     Again following the debate, we select False Positive Rates, False Negative Rates and False Discovery Rates.
+
+     <h2> Analysis </h2>
+     Scrolling through the Bias Report, we  the African-American false discovery rates are within the bounds of fairness. This result is expected because COMPAS is calibrated. (The overall FDR fairness returns false, because Asian and Native American defendants did not fall within the fairness threshholds for FDR).
+
+     On the other hand, African-Americans are roughly twice as likely to have false positives and 40 percent less likely to false negatives. In real terms, 44.8% of African-Americans who did not recidivate were marked high or medium risk (with potential for associated penalties), compared with 23.4% of Caucasian non-reoffenders. This is unfair and is marked False below.
+
+     These findings mark an inherent trade-off between FPR Fairness, FNR Fairness and calibration, which is present in any decision system where base rates are not equal. See Chouldechova (2017). Aequitas helps bring this trade-off to the forefront with clear metrics and asks system designers to make a reasoned decision based on their use case.
+   </div>
+      <h1 style="color:#b37d4e;" id="the-bias-report" align="center">The Bias Report</h1>
+
+<p>&nbsp;</p>
+
+<table>
+
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Audit Date:</strong></td>
+  <td align="left" style=" padding:5px;">04 Jun 2018</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Data Audited:</strong></td>
+  <td align="left" style=" padding:5px;">7214 rows</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Attributes Audited:</strong></td>
+  <td align="left" style=" padding:5px;">race</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Audit Goal(s):</strong></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a> - Ensure all protected groups have the same false positive rates as the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a> - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a> - Ensure all protected groups have the same false negative rates (as the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Reference Groups:</strong></td>
+  <td align="left" style=" padding:5px;">Custom group - The reference groups you selected for each attribute will be used  to calculate relative disparities in this audit.</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Fairness Threshold:</strong></td>
+  <td align="left" style=" padding:5px;">80%. If disparity for a group is within 80% and 125% of  the value of the reference group on a group metric (e.g. False Positive Rate), this audit will pass.</td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results">Audit Results:</h3>
+
+<ol>
+<li><p><a href="#audit-results-summary">Summary</a></p></li>
+<li><p><a href="#audit-results-details-by-fairness-measures">Details by Fairness Measures</a></p></li>
+<li><p><a href="#audit-results-details-by-protected-attributes">Details by Protected Attributes</a></p></li>
+<li><p><a href="#audit-results-bias-metrics-values">Bias Metrics Values</a></p></li>
+<li><p><a href="#audit-results-group-metrics-values">Base Metrics Calculated for Each Group</a></p></li>
+</ol>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-summary">Audit Results: Summary</h3>
+
+<table>
+
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a> - Ensure all protected groups have the same false positive rates as the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-positive-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a> - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-discovery-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a> - Ensure all protected groups have the same false negative rates (as the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-negative-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-details-by-fairness-measures">Audit Results: Details by Fairness Measures</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-positive-rate-parity-span-red-initfailedspan-red-end">False Positive Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Positive parity if every group has the same False Positive Error Rate. For example, if race has false positive parity, it implies that all three races have the same False Positive Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and has a risk of adverse outcomes for individuals. Using this criteria allows you to make sure that you are not making false positive mistakes about any single group disproportionately.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For race</strong> (with reference group as <strong>Caucasian</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false positive rate of this group is 0.09 compared to 0.23 for the reference group Caucasian. ">Asian</a> with <span style="color:red"><b>0.37X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false positive rate of this group is 0.45 compared to 0.23 for the reference group Caucasian. ">African-American</a> with <span style="color:red"><b>1.91X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false positive rate of this group is 0.38 compared to 0.23 for the reference group Caucasian. ">Native American</a> with <span style="color:red"><b>1.60X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false positive rate of this group is 0.15 compared to 0.23 for the reference group Caucasian. ">Other</a> with <span style="color:red"><b>0.63X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-discovery-rate-parity-span-red-initfailedspan-red-end">False Discovery Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Discovery Rate parity if every group has the same False Discovery Error Rate. For example, if race has false discovery parity, it implies that all three races have the same False Discvery Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and can hurt individuals and where you are selecting a very small group for interventions.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For race</strong> (with reference group as <strong>Caucasian</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false discovery rate of this group is 0.25 compared to 0.41 for the reference group Caucasian. ">Native American</a> with <span style="color:red"><b>0.61X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false discovery rate of this group is 0.25 compared to 0.41 for the reference group Caucasian. ">Asian</a> with <span style="color:red"><b>0.61X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-negative-rate-parity-span-red-initfailedspan-red-end">False Negative Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Negative parity if every group has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three races have the same False Negative Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false negative errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is assistive (providing helpful social services for example) and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure that you’re not missing people from certain groups disproportionately.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For race</strong> (with reference group as <strong>Caucasian</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false negative rate of this group is 0.1 compared to 0.48 for the reference group Caucasian. ">Native American</a> with <span style="color:red"><b>0.21X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false negative rate of this group is 0.28 compared to 0.48 for the reference group Caucasian. ">African-American</a> with <span style="color:red"><b>0.59X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false negative rate of this group is 0.33 compared to 0.48 for the reference group Caucasian. ">Asian</a> with <span style="color:red"><b>0.70X</b> </span>  Disparity<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false negative rate of this group is 0.68 compared to 0.48 for the reference group Caucasian. ">Other</a> with <span style="color:red"><b>1.42X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-details-by-protected-attributes">Audit Results: Details by Protected Attributes</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="race">race</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected."> <a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a></a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">African-American</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Asian</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Caucasian</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Ref</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Hispanic</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:green"><b>Passed</b></a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Native American</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-2">Other</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-2" style="color:red"><b>Failed</b></a></td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-bias-metrics-values">Audit Results: Bias Metrics Values</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="race-2">race</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="The False Discovery Rate of each group divided by the same metric value of the reference group.">False Discovery Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The False Positive Rate of each group divided by the same metric value of the reference group.">False Positive Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The False Negative Rate of each group divided by the same metric value of the reference group.">False Negative Rate Disparity</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">African-American</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:green"> 0.91</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">1.91</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.59</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">Asian</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.61</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.37</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.7</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">Caucasian</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3">1.0</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">Hispanic</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:green"> 1.12</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:green"> 0.92</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:green"> 1.17</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">Native American</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.61</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">1.6</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.21</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#race-3">Other</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:green"> 1.12</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">0.63</a></td>
+  <td align="left" style=" padding:5px;"><a href="#race-3" style="color:red">1.42</a></td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#race">Go to Previous</a></p>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-group-metrics-values">Audit Results: Group Metrics Values</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="race-3">race</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left">Group Size Ratio</th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="Number of false positives of the group divided by the size of the intervention set of the group (predicted positives within group).">False Discovery Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of false positives of the group divided by number of labeled negatives within the group.">False Positive Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of false negative of the group divided by number of labeled positives in the group">False Negative Rate</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;">African-American</td>
+  <td align="left" style=" padding:5px;">0.51</td>
+  <td align="left" style="color:green; padding:10px;"> 0.37</td>
+  <td align="left" style="color:red; padding:10px;">0.45</td>
+  <td align="left" style="color:red; padding:10px;">0.28</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Asian</td>
+  <td align="left" style=" padding:5px;">0</td>
+  <td align="left" style="color:red; padding:10px;">0.25</td>
+  <td align="left" style="color:red; padding:10px;">0.09</td>
+  <td align="left" style="color:red; padding:10px;">0.33</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Caucasian</td>
+  <td align="left" style=" padding:5px;">0.34</td>
+  <td align="left" style=" padding:5px;">0.41</td>
+  <td align="left" style=" padding:5px;">0.23</td>
+  <td align="left" style=" padding:5px;">0.48</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Hispanic</td>
+  <td align="left" style=" padding:5px;">0.09</td>
+  <td align="left" style="color:green; padding:10px;"> 0.46</td>
+  <td align="left" style="color:green; padding:10px;"> 0.21</td>
+  <td align="left" style="color:green; padding:10px;"> 0.56</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Native American</td>
+  <td align="left" style=" padding:5px;">0</td>
+  <td align="left" style="color:red; padding:10px;">0.25</td>
+  <td align="left" style="color:red; padding:10px;">0.38</td>
+  <td align="left" style="color:red; padding:10px;">0.1</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Other</td>
+  <td align="left" style=" padding:5px;">0.05</td>
+  <td align="left" style="color:green; padding:10px;"> 0.46</td>
+  <td align="left" style="color:red; padding:10px;">0.15</td>
+  <td align="left" style="color:red; padding:10px;">0.68</td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#race-2">Go to Previous</a></p>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+
+  </div>
+
+  <footer align="center" class="footer">
+        <p>&copy; 2018 Center for Data Science and Public Policy - University of Chicago</p>
+  </footer>
+</body>
+
+  <script src="/static/assets/js/ie10-viewport-bug-workaround.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <script>
+      $(document).ready(function () {
+          $('[data-toggle="tooltip"]').tooltip();
+      });
+  </script>
+</html>
