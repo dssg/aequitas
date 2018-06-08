@@ -2,9 +2,11 @@
 
 
 Make changes in python notebooks stored in `/source` 
+Note you must have pandoc installed.
 
 ```
 python3 -m pip install nbsphinx
+python3 -m pip install sphinx_rtd_theme
 cd aequitas
 python3 -m sphinx docs/source docs
 ```
