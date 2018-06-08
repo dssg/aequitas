@@ -9,12 +9,12 @@
     "\n",
     "Northpointe's COMPAS (Correctional Offender Management Profiling for Alternative Sanctions) is one of the widest used risk assessment tools, algorithms which are used in the criminal justice system to guide decisions such as how to set bail. The ProPublica dataset represents two years of COMPAS predicitons from Broward County, FL.\n",
     "\n",
-    "The data was preprocess for compatibility with Aequitas and analyzed by Ari Anisfeld and Abby Stevens."
+    "Analysis by Ari Anisfeld and Abby Stevens."
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 2,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -27,12 +27,114 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
+   "execution_count": 3,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>entity_id</th>\n",
+       "      <th>score</th>\n",
+       "      <th>label_value</th>\n",
+       "      <th>race</th>\n",
+       "      <th>sex</th>\n",
+       "      <th>age_cat</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>Other</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>Greater than 45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>3</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>African-American</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>25 - 45</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>4</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>African-American</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>Less than 25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>5</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>African-American</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>Less than 25</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>6</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>Other</td>\n",
+       "      <td>Male</td>\n",
+       "      <td>25 - 45</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   entity_id  score  label_value              race   sex          age_cat\n",
+       "0          1    0.0            0             Other  Male  Greater than 45\n",
+       "1          3    0.0            1  African-American  Male          25 - 45\n",
+       "2          4    0.0            1  African-American  Male     Less than 25\n",
+       "3          5    1.0            0  African-American  Male     Less than 25\n",
+       "4          6    0.0            0             Other  Male          25 - 45"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
    "source": [
     "df = pd.read_csv(\"../../../examples/data/compas_for_aequitas.csv\")\n",
     "df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The data was preprocessed for compatibility with Aequitas. Notice the mandatory `score` and `label_value` columns along with a set of attribute columns specific to this data set. See [documentation](../input_data.html) for more information about input data. (`entity_id` is not necessary for this example. As a reserve column name, Aequitas will not treat `entity_id` as an attribute column.) "
    ]
   },
   {
@@ -135,7 +237,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
+   "execution_count": 9,
    "metadata": {},
    "outputs": [
     {
@@ -177,7 +279,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": 10,
    "metadata": {},
    "outputs": [
     {
@@ -377,7 +479,7 @@
        "10        1529  "
       ]
      },
-     "execution_count": 6,
+     "execution_count": 10,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -408,7 +510,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": 11,
    "metadata": {},
    "outputs": [
     {
@@ -433,7 +535,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
+   "execution_count": 12,
    "metadata": {},
    "outputs": [
     {
@@ -443,14 +545,17 @@
        "       'tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr', 'npv', 'precision', 'pp',\n",
        "       'pn', 'ppr', 'pprev', 'fp', 'fn', 'tn', 'tp', 'group_label_neg',\n",
        "       'group_label_pos', 'group_size', 'total_entities', 'prev',\n",
-       "       'ppr_disparity', 'pprev_disparity', 'fdr_disparity', 'for_disparity',\n",
-       "       'fpr_disparity', 'fnr_disparity', 'ppr_ref_group_value',\n",
-       "       'pprev_ref_group_value', 'fdr_ref_group_value', 'for_ref_group_value',\n",
-       "       'fpr_ref_group_value', 'fnr_ref_group_value'],\n",
+       "       'ppr_disparity', 'pprev_disparity', 'precision_disparity',\n",
+       "       'fdr_disparity', 'for_disparity', 'fpr_disparity', 'fnr_disparity',\n",
+       "       'tpr_disparity', 'tnr_disparity', 'npv_disparity',\n",
+       "       'ppr_ref_group_value', 'pprev_ref_group_value',\n",
+       "       'precision_ref_group_value', 'fdr_ref_group_value',\n",
+       "       'for_ref_group_value', 'fpr_ref_group_value', 'fnr_ref_group_value',\n",
+       "       'tpr_ref_group_value', 'tnr_ref_group_value', 'npv_ref_group_value'],\n",
        "      dtype='object')"
       ]
      },
-     "execution_count": 8,
+     "execution_count": 12,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -461,7 +566,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
+   "execution_count": 13,
    "metadata": {},
    "outputs": [
     {
@@ -649,7 +754,7 @@
        "10       0.935673       1.313873       1.621868       0.696781  "
       ]
      },
-     "execution_count": 9,
+     "execution_count": 13,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -1112,7 +1217,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.4"
+   "version": "3.6.5"
   }
  },
  "nbformat": 4,

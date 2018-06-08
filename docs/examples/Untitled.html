@@ -1,0 +1,694 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>&lt;no title&gt; &mdash; aequitas  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> aequitas
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aequitas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>&lt;no title&gt;</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/Untitled.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">aequitas.preprocessing</span> <span class="k">import</span> <span class="n">preprocess_input_df</span>
+<span class="kn">from</span> <span class="nn">aequitas.group</span> <span class="k">import</span> <span class="n">Group</span>
+<span class="kn">from</span> <span class="nn">aequitas.bias</span> <span class="k">import</span> <span class="n">Bias</span>
+<span class="kn">from</span> <span class="nn">aequitas.fairness</span> <span class="k">import</span> <span class="n">Fairness</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../../../examples/data/compas_for_aequitas.csv&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>entity_id</th>
+      <th>score</th>
+      <th>label_value</th>
+      <th>race</th>
+      <th>sex</th>
+      <th>age_cat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>Other</td>
+      <td>Male</td>
+      <td>Greater than 45</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>25 - 45</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>Less than 25</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>1.0</td>
+      <td>0</td>
+      <td>African-American</td>
+      <td>Male</td>
+      <td>Less than 25</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>6</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>Other</td>
+      <td>Male</td>
+      <td>25 - 45</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">random</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rand&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="o">*</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> - </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">rand</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rand&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">g</span> <span class="o">=</span> <span class="n">Group</span><span class="p">()</span>
+<span class="c1">#dfp, _ = preprocess_input_df(df)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">get_crosstabs</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+model_id, score_thresholds 1 {&#39;rank_abs&#39;: [3317]}
+COUNTS::: race
+African-American    3696
+Asian                 32
+Caucasian           2454
+Hispanic             637
+Native American       18
+Other                377
+dtype: int64
+COUNTS::: sex
+Female    1395
+Male      5819
+dtype: int64
+COUNTS::: age_cat
+25 - 45            4109
+Greater than 45    1576
+Less than 25       1529
+dtype: int64
+COUNTS::: group
+0 - 9      673
+10 - 19    725
+20 - 29    718
+30 - 39    729
+40 - 49    747
+50 - 59    687
+60 - 69    712
+70 - 79    738
+80 - 89    717
+90 - 99    741
+nan         27
+dtype: int64
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[49]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>(   attribute_name   attribute_value     k  model_id score_threshold       tpr  \
+ 0            race  African-American  3317         1      binary 0/1  0.720147
+ 1            race             Asian  3317         1      binary 0/1  0.666667
+ 2            race         Caucasian  3317         1      binary 0/1  0.522774
+ 3            race          Hispanic  3317         1      binary 0/1  0.443966
+ 4            race   Native American  3317         1      binary 0/1  0.900000
+ 5            race             Other  3317         1      binary 0/1  0.323308
+ 6             sex            Female  3317         1      binary 0/1  0.608434
+ 7             sex              Male  3317         1      binary 0/1  0.629132
+ 8         age_cat           25 - 45  3317         1      binary 0/1  0.626257
+ 9         age_cat   Greater than 45  3317         1      binary 0/1  0.427711
+ 10        age_cat      Less than 25  3317         1      binary 0/1  0.739583
+ 11          group             0 - 9  3317         1      binary 0/1  0.622951
+ 12          group           10 - 19  3317         1      binary 0/1  0.628399
+ 13          group           20 - 29  3317         1      binary 0/1  0.622024
+ 14          group           30 - 39  3317         1      binary 0/1  0.582555
+ 15          group           40 - 49  3317         1      binary 0/1  0.633721
+ 16          group           50 - 59  3317         1      binary 0/1  0.628664
+ 17          group           60 - 69  3317         1      binary 0/1  0.643312
+ 18          group           70 - 79  3317         1      binary 0/1  0.647436
+ 19          group           80 - 89  3317         1      binary 0/1  0.612698
+ 20          group           90 - 99  3317         1      binary 0/1  0.629944
+ 21          group               nan  3317         1      binary 0/1  0.833333
+
+          tnr       for       fdr       fpr    ...        pprev   fp    fn  \
+ 0   0.551532  0.349540  0.370285  0.448468    ...     0.588203  805   532
+ 1   0.913043  0.125000  0.250000  0.086957    ...     0.250000    2     3
+ 2   0.765457  0.288125  0.408665  0.234543    ...     0.348003  349   461
+ 3   0.785185  0.288591  0.457895  0.214815    ...     0.298273   87   129
+ 4   0.625000  0.166667  0.250000  0.375000    ...     0.666667    3     1
+ 5   0.852459  0.302013  0.455696  0.147541    ...     0.209549   36    90
+ 6   0.678930  0.242537  0.487310  0.321070    ...     0.423656  288   195
+ 7   0.675799  0.330100  0.364637  0.324201    ...     0.468465  994  1021
+ 8   0.666216  0.323112  0.385135  0.333784    ...     0.468240  741   706
+ 9   0.832096  0.241117  0.459391  0.167904    ...     0.250000  181   285
+ 10  0.458647  0.424528  0.360360  0.541353    ...     0.653368  360   225
+ 11  0.703804  0.307487  0.364548  0.296196    ...     0.444279  109   115
+ 12  0.652284  0.323684  0.397101  0.347716    ...     0.475862  137   123
+ 13  0.678010  0.329016  0.370482  0.321990    ...     0.462396  123   127
+ 14  0.659314  0.332506  0.426380  0.340686    ...     0.447188  139   134
+ 15  0.660050  0.321429  0.385915  0.339950    ...     0.475234  137   126
+ 16  0.713158  0.296104  0.360927  0.286842    ...     0.439592  109   114
+ 17  0.693467  0.288660  0.376543  0.306533    ...     0.455056  122   112
+ 18  0.654930  0.282776  0.421203  0.345070    ...     0.472900  147   110
+ 19  0.691542  0.305000  0.391167  0.308458    ...     0.442120  124   122
+ 20  0.661499  0.338501  0.370056  0.338501    ...     0.477733  131   131
+ 21  0.733333  0.153846  0.285714  0.266667    ...     0.518519    4     2
+
+       tn    tp  group_label_neg  group_label_pos  group_size  total_entities  \
+ 0    990  1369             1795             1901        3696            7214
+ 1     21     6               23                9          32            7214
+ 2   1139   505             1488              966        2454            7214
+ 3    318   103              405              232         637            7214
+ 4      5     9                8               10          18            7214
+ 5    208    43              244              133         377            7214
+ 6    609   303              897              498        1395            7214
+ 7   2072  1732             3066             2753        5819            7214
+ 8   1479  1183             2220             1889        4109            7214
+ 9    897   213             1078              498        1576            7214
+ 10   305   639              665              864        1529            7214
+ 11   259   190              368              305         673            7214
+ 12   257   208              394              331         725            7214
+ 13   259   209              382              336         718            7214
+ 14   269   187              408              321         729            7214
+ 15   266   218              403              344         747            7214
+ 16   271   193              380              307         687            7214
+ 17   276   202              398              314         712            7214
+ 18   279   202              426              312         738            7214
+ 19   278   193              402              315         717            7214
+ 20   256   223              387              354         741            7214
+ 21    11    10               15               12          27            7214
+
+         prev
+ 0   0.514340
+ 1   0.281250
+ 2   0.393643
+ 3   0.364207
+ 4   0.555556
+ 5   0.352785
+ 6   0.356989
+ 7   0.473105
+ 8   0.459723
+ 9   0.315990
+ 10  0.565075
+ 11  0.453195
+ 12  0.456552
+ 13  0.467967
+ 14  0.440329
+ 15  0.460509
+ 16  0.446870
+ 17  0.441011
+ 18  0.422764
+ 19  0.439331
+ 20  0.477733
+ 21  0.444444
+
+ [22 rows x 26 columns],
+ Index([&#39;race&#39;, &#39;sex&#39;, &#39;age_cat&#39;, &#39;group&#39;], dtype=&#39;object&#39;))
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Center for Data Science and Public Policy.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
