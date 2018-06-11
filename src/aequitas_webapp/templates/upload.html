@@ -1,64 +1,79 @@
 {% extends "base.html" %}
 {% block content %}
-      <div class="row marketing">
 
-          <br>
-          <h1 style="text-align:center; color: #b37d4e;">Select Data Set to Audit</h1>
-          <br>
-          <h4 style="margin-top:40px; margin-bottom:60px; font-weight:400">Try out the toolkit using your own data containg
-              predictions and protected attributes to audit bias and fairness. Or audit out one of
-              our sample data sets.</h4>
-          <br>
-          <br>
 
-      <img src="/static/images/flow-1.png" width="80%" class="img-fluid center-block">
-          <br>
-          <br>
+    <div class="row">
+        <!--<h1 style="color: #b37d4e;">Select Data Set to Audit</h1>-->
+        <img src="/static/images/flow-1.png" width="60%" class="img-fluid center-block"></img>
+    </div>
 
-      <ul class="list-unstyled">
-      {% for (category, message) in get_flashed_messages(True) %}
-        <li class="alert-{{ category }}">{{ message }}</li>
-      {% endfor %}
-      </ul>
-
-          <h3 style="margin-top: 50px; color:#b37d4e">Try auditing one of the sample data sets below</h3>
-          <br>
-
-          <div style="font-size: 18px;">
-            <a href="{{ url_for('audit_sample', name='sample1') }}">COMPAS Recidivism Risk Assessment Data</a><a href="https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis"> [About the Data]</a><br>
-            <a href="{{ url_for('audit_sample', name='sample2') }}">US Adult Income Data</a> <A href="https://archive.ics.uci.edu/ml/datasets/adult"> [About the Data]</a><br>
-        </div>
-   </div>
-      <br>
-      <br>
-      <br>
-        <div>
-            <h5 style="margin-left: 15%; margin-right: 15%; margin-top:40px; margin-bottom:40px; text-align: left; font-weight:400;">
-                The data file should contain (<a href="https://dssg.github.io/aequitas/input_data.html">see
-                documentation</a>):
-      <ul>
-          <li>"score" column - binary assessments (0 or 1 for each row) made by the predictive model (1
-              denotes the
-              individuals
-              selected for the intervention)
-          <li>columns containing attributes you want to audit for bias (column name does not matter)
-          <li>"label_value" column - true future outcome for each individual (0 or 1 for each row) if
-              you want to audit bias based in disparate errors
-        </li></ul>
-                Please note that any data you upload will be used to generate the audit report for you and then deleted. We do
-                encourage you to use the <a href="https://dssg.github.io/aequitas/30_seconds_webapp.html">desktop version of the
-                audit tool</a> if your data is private and sensitive.
+      <div class='alerts'>
+        <ul class="list-unstyled">
+          {% for (category, message) in get_flashed_messages(True) %}
+            <li class="alert-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
       </div>
 
-      <div style="margin-left: 15%; margin-right: 15%; background:#B37D4E !important" class="jumbotron">
-          <h3 align="center">Or Audit Your Own Data</h3>
 
-          <form align="center" method=post enctype=multipart/form-data action="{{ url_for('upload_file') }}">
-              <input type=file name=file>
-              <input type=submit value=Upload>
-          </form>
+      <div class='row'>
+        <div class='col-sm-6'>
+        <h3 style=" color:#b37d4e">Try auditing a sample data set </h3>
+        <div class="jumbotron">
+          <p >
+              <a href="{{ url_for('audit_sample', name='sample1') }}">COMPAS Recidivism Risk Assessment Data</a>
+              <br>
+              <a href="https://www.propublica.org/datastore/dataset/compas-recidivism-risk-score-data-and-analysis"> [About the Data]</a>
+              <br>
+              <br>
+              <a href="{{ url_for('audit_sample', name='sample2') }}">US Adult Income Data</a>
+              <br>
+              <a href="https://archive.ics.uci.edu/ml/datasets/adult"> [About the Data]</a>
+          </p>
+        </div>
         </div>
 
-  </div>
+        <div class='col-sm-6'>
+          <h3 style="color:#b37d4e"> Or audit your own data</h3>
+          <div style="background:#B37D4E" class="jumbotron">
+            <form align="center" method=post enctype=multipart/form-data action="{{ url_for('upload_file') }}">
+                <input type=file name=file>
+                <input type=submit value=Upload>
+            </form>
+            <br>
+            <p style='font-size:14px'>
+            Data you upload is used to generate the audit report. While the data is deleted, we host the audit report in perpitutity.
+            If your data is private and sensitive, we encourage you to use the <a href="https://dssg.github.io/aequitas/30_seconds_webapp.html"> desktop version of the
+            audit tool</a>. See below for information on how to format input data.
+            </p>
+          </div>
+        </div>
+      </div>
+  <div class='row'>
+
+      <div class='col-sm-4'>
+        <h3 style=" color:#b37d4e"> Example input data</h3>
+      <p> The data file is a CSV with the following columns: </p>
+      <ul>
+        <li>
+            "score" column - binary assessments (0 or 1 for each row) made by the predictive model (1
+            denotes the individuals selected for the intervention)
+        </li>
+        <li>
+            "label_value" column - true binary outcomes for each individual (0 or 1 for each row) if
+            you want to audit bias based on disparate errors
+        </li>
+        <li>
+          attribute columns - contain attributes you want to audit for bias (column names are user defined, e.g. age, race, citizenship_status)
+        </li>
+     </ul>
+
+     Extraneous columns will interfer with the bias report. For further clarification, please <a href="https://dssg.github.io/aequitas/input_data.html"> see
+      the documentation</a>
+    </div>
+    <div class='col-sm-8'>
+      <img src= {{ url_for('static', filename = 'images/webapp_input.png') }} alt="webapp input" title="example_input_data" border="0">
+    </div>
+</div>
 
 {% endblock %}
