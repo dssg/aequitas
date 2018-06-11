@@ -198,6 +198,6 @@ def report(dirname, name, reportid):
     )
 
 
-@app.route('/example.html', methods=['GET'])
+@app.route('/example', methods=['GET'])
 def example():
     return render_template('example2.html')

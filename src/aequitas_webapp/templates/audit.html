@@ -1,95 +1,148 @@
 {% extends "base.html" %}
+{% block head %}
+  {{ super() }}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+  $(document).ready(function(){
+    $("#metrics").hide();
+    $(".metrics").hide();
+      $("#next").click(function(){
+          $("#groups").hide();
+          $(".groups").hide();
+
+          $("#metrics").show();
+          $(".metrics").show();
+      });
+  });
+  </script>
+{% endblock %}
+
+
+
+{% block title %}
+  Configure the Bias Audit
+{% endblock %}
+
+{% block description %}
+  <div class="groups">
+    Select attributes to audit and a method for determining the reference groups.
+  </div>
+  <div class="metrics">
+    Configure the bias and fairness audit by
+    selecting the fairness measures to audit and the fairness threshold to determine when the audit passes or
+    fails.
+  </div>
+{% endblock %}
+
+{% block flow %}
+  <div class="groups">
+      <img src="/static/images/flow-2.png" width="60%" class="img-fluid center-block">
+  </div>
+  <div class="metrics">
+    <img src="/static/images/flow-3.png" width="60%" class="img-fluid center-block">
+  </div>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <img src="/static/images/flow-2.png" width="60%" class="img-fluid center-block"></img>
-    <h4>Select attributes to audit and a method for determining the reference groups.</h4>
-</div>
+  <form method="post">
 
-    <h4 style="color: #286da8">1. Select method for determining reference group:</h4>
-    <p>
-      <b>Reference groups</b> are used to calculate relative disparities in our Bias Audit. For example, you might select <b>Male</b> as the reference group for Gender. Aequitas will then use <b>Male</b> as the baseline to calculate any biases for other groups in the attribute Gender (for <b>Female</b> and <b>Other</b> for example).
-    </p>
+  <div class="tab" id="groups">
+      <div>
+        <h4 class="blue-header">
+          1. Select method for determining reference group:
+        </h4>
+        <p>
+          <b>Reference groups</b> are used to calculate relative disparities in our Bias Audit. For example, you might select <b>Male</b> as the reference group for Gender. Aequitas will then use <b>Male</b> as the baseline to calculate any biases for other groups in the attribute Gender (for <b>Female</b> and <b>Other</b> for example).
+        </p>
+        <p><input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group (Select your own) </p>
+        <p><input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group (Automatically select the largest group for every attribute)</p>
+        <p><input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Automatically select group with the lowest bias metric for every attribute</p>
+      </div>
+      <br>
 
-    <form method="post">
-    <div>
-      <p><input type='radio' name='ref_groups_method' value='predefined' id='id1' checked="checked"> Custom group (Select your own) </p>
-      <p><input type='radio' name='ref_groups_method' value='majority' id='id2'> Majority group (Automatically select the largest group for every attribute)</p>
-      <p><input type='radio' name='ref_groups_method' value='min_metric' id='id3'> Automatically select group with the lowest bias metric for every attribute</p>
-    </div>
+        <div>
+           <h4 class="blue-header">
+             2. Select protected attributes that need to be audited for bias.
+           </h4>
+           <div id="div1">
+             <table class="table">
+                   <thead>
+                     <tr>
+                       <th scope="col">Attribute</th>
+                       <th scope="col">Reference Group</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                      {% for cat in categories %}
+                      <tr><td>
+                         <input type="checkbox" name="group_variable1" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}</td>
+                         <td><select name="{{cat}}" method="GET" action="/", float>
+                             <option value="{{subcategories[cat][0]}}" selected>{{subcategories[cat][0]}}</option>
+                             {% for sc2 in subcategories[cat][1:] %}
+                                 <option value="{{sc2}}">{{sc2}}</option>
+                             {% endfor %}
+                         </select> </td>
+                   </tr>
+                     {% endfor %}
+                   </tbody>
+             </table>
+           </div>
 
-     <h4 style="color: #286da8">2. Select protected attributes that need to be audited for bias.</h4>
+           <div id="div2" class="regular-element">
+             <table class="table">
+                   <thead>
+                     <tr>
+                       <th scope="col">Attribute</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {% for cat in categories %}
+                   <tr>
+                     <td>
+                         <input type="checkbox" name="group_variable2" value="{{cat}}" checked="checked"> &nbsp;&nbsp;{{cat}}
+                     </td>
+                   </tr>
+                     {% endfor %}
+                   </tbody>
+                 </table>
+             </div>
 
-    <div id="div1">
-      <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Attribute</th>
-                <th scope="col">Reference Group</th>
-              </tr>
-            </thead>
-            <tbody>
+         </div>
 
-               {% for cat in categories %}
-               <tr><td>
-                  <input type="checkbox" name="group_variable1" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}</td>
-                  <td><select name="{{cat}}" method="GET" action="/", float>
-                      <option value="{{subcategories[cat][0]}}" selected>{{subcategories[cat][0]}}</option>
-                      {% for sc2 in subcategories[cat][1:] %}
-                          <option value="{{sc2}}">{{sc2}}</option>
-                      {% endfor %}
-                  </select> </td>
-            </tr>
-              {% endfor %}
-            </tbody>
-      </table>
-    </div>
-    <div id="div2" class="regular-element">
-      {% for cat in categories %}
-       <p>
-          <input type="checkbox" name="group_variable2" value="{{cat}}" checked="checked">&nbsp;&nbsp;{{cat}}
-      </p>
-      {% endfor %}
-   </div>
-</div>
+         <a class="btn btn-primary btn-lg" role="button" id="next">Next!</a>
 
-
-  <a class="btn btn-primary btn-lg" href="#metrics" role="button">Next!</a>
-    <div style="margin-bottom: 600px;">
-    </div>
-    <section id=”metrics”>
-    <div class="metrics"></div>
-    <a name="metrics"></a>
-    <div class="row">
-        <!--<h1 style="color: #b37d4e;">Select Data Set to Audit</h1>-->
-        <img src="/static/images/flow-3.png" width="60%" class="img-fluid center-block"></img>
-        <h4 style="margin-top:40px; margin-bottom:60px; font-weight:400">Configure the bias and fairness audit by
-            selecting the fairness measures to audit and the fairness threshold to determine when the audit passes or
-            fails.</h4>
-    </div>
+  </div>
+  <!-- FORM PART II -->
+  <div id="metrics">
     <div class="row marketing">
       <div class="col-sm-4">
-        <h4 style="margin-top: 50px; margin-bottom: 50px; color: #286da8;">Select Fairness Metrics to Compute:</h4>
-
+          <h4 class="blue-header"> 3. Select Fairness Metrics to Compute:</h4>
           {% for fm in fairness %}
               <input type="checkbox" name="fairness_measures" value="{{fm}}" checked="checked">&nbsp;&nbsp;{{fm}}<br>
           {% endfor %}
+          <br>
+          <br>
 
+          <h4 class="blue-header">
+            4. Enter your Disparity Intolerance (in %):
+          </h4>
+          <p>
+            If a specific bias metric for a group is within this percentage of the reference group, this audit will pass
+          </p>
+          <p>
+            <input type="text" name="fairness_pct" placeholder='80'>%
+          </p>
+
+          <br>
+          <br>
+          <p>
+            <input class="btn btn-primary btn-lg" type="submit" name="submit" value="Generate Fairness Report">
+          </p>
       </div>
       <div class="col-sm-8">
-         <img style="margin-top: 50px;" src="/static/images/metrictree.png" width="100%" class="img-fluid center-block">
+         <img src="/static/images/metrictree.png" width="100%" class="img-fluid center-block">
       </div>
-
-
-    <h4 style="margin-top: 50px; margin-bottom: 20px; color: #286da8;">Enter your Disparity Tolerance (in %):</h4>
-    If a specific bias metric for a group is within this percentage of the reference group, this audit will pass
-    <p><p><p>
-              <p>
-                  <input type="text" name="fairness_pct" placeholder='80'>%
-
-    <p><input class="btn btn-primary btn-lg" type="submit" name="submit" value="Generate Fairness Report">
-    </p>
-  </form>
-
     </div>
-
+  </div>
+  </form>
 {% endblock %}

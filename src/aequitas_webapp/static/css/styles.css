@@ -1,3 +1,23 @@
 .regular-element {
     display: none;
 }
+
+.space-out {
+  margin-top:30px;
+  margin-bottom:30px;
+  font-weight:400;
+}
+
+.about-data {
+  font-size: 12px;
+}
+
+.big-font {
+  margin-bottom: 15px;
+  font-weight: 200;
+  font-size: 21px;
+}
+
+.blue-header {
+  color: #286da8
+}
