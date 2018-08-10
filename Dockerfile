@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.4.10
+FROM python:3.6.6
 COPY . /aequitas
 WORKDIR /aequitas
 RUN python setup.py install
