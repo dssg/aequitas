@@ -1,8 +1,0 @@
-version: '3.1'
-services:
-    app:
-        build: .
-        ports:
-            - "5000:5000"
-        environment:
-            - HOST=0.0.0.0

@@ -52,6 +52,14 @@ You may then import the ``aequitas`` module from Python::
 
     aequitas-report
 
+Docker
+======
+Build and run within a Docker container::
+
+    docker build -t aequitas .
+
+    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
+
 Development
 ===========
 
