@@ -11,7 +11,7 @@ class Configs(object):
                  attr_cols=None, report=True, score_thresholds=None, project_description={'title': '', 'goal': ''},
                  ref_groups=None, db=None, fairness_measures=['Statistical Parity', 'Impact Parity', 'FDR Parity',
                                                               'FPR Parity', 'FNR Parity', 'FOR Parity', 'TPR Parity',
-                                                              'Precision Parity']):
+                                                              'Precision Parity'], plot_bias_disparities=[]):
         self.ref_groups_method = ref_groups_method
         self.fairness_threshold = fairness_threshold
         self.attr_cols = attr_cols
@@ -21,6 +21,7 @@ class Configs(object):
         self.db = db
         self.fair_measures_requested = fairness_measures
         self.project_description = project_description
+        self.plot_bias_disparities = plot_bias_disparities
 
     @staticmethod
     def load_configs(configs_path):

@@ -2,6 +2,9 @@ import logging
 from sys import exit
 
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 logging.getLogger(__name__)
 
@@ -187,3 +190,71 @@ class Bias(object):
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         #df = df.fillna(value=fill_zeros)
         return df
+
+    @staticmethod
+    def plot_single_disparity(disparities_table, group_metric, ax=None):
+        '''
+        Plot a single group metric's disparity
+        :param disparities_table: A disparity table
+        :param group_metric: The metric to plot. Must be a column in the disparities_table
+        :param ax: A matplotlib Axis. If not passed a new figure will be created.
+        :return: matplotlib.Axis
+        '''
+        if any(disparities_table[group_metric].isnull()):
+            raise IOError(f"Cannot plot {group_metric}, has Nan values.")
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(10, 5))
+
+        height_of_bar = 1
+        attribute_names = disparities_table.attribute_name.unique()
+        tick_indices = []
+        next_bar_height = 0
+
+        for attribute_name in attribute_names:
+            attribute_data = disparities_table.loc[
+                disparities_table['attribute_name'] == attribute_name]
+            attribute_indices = np.arange(next_bar_height,
+                                          next_bar_height + attribute_data.shape[0],
+                                          step=height_of_bar)
+            attribute_tick_location = float((min(attribute_indices) + max(attribute_indices) + height_of_bar)) / 2
+            h_attribute = ax.barh(attribute_indices,
+                                  width=attribute_data[group_metric].values,
+                                  color='deepskyblue',
+                                  align='edge', edgecolor='black')
+            for y, label in zip(attribute_indices, attribute_data['attribute_value'].values):
+                ax.text(disparities_table[group_metric].max() + 0.2,
+                        y + float(height_of_bar) / 2, label, fontsize=12, verticalalignment='top')
+            tick_indices.append((attribute_name, attribute_tick_location))
+            next_bar_height = max(attribute_indices) + 2 * height_of_bar
+
+        ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
+        ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)), fontsize=14)
+        ax.set_title(f"Disparity of {group_metric}", fontsize=20)
+        ax.set_xlim(0, 1.5)
+        return ax
+
+    def plot_disparities(self, disparities_table, plot_group_metrics=None, fillzeros=True, show_figure=True):
+        '''
+        This function plots disparities as indicated by the config file
+        :param disparities_table: Output of bias.get_disparity functions
+        :param plot_group_metrics: which metrics to plot.
+            If this value is null will plot all self.input_group_metrics
+        :param fillzeros: Should null values be filled with zeros. Default is True
+        :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :return: Returns a figure
+        '''
+        if fillzeros:
+            disparities_table = disparities_table.fillna(0)
+        if plot_group_metrics is None:
+            plot_group_metrics = list(set(self.input_group_metrics) & set(disparities_table.columns))
+
+        fig, ax = plt.subplots(nrows=len(plot_group_metrics), figsize=(10, 5 * len(plot_group_metrics)))
+
+        for i, plot_group_metric in enumerate(plot_group_metrics):
+            self.plot_single_disparity(disparities_table, plot_group_metric, ax[i])
+
+        plt.tight_layout(h_pad=2)
+        if show_figure:
+            plt.show()
+        return fig

@@ -119,6 +119,8 @@ def audit(df, configs, model_id=1, preprocessed=False):
         bias_df = b.get_disparity_min_metric(groups_model)
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
+    if len(configs.plot_bias_disparities) > 0:
+        fig = b.plot_disparities(bias_df, configs.plot_bias_disparities)
     f = Fairness(tau=configs.fairness_threshold)
     print('Fairness Threshold:', configs.fairness_threshold)
     print('Fairness Measures:', configs.fair_measures_requested)
