@@ -3,7 +3,6 @@ from sys import exit
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 
 logging.getLogger(__name__)
@@ -235,7 +234,7 @@ class Bias(object):
         return ax
 
     def plot_disparities(self, disparities_table, plot_group_metrics=None, fillzeros=True, show_figure=True):
-        '''
+        """
         This function plots disparities as indicated by the config file
         :param disparities_table: Output of bias.get_disparity functions
         :param plot_group_metrics: which metrics to plot.
@@ -243,7 +242,7 @@ class Bias(object):
         :param fillzeros: Should null values be filled with zeros. Default is True
         :param show_figure: Whether to show figure (plt.show()). Default is True.
         :return: Returns a figure
-        '''
+        """
         if fillzeros:
             disparities_table = disparities_table.fillna(0)
         if plot_group_metrics is None:
