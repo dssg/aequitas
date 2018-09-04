@@ -115,10 +115,10 @@ require pyenv \
 
 # python
 
-PY_VERSION=3.6.3
+PY_VERSION=3.6.6
 
 exists_python() {
-  pyenv versions | grep -E "^ *${PY_VERSION}$" > /dev/null
+  pyenv versions 2> /dev/null | grep -E "^ *${PY_VERSION}$" > /dev/null
 }
 
 install_python() {
@@ -139,7 +139,7 @@ exists_virtualenv() {
 }
 
 install_virtualenv() {
-  pyenv virtualenv 3.6.3 $PROJECT
+  pyenv virtualenv $PY_VERSION $PROJECT
 }
 
 require "env-${PROJECT}" \
