@@ -1,4 +1,4 @@
-argcmdr==0.5.0
+argcmdr==0.6.0
 awsebcli==3.12.4
 bumpversion==0.5.3
 flake8==3.5.0
