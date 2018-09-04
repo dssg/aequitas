@@ -25,6 +25,51 @@ class Aequitas(LocalRoot):
 
 
 @Aequitas.register
+class Container(Local):
+    """manage the aequitas docker image and container"""
+
+    image_name = 'aequitas'
+    container_name = 'aequitas-dev'
+
+    @localmethod
+    def build(self):
+        """build image"""
+        return self.local['docker'][
+            'build',
+            '-t',
+            self.image_name,
+            ROOT_PATH,
+        ]
+
+    @localmethod
+    def create(self):
+        """create local container"""
+        return self.local['docker'][
+            'create',
+            '-p', '5000:5000',
+            '-e', 'HOST=0.0.0.0',
+            '--name', self.container_name,
+            self.image_name,
+        ]
+
+    @localmethod
+    def start(self):
+        """start local container"""
+        return self.local['docker'][
+            'start',
+            self.container_name,
+        ]
+
+    @localmethod
+    def stop(self):
+        """stop local container"""
+        return self.local['docker'][
+            'stop',
+            self.container_name,
+        ]
+
+
+@Aequitas.register
 class Web(Local):
     """manage the aequitas webapp"""
 
