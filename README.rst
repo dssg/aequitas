@@ -1,16 +1,15 @@
-
-======
+========================================================
 The Bias and Fairness Audit Toolkit for Machine Learning
-======
+========================================================
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
    :scale: 50 %
 
 
-----------------------------------------------
+--------
 Aequitas
-----------------------------------------------
+--------
 
 Aequitas is an open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
 
@@ -22,12 +21,12 @@ Demo
 `See what Aequitas can do <http://aequitas.dssg.io/>`_.
 
 Sample Jupyter Notebook
-====
+=======================
 
- `Explore bias analysis of the COMPAS data <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using the Aequitas library.
+`Explore bias analysis of the COMPAS data <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using the Aequitas library.
 
 Documentation
-====
+=============
 
 Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
@@ -38,11 +37,11 @@ Aequitas requires Python 3.
 
 Install this Python library from source::
 
-    python3 setup.py install
+    python setup.py install
 
 ...or named as an installation requirement, *e.g.* via ``pip``::
 
-    pip3 install git+https://github.com/dssg/aequitas.git
+    python -m pip install git+https://github.com/dssg/aequitas.git
 
 You may then import the ``aequitas`` module from Python::
 
@@ -52,18 +51,16 @@ You may then import the ``aequitas`` module from Python::
 
     aequitas-report
 
-Docker
-======
-Build and run within a Docker container::
+...or, also from the command line, launch the Web front-end::
 
-    docker build -t aequitas .
+    python -m serve
 
-    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
+(Note: The above command launches a Web server only intended for development.)
 
 Development
 ===========
 
-Provision your development environment via ``develop``::
+Provision your development environment via the shell script ``develop``::
 
     ./develop
 
@@ -71,18 +68,30 @@ Common development tasks, such as deploying the webapp, may then be handled via 
 
     manage --help
 
+Containerization
+================
 
-`Find more at the documentation  <https://dssg.github.io/aequitas/>`_.
+To build a Docker container of Aequitas::
 
+    docker build -t aequitas .
 
+...or simply via ``manage``::
+
+    manage container build
+
+The Docker image's container defaults to launching the development Web server, though this can be overridden via the Docker "command" and/or "entrypoint".
+
+To run such a container, supporting the Web server, on-the-fly::
+
+    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
+
+...or, manage a development container via ``manage``::
+
+    manage container [create|start|stop]
+
+Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
 
 To contact the team, please email us at [aequitas at uchicago dot edu]
-
-----------------------------------------------
-----------------------------------------------
-
-
-
 
 
 
