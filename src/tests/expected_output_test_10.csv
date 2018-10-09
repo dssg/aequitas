@@ -1,0 +1,5 @@
+,attribute_name,attribute_value,group_size,pp,ppr,pprev,group_label_pos,group_label_neg,pn,tp,fp,tn,fn,fpr,fnr,fdr,fnr_disparity,fpr_disparity,for_disparity,fdr_disparity,ppr_disparity,pprev_disparity,FNR Parity,FPR Parity,FOR Parity,FDR Parity,Statistical Parity,Impact Parity,TypeI Parity,TypeII Parity,Unsupervised Fairness,Supervised Fairness
+0,class_1,High,7,4,0.5,0.5714285714285714,5,2,3,3,1,1,2,0.5,0.4,0.25,1.0,1.0,1.0,1.0,1.0,1.0,True,True,True,True,True,True,True,True,True,True
+1,class_1,Low,7,4,0.5,0.5714285714285714,4,3,3,2,2,1,2,0.6666666666666666,0.5,0.5,1.25,1.3333333333333333,1.0,2.0,1.0,1.0,True,True,True,True,True,True,True,True,True,True
+2,class_2,High,10,6,0.75,0.6,5,5,4,3,3,2,2,0.6,0.4,0.5,1.0,1.0,1.0,1.0,1.0,1.0,True,True,True,True,True,True,True,True,True,True
+3,class_2,Low,4,2,0.25,0.5,4,0,2,2,0,0,2,,0.5,0.0,1.25,,2.0,0.0,0.3333333333333333,0.8333333333333334,True,,True,False,False,True,False,True,False,False
