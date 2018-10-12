@@ -3,7 +3,7 @@ Flask-Bootstrap==3.3.7.1
 markdown2==2.3.5
 matplotlib==2.2.3
 numpy==1.15.0
-pandas==0.23.4
+pandas==0.21.0
 PyYAML==3.13
 SQLAlchemy==1.2.10
 tabulate==0.8.2
