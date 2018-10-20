@@ -550,13 +550,13 @@ def plot_fairness_disparity(fairness_table, group_metric, ax=None, ax_lim=None,
     return ax
 
 
-def plot_multiple(data_table, plot_fcn, plot_group_metrics=None, fillzeros=True, title=True, ncols=3, label_dict=None,
+def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True, ncols=3, label_dict=None,
                   show_figure=True):
     """
     This function plots disparities as indicated by the config file, colored
         based on calculated parity
     :param data_table: Output of group.get_crosstabs, bias.get_disparity, or fairness.get_fairness functions
-    :param plot_group_metrics: which metric(s) to plot, or 'all.'
+    :param metrics: which metric(s) to plot, or 'all.'
         If this value is null, will plot: Predicted Prevalence (pprev), Predicted Positive Rate (ppr),
         False Discovery Rate (fdr), False Omission Rate (for), False Positve Rate (fpr),
         False Negative Rate (fnr), (or related disparity measures).
@@ -571,27 +571,27 @@ def plot_multiple(data_table, plot_fcn, plot_group_metrics=None, fillzeros=True,
         data_table = data_table.fillna(0)
 
     if plot_fcn in [plot_fairness_group, plot_group_metric]:
-        if not plot_group_metrics:
-            plot_group_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr']
+        if not metrics:
+            metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr']
 
-        #         plot_group_metrics = list(set(self.input_group_metrics) & set(data_table.columns))
-        elif plot_group_metrics == 'all':
-            plot_group_metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
+        #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
+        elif metrics == 'all':
+            metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
                                   'npv', 'precision', 'ppr', 'pprev']
 
         ax_lim = 1
 
     elif plot_fcn in [plot_fairness_disparity, plot_disparity]:
-        if not plot_group_metrics:
-            #         plot_group_metrics = list(set(self.input_group_metrics) & set(data_table.columns))
-            plot_group_metrics = ['pprev_disparity', 'ppr_disparity', 'fdr_disparity',
+        if not metrics:
+            #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
+            metrics = ['pprev_disparity', 'ppr_disparity', 'fdr_disparity',
                                   'for_disparity', 'fpr_disparity', 'fnr_disparity']
-        elif plot_group_metrics == 'all':
-            plot_group_metrics = list(data_table.columns[data_table.columns.str.contains('disparity')])
+        elif metrics == 'all':
+            metrics = list(data_table.columns[data_table.columns.str.contains('disparity')])
 
-        ax_lim = min(10, nearest_quartile(max(data_table[plot_group_metrics].max())) + 0.1)
+        ax_lim = min(10, nearest_quartile(max(data_table[metrics].max())) + 0.1)
 
-    num_metrics = len(plot_group_metrics)
+    num_metrics = len(metrics)
     rows = math.ceil(num_metrics / ncols)
     if ncols == 1 or (num_metrics % ncols == 0):
         axes_to_remove = 0
@@ -601,12 +601,12 @@ def plot_multiple(data_table, plot_fcn, plot_group_metrics=None, fillzeros=True,
     assert (
                 0 < rows <= num_metrics), \
         "Plot must have at least one row. Please update number of columns " \
-        "('ncols') or list of metrics to be plotted ('plot_group_metrics')."
+        "('ncols') or list of metrics to be plotted ('metrics')."
     assert (
                 0 < ncols <= num_metrics), \
         "Plot must have at least one column, and no more columns than metrics. " \
         "Please update number of columns ('ncols') or list of metrics to be " \
-        "plotted ('plot_group_metrics')."
+        "plotted ('metrics')."
 
     total_plot_width = 25
 
@@ -618,7 +618,7 @@ def plot_multiple(data_table, plot_fcn, plot_group_metrics=None, fillzeros=True,
     ax_col = 0
     ax_row = 0
 
-    for group_metric in plot_group_metrics:
+    for group_metric in metrics:
         if (ax_col >= ncols) & ((ax_col + 1) % ncols) == 1:
             ax_row += 1
             ax_col = 0
@@ -646,13 +646,13 @@ def plot_multiple(data_table, plot_fcn, plot_group_metrics=None, fillzeros=True,
     return fig
 
 
-def plot_group_metric_all(data_table, plot_group_metrics=None, fillzeros=True,
+def plot_group_metric_all(data_table, metrics=None, fillzeros=True,
                           ncols=3, title=True, label_dict=None,
                           show_figure=True):
     '''
     Plot multiple metrics at once from a fairness object table.
     :param data_table:  Output of group.get_crosstabs function.
-    :param plot_group_metrics: which metric(s) to plot, or 'all.'
+    :param metrics: which metric(s) to plot, or 'all.'
         If this value is null, will plot:
             - Predicted Prevalence (pprev),
             - Predicted Positive Rate (ppr),
@@ -668,18 +668,18 @@ def plot_group_metric_all(data_table, plot_group_metrics=None, fillzeros=True,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_group_metric,
-                         plot_group_metrics=plot_group_metrics,
+                         metrics=metrics,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
 
 
-def plot_disparity_all(data_table, plot_group_metrics=None, fillzeros=True,
+def plot_disparity_all(data_table, metrics=None, fillzeros=True,
                        ncols=3, title=True, label_dict=None, show_figure=True):
     '''
     Plot multiple metrics at once from a fairness object table.
     :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
         fairness.get_fairness functions.
-    :param plot_group_metrics: which metric(s) to plot, or 'all.'
+    :param metrics: which metric(s) to plot, or 'all.'
         If this value is null, will plot:
             - Predicted Prevalence Disparity (pprev_disparity),
             - Predicted Positive Rate Disparity (ppr_disparity),
@@ -695,20 +695,20 @@ def plot_disparity_all(data_table, plot_group_metrics=None, fillzeros=True,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_disparity,
-                         plot_group_metrics=plot_group_metrics,
+                         metrics=metrics,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
 
 
 
-def plot_fairness_group_all(data_table, plot_group_metrics=None, fillzeros=True,
+def plot_fairness_group_all(data_table, metrics=None, fillzeros=True,
                             ncols=3, title=True, label_dict=None,
                             show_figure=True):
     '''
     Plot multiple metrics at once from a fairness object table.
     :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
         fairness.get_fairness functions.
-    :param plot_group_metrics: which metric(s) to plot, or 'all.'
+    :param metrics: which metric(s) to plot, or 'all.'
         If this value is null, will plot:
             - Predicted Prevalence (pprev),
             - Predicted Positive Rate (ppr),
@@ -724,19 +724,19 @@ def plot_fairness_group_all(data_table, plot_group_metrics=None, fillzeros=True,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_fairness_group,
-                         plot_group_metrics=plot_group_metrics,
+                         metrics=metrics,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
 
 
-def plot_fairness_disparity_all(data_table, plot_group_metrics=None,
+def plot_fairness_disparity_all(data_table, metrics=None,
                                 fillzeros=True, ncols=3, title=True,
                                 label_dict=None, show_figure=True):
     '''
     Plot multiple metrics at once from a fairness object table.
     :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
         fairness.get_fairness functions.
-    :param plot_group_metrics: which metric(s) to plot, or 'all.'
+    :param metrics: which metric(s) to plot, or 'all.'
         If this value is null, will plot:
             - Predicted Prevalence Disparity (pprev_disparity),
             - Predicted Positive Rate Disparity (ppr_disparity),
@@ -752,6 +752,6 @@ def plot_fairness_disparity_all(data_table, plot_group_metrics=None,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_fairness_disparity,
-                         plot_group_metrics=plot_fairness_disparity,
+                         metrics=None,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
