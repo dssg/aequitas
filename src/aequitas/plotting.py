@@ -542,7 +542,7 @@ def plot_fairness_disparity(fairness_table, group_metric, ax=None, ax_lim=None,
     ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
     ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)), fontsize=14)
 
-    ax.set_xlabel('Absolute Metric Magnitude')
+    ax.set_xlabel('Disparity Magnitude')
 
     if title:
         ax.set_title(f"{group_metric.upper()}", fontsize=20)
