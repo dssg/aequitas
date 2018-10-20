@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-# import matplotlib.colors as colors
-# import matplotlib.cm as cm
+import matplotlib.colors as colors
+import matplotlib.cm as cm
 import matplotlib.gridspec as gridspec
 import re
 import math
