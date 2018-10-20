@@ -190,6 +190,13 @@ class Bias(object):
         #df = df.fillna(value=fill_zeros)
         return df
 
+    def list_disparities(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of disparity metrics
+        '''
+        return list(df.columns[df.columns.str.contains('disparity')])
+
     @staticmethod
     def plot_single_disparity(disparities_table, group_metric, ax=None):
         '''
