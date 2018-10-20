@@ -752,6 +752,6 @@ def plot_fairness_disparity_all(data_table, plot_group_metrics=None,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_fairness_disparity,
-                         plot_group_metrics=plot_group_metrics,
+                         plot_group_metrics=plot_disparity,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
