@@ -16,6 +16,9 @@ from .utils.io import push_tocsv
 from .utils.io import push_todb
 from .utils.io import push_topdf
 from .utils.report import audit_report_markdown
+from aequitas.plotting import plot_disparity, plot_disparity_all, \
+    plot_fairness_disparity, plot_fairness_disparity_all, plot_group_metric, \
+    plot_group_metric_all, plot_fairness_group, plot_fairness_group_all
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -120,13 +123,29 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
     if len(configs.plot_bias_disparities) > 0:
-        fig = b.plot_disparities(bias_df, configs.plot_bias_disparities)
+        # fig = b.plot_disparities(bias_df, configs.plot_bias_disparities)
+        disparity_plots = [disp for disp in configs.plot_bias_disparities if 'disparity' in disp]
+        abs_metric_plots = list(set(configs.plot_bias_disparities) - set(disparity_plots))
+        if len(abs_metric_plots) > 0:
+            fig1 = plot_group_metric_all(bias_df, abs_metric_plots)
+        if len(disparity_plots) > 0:
+            fig2 = plot_disparity_all(bias_df, disparity_plots)
+
     f = Fairness(tau=configs.fairness_threshold)
     print('Fairness Threshold:', configs.fairness_threshold)
     print('Fairness Measures:', configs.fair_measures_requested)
     group_value_df = f.get_group_value_fairness(bias_df, fair_measures_requested=configs.fair_measures_requested)
     group_attribute_df = f.get_group_attribute_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     fair_results = f.get_overall_fairness(group_attribute_df)
+    if len(configs.plot_bias_disparities) > 0:
+        # fig = b.plot_disparities(bias_df, configs.plot_bias_disparities)
+        fairness_disparity_plots = [disp for disp in configs.plot_bias_disparities if 'disparity' in disp]
+        fairness_abs_metric_plots = list(set(configs.plot_bias_disparities) - set(disparity_plots))
+        if len(fairness_abs_metric_plots) > 0:
+            fig1 = plot_fairness_group_all(bias_df, fairness_disparity_plots)
+        if len(fairness_disparity_plots) > 0:
+            fig2 = plot_fairness_disparity_all(bias_df, fairness_disparity_plots)
+
     print(fair_results)
     report = None
     if configs.report is True:

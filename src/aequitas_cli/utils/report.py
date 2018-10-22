@@ -104,7 +104,8 @@ def get_highlevel_report(group_attribute_df):
     for attr in attr_list:
         group_attribute_df = group_attribute_df.replace(attr, '[' + attr + ']' + '(#' + '-'.join(attr.lower().split(' ')) + ')')
     group_attribute_df = group_attribute_df.rename(index=str, columns=map)
-    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never', numalign="left")
+    # highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', showindex='never', numalign="left")
+    highlevel_report = tabulate(group_attribute_df, headers='keys', tablefmt='pipe', numalign="left")
     return highlevel_report
 
 
@@ -142,7 +143,8 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
 
     parity_group = tabulate(aux_df,
                             headers='keys',
-                            tablefmt='pipe', showindex='never', numalign="left")
+                            # tablefmt='pipe', showindex='never', numalign="left")
+                            tablefmt = 'pipe', numalign = "left")
     return parity_group
 
 
@@ -199,7 +201,8 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
     aux_df = aux_df[new_order]
     disparities_group = tabulate(aux_df,
                                  headers='keys',
-                                 tablefmt='pipe', showindex='never', numalign="left")
+                                 # tablefmt='pipe', showindex='never', numalign="left")
+                                 tablefmt = 'pipe', numalign = "left")
 
     return disparities_group
 
@@ -230,7 +233,8 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     aux_df = aux_df.rename(index=str, columns=map)
     group_group = tabulate(aux_df,
                            headers='keys',
-                           tablefmt='pipe', showindex='never', numalign="left")
+                           # tablefmt='pipe', showindex='never', numalign="left")
+                           tablefmt = 'pipe', numalign = "left")
     return group_group
 
 
@@ -523,7 +527,8 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
         # krrp
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Reference Groups Selected',
                                           'Unfairly Affected Groups']], headers='keys',
-                                   tablefmt='pipe', showindex='never', numalign="left")
+                                   # tablefmt='pipe', showindex='never', numalign="left")
+                                   tablefmt = 'pipe', numalign = "left")
     return highlevel_table
 
 
@@ -573,8 +578,10 @@ def audit_summary(configs, group_value_df):
                 raw['column3'].append(link)
                 measures_results_dict[measure] = '++span-red-init++Failed++span-red-end++'
     df = pd.DataFrame(raw, columns=['column1', 'column2', 'column3'])
+    # summ_table = tabulate(df[['column1', 'column2', 'column3']], headers='keys',
+    #                       tablefmt='pipe', showindex='never', numalign="left")
     summ_table = tabulate(df[['column1', 'column2', 'column3']], headers='keys',
-                          tablefmt='pipe', showindex='never', numalign="left")
+                          tablefmt='pipe', numalign="left")
     return summ_table, measures_results_dict
 
 
@@ -634,8 +641,10 @@ def audit_description(configs, group_value_df):
     raw['column2'].append(thresh)
 
     df = pd.DataFrame(raw, columns=['column1', 'column2'])
+    # desc_table = tabulate(df[['column1', 'column2']], headers='keys',
+    #                       tablefmt='pipe', showindex='never', numalign="left")
     desc_table = tabulate(df[['column1', 'column2']], headers='keys',
-                          tablefmt='pipe', showindex='never', numalign="left")
+                          tablefmt='pipe', numalign="left")
 
     return desc_table
 
@@ -676,10 +685,15 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         raw['Which groups failed the audit:'] = '##border##' + get_false_text(group_value_df, 'Statistical Parity',
                                                                               fairness_measures_depend)
         dft = pd.DataFrame(raw)
+        # mkdown_highlevel += tabulate(dft[['What is it?', 'When does it matter?', 'Which groups failed the audit:']],
+        #                              headers='keys',
+        #                              tablefmt='pipe', showindex='never', numalign="left") + \
+        #                     oneline
         mkdown_highlevel += tabulate(dft[['What is it?', 'When does it matter?', 'Which groups failed the audit:']],
                                      headers='keys',
-                                     tablefmt='pipe', showindex='never', numalign="left") + \
+                                     tablefmt='pipe', numalign="left") + \
                             oneline
+
         # mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
         #mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
@@ -699,9 +713,11 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
 
         dft = pd.DataFrame(raw)
         mkdown_highlevel += tabulate(dft[['What is it?', 'When does it matter?', 'Which groups failed the audit:']],
-                                     headers='keys',
-                                     tablefmt='pipe', showindex='never', numalign="left") + \
-                            oneline
+                            #          headers='keys',
+                            #          tablefmt='pipe', showindex='never', numalign="left") + \
+                            # oneline
+                                    tablefmt = 'pipe', numalign = "left") + \
+                                        oneline
 
         #mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline
@@ -735,8 +751,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += tabulate(
             dft[['What is it?', 'When does it matter?', 'Which groups failed the audit:']],
             headers='keys',
-            tablefmt='pipe', showindex='never', numalign="left") + \
-                            oneline
+            # tablefmt='pipe', showindex='never', numalign="left") + \
+            #                 oneline
+            tablefmt = 'pipe', numalign = "left") + \
+                oneline
 
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
     mkdown_highlevel += oneline + '----' + oneline
@@ -759,7 +777,9 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += tabulate(
             dft[['What is it?', 'When does it matter?', 'Which groups failed the audit:']],
             headers='keys',
-            tablefmt='pipe', showindex='never', numalign="left") + \
+            # tablefmt='pipe', showindex='never', numalign="left") + \
+            #                 oneline
+            tablefmt = 'pipe', numalign = "left") + \
                             oneline
 
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
@@ -792,8 +812,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += tabulate(dft[['What is it?', 'When does it matter?',
                                           'Which groups failed the audit:']],
                                      headers='keys',
-                                     tablefmt='pipe', showindex='never', numalign="left") + \
-                            oneline
+                            #          tablefmt='pipe', showindex='never', numalign="left") + \
+                            # oneline
+                                    tablefmt = 'pipe', numalign = "left") + \
+                                        oneline
 
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
     mkdown_highlevel += oneline + '----' + oneline
@@ -822,8 +844,10 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
         mkdown_highlevel += tabulate(dft[['What is it?', 'When does it matter?',
                                           'Which groups failed the audit:']],
                                      headers='keys',
-                                     tablefmt='pipe', showindex='never', numalign="left") + \
-                            oneline
+                            #          tablefmt='pipe', showindex='never', numalign="left") + \
+                            # oneline
+                                    tablefmt = 'pipe', numalign = "left") + \
+                                        oneline
 
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline
     # mkdown_highlevel += oneline + '----' + oneline

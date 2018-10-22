@@ -572,20 +572,22 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
 
     if plot_fcn in [plot_fairness_group, plot_group_metric]:
         if not metrics:
-            metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr']
+            primary_abs_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr']
+            metrics = list(set(primary_abs_metrics) & set(data_table.columns))
 
         #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
         elif metrics == 'all':
-            metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
+            abs_metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
                                   'npv', 'precision', 'ppr', 'pprev']
+            metrics = list(set(abs_metrics) & set(data_table.columns))
 
         ax_lim = 1
 
     elif plot_fcn in [plot_fairness_disparity, plot_disparity]:
         if not metrics:
-            #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
-            metrics = ['pprev_disparity', 'ppr_disparity', 'fdr_disparity',
+            primary_disparities = ['pprev_disparity', 'ppr_disparity', 'fdr_disparity',
                                   'for_disparity', 'fpr_disparity', 'fnr_disparity']
+            metrics = list(set(primary_disparities) & set(data_table.columns))
         elif metrics == 'all':
             metrics = list(data_table.columns[data_table.columns.str.contains('disparity')])
 

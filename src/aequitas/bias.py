@@ -199,12 +199,9 @@ class Bias(object):
         '''
         return list(df.columns[df.columns.str.contains('disparity')])
 
-    def list_absolute_metrics(self, df):
+    def list_absolute_metrics(self):
         '''
         View all calculated disparities in table
         :return: list of disparity metrics
         '''
-        return [col for col in group_table.columns if col in [
-            'fpr', 'fnr', 'tpr', 'tnr', 'for', 'fdr', 'npv', 'precision',
-            'ppr', 'pprev', 'prev']
-                ]
+        return self.input_group_metrics

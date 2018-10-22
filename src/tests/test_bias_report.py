@@ -113,13 +113,13 @@ def test_all_0_labels_6():
 
 
 def test_threshold_7():
-    return helper('test_1.csv', 'expected_output_test_7.csv', 'test_3.yaml')
+    return helper('test_7.csv', 'expected_output_test_7.csv', 'test_3.yaml')
 
 
 def test_threshold_8():
-    return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
+    return helper('test_8.csv', 'expected_output_test_8.csv', 'test_4.yaml')
 
 
-def test_disparities_plot_1():
+def test_plot_fcns_1():
     # test that the disparities plots appear
     return helper('test_10.csv', 'expected_output_test_10.csv', 'test_10.yaml')
