@@ -205,3 +205,13 @@ class Group(object):
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
         return groups_df, attr_cols
+
+    def list_absolute_metrics(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of disparity metrics
+        '''
+        return [col for col in group_table.columns if col in [
+            'fpr', 'fnr', 'tpr', 'tnr', 'for', 'fdr', 'npv', 'precision',
+            'ppr', 'pprev', 'prev']
+                ]
