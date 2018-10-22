@@ -211,7 +211,7 @@ class Group(object):
         View all calculated disparities in table
         :return: list of disparity metrics
         '''
-        return [col for col in group_table.columns if col in [
+        return [col for col in df.columns if col in [
             'fpr', 'fnr', 'tpr', 'tnr', 'for', 'fdr', 'npv', 'precision',
             'ppr', 'pprev', 'prev']
                 ]
