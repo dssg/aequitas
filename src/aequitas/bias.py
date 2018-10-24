@@ -36,7 +36,23 @@ class Bias(object):
             self.fill_divbyzero = 10.00000
         else:
             self.fill_divbyzero = fill_divbyzero
-        self.predefined_groups = None
+
+        # include attribute to store current predefined group(s)
+        self._predefined_groups = None
+
+
+    @property
+    def predefined_groups(self):
+        ''' Getter for predefined_groups '''
+        return self._predefined_groups
+
+
+    @predefined_groups.setter
+    def predefined_groups(self, predefined_groups):
+        if not isinstance(predefined_groups, dict):
+            raise ValueError("Not a dictionary")
+        self._predefined_groups = predefined_groups
+
 
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
@@ -191,11 +207,12 @@ class Bias(object):
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
-        
-        # add the latest ref_group as an attribute of the class instance
+
+        # add the latest ref_group_dict as an attribute of the class instance
         self.predefined_groups = ref_groups_dict
 
         return df
+
 
     def list_disparities(self, df):
         '''
