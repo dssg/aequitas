@@ -337,6 +337,7 @@ def plot_fairness_group(fairness_table, group_metric, ax=None, ax_lim=None,
         attribute_data = fairness_table.loc[
             fairness_table['attribute_name'] == attribute]
         values = attribute_data[group_metric].values
+        label_values = attribute_data[group_metric + 'disparity']
 
         # apply red for "False" fairness determinations and green for "True"
         # determinations
@@ -369,7 +370,7 @@ def plot_fairness_group(fairness_table, group_metric, ax=None, ax_lim=None,
             labels = attribute_data['attribute_value'].values
 
         for y, label, value, text_color in zip(attribute_indices, labels,
-                                               values, label_colors):
+                                               label_values, label_colors):
 
             next_position = label_position_values.pop(0)
 
