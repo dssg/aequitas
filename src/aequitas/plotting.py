@@ -337,7 +337,7 @@ def plot_fairness_group(fairness_table, group_metric, ax=None, ax_lim=None,
         attribute_data = fairness_table.loc[
             fairness_table['attribute_name'] == attribute]
         values = attribute_data[group_metric].values
-        label_values = attribute_data[group_metric + 'disparity']
+        label_values = attribute_data[group_metric + '_disparity']
 
         # apply red for "False" fairness determinations and green for "True"
         # determinations
@@ -578,8 +578,8 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
 
         #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
         elif metrics == 'all':
-            abs_metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
-                                  'npv', 'precision', 'ppr', 'pprev']
+            abs_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr',
+                           'tpr', 'tnr', 'npv', 'precision']
             metrics = list(set(abs_metrics) & set(data_table.columns))
 
         ax_lim = 1
