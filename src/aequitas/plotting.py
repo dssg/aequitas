@@ -574,13 +574,13 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
     if plot_fcn in [plot_fairness_group, plot_group_metric]:
         if not metrics:
             primary_abs_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr']
-            metrics = list(set(primary_abs_metrics) & set(data_table.columns))
+            metrics = [met for met in primary_abs_metrics if met in data_table.columns]
 
         #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
         elif metrics == 'all':
             abs_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr',
                            'tpr', 'tnr', 'npv', 'precision']
-            metrics = list(set(abs_metrics) & set(data_table.columns))
+            metrics = [met for met in abs_metrics if met in data_table.columns]
 
         ax_lim = 1
 
@@ -588,7 +588,7 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
         if not metrics:
             primary_disparities = ['pprev_disparity', 'ppr_disparity', 'fdr_disparity',
                                   'for_disparity', 'fpr_disparity', 'fnr_disparity']
-            metrics = list(set(primary_disparities) & set(data_table.columns))
+            metrics = [disp for disp in primary_disparities if disp in data_table.columns]
         elif metrics == 'all':
             metrics = list(data_table.columns[data_table.columns.str.contains('disparity')])
 
@@ -634,7 +634,6 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
             ax_row += 1
         else:
             current_subplot = axs[ax_row, ax_col]
-
         plot_fcn(data_table, group_metric=group_metric, ax=current_subplot,
                  ax_lim=ax_lim, title=title, label_dict=label_dict)
         ax_col += 1
