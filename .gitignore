@@ -10,6 +10,7 @@ __pycache__/
 .manage
 
 *.DS_Store*
+*.DS_Store
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

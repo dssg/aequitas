@@ -4,6 +4,7 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
+
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
 #          Benedict Kuester
@@ -13,6 +14,7 @@ logging.getLogger(__name__)
 class Group(object):
     """
     """
+
     def __init__(self):
         """
         """
@@ -211,7 +213,6 @@ class Group(object):
         View all calculated disparities in table
         :return: list of disparity metrics
         '''
-        return [col for col in df.columns if col in [
-            'fpr', 'fnr', 'tpr', 'tnr', 'for', 'fdr', 'npv', 'precision',
-            'ppr', 'pprev', 'prev']
-                ]
+        return list(set(df.columns) & set(['fpr', 'fnr', 'tpr', 'tnr', 'for',
+                                           'fdr', 'npv', 'precision', 'ppr',
+                                           'pprev', 'prev']))

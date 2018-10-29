@@ -590,7 +590,7 @@ def plot_multiple(data_table, plot_fcn, metrics=None, fillzeros=True, title=True
                                   'for_disparity', 'fpr_disparity', 'fnr_disparity']
             metrics = [disp for disp in primary_disparities if disp in data_table.columns]
         elif metrics == 'all':
-            metrics = list(data_table.columns[data_table.columns.str.contains('disparity')])
+            metrics = list(data_table.columns[data_table.columns.str.contains('_disparity')])
 
         ax_lim = min(10, nearest_quartile(max(data_table[metrics].max())) + 0.1)
 
@@ -754,6 +754,6 @@ def plot_fairness_disparity_all(data_table, metrics=None,
     :return:
     '''
     return plot_multiple(data_table, plot_fcn=plot_fairness_disparity,
-                         metrics=None,
+                         metrics=metrics,
                          fillzeros=fillzeros, title=title, ncols=ncols,
                          label_dict=label_dict, show_figure=show_figure)
