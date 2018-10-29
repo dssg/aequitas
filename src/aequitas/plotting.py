@@ -75,7 +75,7 @@ def plot_group_metric(group_table, group_metric, ax=None, ax_lim=None,
     next_bar_height = 0
     label_position_values = list(group_table[group_metric].values)
 
-    lighter_coppers = truncate_colormap('PuBu', min_value=0, max_value=0.65)
+    lighter_coppers = truncate_colormap('copper_r', min_value=0, max_value=0.65)
 
     norm = colors.Normalize(vmin=group_table[group_metric].min(),
                             vmax=group_table[group_metric].max())
@@ -193,11 +193,11 @@ def plot_disparity(disparities_table, group_metric, ax=None, ax_lim=None,
     next_bar_height = 0
     label_position_values = list(disparities_table[group_metric].values)
 
-    lighter_coppers = truncate_colormap('copper_r', min_value=0, max_value=0.65)
+    lighter_purples = truncate_colormap('PuBu', min_value=0, max_value=0.65)
 
     norm = colors.Normalize(vmin=disparities_table[group_metric].min(),
                             vmax=disparities_table[group_metric].max())
-    mapping = cm.ScalarMappable(norm=norm, cmap=lighter_coppers)
+    mapping = cm.ScalarMappable(norm=norm, cmap=lighter_purples)
 
     if not ax_lim:
         ax_lim = nearest_quartile(disparities_table[group_metric].max()) + 0.1
