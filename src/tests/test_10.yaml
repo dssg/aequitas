@@ -12,4 +12,5 @@ fairness_threshold: 0.5
 # available fairness_measures "Impact Parity", "Statistical Parity", "FPR Parity", "FDR Parity", "FNR Parity", "FOR Parity"
 #fairness_measures: ["FPR Parity", "FNR Parity"]
 
-plot_bias_disparities: ["for", "fpr", "fnr"]
+plot_bias_metrics: ["for", "fpr", "fnr"]
+plot_bias_disparities: ["precision", "fpr", "fdr", "for"]

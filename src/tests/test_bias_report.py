@@ -17,8 +17,10 @@ BASE_DIR = os.path.dirname(__file__)
 import pytest
 import pandas as pd
 import numpy as np
+import squarify
 from aequitas_cli.aequitas_audit import audit
 from aequitas_cli.utils.configs_loader import Configs
+
 
 
 def helper(input_filename, expected_filename, config_file):

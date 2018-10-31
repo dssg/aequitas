@@ -8,3 +8,4 @@ PyYAML==3.13
 SQLAlchemy==1.2.10
 tabulate==0.8.2
 xhtml2pdf==0.2.2
+squarify==0.3.0

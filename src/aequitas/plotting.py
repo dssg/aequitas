@@ -59,16 +59,18 @@ def assemble_ref_groups(df, ref_group_flag='_ref_group_value'):
         attr_table = df.loc[df['attribute_name'] == attribute]
         attr_refs = {}
         for col in ref_group_cols:
-            metric_key = "".join(col.rsplit(ref_group_flag))
+            metric_key = "".join(col.split(ref_group_flag))
             attr_refs[metric_key] = attr_table.loc[attr_table['attribute_name']==attribute, col].min()
         ref_groups[attribute] = attr_refs
     return ref_groups
 
 
 def locate_ref_group_indices(df, attribute_name, group_metric, ref_group_flag='_ref_group_value', model_id=1):
-    abs_metric = "".join(group_metric.rsplit('_disparity'))
+    abs_metric = "".join(group_metric.split('_disparity'))
     all_ref_groups = assemble_ref_groups(df, ref_group_flag)
-    ind = list(df[(df['attribute_name'] == attribute_name) & (df['attribute_value'] == all_ref_groups[attribute_name][abs_metric]) & (df['model_id'] == model_id)].index)
+    ind = list(df[(df['attribute_name'] == attribute_name) &
+                  (df['attribute_value'] == all_ref_groups[attribute_name][abs_metric]) &
+                  (df['model_id'] == model_id)].index)
     idx = ind[0]
     relative_ind = df.index.get_loc(idx)
     return relative_ind
@@ -380,7 +382,7 @@ def plot_group_metric(group_table, group_metric, ax=None, ax_lim=None,
 #     return ax
 
 
-def plot_disparity_treemap(data_table, group_metric, attribute_name,
+def plot_disparity(data_table, group_metric, attribute_name,
                            color_mapping=None, model_id=1, ax=None, fig=None,
                            higlight_fairness=False):
     '''
@@ -446,7 +448,7 @@ def plot_disparity_treemap(data_table, group_metric, attribute_name,
         darker_blues = truncate_colormap('Blues', min_value=0.3, max_value=1)
 
         if not color_mapping:
-            norm = colors.Normalize(vmin=0, vmax=1)
+            norm = colors.Normalize(vmin=0, vmax=2)
             color_mapping = cm.ScalarMappable(norm=norm, cmap=darker_blues)
 
         clrs = [color_mapping.to_rgba(val) for val in sorted_df[related_disparity]]
@@ -756,9 +758,9 @@ def plot_fairness_group(fairness_table, group_metric, ax=None, ax_lim=None,
 #     return ax
 
 
-def plot_fairness_disparity_treemap(data_table, group_metric, attribute_name,
+def plot_fairness_disparity(data_table, group_metric, attribute_name,
                             model_id=1, ax=None, fig=None):
-    return plot_disparity_treemap(data_table=data_table,
+    return plot_disparity(data_table=data_table,
                                   group_metric=group_metric,
                                   attribute_name=attribute_name,
                                   color_mapping=None, model_id=model_id,
@@ -981,7 +983,7 @@ def plot_multiple_treemaps(data_table, plot_fcn, attributes=None, metrics=None,
 
     plt.suptitle(f"{viz_title}", fontsize=25, fontweight="bold")
 
-    fig.tight_layout()
+    # fig.tight_layout()
 
     if rows > 2:
         fig.subplots_adjust(top=0.95)
@@ -1047,7 +1049,7 @@ def plot_group_metric_all(data_table, metrics=None, fillzeros=True,
 #                          label_dict=label_dict, show_figure=show_figure)
 
 
-def plot_disparity_treemap_all(data_table, attributes=None, metrics=None,
+def plot_disparity_all(data_table, attributes=None, metrics=None,
                                 fillzeros=True, ncols=3, title=True,
                                 label_dict=None, show_figure=True):
     '''
@@ -1071,7 +1073,7 @@ def plot_disparity_treemap_all(data_table, attributes=None, metrics=None,
     :param show_figure: Whether to show figure (plt.show()). Default is True.
     :return:
     '''
-    return plot_multiple_treemaps(data_table, plot_fcn=plot_disparity_treemap,
+    return plot_multiple_treemaps(data_table, plot_fcn=plot_disparity,
                                   attributes=attributes, metrics=metrics,
                                   fillzeros=fillzeros, title=title,
                                   label_dict=label_dict, higlight_fairness=False,
@@ -1129,7 +1131,7 @@ def plot_fairness_disparity_all(data_table, attributes=None, metrics=None,
     :param show_figure: Whether to show figure (plt.show()). Default is True.
     :return:
     '''
-    return plot_multiple_treemaps(data_table, plot_fcn=plot_disparity_treemap,
+    return plot_multiple_treemaps(data_table, plot_fcn=plot_disparity,
                                   attributes=attributes, metrics=metrics,
                                   fillzeros=fillzeros, title=title,
                                   label_dict=label_dict, higlight_fairness=True,
