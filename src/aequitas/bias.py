@@ -41,19 +41,6 @@ class Bias(object):
         self._predefined_groups = None
 
 
-    @property
-    def predefined_groups(self):
-        ''' Getter for predefined_groups '''
-        return self._predefined_groups
-
-
-    @predefined_groups.setter
-    def predefined_groups(self, predefined_groups):
-        if not isinstance(predefined_groups, dict):
-            raise ValueError("Not a dictionary")
-        self._predefined_groups = predefined_groups
-
-
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
         """
