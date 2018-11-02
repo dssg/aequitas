@@ -37,9 +37,6 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
 
-        # include attribute to store current predefined group(s)
-        self._predefined_groups = None
-
 
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
