@@ -138,15 +138,25 @@ class Group(object):
         if non_string_cols.empty is False:
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
             exit(1)
+
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
+
         if not score_thresholds:
             df['score'] = df['score'].astype(float)
-            count_ones = df['score'].value_counts()[1.0]
+            counts_all = df['score'].value_counts()
+
+            # check wehther
+            if 1.0 in counts_all.index:
+                count_ones = counts_all.loc[1.0]
+            else:
+                count_ones = 0
+
             if count_ones == 0:
                 logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
                 exit(1)
             score_thresholds = {'rank_abs': [count_ones]}
+
         print('model_id, score_thresholds', model_id, score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
