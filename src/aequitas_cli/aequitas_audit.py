@@ -6,6 +6,7 @@ import pandas as pd
 from aequitas.bias import Bias
 from aequitas.fairness import Fairness
 from aequitas.group import Group
+from aequitas.plotting import Plotting
 from aequitas.preprocessing import preprocess_input_df
 
 from .utils.configs_loader import Configs
@@ -16,10 +17,6 @@ from .utils.io import push_tocsv
 from .utils.io import push_todb
 from .utils.io import push_topdf
 from .utils.report import audit_report_markdown
-from aequitas.plotting import plot_disparity, plot_disparity_all, \
-    plot_fairness_disparity, plot_fairness_disparity_all, plot_group_metric, \
-    plot_group_metric_all, plot_fairness_group, plot_fairness_group_all, \
-    plot_multiple_treemaps
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -123,11 +120,17 @@ def audit(df, configs, model_id=1, preprocessed=False):
         bias_df = b.get_disparity_min_metric(groups_model)
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
-    if len(configs.plot_bias_metrics) > 0:
-        fig1 = plot_disparity_all(bias_df, configs.plot_bias_metrics)
-    if len(configs.plot_bias_disparities) > 0:
-        # fig = b.plot_disparities(bias_df, configs.plot_bias_disparities)
-        fig2 = plot_group_metric_all(bias_df, metrics=configs.plot_bias_disparities)
+
+    aqp = Plotting()
+
+    if len(configs.plot_bias_metrics) == 1:
+        fig1 = aqp.plot_disparity(bias_df, metrics=configs.plot_bias_metrics)
+    elif len(configs.plot_bias_metrics) > 1:
+        fig1 = aqp.plot_disparity_all(bias_df, metrics=configs.plot_bias_metrics)
+    if len(configs.plot_bias_disparities) == 1:
+        fig2 = aqp.plot_group_metric(bias_df, metrics=configs.plot_bias_disparities)
+    elif len(configs.plot_bias_disparities) > 1:
+        fig2 = aqp.plot_group_metric_all(bias_df, metrics=configs.plot_bias_disparities)
 
     f = Fairness(tau=configs.fairness_threshold)
     print('Fairness Threshold:', configs.fairness_threshold)
@@ -136,10 +139,15 @@ def audit(df, configs, model_id=1, preprocessed=False):
     group_attribute_df = f.get_group_attribute_fairness(group_value_df, fair_measures_requested=configs.fair_measures_requested)
     fair_results = f.get_overall_fairness(group_attribute_df)
 
-    if len(configs.plot_bias_metrics) > 0:
-        fig3 = plot_fairness_group_all(group_value_df, configs.plot_bias_metrics)
-    if len(configs.plot_bias_disparities) > 0:
-        fig4 = plot_fairness_disparity_all(group_value_df, metrics=configs.plot_bias_disparities)
+    if len(configs.plot_bias_metrics) == 1:
+        fig3 = aqp.plot_fairness_group(group_value_df, metrics=configs.plot_bias_metrics)
+    elif len(configs.plot_bias_metrics) > 1:
+        fig3 = aqp.plot_fairness_group_all(group_value_df, metrics=configs.plot_bias_metrics)
+
+    if len(configs.plot_bias_disparities) == 1:
+        fig4 = aqp.plot_fairness_disparity(group_value_df, metrics=configs.plot_bias_disparities)
+    elif len(configs.plot_bias_metrics) > 1:
+        fig4 = aqp.plot_fairness_disparity_all(group_value_df, metrics=configs.plot_bias_disparities)
 
     print(fair_results)
     report = None

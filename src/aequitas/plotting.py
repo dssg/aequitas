@@ -126,6 +126,7 @@ class Plotting(object):
 
         abs_metric = "".join(group_metric.split('_disparity'))
         all_ref_groups = self.__assemble_ref_groups(disparities_table, ref_group_flag)
+        print(attribute_name, all_ref_groups.keys())
         ind = list(disparities_table[(disparities_table['attribute_name'] == attribute_name) &
                                      (disparities_table['attribute_value'] == all_ref_groups[attribute_name][
                                          abs_metric]) &
@@ -890,7 +891,7 @@ class Plotting(object):
                                    color_mapping=None, model_id=model_id,
                                    ax=ax, fig=fig, highlight_fairness=True)
 
-    def plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True, title=True,
+    def __plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True, title=True,
                       ncols=3, label_dict=None, show_figure=True):
         """
         This function plots bar charts of absolute metrics indicated by config file
@@ -1000,7 +1001,7 @@ class Plotting(object):
             plt.show()
         return fig
 
-    def plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None, metrics=None,
+    def __plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None, metrics=None,
                                fillzeros=True, title=True, label_dict=None,
                                highlight_fairness=False, show_figure=True):
         """
@@ -1062,8 +1063,12 @@ class Plotting(object):
             viz_title = f"{(', ').join(map(lambda x:x.upper(), metrics))} " \
                         f"Across Attributes"
 
-        ncols = 3
         num_metrics = len(attributes) * len(metrics)
+        if num_metrics > 1:
+            ncols = 3
+        else:
+            ncols = 1
+
         rows = math.ceil(num_metrics / ncols)
         if ncols == 1 or (num_metrics % ncols == 0):
             axes_to_remove = 0
@@ -1106,10 +1111,13 @@ class Plotting(object):
                     ax_row += 1
                     ax_col = 0
 
-                if rows == 1:
+                if num_metrics == 1:
+                    current_subplot = axs
+
+                elif (num_metrics > 1) & (rows == 1):
                     current_subplot = axs[ax_col]
 
-                elif ncols == 1:
+                elif (num_metrics > 1) & (ncols == 1):
                     current_subplot = axs[ax_row]
                     ax_row += 1
                 else:
@@ -1164,7 +1172,7 @@ class Plotting(object):
 
         :return:
         '''
-        return self.plot_multiple(data_table, plot_fcn=self.plot_group_metric,
+        return self.__plot_multiple(data_table, plot_fcn=self.plot_group_metric,
                                   metrics=metrics,
                                   fillzeros=fillzeros, title=title, ncols=ncols,
                                   label_dict=label_dict, show_figure=show_figure)
@@ -1192,7 +1200,7 @@ class Plotting(object):
     #
     #     :return: Returns a figure
     #     '''
-    #     return self.plot_multiple(data_table, plot_fcn=self.plot_disparity,
+    #     return self.__plot_multiple(data_table, plot_fcn=self.plot_disparity,
     #                          metrics=metrics,
     #                          fillzeros=fillzeros, title=title, ncols=ncols,
     #                          label_dict=label_dict, show_figure=show_figure)
@@ -1223,7 +1231,7 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.plot_multiple_treemaps(data_table, plot_fcn=self.plot_disparity,
+        return self.__plot_multiple_treemaps(data_table, plot_fcn=self.plot_disparity,
                                            attributes=attributes, metrics=metrics,
                                            fillzeros=fillzeros, title=title,
                                            label_dict=label_dict, highlight_fairness=False,
@@ -1251,7 +1259,7 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.plot_multiple(fairness_table, plot_fcn=self.plot_fairness_group,
+        return self.__plot_multiple(fairness_table, plot_fcn=self.plot_fairness_group,
                                   metrics=metrics, fillzeros=fillzeros,
                                   title=title, ncols=ncols, label_dict=label_dict,
                                   show_figure=show_figure)
@@ -1280,7 +1288,7 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.plot_multiple_treemaps(fairness_table, plot_fcn=self.plot_disparity,
+        return self.__plot_multiple_treemaps(fairness_table, plot_fcn=self.plot_disparity,
                                            attributes=attributes, metrics=metrics,
                                            fillzeros=fillzeros, title=title,
                                            label_dict=label_dict, highlight_fairness=True,
