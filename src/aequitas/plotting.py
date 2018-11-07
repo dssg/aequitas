@@ -202,7 +202,8 @@ class Plotting(object):
         return ax
 
     def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
-                          title=True, label_dict=None):
+                          title=True, label_dict=None,
+                          min_group = None):
         '''
         Plot a single group metric's absolute metrics
 
@@ -214,6 +215,8 @@ class Plotting(object):
         :param title: Whether a title should be added to the plot. Default is True.
         :param label_dict: Optional dictionary of replacement labels for data.
             Default is None.
+        :param min_group: Minimum size for groups to include in visualization
+            (as a proportion of total sample)
 
         :return: matplotlib.Axis
         '''
@@ -227,12 +230,22 @@ class Plotting(object):
         attribute_names = group_table.attribute_name.unique()
         tick_indices = []
         next_bar_height = 0
+
+        if min_group:
+            if min_group > (group_table.group_size.max() / group_table.group_size.sum()):
+                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+                                f"is larger than all groups in sample.")
+
+            min_size = min_group * group_table.group_size.sum()
+            group_table = group_table.loc[group_table['group_size'] >= min_size]
+
         label_position_values = list(group_table[group_metric].values)
 
-        lighter_coppers = self.__truncate_colormap('copper_r', min_value=0, max_value=0.65)
+        lighter_coppers = self.__truncate_colormap('copper_r', min_value=0,
+                                                   max_value=0.65)
 
-        norm = colors.Normalize(vmin=group_table[group_metric].min(),
-                                vmax=group_table[group_metric].max())
+        norm = colors.Normalize(vmin=group_table['group_size'].min(),
+                                vmax=group_table['group_size'].max())
         mapping = cm.ScalarMappable(norm=norm, cmap=lighter_coppers)
 
         # Lock absolute value metric plot x-axis to (0, 1)
@@ -242,8 +255,10 @@ class Plotting(object):
         for attribute_name in attribute_names:
 
             attribute_data = group_table.loc[
-                group_table['attribute_name'] == attribute_name]
+                (group_table['attribute_name'] == attribute_name)]
+
             values = attribute_data[group_metric].values
+            grp_sizes = attribute_data['group_size'].values
 
             attribute_indices = np.arange(next_bar_height,
                                           next_bar_height + attribute_data.shape[0],
@@ -258,8 +273,8 @@ class Plotting(object):
             label_colors = []
             min_brightness = 0.55
 
-            for (i, bar), val in zip(enumerate(h_attribute), values):
-                my_col = mapping.to_rgba(val)
+            for (i, bar), g_size in zip(enumerate(h_attribute), grp_sizes):
+                my_col = mapping.to_rgba(g_size)
                 bar.set_color(my_col)
                 label_colors.append(self.__brightness_threshold(
                     my_col[:3], min_brightness, light_color=(1, 1, 1, 1)))
@@ -271,9 +286,11 @@ class Plotting(object):
             else:
                 labels = attribute_data['attribute_value'].values
 
-            for y, label, value, text_color in zip(attribute_indices, labels,
-                                                   values, label_colors):
+            for y, label, value, text_color, g_size in zip(attribute_indices, labels,
+                                                   values, label_colors,
+                                                   grp_sizes):
                 next_position = label_position_values.pop(0)
+                group_label = f"{label} ({g_size:,})"
 
                 if ax_lim < 3:
                     CHAR_PLACEHOLDER = 0.03
@@ -292,7 +309,7 @@ class Plotting(object):
                     ax.text(next_position + indent_length, y + float(height_of_bar) / 2,
                             f"{value:.2f}", fontsize=12, verticalalignment='top')
                     ax.text(indent_length, y + float(height_of_bar) / 2,
-                            label, fontsize=11, verticalalignment='top',
+                            group_label, fontsize=11, verticalalignment='top',
                             color=text_color)
 
                 # case when bar too long for labels after bar, print all text in bar
@@ -300,14 +317,14 @@ class Plotting(object):
                         ax_lim - indent_length):
 
                     ax.text(indent_length, y + float(height_of_bar) / 2,
-                            f"{label}, {value:.2f}", fontsize=11,
+                            f"{group_label}, {value:.2f}", fontsize=11,
                             verticalalignment='top', color=text_color)
 
                 # case when bar too small for labels inside bar, print after bar
                 else:
                     ax.text(next_position + indent_length, y + float(
                         height_of_bar) / 2,
-                            f"{label}, {value:.2f}", fontsize=12,
+                            f"{group_label}, {value:.2f}", fontsize=12,
                             verticalalignment='top')
 
             tick_indices.append((attribute_name, attribute_tick_location))
