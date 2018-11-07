@@ -20,7 +20,6 @@ import numpy as np
 from aequitas_cli.aequitas_audit import audit
 from aequitas_cli.utils.configs_loader import Configs
 
-
 def helper(input_filename, expected_filename, config_file):
     '''
 
@@ -69,8 +68,9 @@ def helper(input_filename, expected_filename, config_file):
 
                     pytest.fail(s)
             else:
-                if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
-                           (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
+                if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
+                # if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
+                #            (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
                     s += "{} fails: at least one entry was not the same between data sets\n".format(col)
                     pytest.fail(s)
 
@@ -113,11 +113,11 @@ def test_all_0_labels_6():
 
 
 def test_threshold_7():
-    return helper('test_7.csv', 'expected_output_test_7.csv', 'test_3.yaml')
+    return helper('test_1.csv', 'expected_output_test_7.csv', 'test_3.yaml')
 
 
 def test_threshold_8():
-    return helper('test_8.csv', 'expected_output_test_8.csv', 'test_4.yaml')
+    return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
 
 
 def test_plot_fcns_1():
