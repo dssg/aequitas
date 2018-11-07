@@ -126,7 +126,6 @@ class Plotting(object):
 
         abs_metric = "".join(group_metric.split('_disparity'))
         all_ref_groups = self.__assemble_ref_groups(disparities_table, ref_group_flag)
-        print(attribute_name, all_ref_groups.keys())
         ind = list(disparities_table[(disparities_table['attribute_name'] == attribute_name) &
                                      (disparities_table['attribute_value'] == all_ref_groups[attribute_name][
                                          abs_metric]) &
