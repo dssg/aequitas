@@ -231,7 +231,6 @@ def get_group_group_report(group_value_df, attribute, fairness_measures, fairnes
     group_group = tabulate(aux_df,
                            headers='keys',
                            tablefmt='pipe', showindex='never', numalign="left")
-
     return group_group
 
 
@@ -705,7 +704,6 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                      headers='keys',
                                      tablefmt='pipe', showindex='never', numalign="left") + \
                             oneline
-
 
         #mkdown_highlevel += get_impact_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline

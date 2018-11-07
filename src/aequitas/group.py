@@ -4,7 +4,6 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
 #          Benedict Kuester
@@ -14,7 +13,6 @@ logging.getLogger(__name__)
 class Group(object):
     """
     """
-
     def __init__(self):
         """
         """

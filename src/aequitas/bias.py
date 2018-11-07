@@ -7,7 +7,6 @@ import numpy as np
 
 logging.getLogger(__name__)
 
-
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
 #
@@ -16,7 +15,6 @@ logging.getLogger(__name__)
 class Bias(object):
     """
     """
-
     def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
         """
 
@@ -36,7 +34,6 @@ class Bias(object):
             self.fill_divbyzero = 10.00000
         else:
             self.fill_divbyzero = fill_divbyzero
-
 
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
