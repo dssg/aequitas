@@ -68,9 +68,9 @@ def helper(input_filename, expected_filename, config_file):
 
                     pytest.fail(s)
             else:
-                if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
-                # if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
-                #            (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
+                # if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
+                if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
+                           (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
                     s += "{} fails: at least one entry was not the same between data sets\n".format(col)
                     pytest.fail(s)
 
