@@ -146,7 +146,7 @@ class Group(object):
             df['score'] = df['score'].astype(float)
             counts_all = df['score'].value_counts()
 
-            # check wehther
+            # check whether 1.0 in index before requesting count value
             if 1.0 in counts_all.index:
                 count_ones = counts_all.loc[1.0]
             else:
