@@ -191,10 +191,6 @@ class Bias(object):
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
-
-        # add the latest ref_group_dict as an attribute of the class instance
-        self.predefined_groups = ref_groups_dict
-
         return df
 
 
