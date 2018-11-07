@@ -332,6 +332,8 @@ class Plotting(object):
 
         ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
         ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)), fontsize=14)
+        ax.set_axisbelow(True)
+        ax.xaxis.grid(color='lightgray', which='major',linestyle='dashed')
         ax.set_xlabel("Absolute Metric Magnitude")
 
         if title:
@@ -611,7 +613,7 @@ class Plotting(object):
         ax.axis('off')
 
     def plot_fairness_group(self, fairness_table, group_metric, ax=None, ax_lim=None,
-                            title=False, label_dict=None):
+                            title=False, label_dict=None, min_group=None):
         '''
         This function plots absolute group metrics as indicated by the config file,
             colored based on calculated parity
@@ -640,6 +642,15 @@ class Plotting(object):
         attributes = fairness_table.attribute_name.unique()
         tick_indices = []
         next_bar_height = 0
+
+        if min_group:
+            if min_group > (fairness_table.group_size.max() / fairness_table.group_size.sum()):
+                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+                                f"is larger than all groups in sample.")
+
+            min_size = min_group * fairness_table.group_size.sum()
+            fairness_table = fairness_table.loc[fairness_table['group_size'] >= min_size]
+
         label_position_values = list(fairness_table[group_metric].values)
 
         # Define mapping for condiitonal coloring based on fairness determinations
@@ -743,6 +754,8 @@ class Plotting(object):
 
         ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
         ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)), fontsize=14)
+        ax.set_axisbelow(True)
+        ax.xaxis.grid(color='lightgray', which='major', linestyle='dashed')
 
         ax.set_xlabel('Absolute Metric Magnitude')
 
