@@ -7,7 +7,7 @@ import matplotlib.gridspec as gridspec
 import re
 import math
 import squarify
-
+import warnings
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Loren Hinkson
@@ -123,16 +123,23 @@ class Plotting(object):
 
         :return: Integer indicating relative index of reference group value row.
         """
-
+        # get absolute metric name from passed group metric (vs. a disparity name)
         abs_metric = "".join(group_metric.split('_disparity'))
+
         all_ref_groups = self.__assemble_ref_groups(disparities_table, ref_group_flag)
-        ind = list(disparities_table[(disparities_table['attribute_name'] == attribute_name) &
-                                     (disparities_table['attribute_value'] == all_ref_groups[attribute_name][
-                                         abs_metric]) &
+        ref_group_name = all_ref_groups[attribute_name][abs_metric]
+
+        # get index for row associated with reference group for that model
+        ind = list(disparities_table.loc[(disparities_table['attribute_name'] == attribute_name) &
+                                     (disparities_table['attribute_value'] == ref_group_name) &
                                      (disparities_table['model_id'] == model_id)].index)
+
+        # there should only ever be one item in list, but JIC, select first
         idx = ind[0]
+
         relative_ind = disparities_table.index.get_loc(idx)
-        return relative_ind
+        return relative_ind, ref_group_name
+
 
     def __squarify_plot_rects(self, rects, norm_x=100, norm_y=100, color=None,
                             label=None, value=None, ax=None, **kwargs):
@@ -469,7 +476,7 @@ class Plotting(object):
 
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
                        color_mapping=None, model_id=1, ax=None, fig=None,
-                       highlight_fairness=False):
+                       highlight_fairness=False, min_group=None):
         '''
         Create treemap from disparity or absolute metric values
 
@@ -499,7 +506,8 @@ class Plotting(object):
         assert (group_metric in table_columns), \
             f"Specified group metric {group_metric} not in data_table."
 
-        attribute_table = disparity_table.loc[disparity_table['attribute_name'] == attribute_name]
+        attribute_table = \
+            disparity_table.loc[disparity_table['attribute_name'] == attribute_name]
 
         sorted_df = attribute_table.sort_values(group_metric, ascending=False)
 
@@ -511,8 +519,9 @@ class Plotting(object):
         values = sorted_df.loc[:, group_metric]
 
         # labels for squares in tree map:
-        # label should always be disparity value, disparities visualized should be
-        # capped between 0.1x ref group and 10x ref group
+        # label should always be disparity value (but boxes visualized should be
+        # always be the metric absolute value capped between 0.1x ref group and
+        # 10x ref group)
         if group_metric + '_disparity' not in attribute_table.columns:
             related_disparity = group_metric
 
@@ -560,7 +569,7 @@ class Plotting(object):
                 f"included in data table to color visualization based " \
                 f"on metric fairness."
             clrs = [cb_green if val == True else
-                    cb_red for val in attribute_table[measure]]
+                    cb_red for val in sorted_df[measure]]
 
         else:
             darker_blues = self.__truncate_colormap('Blues', min_value=0.3,
@@ -574,20 +583,48 @@ class Plotting(object):
                 [color_mapping.to_rgba(val) for val in sorted_df[related_disparity]]
 
         # color reference group grey
-        ref_group_idx = self.__locate_ref_group_indices(disparities_table=sorted_df,
-                                                 attribute_name=attribute_name,
-                                                 group_metric=group_metric)
-        clrs[ref_group_idx] = '#D3D3D3'
+        ref_group_rel_idx, ref_group_name = \
+            self.__locate_ref_group_indices(disparities_table=sorted_df,
+                                            attribute_name=attribute_name,
+                                            group_metric=group_metric)
+        clrs[ref_group_rel_idx] = '#D3D3D3'
 
-        compare_value = values.iloc[ref_group_idx]
+        compare_value = values.iloc[ref_group_rel_idx]
 
         scaled_values = [(0.1 * compare_value) if val < (0.1 * compare_value) else
                          (10 * compare_value) if val >= (10 * compare_value) else
                          val for val in values]
 
-        labels = [f"{attr_val}\n{disp:.2f}" if disp != 1. else
-                  f"{attr_val}\n(Reference)" for attr_val, disp in
-                  zip(sorted_df['attribute_value'], sorted_df[related_disparity])]
+        if min_group:
+            if min_group > (disparity_table.group_size.max() /
+                            disparity_table.group_size.sum()):
+                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+                                f"is larger than all groups in sample.")
+
+            min_size = min_group * disparity_table.group_size.sum()
+
+            # raise warning if minimum group size specified would exclude
+            # reference group
+            if any(sorted_df.loc[(sorted_df['attribute_value']==ref_group_name),
+                                 ['group_size']].values < min_size):
+                warnings.warn(
+                    f"Reference group size is smaller than 'min_group' proportion "
+                    f"specified: '{min_group}'. Reference group '{ref_group_name}' "
+                    f"was not excluded.",stacklevel=2)
+
+            sorted_df = \
+                    sorted_df.loc[(sorted_df['group_size'] >= min_size) |
+                                  (sorted_df['attribute_value'] == ref_group_name)]
+
+            scaled_values = \
+                [sv for i, sv in enumerate(scaled_values) if i in sorted_df.index]
+            clrs = \
+                [sv for i, sv in enumerate(clrs) if i in sorted_df.index]
+
+        labels = \
+            [f"{attr_val}\n{disp:.2f}" if disp != 1. else
+             f"{attr_val}\n(Reference)" for attr_val, disp in
+             zip(sorted_df['attribute_value'], sorted_df[related_disparity])]
 
         normed = squarify.normalize_sizes(scaled_values, width, height)
 
@@ -611,6 +648,7 @@ class Plotting(object):
 
         #     Remove axes and display the plot
         ax.axis('off')
+
 
     def plot_fairness_group(self, fairness_table, group_metric, ax=None, ax_lim=None,
                             title=False, label_dict=None, min_group=None):
@@ -901,7 +939,7 @@ class Plotting(object):
     #     return ax
 
     def plot_fairness_disparity(self, fairness_table, group_metric, attribute_name,
-                                model_id=1, ax=None, fig=None):
+                                model_id=1, ax=None, fig=None, min_group=None):
         """
         Plot disparity metrics colored based on calculated disparity.
 
@@ -918,7 +956,8 @@ class Plotting(object):
                                    group_metric=group_metric,
                                    attribute_name=attribute_name,
                                    color_mapping=None, model_id=model_id,
-                                   ax=ax, fig=fig, highlight_fairness=True)
+                                   ax=ax, fig=fig, highlight_fairness=True,
+                                   min_group=min_group)
 
     def __plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True, title=True,
                       ncols=3, label_dict=None, show_figure=True):
@@ -1133,7 +1172,6 @@ class Plotting(object):
         ax_col = 0
         ax_row = 0
 
-        #     if attributes:
         for group_metric in metrics:
             for attr in attributes:
                 if (ax_col >= ncols) & ((ax_col + 1) % ncols) == 1:
@@ -1176,6 +1214,8 @@ class Plotting(object):
         if show_figure:
             plt.show()
         return fig
+
+
 
     def plot_group_metric_all(self, data_table, metrics=None, fillzeros=True,
                               ncols=3, title=True, label_dict=None,
