@@ -5,6 +5,7 @@ import matplotlib.colors as colors
 import matplotlib.cm as cm
 import matplotlib.gridspec as gridspec
 import re
+import seaborn as sns
 import math
 import squarify
 import warnings
@@ -476,6 +477,7 @@ class Plotting(object):
 
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
                        color_mapping=None, model_id=1, ax=None, fig=None,
+                       label_dict=None, title=True,
                        highlight_fairness=False, min_group=None):
         '''
         Create treemap from disparity or absolute metric values
@@ -491,7 +493,7 @@ class Plotting(object):
             disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
         :param color_mapping: matplotlib colormapping for treemap value boxes.
-        :param model_id: Which model to plot for. Default is None.
+        :param model_id: Which model to plot for. Default is 1.
         :param ax: A matplotlib Axis. If not passed, a new figure will be created.
         :param fig: A matplotlib Figure. If not passed, a new figure will be created.
         :param highlight_fairness: Whether to highlight treemaps by disparity
@@ -516,7 +518,39 @@ class Plotting(object):
         width = 100.
         height = 100.
 
+        ref_group_rel_idx, ref_group_name = \
+            self.__locate_ref_group_indices(disparities_table=sorted_df,
+                                            attribute_name=attribute_name,
+                                            group_metric=group_metric)
+
+        if min_group:
+            if min_group > (disparity_table.group_size.max() /
+                            disparity_table.group_size.sum()):
+                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+                                f"is larger than all groups in sample.")
+
+            min_size = min_group * disparity_table.group_size.sum()
+
+            # raise warning if minimum group size specified would exclude
+            # reference group
+            if any(sorted_df.loc[(sorted_df['attribute_value']==ref_group_name),
+                                 ['group_size']].values < min_size):
+                warnings.warn(
+                    f"Reference group size is smaller than 'min_group' proportion "
+                    f"specified: '{min_group}'. Reference group '{ref_group_name}' "
+                    f"was not excluded.",stacklevel=2)
+
+            sorted_df = \
+                    sorted_df.loc[(sorted_df['group_size'] >= min_size) |
+                                  (sorted_df['attribute_value'] == ref_group_name)]
+
         values = sorted_df.loc[:, group_metric]
+
+        # get new index for ref group
+        ref_group_rel_idx, _ = \
+            self.__locate_ref_group_indices(disparities_table=sorted_df,
+                                            attribute_name=attribute_name,
+                                            group_metric=group_metric)
 
         # labels for squares in tree map:
         # label should always be disparity value (but boxes visualized should be
@@ -527,6 +561,7 @@ class Plotting(object):
 
         else:
             related_disparity = group_metric + '_disparity'
+
 
         if highlight_fairness:
 
@@ -556,7 +591,7 @@ class Plotting(object):
                 set(metric_parity_mapping.values()))
             ) > 1), \
                 "Data table must include at least one fairness determination to " \
-                "color visualizations based on metric fairness."
+                "visualize metric parity."
 
             # apply red for "False" fairness determinations and green for "True"
             # determinations
@@ -574,19 +609,16 @@ class Plotting(object):
         else:
             darker_blues = self.__truncate_colormap('Blues', min_value=0.3,
                                                     max_value=1)
+            aq_palette = sns.diverging_palette(215, 35, sep=10, as_cmap=True)
 
             if not color_mapping:
                 norm = colors.Normalize(vmin=0, vmax=2)
-                color_mapping = cm.ScalarMappable(norm=norm, cmap=darker_blues)
+                color_mapping = cm.ScalarMappable(norm=norm, cmap=aq_palette)
 
             clrs = \
                 [color_mapping.to_rgba(val) for val in sorted_df[related_disparity]]
 
         # color reference group grey
-        ref_group_rel_idx, ref_group_name = \
-            self.__locate_ref_group_indices(disparities_table=sorted_df,
-                                            attribute_name=attribute_name,
-                                            group_metric=group_metric)
         clrs[ref_group_rel_idx] = '#D3D3D3'
 
         compare_value = values.iloc[ref_group_rel_idx]
@@ -595,36 +627,20 @@ class Plotting(object):
                          (10 * compare_value) if val >= (10 * compare_value) else
                          val for val in values]
 
-        if min_group:
-            if min_group > (disparity_table.group_size.max() /
-                            disparity_table.group_size.sum()):
-                raise Exception(f"'min_group' proportion specified: '{min_group}' "
-                                f"is larger than all groups in sample.")
 
-            min_size = min_group * disparity_table.group_size.sum()
-
-            # raise warning if minimum group size specified would exclude
-            # reference group
-            if any(sorted_df.loc[(sorted_df['attribute_value']==ref_group_name),
-                                 ['group_size']].values < min_size):
-                warnings.warn(
-                    f"Reference group size is smaller than 'min_group' proportion "
-                    f"specified: '{min_group}'. Reference group '{ref_group_name}' "
-                    f"was not excluded.",stacklevel=2)
-
-            sorted_df = \
-                    sorted_df.loc[(sorted_df['group_size'] >= min_size) |
-                                  (sorted_df['attribute_value'] == ref_group_name)]
-
-            scaled_values = \
-                [sv for i, sv in enumerate(scaled_values) if i in sorted_df.index]
-            clrs = \
-                [sv for i, sv in enumerate(clrs) if i in sorted_df.index]
+            # scaled_values = \
+            #     [sv for i, sv in enumerate(scaled_values) if i in sorted_df.index]
+            # clrs = \
+            #     [sv for i, sv in enumerate(clrs) if i in sorted_df.index]
 
         labels = \
-            [f"{attr_val}\n{disp:.2f}" if disp != 1. else
-             f"{attr_val}\n(Reference)" for attr_val, disp in
-             zip(sorted_df['attribute_value'], sorted_df[related_disparity])]
+            [f"{attr_val}\n(Reference)" if attr_val == ref_group_name else
+             f"{attr_val}\n{disp:.2f}" for attr_val, disp in
+             zip(sorted_df['attribute_value'], sorted_df[related_disparity]) ]
+
+        if label_dict:
+            labels = \
+                [l if l not in label_dict.keys() else label_dict[l] for l in labels]
 
         normed = squarify.normalize_sizes(scaled_values, width, height)
 
@@ -637,12 +653,17 @@ class Plotting(object):
 
         ax = self.__squarify_plot_rects(padded_rects, color=clrs,
                                  label=labels, ax=ax, alpha=0.8)
-        ax.set_title(f"{(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
+        # if model_id:
+        #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
+        #              fontsize=23, fontweight="bold")
+
+        if title:
+            ax.set_title(f"{(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
                      fontsize=23, fontweight="bold")
 
         if not highlight_fairness:
             # create dummy invisible image with a color map to leverage for color bar
-            img = plt.imshow([[0, 2]], cmap=darker_blues, alpha=0.8)
+            img = plt.imshow([[0, 2]], cmap=aq_palette, alpha=0.8)
             img.set_visible(False)
             fig.colorbar(img, orientation="vertical", shrink=.96, ax=ax)
 
@@ -939,7 +960,8 @@ class Plotting(object):
     #     return ax
 
     def plot_fairness_disparity(self, fairness_table, group_metric, attribute_name,
-                                model_id=1, ax=None, fig=None, min_group=None):
+                                model_id=1, ax=None, fig=None, title=True,
+                                min_group=None):
         """
         Plot disparity metrics colored based on calculated disparity.
 
@@ -957,10 +979,11 @@ class Plotting(object):
                                    attribute_name=attribute_name,
                                    color_mapping=None, model_id=model_id,
                                    ax=ax, fig=fig, highlight_fairness=True,
-                                   min_group=min_group)
+                                   min_group=min_group, title=title)
 
-    def __plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True, title=True,
-                      ncols=3, label_dict=None, show_figure=True):
+    def __plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True,
+                        title=True, ncols=3, label_dict=None, show_figure=True,
+                        min_group=None):
         """
         This function plots bar charts of absolute metrics indicated by config file
 
@@ -1057,7 +1080,8 @@ class Plotting(object):
                 current_subplot = axs[ax_row, ax_col]
 
             plot_fcn(data_table, group_metric=group_metric, ax=current_subplot,
-                     ax_lim=ax_lim, title=title, label_dict=label_dict)
+                     ax_lim=ax_lim, title=title, label_dict=label_dict,
+                     min_group=min_group)
             ax_col += 1
 
         # disable axes not being used
@@ -1069,9 +1093,11 @@ class Plotting(object):
             plt.show()
         return fig
 
-    def __plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None, metrics=None,
-                               fillzeros=True, title=True, label_dict=None,
-                               highlight_fairness=False, show_figure=True):
+
+    def __plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None,
+                                 metrics=None, fillzeros=True, title=True,
+                                 label_dict=None, highlight_fairness=False,
+                                 show_figure=True, min_group=None):
         """
         This function plots treemaps of disparities indicated by config file
 
@@ -1165,13 +1191,22 @@ class Plotting(object):
         else:
             darker_blues = self.__truncate_colormap('Blues', min_value=0.25,
                                                     max_value=1)
+            aq_palette = sns.diverging_palette(215, 35, sep=10, as_cmap=True)
+
             norm = colors.Normalize(vmin=0, vmax=2)
-            mapping = cm.ScalarMappable(norm=norm, cmap=darker_blues)
+            mapping = cm.ScalarMappable(norm=norm, cmap=aq_palette)
 
         # set a different metric to be plotted in each subplot
         ax_col = 0
         ax_row = 0
 
+        models = list(data_table.model_id.unique())
+
+        # to do: (next iteration) plot for multiple models based on metrics/
+        # attributes in that model
+        #
+        # for model in models:
+        #     model = lambda x: x if len(models) > 1 else None
         for group_metric in metrics:
             for attr in attributes:
                 if (ax_col >= ncols) & ((ax_col + 1) % ncols) == 1:
@@ -1192,8 +1227,10 @@ class Plotting(object):
 
                 plot_fcn(data_table, group_metric=group_metric,
                          attribute_name=attr, color_mapping=mapping,
-                         ax=current_subplot, fig=fig,
-                         highlight_fairness=highlight_fairness)
+                         ax=current_subplot, fig=fig, title=title,
+                         label_dict=label_dict,
+                         highlight_fairness=highlight_fairness,
+                         min_group=min_group)
 
                 ax_col += 1
 
@@ -1219,7 +1256,7 @@ class Plotting(object):
 
     def plot_group_metric_all(self, data_table, metrics=None, fillzeros=True,
                               ncols=3, title=True, label_dict=None,
-                              show_figure=True):
+                              show_figure=True, min_group=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1241,13 +1278,14 @@ class Plotting(object):
 
         :return:
         '''
-        return self.__plot_multiple(data_table, plot_fcn=self.plot_group_metric,
-                                  metrics=metrics,
-                                  fillzeros=fillzeros, title=title, ncols=ncols,
-                                  label_dict=label_dict, show_figure=show_figure)
+        return self.__plot_multiple(
+            data_table, plot_fcn=self.plot_group_metric, metrics=metrics,
+            fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
+            show_figure=show_figure, min_group=min_group)
 
     # def plot_disparity_all(self, data_table, metrics=None, fillzeros=True,
-    #                        ncols=3, title=True, label_dict=None, show_figure=True):
+    #                        ncols=3, title=True, label_dict=None, show_figure=True,
+    #                        min_group=None):
     #     '''
     #     Plot multiple metrics at once from a fairness object table.
     #     :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1272,11 +1310,12 @@ class Plotting(object):
     #     return self.__plot_multiple(data_table, plot_fcn=self.plot_disparity,
     #                          metrics=metrics,
     #                          fillzeros=fillzeros, title=title, ncols=ncols,
-    #                          label_dict=label_dict, show_figure=show_figure)
+    #                          label_dict=label_dict, show_figure=show_figure
+    #                           min_group=min_group)
 
     def plot_disparity_all(self, data_table, attributes=None, metrics=None,
-                           fillzeros=True, ncols=3, title=True,
-                           label_dict=None, show_figure=True):
+                           fillzeros=True, title=True, label_dict=None,
+                           show_figure=True, min_group=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1300,14 +1339,15 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.__plot_multiple_treemaps(data_table, plot_fcn=self.plot_disparity,
-                                           attributes=attributes, metrics=metrics,
-                                           fillzeros=fillzeros, title=title,
-                                           label_dict=label_dict, highlight_fairness=False,
-                                           show_figure=show_figure)
+        return self.__plot_multiple_treemaps(
+            data_table, plot_fcn=self.plot_disparity, attributes=attributes,
+            metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
+            highlight_fairness=False, show_figure=show_figure, title=title,
+            min_group=min_group)
 
-    def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True, ncols=3,
-                                title=True, label_dict=None, show_figure=True):
+    def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True,
+                                ncols=3, title=True, label_dict=None,
+                                show_figure=True, min_group=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1328,14 +1368,14 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.__plot_multiple(fairness_table, plot_fcn=self.plot_fairness_group,
-                                  metrics=metrics, fillzeros=fillzeros,
-                                  title=title, ncols=ncols, label_dict=label_dict,
-                                  show_figure=show_figure)
+        return self.__plot_multiple(
+            fairness_table, plot_fcn=self.plot_fairness_group, metrics=metrics,
+            fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
+            show_figure=show_figure, min_group=min_group)
 
     def plot_fairness_disparity_all(self, fairness_table, attributes=None, metrics=None,
                                     fillzeros=True, title=True,
-                                    label_dict=None, show_figure=True):
+                                    label_dict=None, show_figure=True, min_group=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1357,8 +1397,8 @@ class Plotting(object):
 
         :return: Returns a figure
         '''
-        return self.__plot_multiple_treemaps(fairness_table, plot_fcn=self.plot_disparity,
-                                           attributes=attributes, metrics=metrics,
-                                           fillzeros=fillzeros, title=title,
-                                           label_dict=label_dict, highlight_fairness=True,
-                                           show_figure=show_figure)
+        return self.__plot_multiple_treemaps(
+            fairness_table, plot_fcn=self.plot_disparity, attributes=attributes,
+            metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
+            title=title, highlight_fairness=True, show_figure=show_figure,
+            min_group=min_group)
