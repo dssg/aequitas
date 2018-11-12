@@ -7,7 +7,8 @@ import matplotlib.gridspec as gridspec
 import re
 import seaborn as sns
 import math
-import squarify
+from squarify_flipped import normalize_sizes, squarify, padded_squarify, \
+    squarify_plot_rects
 import warnings
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
@@ -642,16 +643,16 @@ class Plotting(object):
             labels = \
                 [l if l not in label_dict.keys() else label_dict[l] for l in labels]
 
-        normed = squarify.normalize_sizes(scaled_values, width, height)
+        normed = normalize_sizes(scaled_values, width, height)
 
         #     rects = squarify.squarify(normed, x, y, width, height)
-        padded_rects = squarify.padded_squarify(normed, x, y, width, height)
+        padded_rects = padded_squarify(normed, x, y, width, height)
 
         # make plot
         if not ax or not fig:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        ax = self.__squarify_plot_rects(padded_rects, color=clrs,
+        ax = squarify_plot_rects(padded_rects, color=clrs,
                                  label=labels, ax=ax, alpha=0.8)
         # if model_id:
         #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
