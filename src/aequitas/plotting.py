@@ -610,7 +610,7 @@ class Plotting(object):
         else:
             darker_blues = self.__truncate_colormap('Blues', min_value=0.3,
                                                     max_value=1)
-            aq_palette = sns.diverging_palette(215, 35, sep=10, as_cmap=True)
+            aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
 
             if not color_mapping:
                 norm = colors.Normalize(vmin=0, vmax=2)
@@ -1192,7 +1192,7 @@ class Plotting(object):
         else:
             darker_blues = self.__truncate_colormap('Blues', min_value=0.25,
                                                     max_value=1)
-            aq_palette = sns.diverging_palette(215, 35, sep=10, as_cmap=True)
+            aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
 
             norm = colors.Normalize(vmin=0, vmax=2)
             mapping = cm.ScalarMappable(norm=norm, cmap=aq_palette)
