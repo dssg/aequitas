@@ -87,19 +87,14 @@ def squarify(sizes, x, y, dx, dy):
     i = 1
     while i < len(sizes) and worst_ratio(sizes[:i], x, y, dx, dy) >= worst_ratio(sizes[:(i + 1)], x, y, dx, dy):
         i += 1
-        print(f"while loop {i}")
-    "while loop broken"
     current = sizes[:i]
 
     remaining = sizes[i:]
 
     (leftover_x, leftover_y, leftover_dx, leftover_dy) = leftover(current, x, y, dx, dy)
-    print()
-    print(f"about to layout {current} x:{x}, y:{y}, dx:{dx}, dy:{dy} -- {layout(current, x, y, dx, dy)}")
-    print(
-        f"squarifying the rest: {remaining}--leftover_x:{leftover_x}, leftover_y:{leftover_x}, leftover_dx:{leftover_dx}, leftover_dy:{leftover_dy}")
+
     return layout(current, x, y, dx, dy) + \
-           squarify(remaining, leftover_x, leftover_y, leftover_dx, leftover_dy)
+       squarify(remaining, leftover_x, leftover_y, leftover_dx, leftover_dy)
 
 
 def pad_rectangle(rect):

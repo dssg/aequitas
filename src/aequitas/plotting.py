@@ -7,7 +7,7 @@ import matplotlib.gridspec as gridspec
 import re
 import seaborn as sns
 import math
-from squarify_flipped import normalize_sizes, squarify, padded_squarify, \
+from aequitas.squarify_flipped import normalize_sizes, squarify, padded_squarify, \
     squarify_plot_rects
 import warnings
 
