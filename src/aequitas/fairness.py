@@ -34,13 +34,12 @@ class Fairness(object):
         else:
             self.tau = tau
 
-        # self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
-        #     else \
-        #     (True if (x[col1] is True and x[col2] is True) else False)
-        self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (
-                    pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
+        self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
             else \
             (True if (x[col1] is True and x[col2] is True) else False)
+        # self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) or pd.np.isnan(x[col2])) \
+        #     else \
+        #     (True if (x[col1] is True and x[col2] is True) else False)
 
         self.high_level_single_eval = lambda col: lambda x: pd.np.nan if pd.np.isnan(x[col]) else (True if x[col] is True else
         False)
