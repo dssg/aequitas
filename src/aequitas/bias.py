@@ -2,8 +2,6 @@ import logging
 from sys import exit
 
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 
 logging.getLogger(__name__)
 

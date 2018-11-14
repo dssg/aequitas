@@ -112,7 +112,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
-    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute].copy()
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:

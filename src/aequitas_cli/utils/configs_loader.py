@@ -8,11 +8,14 @@ logging.getLogger(__name__)
 
 class Configs(object):
     def __init__(self, ref_groups_method='majority', fairness_threshold=0.8,
-                 attr_cols=None, report=True, score_thresholds=None, project_description={'title': '', 'goal': ''},
-                 ref_groups=None, db=None, fairness_measures=['Statistical Parity', 'Impact Parity', 'FDR Parity',
-                                                              'FPR Parity', 'FNR Parity', 'FOR Parity', 'TPR Parity',
-                                                              'Precision Parity'], plot_bias_disparities=[],
-                                                               plot_bias_metrics=[]):
+                 attr_cols=None, report=True, score_thresholds=None,
+                 project_description={'title': '', 'goal': ''},
+                 ref_groups=None, db=None, fairness_measures=[
+                'Statistical Parity', 'Impact Parity', 'FDR Parity',
+                'FPR Parity', 'FNR Parity', 'FOR Parity', 'TPR Parity',
+                'Precision Parity'],
+                 plot_bias_disparities=[], plot_bias_metrics=[]):
+
         self.ref_groups_method = ref_groups_method
         self.fairness_threshold = fairness_threshold
         self.attr_cols = attr_cols

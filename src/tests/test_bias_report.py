@@ -23,10 +23,6 @@ from aequitas_cli.utils.configs_loader import Configs
 def helper(input_filename, expected_filename, config_file):
     '''
 
-    :param input_filename:
-    :param expected_filename:
-    :param config_file:
-    :return:
     '''
 
     input_filename = os.path.join(BASE_DIR, input_filename)
@@ -37,7 +33,7 @@ def helper(input_filename, expected_filename, config_file):
 
     config = Configs.load_configs(config_file)
 
-    test_df, _ = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
+    test_df, _  = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
 
     # match expected_df columns
     shared_columns = [c for c in expected_df.columns if c in test_df.columns]
@@ -59,18 +55,25 @@ def helper(input_filename, expected_filename, config_file):
         if col not in {'attribute_value', 'attribute_name'}:
             print('testing {} ...'.format(col))
 
-            if np.issubdtype(combined_data[col + '_x'].dtype, np.number):
+            # master uses try/ except
+            try:
+            # change proposed by kalkairis (fails test 3, labels all 1), likely due to NaNs:
+            # if np.issubdtype(combined_data[col + '_x'], np.number):
+
                 if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
                     aeq_mean = np.mean(combined_data[col + "_y"])
-                    s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean,
-                                                                                               aeq_mean)
+                    s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean,                                                                              aeq_mean)
 
                     pytest.fail(s)
-            else:
-                # if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
-                if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
-                           (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
+            # change proposed by kalkairis (fails test 3, labels all 1):
+            # checking for nulls here, but NaNs fall within np.number (checked for above)
+            # else:
+            #     if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
+            #            (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
+
+            except:
+                if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
                     s += "{} fails: at least one entry was not the same between data sets\n".format(col)
                     pytest.fail(s)
 
@@ -121,5 +124,5 @@ def test_threshold_8():
 
 
 def test_plot_fcns_1():
-    # test that the disparities plots appear
+    # test that absolute group metric and  disparity plots appear
     return helper('test_10.csv', 'expected_output_test_10.csv', 'test_10.yaml')
