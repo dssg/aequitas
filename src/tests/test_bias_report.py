@@ -55,22 +55,13 @@ def helper(input_filename, expected_filename, config_file):
         if col not in {'attribute_value', 'attribute_name'}:
             print('testing {} ...'.format(col))
 
-            # master uses try/ except
             try:
-            # change proposed by kalkairis (fails test 3, labels all 1), likely due to NaNs:
-            # if np.issubdtype(combined_data[col + '_x'], np.number):
-
                 if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
                     aeq_mean = np.mean(combined_data[col + "_y"])
                     s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean,                                                                              aeq_mean)
 
                     pytest.fail(s)
-            # change proposed by kalkairis (fails test 3, labels all 1):
-            # checking for nulls here, but NaNs fall within np.number (checked for above)
-            # else:
-            #     if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
-            #            (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
 
             except:
                 if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):

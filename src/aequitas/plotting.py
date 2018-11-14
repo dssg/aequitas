@@ -37,6 +37,37 @@ class Plotting(object):
         else:
             self.key_disparities = key_disparities
 
+        # Define mapping for condiitonal coloring based on fairness
+        # determinations
+        self.__metric_parity_mapping = {
+                'ppr_disparity': 'Statistical Parity',
+                'pprev_disparity': 'Impact Parity',
+                'precision_disparity': 'Precision Parity',
+                'fdr_disparity': 'FDR Parity',
+                'for_disparity': 'FOR Parity',
+                'fpr_disparity': 'FPR Parity',
+                'fnr_disparity': 'FNR Parity',
+                'tpr_disparity': 'TPR Parity',
+                'tnr_disparity': 'TNR Parity',
+                'npv_disparity': 'NPV Parity',
+                'ppr': 'Statistical Parity',
+                'pprev': 'Impact Parity',
+                'precision': 'Precision Parity',
+                'fdr': 'FDR Parity',
+                'for': 'FOR Parity',
+                'fpr': 'FPR Parity',
+                'fnr': 'FNR Parity',
+                'tpr': 'TPR Parity',
+                'tnr': 'TNR Parity',
+                'npv': 'NPV Parity'
+                }
+
+
+    @property
+    def metric_parity_mapping(self):
+        ''' Getter for metric_parity_mapping '''
+        return self.__metric_parity_mapping
+
 
     def __nearest_quartile(self, x):
         rounded = round(x * 4) / 4
@@ -143,76 +174,9 @@ class Plotting(object):
         return relative_ind, ref_group_name
 
 
-    def __squarify_plot_rects(self, rects, norm_x=100, norm_y=100, color=None,
-                            label=None, value=None, ax=None, **kwargs):
-        """
-        Plotting with Matplotlib from predefined rectangles. Adapted from squarify
-        source code.
-
-        :param rects: list-like of dictionaries indicating rectangle dimensions
-            for plotting
-        :param norm_x:  overall figure dimensions for normalizing value box sizes
-        :param norm_y: overall figure dimensions for normalizing value box sizes
-        :param color: color string or list-like of colors to use for value boxes
-        :param label: list-like used as label text
-        :param value: list-like used as value text
-        :param ax: Matplotlib Axes instance
-        :param kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
-
-        :return: matplotlib.Axis
-        """
-        x = [rect['x'] for rect in rects]
-        y = [rect['y'] for rect in rects]
-        dx = [rect['dx'] for rect in rects]
-        dy = [rect['dy'] for rect in rects]
-
-        ax.bar(x, dy, width=dx, bottom=y, color=color,
-               label=label, align='edge', **kwargs)
-
-        if value is not None:
-            va = 'center' if label is None else 'top'
-            for v, r in zip(value, rects):
-                x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-                ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
-
-        if label is not None:
-            va = 'center' if value is None else 'bottom'
-            under_plot = []
-            alphabet = list(map(chr, range(65, 91)))
-            under_plot_num = 0
-
-            for l, r in zip(label, rects):
-                x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-                length = dx
-
-                indent_length = 4
-                CHAR_PLACEHOLDER = 1.5
-
-                # if box large enough, add labels and values
-                if (dx >= (indent_length * 2) + CHAR_PLACEHOLDER * len(l)) & (dx > 10):
-                    ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center',
-                            fontsize=14, wrap=False)
-
-                else:
-                    # add labels that don't fit in boxes underneath plot
-                    ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
-                            ha='center', fontsize=10, wrap=False)
-                    underplot_label = l.replace('\n', ', ')
-                    under_plot.append(f"{alphabet[under_plot_num]}: {underplot_label}")
-                    under_plot_num += 1
-
-        if len(under_plot) > 0:
-            unlabeled = ('\n').join(under_plot)
-            ax.text(0.0, -0.05, f"Not labeled above:\n{unlabeled}",
-                    ha='left', va='top', transform=ax.transAxes, fontsize=14)
-
-        ax.set_xlim(0, norm_x)
-        ax.set_ylim(0, norm_y)
-        return ax
-
     def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
                           title=True, label_dict=None,
-                          min_group = None):
+                          min_group_size = None):
         '''
         Plot a single group metric's absolute metrics
 
@@ -224,11 +188,14 @@ class Plotting(object):
         :param title: Whether a title should be added to the plot. Default is True.
         :param label_dict: Optional dictionary of replacement labels for data.
             Default is None.
-        :param min_group: Minimum size for groups to include in visualization
+        :param min_group_size: Minimum size for groups to include in visualization
             (as a proportion of total sample)
 
         :return: matplotlib.Axis
         '''
+        assert (group_metric in group_table.columns), \
+            f"Specified disparity metric {group_metric} not in 'group_table'."
+
         if any(group_table[group_metric].isnull()):
             raise IOError(f"Cannot plot {group_metric}, has NaN values.")
 
@@ -240,12 +207,12 @@ class Plotting(object):
         tick_indices = []
         next_bar_height = 0
 
-        if min_group:
-            if min_group > (group_table.group_size.max() / group_table.group_size.sum()):
-                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+        if min_group_size:
+            if min_group_size > (group_table.group_size.max() / group_table.group_size.sum()):
+                raise Exception(f"'min_group_size' proportion specified: '{min_group_size}' "
                                 f"is larger than all groups in sample.")
 
-            min_size = min_group * group_table.group_size.sum()
+            min_size = min_group_size * group_table.group_size.sum()
             group_table = group_table.loc[group_table['group_size'] >= min_size]
 
         label_position_values = list(group_table[group_metric].values)
@@ -350,136 +317,11 @@ class Plotting(object):
 
         return ax
 
-    # def plot_disparity(self, disparities_table, group_metric, ax=None, ax_lim=None,
-    #                    title=True, label_dict=None):
-    #     '''
-    #     Plot a single group metric's disparity
-
-    #     :param disparities_table: A disparity table. Output of bias.get_disparity
-    #          or fairness.get_fairness functions
-    #     :param group_metric: The metric to plot. Must be a column in the
-    #         disparities_table
-    #     :param ax: A matplotlib Axis. If not passed a new figure will be created.
-    #     :param ax_lim: Maximum value on x-axis, used to match axes across subplots
-    #         when plotting multiple metrics. Default is None.
-    #     :param title: Whether a title should be added to the plot. Default is True.
-    #     :param label_dict: Optional ictionary of replacement labels for data.
-    #       Default is None.
-
-    #     :return: matplotlib.Axis
-    #     '''
-    #     if any(disparities_table[group_metric].isnull()):
-    #         raise IOError(f"Cannot plot {group_metric}, has NaN values.")
-    #
-    #     if ax is None:
-    #         fig, ax = plt.subplots(figsize=(10, 5))
-    #
-    #     height_of_bar = 1
-    #     attribute_names = disparities_table.attribute_name.unique()
-    #     tick_indices = []
-    #     next_bar_height = 0
-    #     label_position_values = list(disparities_table[group_metric].values)
-    #
-    #     lighter_purples = self.__truncate_colormap('PuBu', min_value=0, max_value=0.65)
-    #
-    #     norm = colors.Normalize(vmin=disparities_table[group_metric].min(),
-    #                             vmax=disparities_table[group_metric].max())
-    #     mapping = cm.ScalarMappable(norm=norm, cmap=lighter_purples)
-    #
-    #     if not ax_lim:
-    #         ax_lim = self.__nearest_quartile(disparities_table[group_metric].max()) + 0.1
-    #
-    #     ax.set_xlim(0, min(10, ax_lim))
-    #
-    #     for attribute_name in attribute_names:
-    #
-    #         attribute_data = disparities_table.loc[
-    #             disparities_table['attribute_name'] == attribute_name]
-    #         values = attribute_data[group_metric].values
-    #
-    #         attribute_indices = np.arange(next_bar_height,
-    #                                       next_bar_height + attribute_data.shape[0],
-    #                                       step=height_of_bar)
-    #         attribute_tick_location = float(
-    #             (min(attribute_indices) + max(attribute_indices) + height_of_bar)) / 2
-    #
-    #         h_attribute = ax.barh(
-    #             attribute_indices, width=values,
-    #             label=list(attribute_data['attribute_value'].values),
-    #             align='edge', edgecolor='grey')
-    #
-    #         label_colors = []
-    #         min_brightness = 0.55
-    #
-    #         for (i, bar), val in zip(enumerate(h_attribute), values):
-    #             my_col = mapping.to_rgba(val)
-    #             bar.set_color(my_col)
-    #             label_colors.append(self.__brightness_threshold(
-    #               my_col[:3], min_brightness, light_color=(1, 1, 1, 1)))
-    #
-    #         if label_dict:
-    #             labels = [label if label not in label_dict.keys() else
-    #                       label_dict[label] for label in
-    #                       attribute_data['attribute_value'].values]
-    #         else:
-    #             labels = attribute_data['attribute_value'].values
-    #
-    #         for y, label, value, text_color in zip(attribute_indices, labels, values,
-    #                                                label_colors):
-    #             next_position = label_position_values.pop(0)
-    #
-    #             if ax_lim < 3:
-    #                 CHAR_PLACEHOLDER = 0.03
-    #             else:
-    #                 CHAR_PLACEHOLDER = 0.25
-    #
-    #             label_length = len(label) * CHAR_PLACEHOLDER
-    #             max_val_length = 7 * CHAR_PLACEHOLDER
-    #             indent_length = ax_lim * 0.025
-    #
-    #             # bar long enough for label, enough space after bar for value
-    #             if ((indent_length + label_length) < (next_position - indent_length)) & (
-    #                     (next_position + indent_length + max_val_length) < (
-    #                           ax_lim - indent_length)):
-    #
-    #                 ax.text(next_position + indent_length, y + float(height_of_bar) / 2,
-    #                         f"{value:.2f}", fontsize=12, verticalalignment='top')
-    #                 ax.text(indent_length, y + float(height_of_bar) / 2,
-    #                         label, fontsize=11, verticalalignment='top',
-    #                         color=text_color)
-    #
-    #             # case when bar too long for labels after bar, print all text in bar
-    #             elif (next_position + indent_length + max_val_length) > (
-    #                          ax_lim - indent_length):
-    #
-    #                 ax.text(indent_length, y + float(height_of_bar) / 2,
-    #                         f"{label}, {value:.2f}", fontsize=11,
-    #                         verticalalignment='top', color=text_color)
-    #
-    #             # case when bar too small for labels inside bar, print all text after bar
-    #             else:
-    #                 ax.text(next_position + indent_length, (
-    #                           y + float(height_of_bar) )/ 2,
-    #                         f"{label}, {value:.2f}", fontsize=12,
-    #                         verticalalignment='top')
-    #
-    #         tick_indices.append((attribute_name, attribute_tick_location))
-    #         next_bar_height = max(attribute_indices) + 2 * height_of_bar
-    #
-    #     ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
-    #     ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)), fontsize=14)
-    #
-    #     ax.set_xlabel('Disparity Magnitude')
-    #
-    #     if title:
-    #         ax.set_title(f"{group_metric.upper()}", fontsize=20)
-    #
-    #     return ax
 
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
                        color_mapping=None, model_id=1, ax=None, fig=None,
                        label_dict=None, title=True,
-                       highlight_fairness=False, min_group=None):
+                       highlight_fairness=False, min_group_size=None):
         '''
         Create treemap from disparity or absolute metric values
 
@@ -506,8 +348,8 @@ class Plotting(object):
         # between the min and max, then assign colors to individual values
 
         table_columns = set(disparity_table.columns)
-        assert (group_metric in table_columns), \
-            f"Specified group metric {group_metric} not in data_table."
+        assert (group_metric in disparity_table.columns), \
+            f"Specified disparity metric {group_metric} not in 'disparity_table'."
 
         attribute_table = \
             disparity_table.loc[disparity_table['attribute_name'] == attribute_name]
@@ -524,21 +366,21 @@ class Plotting(object):
                                             attribute_name=attribute_name,
                                             group_metric=group_metric)
 
-        if min_group:
-            if min_group > (disparity_table.group_size.max() /
+        if min_group_size:
+            if min_group_size > (disparity_table.group_size.max() /
                             disparity_table.group_size.sum()):
-                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+                raise Exception(f"'min_group_size' proportion specified: '{min_group_size}' "
                                 f"is larger than all groups in sample.")
 
-            min_size = min_group * disparity_table.group_size.sum()
+            min_size = min_group_size * disparity_table.group_size.sum()
 
             # raise warning if minimum group size specified would exclude
             # reference group
             if any(sorted_df.loc[(sorted_df['attribute_value']==ref_group_name),
                                  ['group_size']].values < min_size):
                 warnings.warn(
-                    f"Reference group size is smaller than 'min_group' proportion "
-                    f"specified: '{min_group}'. Reference group '{ref_group_name}' "
+                    f"Reference group size is smaller than 'min_group_size' proportion "
+                    f"specified: '{min_group_size}'. Reference group '{ref_group_name}' "
                     f"was not excluded.",stacklevel=2)
 
             sorted_df = \
@@ -565,31 +407,8 @@ class Plotting(object):
 
 
         if highlight_fairness:
-
-            metric_parity_mapping = {
-                'ppr_disparity': 'Statistical Parity',
-                'pprev_disparity': 'Impact Parity',
-                'precision_disparity': 'Precision Parity',
-                'fdr_disparity': 'FDR Parity',
-                'for_disparity': 'FOR Parity',
-                'fpr_disparity': 'FPR Parity',
-                'fnr_disparity': 'FNR Parity',
-                'tpr_disparity': 'TPR Parity',
-                'tnr_disparity': 'TNR Parity',
-                'npv_disparity': 'NPV Parity',
-                'tpr': 'TPR Parity',
-                'tnr': 'TNR Parity',
-                'for': 'FOR Parity',
-                'fdr': 'FDR Parity',
-                'fpr': 'FPR Parity',
-                'fnr': 'FNR Parity',
-                'npv': 'NPV Parity',
-                'precision': 'Precision Parity',
-                'ppr': 'Statistical Parity',
-                'pprev': 'Impact Parity'}
-
             assert (len(table_columns.intersection(
-                set(metric_parity_mapping.values()))
+                set(self.metric_parity_mapping.values()))
             ) > 1), \
                 "Data table must include at least one fairness determination to " \
                 "visualize metric parity."
@@ -599,7 +418,7 @@ class Plotting(object):
             cb_green = '#1b7837'
             cb_red = '#a50026'
 
-            measure = metric_parity_mapping[group_metric]
+            measure = self.metric_parity_mapping[group_metric]
             assert ((measure in table_columns)), \
                 f"Related fairness determination for {group_metric} must be " \
                 f"included in data table to color visualization based " \
@@ -608,8 +427,6 @@ class Plotting(object):
                     cb_red for val in sorted_df[measure]]
 
         else:
-            darker_blues = self.__truncate_colormap('Blues', min_value=0.3,
-                                                    max_value=1)
             aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
 
             if not color_mapping:
@@ -628,20 +445,16 @@ class Plotting(object):
                          (10 * compare_value) if val >= (10 * compare_value) else
                          val for val in values]
 
-
-            # scaled_values = \
-            #     [sv for i, sv in enumerate(scaled_values) if i in sorted_df.index]
-            # clrs = \
-            #     [sv for i, sv in enumerate(clrs) if i in sorted_df.index]
-
-        labels = \
-            [f"{attr_val}\n(Reference)" if attr_val == ref_group_name else
-             f"{attr_val}\n{disp:.2f}" for attr_val, disp in
+        label_values = \
+            ["(Reference)" if attr_val == ref_group_name else
+             f"{disp:.2f}" for attr_val, disp in
              zip(sorted_df['attribute_value'], sorted_df[related_disparity]) ]
 
         if label_dict:
             labels = \
                 [l if l not in label_dict.keys() else label_dict[l] for l in labels]
+        else:
+            labels = list(sorted_df['attribute_value'])
 
         normed = normalize_sizes(scaled_values, width, height)
 
@@ -652,8 +465,8 @@ class Plotting(object):
         if not ax or not fig:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        ax = squarify_plot_rects(padded_rects, color=clrs,
-                                 label=labels, ax=ax, alpha=0.8)
+        ax = squarify_plot_rects(padded_rects, color=clrs, label=labels,
+                                 value=label_values, ax=ax, alpha=0.8)
         # if model_id:
         #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
         #              fontsize=23, fontweight="bold")
@@ -672,8 +485,9 @@ class Plotting(object):
         ax.axis('off')
 
 
-    def plot_fairness_group(self, fairness_table, group_metric, ax=None, ax_lim=None,
-                            title=False, label_dict=None, min_group=None):
+    def plot_fairness_group(self, fairness_table, group_metric, ax=None,
+                            ax_lim=None, title=False, label_dict=None,
+                            min_group_size=None):
         '''
         This function plots absolute group metrics as indicated by the config file,
             colored based on calculated parity
@@ -691,6 +505,8 @@ class Plotting(object):
 
         :return: matplotlib.Axis
         '''
+        assert (group_metric in fairness_table.columns), \
+            f"Specified disparity metric {group_metric} not in 'fairness_table'."
 
         if any(fairness_table[group_metric].isnull()):
             raise IOError(f"Cannot plot {group_metric}, has NaN values.")
@@ -703,27 +519,16 @@ class Plotting(object):
         tick_indices = []
         next_bar_height = 0
 
-        if min_group:
-            if min_group > (fairness_table.group_size.max() / fairness_table.group_size.sum()):
-                raise Exception(f"'min_group' proportion specified: '{min_group}' "
+        if min_group_size:
+            if min_group_size > (fairness_table.group_size.max() / fairness_table.group_size.sum()):
+                raise Exception(f"'min_group_size' proportion specified: '{min_group_size}' "
                                 f"is larger than all groups in sample.")
 
-            min_size = min_group * fairness_table.group_size.sum()
+            min_size = min_group_size * fairness_table.group_size.sum()
             fairness_table = fairness_table.loc[fairness_table['group_size'] >= min_size]
 
         label_position_values = list(fairness_table[group_metric].values)
 
-        # Define mapping for condiitonal coloring based on fairness determinations
-        metric_parity_mapping = {'tpr': 'TPR Parity',
-                                 'tnr': 'TNR Parity',
-                                 'for': 'FOR Parity',
-                                 'fdr': 'FDR Parity',
-                                 'fpr': 'FPR Parity',
-                                 'fnr': 'FNR Parity',
-                                 'npv': 'NPV Parity',
-                                 'precision': 'Precision Parity',
-                                 'ppr': 'Statistical Parity',
-                                 'pprev': 'Impact Parity'}
 
         # Lock absolute value metric plot x-axis to (0, 1)
         if not ax_lim:
@@ -740,7 +545,7 @@ class Plotting(object):
             # determinations
             cb_green = '#1b7837'
             cb_red = '#a50026'
-            measure = metric_parity_mapping[group_metric]
+            measure = self.metric_parity_mapping[group_metric]
             measure_colors = [cb_green if val == True else
                               cb_red for val in attribute_data[measure]]
 
@@ -824,145 +629,11 @@ class Plotting(object):
 
         return ax
 
-    # def plot_fairness_disparity(self, fairness_table, group_metric, ax=None, ax_lim=None,
-    #                             title=False, label_dict=None):
-    #     '''
-    #     This function plots absolute group metrics as indicated by config file,
-    #         colored based on calculated parity
-    #     :param fairness_table: A fairness table. Output of fairness.get_fairness
-    #         functions.
-    #     :param group_metric: The fairness metric to plot. Must be a column in the
-    #         fairness_table.
-    #     :param ax: A matplotlib Axis. If not passed a new figure will be created.
-    #     :param ax_lim: Maximum value on x-axis, used to match axes across subplots
-    #         when plotting multiple metrics. Default is None.
-    #     :param title: Whether a title should be added to the plot. Default is True.
-    #     :param label_dict: Optional dictionary of replacement values for data.
-    #         Default is None.
 
-    #     :return: matplotlib.Axis
-    #     '''
-    #
-    #     if any(fairness_table[group_metric].isnull()):
-    #         raise IOError(f"Cannot plot {group_metric}, has NaN values.")
-    #
-    #     if ax is None:
-    #         fig, ax = plt.subplots(figsize=(10, 5))
-    #
-    #     height_of_bar = 1
-    #     attributes = fairness_table.attribute_name.unique()
-    #     tick_indices = []
-    #     next_bar_height = 0
-    #     label_position_values = list(fairness_table[group_metric].values)
-    #
-    #     # Define mapping for condiitonal coloring based on fairness determinations
-    #     metric_parity_mapping = {'ppr_disparity': 'Statistical Parity',
-    #                              'pprev_disparity': 'Impact Parity',
-    #                              'precision_disparity': 'Precision Parity',
-    #                              'fdr_disparity': 'FDR Parity',
-    #                              'for_disparity': 'FOR Parity',
-    #                              'fpr_disparity': 'FPR Parity',
-    #                              'fnr_disparity': 'FNR Parity',
-    #                              'tpr_disparity': 'TPR Parity',
-    #                              'tnr_disparity': 'TNR Parity',
-    #                              'npv_disparity': 'NPV Parity'}
-    #
-    #     if not ax_lim:
-    #         ax_lim = self.__nearest_quartile(fairness_table[group_metric].max()) + 0.1
-    #     ax.set_xlim(0, ax_lim)
-    #
-    #     for attribute in attributes:
-    #         attribute_data = fairness_table.loc[
-    #             fairness_table['attribute_name'] == attribute]
-    #         values = attribute_data[group_metric].values
-    #
-    #         # apply red for "False" fairness determinations and green for "True"
-    #         # determinations
-    #         cb_green = '#1b7837'
-    #         cb_red = '#a50026'
-    #         measure = metric_parity_mapping[group_metric]
-    #         measure_colors = [cb_green if val == True else
-    #                           cb_red for val in attribute_data[measure]]
-    #         # Set white text for red bars and black text for green bars
-    #         label_colors = [(0, 0, 0, 1) if val == True else
-    #                         (1, 1, 1, 1) for val in attribute_data[measure]]
-    #
-    #         attribute_indices = np.arange(next_bar_height,
-    #                                       next_bar_height + attribute_data.shape[0],
-    #                                       step=height_of_bar)
-    #         attribute_tick_location = float((min(attribute_indices) +
-    #                                          max(attribute_indices) +
-    #                                          height_of_bar)) / 2
-    #
-    #         h_attribute = ax.barh(attribute_indices, width=values,
-    #                               color=measure_colors, align='edge',
-    #                               edgecolor='grey', alpha=0.8)
-    #
-    #         if label_dict:
-    #             labels = [label if label not in label_dict.keys() else
-    #                       label_dict[label] for label in
-    #                       attribute_data['attribute_value'].values]
-    #         else:
-    #             labels = attribute_data['attribute_value'].values
-    #
-    #         for y, label, value, text_color in zip(attribute_indices, labels,
-    #                                                values, label_colors):
-    #
-    #             next_position = label_position_values.pop(0)
-    #
-    #             if ax_lim < 3:
-    #                 CHAR_PLACEHOLDER = 0.03
-    #             else:
-    #                 CHAR_PLACEHOLDER = 0.25
-    #
-    #             label_length = len(label) * CHAR_PLACEHOLDER
-    #             max_val_length = 7 * CHAR_PLACEHOLDER
-    #             indent_length = ax_lim * 0.025
-    #
-    #             # bar long enough for label, enough space after bar for value
-    #             if ((indent_length + label_length) < (next_position - indent_length)) & (
-    #                     (next_position + indent_length + max_val_length) < (
-    #                           ax_lim - indent_length)):
-    #
-    #                 ax.text(next_position + indent_length, y + float(height_of_bar) / 2,
-    #                         f"{value:.2f}", fontsize=12, verticalalignment='top')
-    #                 ax.text(indent_length, y + float(height_of_bar) / 2,
-    #                         label, fontsize=11, verticalalignment='top',
-    #                         color=text_color)
-    #
-    #             # case when bar too long for labels after bar, print all text in bar
-    #             elif (next_position + indent_length + max_val_length) > (
-    #                   ax_lim - indent_length):
-    #
-    #                 ax.text(indent_length, y + float(height_of_bar) / 2,
-    #                         f"{label}, {value:.2f}", fontsize=11,
-    #                         verticalalignment='top', color=text_color)
-    #
-    #             # case when bar too small for labels inside bar, print all text
-    #             # after bar
-    #             else:
-    #                 ax.text(next_position + indent_length, (
-    #                           y + float(height_of_bar)) / 2,
-    #                         f"{label}, {value:.2f}", fontsize=12,
-    #                         verticalalignment='top')
-    #
-    #         tick_indices.append((attribute, attribute_tick_location))
-    #         next_bar_height = max(attribute_indices) + 2 * height_of_bar
-    #
-    #     ax.yaxis.set_ticks(list(map(lambda x: x[1], tick_indices)))
-    #     ax.yaxis.set_ticklabels(list(map(lambda x: x[0], tick_indices)),
-    #                              fontsize=14)
-    #
-    #     ax.set_xlabel('Disparity Magnitude')
-    #
-    #     if title:
-    #         ax.set_title(f"{group_metric.upper()}", fontsize=20)
-    #
-    #     return ax
 
-    def plot_fairness_disparity(self, fairness_table, group_metric, attribute_name,
-                                model_id=1, ax=None, fig=None, title=True,
-                                min_group=None):
+    def plot_fairness_disparity(self, fairness_table, group_metric,
+                                attribute_name, model_id=1, ax=None, fig=None,
+                                title=True, min_group_size=None):
         """
         Plot disparity metrics colored based on calculated disparity.
 
@@ -970,8 +641,10 @@ class Plotting(object):
             disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
         :param model_id: Which model to plot for. Default is None.
-        :param ax: A matplotlib Axis. If not passed, a new figure will be created.
-        :param fig: A matplotlib Figure. If not passed, a new figure will be created.
+        :param ax: A matplotlib Axis. If not passed, a new figure will be
+            created.
+        :param fig: A matplotlib Figure. If not passed, a new figure will be
+            created.
 
         :return:
         """
@@ -980,13 +653,14 @@ class Plotting(object):
                                    attribute_name=attribute_name,
                                    color_mapping=None, model_id=model_id,
                                    ax=ax, fig=fig, highlight_fairness=True,
-                                   min_group=min_group, title=title)
+                                   min_group_size=min_group_size, title=title)
 
     def __plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True,
                         title=True, ncols=3, label_dict=None, show_figure=True,
-                        min_group=None):
+                        min_group_size=None):
         """
-        This function plots bar charts of absolute metrics indicated by config file
+        This function plots bar charts of absolute metrics indicated by config
+        file
 
         :param data_table: Output of group.get_crosstabs, bias.get_disparity, or
             fairness.get_fairness functions
@@ -1000,13 +674,16 @@ class Plotting(object):
                 - False Omission Rate (for),
                 - False Positve Rate (fpr),
                 - False Negative Rate (fnr)
-        :param fillzeros: Should null values be filled with zeros. Default is True.
+        :param fillzeros: Should null values be filled with zeros. Default is
+            True.
         :param title: Whether to display a title on each plot. Default is True.
-        :param ncols: The number of subplots to plot per row visualization figure.
+        :param ncols: The number of subplots to plot per row visualization
+            figure.
             Default is 3.
         :param label_dict: Optional dictionary of label replacements. Default is
             None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param show_figure: Whether to show figure (plt.show()). Default is
+            True.
 
         :return: Returns a figure
         """
@@ -1019,11 +696,11 @@ class Plotting(object):
                 metrics = \
                     [met for met in primary_abs_metrics if met in data_table.columns]
 
-            #         metrics = list(set(self.input_group_metrics) & set(data_table.columns))
             elif metrics == 'all':
                 abs_metrics = ['pprev', 'ppr', 'fdr', 'for', 'fpr', 'fnr',
                                'tpr', 'tnr', 'npv', 'precision']
-                metrics = [met for met in abs_metrics if met in data_table.columns]
+                metrics = \
+                    [met for met in abs_metrics if met in data_table.columns]
 
             ax_lim = 1
 
@@ -1049,17 +726,18 @@ class Plotting(object):
         assert (
                 0 < rows <= num_metrics), \
             "Plot must have at least one row. Please update number of columns " \
-            "('ncols') or list of metrics to be plotted ('metrics')."
+            "('ncols') or check that at least one metric is specified in 'metrics'."
         assert (
                 0 < ncols <= num_metrics), \
             "Plot must have at least one column, and no more columns than metrics. " \
-            "Please update number of columns ('ncols') or list of metrics to be " \
-            "plotted ('metrics')."
+            "Please update number of columns ('ncols') or check that at least " \
+            "one metric is specified in 'metrics'."
 
         total_plot_width = 25
 
         fig, axs = plt.subplots(nrows=rows, ncols=ncols,
-                                figsize=(total_plot_width, 6 * rows), sharey=True,
+                                figsize=(total_plot_width, 6 * rows),
+                                sharey=True,
                                 gridspec_kw={'wspace': 0.075, 'hspace': 0.25})
 
         # set a different metric to be plotted in each subplot
@@ -1082,7 +760,7 @@ class Plotting(object):
 
             plot_fcn(data_table, group_metric=group_metric, ax=current_subplot,
                      ax_lim=ax_lim, title=title, label_dict=label_dict,
-                     min_group=min_group)
+                     min_group_size=min_group_size)
             ax_col += 1
 
         # disable axes not being used
@@ -1098,7 +776,7 @@ class Plotting(object):
     def __plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None,
                                  metrics=None, fillzeros=True, title=True,
                                  label_dict=None, highlight_fairness=False,
-                                 show_figure=True, min_group=None):
+                                 show_figure=True, min_group_size=None):
         """
         This function plots treemaps of disparities indicated by config file
 
@@ -1129,8 +807,9 @@ class Plotting(object):
             data_table = data_table.fillna(0)
 
         assert not all(v is None for v in
-                       [attributes, metrics]), "One of the following parameters must" \
-                                               " be specified: 'attribute', 'metrics'"
+                       [attributes, metrics]), \
+                        "One of the following parameters must be specified: " \
+                        "'attribute', 'metrics'."
 
         if attributes:
             if not metrics:
@@ -1146,7 +825,8 @@ class Plotting(object):
                 metrics = \
                     [abs_m for abs_m in abs_metrics if abs_m in data_table.columns]
 
-            viz_title = f"Disparity Metrics by {(', ').join(list(map(lambda x:x.upper(), attributes)))}"
+            viz_title = \
+                f"Disparity Metrics by {(', ').join(list(map(lambda x:x.upper(), attributes)))}"
 
         elif not attributes:
             attributes = list(data_table.attribute_name.unique())
@@ -1173,12 +853,14 @@ class Plotting(object):
         assert (
                 0 < rows <= num_metrics), \
             "Plot must have at least one row. Please update number of columns " \
-            "('ncols') or list of metrics to be plotted ('metrics')."
+            "('ncols'), the list of metrics to be plotted ('metrics'), or the " \
+            "list of attributes to plot disparity metrics across."
         assert (
                 0 < ncols <= num_metrics), \
-            "Plot must have at least one column, and no more columns than metrics. " \
-            "Please update number of columns ('ncols') or list of metrics to be " \
-            "plotted ('metrics')."
+            "Plot must have at least one column, and no more columns than plots. " \
+            "Please update number of columns ('ncols'), the list of metrics to " \
+            "be plotted ('metrics'), or the list of attributes to plot disparity " \
+            "metrics across."
 
         total_plot_width = 25
 
@@ -1190,8 +872,6 @@ class Plotting(object):
         if highlight_fairness:
             mapping = None
         else:
-            darker_blues = self.__truncate_colormap('Blues', min_value=0.25,
-                                                    max_value=1)
             aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
 
             norm = colors.Normalize(vmin=0, vmax=2)
@@ -1231,7 +911,7 @@ class Plotting(object):
                          ax=current_subplot, fig=fig, title=title,
                          label_dict=label_dict,
                          highlight_fairness=highlight_fairness,
-                         min_group=min_group)
+                         min_group_size=min_group_size)
 
                 ax_col += 1
 
@@ -1257,7 +937,7 @@ class Plotting(object):
 
     def plot_group_metric_all(self, data_table, metrics=None, fillzeros=True,
                               ncols=3, title=True, label_dict=None,
-                              show_figure=True, min_group=None):
+                              show_figure=True, min_group_size=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1270,7 +950,8 @@ class Plotting(object):
                 - False Omission Rate (for),
                 - False Positve Rate (fpr),
                 - False Negative Rate (fnr)
-        :param fillzeros: Whether to fill null values with zeros. Default is True.
+        :param fillzeros: Whether to fill null values with zeros. Default is
+            True.
         :param ncols: Number of subplots per row in figure. Default is 3.
         :param title: Whether to display a title on each plot. Default is True.
         :param label_dict: Optional dictionary of label replacements. Default is
@@ -1282,41 +963,12 @@ class Plotting(object):
         return self.__plot_multiple(
             data_table, plot_fcn=self.plot_group_metric, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
-            show_figure=show_figure, min_group=min_group)
+            show_figure=show_figure, min_group_size=min_group_size)
 
-    # def plot_disparity_all(self, data_table, metrics=None, fillzeros=True,
-    #                        ncols=3, title=True, label_dict=None, show_figure=True,
-    #                        min_group=None):
-    #     '''
-    #     Plot multiple metrics at once from a fairness object table.
-    #     :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
-    #         fairness.get_fairness functions.
-    #     :param metrics: which metric(s) to plot, or 'all.'
-    #         If this value is null, will plot:
-    #             - Predicted Prevalence Disparity (pprev_disparity),
-    #             - Predicted Positive Rate Disparity (ppr_disparity),
-    #             - False Discovery Rate Disparity (fdr_disparity),
-    #             - False Omission Rate Disparity (for_disparity),
-    #             - False Positve Rate Disparity (fpr_disparity),
-    #             - False Negative Rate Disparity (fnr_disparity)
-    #     :param fillzeros: Whether to fill null values with zeros. Default is True.
-    #     :param ncols: Number of subplots per row in figure. Default is 3.
-    #     :param title: Whether to display a title on each plot. Default is True.
-    #     :param label_dict: Optional dictionary of label replacements. Default is
-    #       None.
-    #     :param show_figure: Whether to show figure (plt.show()). Default is True.
-    #
-    #     :return: Returns a figure
-    #     '''
-    #     return self.__plot_multiple(data_table, plot_fcn=self.plot_disparity,
-    #                          metrics=metrics,
-    #                          fillzeros=fillzeros, title=title, ncols=ncols,
-    #                          label_dict=label_dict, show_figure=show_figure
-    #                           min_group=min_group)
 
     def plot_disparity_all(self, data_table, attributes=None, metrics=None,
                            fillzeros=True, title=True, label_dict=None,
-                           show_figure=True, min_group=None):
+                           show_figure=True, min_group_size=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1344,11 +996,11 @@ class Plotting(object):
             data_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             highlight_fairness=False, show_figure=show_figure, title=title,
-            min_group=min_group)
+            min_group_size=min_group_size)
 
     def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True,
                                 ncols=3, title=True, label_dict=None,
-                                show_figure=True, min_group=None):
+                                show_figure=True, min_group_size=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1372,11 +1024,12 @@ class Plotting(object):
         return self.__plot_multiple(
             fairness_table, plot_fcn=self.plot_fairness_group, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
-            show_figure=show_figure, min_group=min_group)
+            show_figure=show_figure, min_group_size=min_group_size)
 
-    def plot_fairness_disparity_all(self, fairness_table, attributes=None, metrics=None,
-                                    fillzeros=True, title=True,
-                                    label_dict=None, show_figure=True, min_group=None):
+    def plot_fairness_disparity_all(self, fairness_table, attributes=None,
+                                    metrics=None, fillzeros=True, title=True,
+                                    label_dict=None, show_figure=True,
+                                    min_group_size=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1402,4 +1055,4 @@ class Plotting(object):
             fairness_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             title=title, highlight_fairness=True, show_figure=show_figure,
-            min_group=min_group)
+            min_group_size=min_group_size)
