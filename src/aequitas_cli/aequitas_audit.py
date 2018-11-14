@@ -9,14 +9,14 @@ from aequitas.group import Group
 from aequitas.plotting import Plotting
 from aequitas.preprocessing import preprocess_input_df
 
-from .utils.configs_loader import Configs
-from .utils.io import get_csv_data
-from .utils.io import get_db_data
-from .utils.io import get_engine
-from .utils.io import push_tocsv
-from .utils.io import push_todb
-from .utils.io import push_topdf
-from .utils.report import audit_report_markdown
+from aequitas_cli.utils.configs_loader import Configs
+from aequitas_cli.utils.io import get_csv_data
+from aequitas_cli.utils.io import get_db_data
+from aequitas_cli.utils.io import get_engine
+from aequitas_cli.utils.io import push_tocsv
+from aequitas_cli.utils.io import push_todb
+from aequitas_cli.utils.io import push_topdf
+from aequitas_cli.utils.report import audit_report_markdown, report_html_conversion
 
 # Authors: Pedro Saleiro <saleiro@uchicago.edu>
 #          Rayid Ghani
@@ -152,8 +152,9 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print(fair_results)
     report = None
     if configs.report is True:
-        report = audit_report_markdown(configs, group_value_df, f.fair_measures_depend, fair_results)
-    return group_value_df, report
+        mkdwn_report = audit_report_markdown(configs, group_value_df, f.fair_measures_depend, fair_results)
+        report_html = report_html_conversion(mkdwn_report)
+    return group_value_df, mkdwn_report, report_html
 
 
 def run(df, configs, preprocessed=False):
@@ -171,20 +172,20 @@ def run(df, configs, preprocessed=False):
             model_df_list = []
             report_list = []
             for model_id in df.model_id.unique():
-                model_df, model_report = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
+                model_df, _, html_model_report = audit(df.loc[df['model_id'] == model_id], model_id=model_id, configs=configs,
                                                preprocessed=preprocessed)
                 model_df_list.append(model_df)
-                report_list.append(model_report)
+                report_list.append(html_model_report)
             group_value_df = pd.concat(model_df_list)
-            report = '\n'.join(report_list)
+            html_report = '\n'.join(report_list)
 
         else:
-            group_value_df, report = audit(df, configs=configs, preprocessed=preprocessed)
+            group_value_df, _, html_report = audit(df, configs=configs, preprocessed=preprocessed)
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
     # print(report)
-    return group_value_df, report
+    return group_value_df, html_report
 
 
 def main():

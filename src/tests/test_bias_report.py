@@ -25,7 +25,7 @@ def helper(input_filename, expected_filename, config_file):
 
     '''
 
-    input_filename = os.path.join(BASE_DIR, input_filename)
+    # input_filename = os.path.join(BASE_DIR, input_filename)
     expected_df = pd.read_csv(os.path.join(BASE_DIR, expected_filename))
 
     if config_file:
@@ -33,7 +33,7 @@ def helper(input_filename, expected_filename, config_file):
 
     config = Configs.load_configs(config_file)
 
-    test_df, _  = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
+    test_df, _, _  = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
 
     # match expected_df columns
     shared_columns = [c for c in expected_df.columns if c in test_df.columns]
@@ -57,25 +57,43 @@ def helper(input_filename, expected_filename, config_file):
 
             # master uses try/ except
             try:
-            # change proposed by kalkairis (fails test 3, labels all 1), likely due to NaNs:
-            # if np.issubdtype(combined_data[col + '_x'], np.number):
-
                 if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
                     aeq_mean = np.mean(combined_data[col + "_y"])
                     s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean,                                                                              aeq_mean)
 
                     pytest.fail(s)
-            # change proposed by kalkairis (fails test 3, labels all 1):
-            # checking for nulls here, but NaNs fall within np.number (checked for above)
-            # else:
-            #     if not all((combined_data[col + "_x"] == combined_data[col + "_y"]) | \
-            #            (combined_data[col + "_x"].isnull() & combined_data[col + "_y"].isnull())):
 
             except:
                 if not all(combined_data[col + "_x"] == combined_data[col + "_y"]):
                     s += "{} fails: at least one entry was not the same between data sets\n".format(col)
                     pytest.fail(s)
+
+
+def markdown_test(input_filename, config_file):
+    # def markdown_test(input_filename, config_file, expected_markdown_filename):
+    '''
+
+    '''
+    input_filename = os.path.join(BASE_DIR, input_filename)
+
+    # with open(expected_markdown_filename) as f:
+    #     expected_mkdwn = f.read()
+
+    if config_file:
+        config_file = os.path.join(BASE_DIR, config_file)
+
+    config = Configs.load_configs(config_file)
+
+    _, mkdwn_report, html_report  = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
+
+    s = ""
+    # match markdown strings
+    # if mkdwn_report != expected_mkdwn:
+    #     s += "Markdown test fails: markdown string created does not match expected markdown string.\n".format(col)
+    #     pytest.fail(s)
+
+    return mkdwn_report, html_report
 
 
 # simplest tests
@@ -121,6 +139,9 @@ def test_threshold_7():
 
 def test_threshold_8():
     return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
+
+def test_markdwon_1():
+    return markdown_test('test_1.csv', 'test_4.yaml')
 
 
 def test_plot_fcns_1():
