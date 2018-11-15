@@ -94,6 +94,12 @@ Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
 To contact the team, please email us at [aequitas at uchicago dot edu]
 
 
+Citing Aequitas
+====
+
+If you use Aequitas in a scientific publication, we would appreciate citations to the following paper:
+
+Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequtias: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ( `PDF <https://arxiv.org/pdf/1811.05577.pdf>`_)
 
 |
 |
