@@ -11,7 +11,7 @@ The Bias and Fairness Audit Toolkit
 Aequitas
 --------
 
-Aequitas is an open-source bias audit toolkit for machine learning developers, analysts, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
+Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
 
 `Learn more about the project <http://dsapp.uchicago.edu/aequitas/>`_.
 
