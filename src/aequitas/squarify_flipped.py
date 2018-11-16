@@ -150,7 +150,7 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
 
             # if box large enough, add labels and values
-            if (dx >= (INDENT_LENGTH * 2) + CHAR_PLACEHOLDER * len(v)) & (dx > 10):
+            if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(v))) & (dx > 10):
                 ax.text(x + dx / 2, y + dy / 2, v, va=va,
                         ha='center', fontsize=14)
 
