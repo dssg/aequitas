@@ -194,7 +194,7 @@ class Plotting(object):
         :return: matplotlib.Axis
         '''
         assert (group_metric in group_table.columns), \
-            f"Specified disparity metric {group_metric} not in 'group_table'."
+            f"Specified disparity metric '{group_metric}' not in 'group_table'."
 
         if any(group_table[group_metric].isnull()):
             raise IOError(f"Cannot plot {group_metric}, has NaN values.")
@@ -243,7 +243,7 @@ class Plotting(object):
 
             h_attribute = ax.barh(attribute_indices,
                                   width=values,
-                                  label=list(attribute_data['attribute_value'].values),
+                                  # label=list(attribute_data['attribute_value'].values),
                                   align='edge', edgecolor='grey')
 
             label_colors = []
@@ -473,7 +473,7 @@ class Plotting(object):
         #              fontsize=23, fontweight="bold")
 
         if title:
-            ax.set_title(f"{(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
+            ax.set_title(f"{(' ').join(related_disparity.split('_')).upper()} ({attribute_name.upper()})",
                      fontsize=23, fontweight="bold")
 
         if not highlight_fairness:
@@ -540,7 +540,7 @@ class Plotting(object):
             attribute_data = fairness_table.loc[
                 fairness_table['attribute_name'] == attribute]
             values = attribute_data[group_metric].values
-            label_values = attribute_data[group_metric + '_disparity']
+            grp_sizes = attribute_data['group_size'].values
 
             # apply red for "False" fairness determinations and green for "True"
             # determinations
@@ -574,8 +574,9 @@ class Plotting(object):
             else:
                 labels = attribute_data['attribute_value'].values
 
-            for y, label, value, text_color in zip(attribute_indices, labels,
-                                                   label_values, label_colors):
+            for y, label, value, text_color, g_size in zip(
+                    attribute_indices, labels, values, label_colors,
+                    grp_sizes):
 
                 next_position = label_position_values.pop(0)
 
@@ -821,23 +822,27 @@ class Plotting(object):
             #         metrics = list(set(self.input_group_metrics) &
             # set(data_table.columns))
             elif metrics == 'all':
-                abs_metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
-                               'npv', 'precision', 'ppr', 'pprev']
+                abs_metrics = ['tpr_disparity', 'tnr_disparity', 'for_disparity',
+                               'fdr_disparity', 'fpr_disparity', 'fnr_disparity',
+                               'npv_disparity', 'precision_disparity',
+                               'ppr_disparity', 'pprev_disparity']
                 metrics = \
                     [abs_m for abs_m in abs_metrics if abs_m in data_table.columns]
 
             viz_title = \
-                f"Disparity Metrics by {(', ').join(list(map(lambda x:x.upper(), attributes)))}"
+                f"DISPARITY METRICS by {(', ').join(list(map(lambda x:x.upper(), attributes)))}"
 
         elif not attributes:
             attributes = list(data_table.attribute_name.unique())
             if metrics == 'all':
-                abs_metrics = ['tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
-                               'npv', 'precision', 'ppr', 'pprev']
+                abs_metrics = ['tpr_disparity', 'tnr_disparity', 'for_disparity',
+                               'fdr_disparity', 'fpr_disparity', 'fnr_disparity',
+                               'npv_disparity', 'precision_disparity',
+                               'ppr_disparity', 'pprev_disparity']
                 metrics = [abs_m for abs_m in abs_metrics if
                            abs_m in data_table.columns]
             viz_title = f"{(', ').join(map(lambda x:x.upper(), metrics))} " \
-                        f"Across Attributes"
+                        f"ACROSS ATTRIBUTES"
 
         num_metrics = len(attributes) * len(metrics)
         if num_metrics > 1:
