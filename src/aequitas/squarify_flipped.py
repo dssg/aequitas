@@ -1,5 +1,10 @@
 import matplotlib.pyplot as plt
 
+# Attribution: Adapted from squaify source code for plotting treemaps in
+# matplotlib. Treemaps are flipped so smallest square is in bottom right corner.
+# Added squarify_plot_rects function based on source code plot function for
+# plotting predefined rectangles.
+
 def normalize_sizes(sizes, dx, dy):
     total_size = sum(sizes)
     total_area = dx * dy
@@ -138,11 +143,21 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
     ax.bar(x, dy, width=dx, bottom=y, color=color,
            label=label, align='edge', **kwargs)
 
+    INDENT_LENGTH = 4
+    CHAR_PLACEHOLDER = 1.5
+
     if value is not None:
         va = 'center' if label is None else 'top'
         for v, r in zip(value, rects):
+            if isinstance(v, (int, float)):
+                v = f"{v:.2}"
+
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
-            ax.text(x + dx / 2, y + dy / 2, v, va=va, ha='center')
+
+            # if box large enough, add labels and values
+            if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(v))) & (dx > 10):
+                ax.text(x + dx / 2, y + dy / 2, v, va=va,
+                        ha='center', fontsize=14)
 
     if label is not None:
         va = 'center' if value is None else 'bottom'
@@ -150,15 +165,12 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
         alphabet = list(map(chr, range(65, 91)))
         under_plot_num = 0
 
-        for l, r in zip(label, rects):
+        for i, (l, r) in enumerate(zip(label, rects)):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
             length = dx
 
-            indent_length = 4
-            CHAR_PLACEHOLDER = 1.5
-
             # if box large enough, add labels and values
-            if (dx >= (indent_length * 2) + CHAR_PLACEHOLDER * len(l)) & (dx > 10):
+            if (dx >= (INDENT_LENGTH * 2) + CHAR_PLACEHOLDER * len(l)) & (dx > 10):
                 ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center',
                         fontsize=14, wrap=False)
 
@@ -166,14 +178,20 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
                 # add labels that don't fit in boxes underneath plot
                 ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
                         ha='center', fontsize=10, wrap=False)
-                underplot_label = l.replace('\n', ', ')
+                if value:
+                    plot_ready = \
+                        [val if isinstance(val, str) else f"{val:.2}" if
+                        isinstance(val, (int, float)) else "" for val in value]
+                    underplot_label = f"{l}, {plot_ready[i]}"
+                else:
+                    underplot_label = f"{l}"
                 under_plot.append(f"{alphabet[under_plot_num]}: {underplot_label}")
                 under_plot_num += 1
 
-    if len(under_plot) > 0:
-        unlabeled = ('\n').join(under_plot)
-        ax.text(0.0, -0.05, f"Not labeled above:\n{unlabeled}",
-                ha='left', va='top', transform=ax.transAxes, fontsize=14)
+        if len(under_plot) > 0:
+            unlabeled = ('\n').join(under_plot)
+            ax.text(0.0, -0.05, f"Not labeled above:\n{unlabeled}",
+                    ha='left', va='top', transform=ax.transAxes, fontsize=14)
 
     ax.set_xlim(0, norm_x)
     ax.set_ylim(0, norm_y)

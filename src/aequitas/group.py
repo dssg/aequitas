@@ -150,9 +150,9 @@ class Group(object):
             else:
                 count_ones = 0
 
-            if count_ones == 0:
-                logging.error('get_crosstabs: No threshold provided and there are no 1s in the score column.')
-                exit(1)
+            # if count_ones == 0:
+            #     logging.error('get_crosstabs: No threshold provided and there are no 1s in the score column.')
+            #     exit(1)
             score_thresholds = {'rank_abs': [count_ones]}
 
         print('model_id, score_thresholds', model_id, score_thresholds)

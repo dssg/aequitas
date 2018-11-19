@@ -194,11 +194,11 @@ class Bias(object):
         View all calculated disparities in table
         :return: list of disparity metrics
         '''
-        return list(df.columns[df.columns.str.contains('disparity')])
+        return list(df.columns[df.columns.str.contains('_disparity')])
 
-    def list_absolute_metrics(self):
+    def list_absolute_metrics(self, df):
         '''
         View all calculated disparities in table
-        :return: list of disparity metrics
+        :return: list of absolute group metrics
         '''
-        return self.input_group_metrics
+        return list(set(self.input_group_metrics) & set(metric in df.columns))

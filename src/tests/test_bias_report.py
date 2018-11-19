@@ -55,7 +55,6 @@ def helper(input_filename, expected_filename, config_file):
         if col not in {'attribute_value', 'attribute_name'}:
             print('testing {} ...'.format(col))
 
-            # master uses try/ except
             try:
                 if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
