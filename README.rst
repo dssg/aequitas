@@ -102,7 +102,7 @@ If you use Aequitas in a scientific publication, we would appreciate citations t
 Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequitas: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ( `PDF <https://arxiv.org/pdf/1811.05577.pdf>`_)
 
 
-   @article{saleiro2018aequitas,
+   @article{2018aequitas,
      title={Aequitas: A Bias and Fairness Audit Toolkit},
      author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid},
      journal={arXiv preprint arXiv:1811.05577},
