@@ -171,7 +171,7 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
             # if box large enough, add labels and values
             if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(v))) & (dx > 10):
                 ax.text(x + dx / 2, y + dy / 2, v, va=va,
-                        ha='center', fontsize=14)
+                        ha='center', fontsize=12)
 
     if label is not None:
         va = 'center' if value is None else 'bottom'
