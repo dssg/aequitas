@@ -103,11 +103,14 @@ Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jess
 
 
    @article{saleiro2018aequitas,
+     
      title={Aequitas: A Bias and Fairness Audit Toolkit},
+     
      author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid},
+     
      journal={arXiv preprint arXiv:1811.05577},
-     year={2018}
-   }
+     
+     year={2018}}
 |
 |
 |
