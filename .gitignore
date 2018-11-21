@@ -11,6 +11,7 @@ __pycache__/
 
 *.DS_Store*
 
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/config.yml

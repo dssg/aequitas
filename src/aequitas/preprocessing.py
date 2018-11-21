@@ -5,19 +5,15 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved
-
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 def check_required_cols(df, required_cols):
     """
 
-    :param df:
-    :param model_cols:
-    :return:
+    :param df: A data frame of model results
+    :param required_cols: Column names required for selected fairness measures
+    :return: None, or ValueError
     """
     check_model_cols = [col in df.columns for col in required_cols]
     if False in check_model_cols:
@@ -27,12 +23,12 @@ def check_required_cols(df, required_cols):
 
 def get_attr_cols(df, non_attr_cols):
     """
-
-    :param df:
-    :param non_attr_cols:
-    :return:
+    :param df: A data frame of model results
+    :param non_attr_cols: Names of columns not associated with attributes
+    :return: List of columns associated with attributes
     """
-    attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
+    # index of the columns that are associated with attributes
+    attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
     if attr_cols.empty:
         raise ValueError
     return attr_cols.tolist()
@@ -41,9 +37,9 @@ def get_attr_cols(df, non_attr_cols):
 def discretize(df, target_cols):
     """
 
-    :param df:
-    :param target_cols:
-    :return:
+    :param df: A data frame of model results
+    :param target_cols: Names of columns to discretize
+    :return: A data frame
     """
     for col in target_cols:
         if len(df[col].unique()) > 1:
@@ -65,9 +61,10 @@ def discretize(df, target_cols):
 def preprocess_input_df(df, required_cols=None):
     """
 
-    :param df:
-    :param non_attr_cols:
-    :return:
+    :param df: A data frame of model results
+    :param non_attr_cols: Names of columns not associated with attributes.
+        Default is None.
+    :return: A data frame, list of columns associated with sample attributes
     """
     if not required_cols:
         required_cols = ['score']

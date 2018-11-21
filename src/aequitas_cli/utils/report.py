@@ -9,11 +9,8 @@ tabulate.PRESERVE_WHITESPACE = True
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
-
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 #
 #  DISCLAIMER: these methods were developed with a particular version of the webapp in mind. They lack flexibility (lots of
@@ -524,6 +521,7 @@ def get_highlevel_table(group_value_df, fairness_measures, ):
         highlevel_table = tabulate(landf[['Fairness Criteria', 'Desired Outcome', 'Reference Groups Selected',
                                           'Unfairly Affected Groups']], headers='keys',
                                    tablefmt='pipe', showindex='never', numalign="left")
+
     return highlevel_table
 
 
@@ -680,6 +678,7 @@ def audit_report_markdown(configs, group_value_df, fairness_measures_depend, ove
                                      headers='keys',
                                      tablefmt='pipe', showindex='never', numalign="left") + \
                             oneline
+
         # mkdown_highlevel += '**The Bias Report has found that the following groups do not have Equal Parity:**\n\n'
         #mkdown_highlevel += get_statpar_text(group_value_df, fairness_measures_depend) + oneline
         mkdown_highlevel += '\n\n[Go to Top](#)' + oneline + '----' + oneline

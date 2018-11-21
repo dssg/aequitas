@@ -4,11 +4,9 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#          Benedict Kuester
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+
 
 class Group(object):
     """
@@ -136,15 +134,15 @@ class Group(object):
         if non_string_cols.empty is False:
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
             exit(1)
+
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
+
         if not score_thresholds:
             df['score'] = df['score'].astype(float)
-            count_ones = df['score'].value_counts()[1.0]
-            if count_ones == 0:
-                logging.error('get_crosstabs: No threshold provided and there is no 1s in the score column.')
-                exit(1)
+            count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
+
         print('model_id, score_thresholds', model_id, score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
@@ -205,3 +203,13 @@ class Group(object):
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
         return groups_df, attr_cols
+
+    def list_absolute_metrics(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of disparity metrics
+        '''
+        return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
+                                           'fdr', 'npv', 'precision', 'ppr',
+                                           'pprev', 'prev'
+                                        ]).tolist()

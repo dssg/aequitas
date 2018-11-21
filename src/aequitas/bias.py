@@ -5,10 +5,8 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 class Bias(object):
     """
@@ -118,7 +116,7 @@ class Bias(object):
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        #df = df.fillna(value=fill_zeros)
+        # df = df.fillna(value=fill_zeros)
         return df
 
     def verify_ref_groups_dict_len(self, df, ref_groups_dict):
@@ -185,5 +183,20 @@ class Bias(object):
         # when there is a zero in the numerator and a zero in denominator it is considered NaN
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        #df = df.fillna(value=fill_zeros)
+        # df = df.fillna(value=fill_zeros)
         return df
+
+
+    def list_disparities(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of disparity metrics
+        '''
+        return list(df.columns[df.columns.str.contains('_disparity')])
+
+    def list_absolute_metrics(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of absolute group metrics
+        '''
+        return list(set(self.input_group_metrics) & set(df.columns))
