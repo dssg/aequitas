@@ -73,7 +73,13 @@ def leftover(sizes, x, y, dx, dy):
 
 
 def worst_ratio(sizes, x, y, dx, dy):
-    return max([max(rect['dx'] / rect['dy'], rect['dy'] / rect['dx']) for rect in layout(sizes, x, y, dx, dy)])
+    return max(
+        max(
+            rect['dx'] / rect['dy'],
+            rect['dy'] / rect['dx']
+            )
+        for rect in layout(sizes, x, y, dx, dy)
+    )
 
 
 def squarify(sizes, x, y, dx, dy):

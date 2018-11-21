@@ -201,4 +201,4 @@ class Bias(object):
         View all calculated disparities in table
         :return: list of absolute group metrics
         '''
-        return list(set(self.input_group_metrics) & set(metric in df.columns))
+        return list(set(self.input_group_metrics) & set(df.columns))

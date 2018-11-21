@@ -214,7 +214,7 @@ class Fairness(object):
         View all parity determinations in table
         :return: list of absolute group metrics
         '''
-        all_fairness = set(self.type_parity_depend.keys()) | \
-                       set(self.high_level_fairness_depend.keys()) | \
-                       set(self.fair_measures_depend.keys())
+        all_fairness = self.type_parity_depend.keys() | \
+                       self.high_level_fairness_depend.keys() | \
+                       self.fair_measures_depend.keys()
         return list(all_fairness & set(df.columns))
