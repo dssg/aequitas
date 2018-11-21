@@ -26,7 +26,7 @@ class Configs(object):
         self.score_thresholds = score_thresholds
         self.ref_groups = ref_groups
         self.db = db
-        self.fair_measures_requested = fairness_measures
+        self.fair_measures_requested = list(fairness_measures)
         self.project_description = project_description
         self.plot_bias_metrics = plot_bias_metrics
         self.plot_bias_disparities = plot_bias_disparities

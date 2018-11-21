@@ -183,7 +183,7 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
             else:
                 # add labels that don't fit in boxes underneath plot
                 ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
-                        ha='center', fontsize=10, wrap=False)
+                        ha='center', fontsize=12, wrap=False)
                 if value:
                     plot_ready = \
                         [val if isinstance(val, str) else f"{val:.2}" if

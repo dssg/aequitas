@@ -3,12 +3,13 @@ import math
 import re
 
 import numpy as np
-import pandas as pd
+#import pandas as pd
+import collections
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import matplotlib.cm
-# check if need gridspec explicitly when using subplot gridspec kwargs
+
 
 from aequitas import squarify_flipped as sf
 
@@ -30,16 +31,50 @@ class Plotting(object):
                            'fdr_disparity', 'for_disparity',
                            'fpr_disparity', 'fnr_disparity')
 
+    # Define mapping for condiitonal coloring based on fairness
+    # determinations
+    _metric_parity_mapping = {
+        'ppr_disparity': 'Statistical Parity',
+        'pprev_disparity': 'Impact Parity',
+        'precision_disparity': 'Precision Parity',
+        'fdr_disparity': 'FDR Parity',
+        'for_disparity': 'FOR Parity',
+        'fpr_disparity': 'FPR Parity',
+        'fnr_disparity': 'FNR Parity',
+        'tpr_disparity': 'TPR Parity',
+        'tnr_disparity': 'TNR Parity',
+        'npv_disparity': 'NPV Parity',
+        'ppr': 'Statistical Parity',
+        'pprev': 'Impact Parity',
+        'precision': 'Precision Parity',
+        'fdr': 'FDR Parity',
+        'for': 'FOR Parity',
+        'fpr': 'FPR Parity',
+        'fnr': 'FNR Parity',
+        'tpr': 'TPR Parity',
+        'tnr': 'TNR Parity',
+        'npv': 'NPV Parity'
+    }
+
+    def __init__(self, key_metrics=default_absolute_metrics,
+                 key_disparities=default_disparities):
+        """
+        :param key_metrics: Set default absolute group metrics for all subplots
+        :param key_disparities: Set default disparity metrics for all subplots
+        """
+        self.key_metrics = key_metrics
+        self.key_disparities = key_disparities
+
     @staticmethod
-    def _nearest_quartile(self, x):
+    def _nearest_quartile(x):
         rounded = round(x * 4) / 4
         if rounded > x:
             return rounded
         else:
             return rounded + 1 / 4
 
-    @classmethod
-    def _check_brightness(cls, rgb_tuple):
+    @staticmethod
+    def _check_brightness(rgb_tuple):
         '''
         Determine the brightness of background color in a plot.
 
@@ -62,48 +97,8 @@ class Plotting(object):
 
         return light_color
 
-    def __init__(self, key_metrics=default_absolute_metrics,
-                 key_disparities=default_disparities):
-        """
-        :param key_metrics: Set default absolute group metrics for all subplots
-        :param key_disparities: Set default disparity metrics for all subplots
-        """
-        self.key_metrics = key_metrics
-        self.key_disparities = key_disparities
-
-        # Define mapping for condiitonal coloring based on fairness
-        # determinations
-        self.__metric_parity_mapping = {
-                'ppr_disparity': 'Statistical Parity',
-                'pprev_disparity': 'Impact Parity',
-                'precision_disparity': 'Precision Parity',
-                'fdr_disparity': 'FDR Parity',
-                'for_disparity': 'FOR Parity',
-                'fpr_disparity': 'FPR Parity',
-                'fnr_disparity': 'FNR Parity',
-                'tpr_disparity': 'TPR Parity',
-                'tnr_disparity': 'TNR Parity',
-                'npv_disparity': 'NPV Parity',
-                'ppr': 'Statistical Parity',
-                'pprev': 'Impact Parity',
-                'precision': 'Precision Parity',
-                'fdr': 'FDR Parity',
-                'for': 'FOR Parity',
-                'fpr': 'FPR Parity',
-                'fnr': 'FNR Parity',
-                'tpr': 'TPR Parity',
-                'tnr': 'TNR Parity',
-                'npv': 'NPV Parity'
-                }
-
-
-    @property
-    def metric_parity_mapping(self):
-        ''' Getter for metric_parity_mapping '''
-        return self.__metric_parity_mapping
-
-
-    def _truncate_colormap(self, orig_cmap, min_value=0.0, max_value=1.0, num_colors=100):
+    @staticmethod
+    def _truncate_colormap(orig_cmap, min_value=0.0, max_value=1.0, num_colors=100):
         '''
         Use only part of a colormap (min_value to max_value) across a given number
         of partiions.
@@ -117,10 +112,8 @@ class Plotting(object):
             cmap(np.linspace(min_value, max_value, num_colors)))
         return new_cmap
 
-
-
-
-    def _assemble_ref_groups(self, disparities_table, ref_group_flag='_ref_group_value'):
+    @staticmethod
+    def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value'):
         """
         Creates a dictionary of reference groups for each metric in a data_table
 
@@ -147,7 +140,8 @@ class Plotting(object):
             ref_groups[attribute] = attr_refs
         return ref_groups
 
-    def _locate_ref_group_indices(self, disparities_table, attribute_name, group_metric,
+    @classmethod
+    def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
                                  ref_group_flag='_ref_group_value', model_id=1):
         """
         Finds relative index (row) of reference group value for a given metric.
@@ -167,7 +161,7 @@ class Plotting(object):
         # get absolute metric name from passed group metric (vs. a disparity name)
         abs_metric = "".join(group_metric.split('_disparity'))
 
-        all_ref_groups = self._assemble_ref_groups(disparities_table, ref_group_flag)
+        all_ref_groups = cls._assemble_ref_groups(disparities_table, ref_group_flag)
         ref_group_name = all_ref_groups[attribute_name][abs_metric]
 
         # get index for row associated with reference group for that model
@@ -224,7 +218,7 @@ class Plotting(object):
             min_size = min_group_size * group_table.group_size.sum()
             group_table = group_table.loc[group_table['group_size'] >= min_size]
 
-        label_position_values = list(group_table[group_metric].values)
+        label_position_values = collections.deque(group_table[group_metric].values)
 
         lighter_coppers = self._truncate_colormap('copper_r', min_value=0,
                                                    max_value=0.65)
@@ -274,7 +268,7 @@ class Plotting(object):
             for y, label, value, text_color, g_size in zip(attribute_indices, labels,
                                                    values, label_colors,
                                                    grp_sizes):
-                next_position = label_position_values.pop(0)
+                next_position = label_position_values.popleft()
                 group_label = f"{label} ({g_size:,})"
 
                 if ax_lim < 3:
@@ -417,18 +411,16 @@ class Plotting(object):
 
 
         if highlight_fairness:
-            assert (len(table_columns.intersection(
-                set(self.metric_parity_mapping.values()))
-            ) > 1), \
-                "Data table must include at least one fairness determination to " \
-                "visualize metric parity."
+            if not len(table_columns.intersection(self._metric_parity_mapping.values())) > 1:
+                raise ValueError("Data table must include at least one fairness "
+                                 "determination to visualize metric parity.")
 
             # apply red for "False" fairness determinations and green for "True"
             # determinations
             cb_green = '#1b7837'
             cb_red = '#a50026'
 
-            measure = self.metric_parity_mapping[group_metric]
+            measure = self._metric_parity_mapping[group_metric]
             if (measure not in table_columns):
                 raise ValueError(
                     f"Related fairness determination for {group_metric} must be "
@@ -539,7 +531,7 @@ class Plotting(object):
             min_size = min_group_size * fairness_table.group_size.sum()
             fairness_table = fairness_table.loc[fairness_table['group_size'] >= min_size]
 
-        label_position_values = list(fairness_table[group_metric].values)
+        label_position_values = collections.deque(fairness_table[group_metric].values)
 
 
         # Lock absolute value metric plot x-axis to (0, 1)
@@ -557,7 +549,7 @@ class Plotting(object):
             # determinations
             cb_green = '#1b7837'
             cb_red = '#a50026'
-            measure = self.metric_parity_mapping[group_metric]
+            measure = self._metric_parity_mapping[group_metric]
             measure_colors = [cb_green if val == True else
                               cb_red for val in attribute_data[measure]]
 
@@ -589,7 +581,7 @@ class Plotting(object):
                     attribute_indices, labels, values, label_colors,
                     grp_sizes):
 
-                next_position = label_position_values.pop(0)
+                next_position = label_position_values.popleft()
 
                 if ax_lim < 3:
                     CHAR_PLACEHOLDER = 0.03
@@ -734,15 +726,16 @@ class Plotting(object):
         else:
             axes_to_remove = ncols - (num_metrics % ncols)
 
-        assert (
-                0 < rows <= num_metrics), \
-            "Plot must have at least one row. Please update number of columns " \
-            "('ncols') or check that at least one metric is specified in 'metrics'."
-        assert (
-                0 < ncols <= num_metrics), \
-            "Plot must have at least one column, and no more columns than metrics. " \
-            "Please update number of columns ('ncols') or check that at least " \
-            "one metric is specified in 'metrics'."
+        if not (0 < rows <= num_metrics):
+           raise ValueError (
+               "Plot must have at least one row. Please update number of columns"
+               " ('ncols') or check that at least one metric is specified in "
+               "'metrics'.")
+        if not (0 < ncols <= num_metrics):
+           raise ValueError(
+               "Plot must have at least one column, and no more columns than "
+               "subplots. Please update number of columns ('ncols') or check "
+               "that at least one metric is specified in 'metrics'.")
 
         total_plot_width = 25
 
@@ -817,10 +810,9 @@ class Plotting(object):
         if fillzeros:
             data_table = data_table.fillna(0)
 
-        assert not all(v is None for v in
-                       [attributes, metrics]), \
-                        "One of the following parameters must be specified: " \
-                        "'attribute', 'metrics'."
+        if all(v is None for v in [attributes, metrics]):
+            raise ValueError("One of the following parameters must be specified: " \
+                        "'attribute', 'metrics'.")
 
         if attributes:
             if not metrics:
@@ -864,17 +856,17 @@ class Plotting(object):
         else:
             axes_to_remove = ncols - (num_metrics % ncols)
 
-        assert (
-                0 < rows <= num_metrics), \
-            "Plot must have at least one row. Please update number of columns " \
-            "('ncols'), the list of metrics to be plotted ('metrics'), or the " \
-            "list of attributes to plot disparity metrics across."
-        assert (
-                0 < ncols <= num_metrics), \
-            "Plot must have at least one column, and no more columns than plots. " \
-            "Please update number of columns ('ncols'), the list of metrics to " \
-            "be plotted ('metrics'), or the list of attributes to plot disparity " \
-            "metrics across."
+        if not (0 < rows <= num_metrics):
+           raise ValueError (
+               "Plot must have at least one row. Please update number of columns"
+               " ('ncols'), the list of metrics to be plotted ('metrics'), or "
+               "the list of attributes to plot disparity metrics across.")
+        if not (0 < ncols <= num_metrics):
+           raise ValueError(
+               "Plot must have at least one column, and no more columns than "
+               "plots. Please update number of columns ('ncols'), the list of "
+               "metrics to be plotted ('metrics'), or the list of attributes to "
+               "plot disparity metrics across.")
 
         total_plot_width = 25
 
