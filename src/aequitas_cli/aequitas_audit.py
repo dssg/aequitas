@@ -18,10 +18,8 @@ from .utils.io import push_todb
 from .utils.io import push_topdf
 from .utils.report import audit_report_markdown
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 about = '\n'.join(
     [

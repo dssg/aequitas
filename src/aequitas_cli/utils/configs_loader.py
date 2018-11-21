@@ -5,6 +5,8 @@ import yaml
 
 logging.getLogger(__name__)
 
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 class Configs(object):
     original_fairness_measures = (

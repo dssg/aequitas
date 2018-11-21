@@ -1,9 +1,17 @@
-import matplotlib.pyplot as plt
 
-# Attribution: Adapted from squaify source code for plotting treemaps in
-# matplotlib. Treemaps are flipped so smallest square is in bottom right corner.
-# Added squarify_plot_rects function based on source code plot function for
-# plotting predefined rectangles.
+'''
+Attribution: Adapted from Uri Laserson's squaify source code for plotting treemaps in
+matplotlib based on algorithm from Bruls, Huizing, van Wijk,
+"Squarified Treemaps". (https://github.com/laserson/squarify)
+
+Treemaps are flipped so smallest square is in bottom right corner. Added
+function for plotting predefined rectangles. Made adjustments to treemap labeling.
+'''
+
+__author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+
+import matplotlib.pyplot as plt
 
 def normalize_sizes(sizes, dx, dy):
     total_size = sum(sizes)

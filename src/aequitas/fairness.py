@@ -4,10 +4,8 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
 class Fairness(object):
@@ -34,12 +32,12 @@ class Fairness(object):
         else:
             self.tau = tau
 
+        # Set high-level fairness evaluation to NA (undefined) if both
+        # underlying parity determinations are NA. If only one parity is NA,
+        # evaluation is determined by the defined parity.
         self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
             else \
             (True if (x[col1] is True and x[col2] is True) else False)
-        # self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) or pd.np.isnan(x[col2])) \
-        #     else \
-        #     (True if (x[col1] is True and x[col2] is True) else False)
 
         self.high_level_single_eval = lambda col: lambda x: pd.np.nan if pd.np.isnan(x[col]) else (True if x[col] is True else
         False)

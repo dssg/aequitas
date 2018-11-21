@@ -15,12 +15,11 @@ from aequitas import squarify_flipped as sf
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Loren Hinkson
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+__author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
-class Plotting(object):
+
+class Plot(object):
     """
     Plotting object allows for visualization of absolute group bias metrics and
     relative disparities calculated by Aequitas Group(), Bias(), and Fairness()

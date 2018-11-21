@@ -5,10 +5,8 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 class Bias(object):
     """
