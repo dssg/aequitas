@@ -38,6 +38,30 @@ class Plotting(object):
         else:
             return rounded + 1 / 4
 
+    @classmethod
+    def _check_brightness(cls, rgb_tuple):
+        '''
+        Determine the brightness of background color in a plot.
+
+        Adapted from https://trendct.org/2016/01/22/how-to-choose-a-label-color-to-contrast-with-background/
+        '''
+        r, g, b = rgb_tuple
+        return (r * 299 + g * 587 + b * 114) / 1000
+
+    @classmethod
+    def _brightness_threshold(cls, rgb_tuple, min_brightness, light_color,
+                             dark_color='black'):
+        '''
+        Determine ideal plot label color (light or dark) based on brightness of
+        background color based on a given brightness threshold.
+
+        Adapted from https://trendct.org/2016/01/22/how-to-choose-a-label-color-to-contrast-with-background/
+        '''
+        if cls._check_brightness(rgb_tuple) > min_brightness:
+            return dark_color
+
+        return light_color
+
     def __init__(self, key_metrics=default_absolute_metrics,
                  key_disparities=default_disparities):
         """
@@ -93,28 +117,8 @@ class Plotting(object):
             cmap(np.linspace(min_value, max_value, num_colors)))
         return new_cmap
 
-    def _check_brightness(self, rgb_tuple):
-        '''
-        Determine the brightness of background color in a plot.
 
-        Adapted from https://trendct.org/2016/01/22/how-to-choose-a-label-color-to-contrast-with-background/
-        '''
-        r, g, b = rgb_tuple
-        return (r * 299 + g * 587 + b * 114) / 1000
 
-    @classmethod
-    def _brightness_threshold(self, rgb_tuple, min_brightness, light_color,
-                             dark_color='black'):
-        '''
-        Determine ideal plot label color (light or dark) based on brightness of
-        background color based on a given brightness threshold.
-
-        Adapted from https://trendct.org/2016/01/22/how-to-choose-a-label-color-to-contrast-with-background/
-        '''
-        if self._check_brightness(rgb_tuple) > min_brightness:
-            return dark_color
-
-        return light_color
 
     def _assemble_ref_groups(self, disparities_table, ref_group_flag='_ref_group_value'):
         """
@@ -258,7 +262,8 @@ class Plotting(object):
                 my_col = mapping.to_rgba(g_size)
                 bar.set_color(my_col)
                 label_colors.append(self._brightness_threshold(
-                    my_col[:3], min_brightness, light_color=(1, 1, 1, 1)))
+                    rgb_tuple=my_col[:3], min_brightness=min_brightness,
+                    light_color=(1, 1, 1, 1)))
 
             if label_dict:
                 labels = [label_dict.get(label, label) for label in
@@ -366,7 +371,7 @@ class Plotting(object):
         height = 100.
 
         ref_group_rel_idx, ref_group_name = \
-            self.locate_ref_group_indices(disparities_table=sorted_df,
+            self._locate_ref_group_indices(disparities_table=sorted_df,
                                             attribute_name=attribute_name,
                                             group_metric=group_metric)
 
