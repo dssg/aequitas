@@ -68,7 +68,7 @@ install_direnv=""
 case $(uname -s) in
 Linux)
   [ -f /etc/os-release ] && . /etc/os-release
-  case $ID_LIKE in
+  case ${ID_LIKE:-$ID} in
   *debian*)
     install_direnv=apt_install_direnv
     ;;

@@ -9,11 +9,8 @@ tabulate.PRESERVE_WHITESPACE = True
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.
-
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 #
 #  DISCLAIMER: these methods were developed with a particular version of the webapp in mind. They lack flexibility (lots of

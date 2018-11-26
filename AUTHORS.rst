@@ -10,9 +10,10 @@ Development Lead
 Contributors
 ------------
 
+- Pedro Saleiro
+- Benedict Kuester
 - Abby Stevens
 - Ari Anisfeld
-- Benedict Kuester
+- Loren Hinkson
 - Jesse London
-- Pedro Saleiro
 - Rayid Ghani

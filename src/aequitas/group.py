@@ -4,11 +4,9 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-# Authors: Pedro Saleiro <saleiro@uchicago.edu>
-#          Rayid Ghani
-#          Benedict Kuester
-#
-# License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+
 
 class Group(object):
     """
@@ -142,17 +140,7 @@ class Group(object):
 
         if not score_thresholds:
             df['score'] = df['score'].astype(float)
-            counts_all = df['score'].value_counts()
-
-            # check whether 1.0 in index before requesting count value
-            if 1.0 in counts_all.index:
-                count_ones = counts_all.loc[1.0]
-            else:
-                count_ones = 0
-
-            # if count_ones == 0:
-            #     logging.error('get_crosstabs: No threshold provided and there are no 1s in the score column.')
-            #     exit(1)
+            count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
         print('model_id, score_thresholds', model_id, score_thresholds)
@@ -221,6 +209,7 @@ class Group(object):
         View all calculated disparities in table
         :return: list of disparity metrics
         '''
-        return list(set(df.columns) & set(['fpr', 'fnr', 'tpr', 'tnr', 'for',
+        return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
                                            'fdr', 'npv', 'precision', 'ppr',
-                                           'pprev', 'prev']))
+                                           'pprev', 'prev'
+                                        ]).tolist()

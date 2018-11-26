@@ -1,9 +1,17 @@
-import matplotlib.pyplot as plt
 
-# Attribution: Adapted from squaify source code for plotting treemaps in
-# matplotlib. Treemaps are flipped so smallest square is in bottom right corner.
-# Added squarify_plot_rects function based on source code plot function for
-# plotting predefined rectangles.
+'''
+Attribution: Adapted from Uri Laserson's squaify source code for plotting treemaps in
+matplotlib based on algorithm from Bruls, Huizing, van Wijk,
+"Squarified Treemaps". (https://github.com/laserson/squarify)
+
+Treemaps are flipped so smallest square is in bottom right corner. Added
+function for plotting predefined rectangles. Made adjustments to treemap labeling.
+'''
+
+__author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
+__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+
+import matplotlib.pyplot as plt
 
 def normalize_sizes(sizes, dx, dy):
     total_size = sum(sizes)
@@ -73,7 +81,13 @@ def leftover(sizes, x, y, dx, dy):
 
 
 def worst_ratio(sizes, x, y, dx, dy):
-    return max([max(rect['dx'] / rect['dy'], rect['dy'] / rect['dx']) for rect in layout(sizes, x, y, dx, dy)])
+    return max(
+        max(
+            rect['dx'] / rect['dy'],
+            rect['dy'] / rect['dx']
+            )
+        for rect in layout(sizes, x, y, dx, dy)
+    )
 
 
 def squarify(sizes, x, y, dx, dy):
@@ -157,7 +171,7 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
             # if box large enough, add labels and values
             if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(v))) & (dx > 10):
                 ax.text(x + dx / 2, y + dy / 2, v, va=va,
-                        ha='center', fontsize=14)
+                        ha='center', fontsize=12)
 
     if label is not None:
         va = 'center' if value is None else 'bottom'
@@ -177,7 +191,7 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
             else:
                 # add labels that don't fit in boxes underneath plot
                 ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
-                        ha='center', fontsize=10, wrap=False)
+                        ha='center', fontsize=12, wrap=False)
                 if value:
                     plot_ready = \
                         [val if isinstance(val, str) else f"{val:.2}" if
