@@ -1,6 +1,8 @@
 import logging
 
 import pandas as pd
+from aequitas.preprocessing import preprocess_input_df
+from scipy import stats
 
 logging.getLogger(__name__)
 
@@ -19,6 +21,107 @@ class Group(object):
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
         self.group_functions = self.get_group_functions()
+
+    def get_statistical_significance(self, df, score_thresholds=None, model_id=1,
+                                     attr_cols=None):
+        if 'label_value' not in df.columns:
+            raise ValueError(
+                "Column 'label_value' not in dataframe. Label values are "
+                "required for computing statistical significance of supervised "
+                "metrics.")
+
+        for col in attr_cols:
+            # find the priors_df
+            col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+            counts = col_group.size()
+
+        if not attr_cols:
+            non_attr_cols = [
+                'id', 'model_id', 'entity_id', 'score', 'label_value',
+                'rank_abs', 'rank_pct']
+            # index of the columns that are attributes
+            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
+
+        # check if all attr_cols exist in df
+        check = [col in df.columns for col in attr_cols]
+        if False in check:
+            raise ValueError(
+                f"Not all attribute columns provided '{attr_cols}' exist in "
+                f"input dataframe!")
+
+        # check if all columns are strings:
+        non_string_cols = \
+            df.columns[(df.dtypes != object) & (df.dtypes != str) & (
+                df.columns.isin(attr_cols))]
+
+        if non_string_cols.empty is False:
+            logging.error(
+                'get_crosstabs: input df was not preprocessed. There are '
+                'non-string cols within attr_cols!')
+            exit(1)
+
+        # if no score_thresholds are provided, we assume that rank_abs equals
+        # the number  of 1s in the score column; it also serves as flag to set
+        # parameter to 'binary'
+
+        count_ones = None
+        if not score_thresholds:
+            df['score'] = df['score'].astype(float)
+            count_ones = df['score'].value_counts().get(1.0, 0)
+            score_thresholds = {'rank_abs': [count_ones]}
+
+        df = df.sort_values('score', ascending=False)
+        df['rank_abs'] = range(1, len(df) + 1)
+        df['rank_pct'] = df['rank_abs'] / len(df)
+
+        binary_true_pos = lambda rank_col, label_col, thres: lambda x: (
+                    (x[rank_col] < thres) & (x[label_col] == 1)).astype(int)
+
+        binary_false_pos = lambda rank_col, label_col, thres: lambda x: (
+                    (x[rank_col] < thres) & (x[label_col] == 0)).astype(int)
+
+        binary_true_neg = lambda rank_col, label_col, thres: lambda x: (
+                    (x[rank_col] > thres) & (x[label_col] == 0)).astype(int)
+
+        binary_false_neg = lambda rank_col, label_col, thres: lambda x: (
+                    (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
+
+        binary_col_functions = {'b_tp': binary_true_pos,
+                                'b_fp': binary_false_pos,
+                                'b_tn': binary_true_neg,
+                                'b_fn': binary_false_neg
+                                }
+
+        for col in attr_cols:
+            # find the priors_df
+            col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+
+            for thres_unit, thres_values in score_thresholds.items():
+                for thres_val in thres_values:
+                    # flag = 0
+                    # k = (df[thres_unit] <= thres_val).sum()
+                    # score_threshold = \
+                    #     'binary 0/1' if count_ones != None else str(thres_val) +\
+                    #                                             '_' + thres_unit[-3:]
+                    for name, func in binary_col_functions.items():
+                        func = func(thres_unit, 'label_value', thres_val)
+                        df[name] = col_group.apply(func).reset_index(level=0, drop=True)
+        #                 binary_df = pd.DataFrame({
+        #                     'model_id': [model_id] * len(feat_bias),
+        #                     'score_threshold': [score_threshold] * len(feat_bias),
+        #                     'k': [k] * len(feat_bias),
+        #                     'attribute_name': [col] * len(feat_bias),
+        #                     'attribute_value': feat_bias.index.values,
+        #                     name: feat_bias.values
+        #                 })
+        #
+        #                 if flag == 0:
+        #                     this_group_df = binary_df
+        #                     flag = 1
+        #                 else:
+        #                     this_group_df = this_group_df.merge(binary_df)
+        # return this_group_df
+        return df
 
     def get_group_functions(self):
         """
@@ -202,7 +305,7 @@ class Group(object):
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
-        return groups_df, attr_cols
+        return groups_df, attr_cols, score_thresholds
 
     def list_absolute_metrics(self, df):
         '''
