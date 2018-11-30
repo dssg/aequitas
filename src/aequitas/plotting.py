@@ -467,8 +467,8 @@ class Plot(object):
         if not ax or not fig:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        ax = sf.squarify_plot_rects(padded_rects, color=clrs, label=labels,
-                                 value=label_values, ax=ax, alpha=0.8)
+        ax = sf.squarify_plot_rects(padded_rects, color=clrs, labels=labels,
+                                 values=label_values, ax=ax, alpha=0.8)
         # if model_id:
         #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
         #              fontsize=23, fontweight="bold")
