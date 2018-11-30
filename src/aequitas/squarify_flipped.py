@@ -12,6 +12,7 @@ __author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 import matplotlib.pyplot as plt
+import itertools
 
 def normalize_sizes(sizes, dx, dy):
     total_size = sum(sizes)
@@ -132,7 +133,7 @@ def padded_squarify(sizes, x, y, dx, dy):
     return rects
 
 def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
-                        label=None, value=None, ax=None, **kwargs):
+                        labels=None, values=None, ax=None, **kwargs):
     """
     Plotting with Matplotlib from predefined rectangles. Adapted from squarify
     source code.
@@ -142,8 +143,8 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
     :param norm_x:  overall figure dimensions for normalizing value box sizes
     :param norm_y: overall figure dimensions for normalizing value box sizes
     :param color: color string or list-like of colors to use for value boxes
-    :param label: list-like used as label text
-    :param value: list-like used as value text
+    :param labels: list-like used as label text
+    :param values: list-like used as value text
     :param ax: Matplotlib Axes instance
     :param kwargs: dict, keyword arguments passed to matplotlib.Axes.bar
 
@@ -155,52 +156,64 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
     dy = [rect['dy'] for rect in rects]
 
     ax.bar(x, dy, width=dx, bottom=y, color=color,
-           label=label, align='edge', **kwargs)
+           label=labels, align='edge', **kwargs)
 
     INDENT_LENGTH = 4
     CHAR_PLACEHOLDER = 1.5
 
-    if value is not None:
-        va = 'center' if label is None else 'top'
-        for v, r in zip(value, rects):
-            if isinstance(v, (int, float)):
-                v = f"{v:.2}"
+    if values is not None:
+        va = 'center' if labels is None else 'top'
+        if values:
+            plot_ready_values = [
+                val if isinstance(val, str)
+                else f"{val:.2}" if isinstance(val, (int, float))
+                else ""
+                for val in values
+            ]
 
+        for val, r in zip(plot_ready_values, rects):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
 
             # if box large enough, add labels and values
-            if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(v))) & (dx > 10):
-                ax.text(x + dx / 2, y + dy / 2, v, va=va,
+            if (dx >= (INDENT_LENGTH * 2) + (CHAR_PLACEHOLDER * len(val))) &\
+                    (dx > 10):
+                ax.text(x + dx / 2, y + dy / 2, val, va=va,
                         ha='center', fontsize=12)
 
-    if label is not None:
-        va = 'center' if value is None else 'bottom'
+    if labels is not None:
+        va = 'center' if values is None else 'bottom'
         under_plot = []
         alphabet = list(map(chr, range(65, 91)))
         under_plot_num = 0
 
-        for i, (l, r) in enumerate(zip(label, rects)):
+        if values:
+            plot_ready_values = [
+                val if isinstance(val, str)
+                else f"{val:.2}" if isinstance(val, (int, float))
+                else ""
+                for val in values
+            ]
+        else:
+            plot_ready_values = itertools.repeat(None)
+
+        for (label, r, val) in zip(labels, rects, plot_ready_values):
             x, y, dx, dy = r['x'], r['y'], r['dx'], r['dy']
             length = dx
 
             # if box large enough, add labels and values
-            if (dx >= (INDENT_LENGTH * 2) + CHAR_PLACEHOLDER * len(l)) & (dx > 10):
-                ax.text(x + dx / 2, y + dy / 2, l, va=va, ha='center',
+            if (dx >= (INDENT_LENGTH * 2) + CHAR_PLACEHOLDER * len(label)) & (dx > 10):
+                ax.text(x + dx / 2, y + dy / 2, label, va=va, ha='center',
                         fontsize=14, wrap=False)
 
             else:
                 # add labels that don't fit in boxes underneath plot
                 ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
                         ha='center', fontsize=12, wrap=False)
-                if value:
-                    plot_ready = \
-                        [val if isinstance(val, str) else f"{val:.2}" if
-                        isinstance(val, (int, float)) else "" for val in value]
-                    underplot_label = f"{l}, {plot_ready[i]}"
-                else:
-                    underplot_label = f"{l}"
+
+                underplot_label = str(label) if val is None else f"{label}, {val}"
                 under_plot.append(f"{alphabet[under_plot_num]}: {underplot_label}")
                 under_plot_num += 1
+
 
         if len(under_plot) > 0:
             unlabeled = ('\n').join(under_plot)
