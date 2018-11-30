@@ -163,7 +163,7 @@ def audit_file(name, dirname):
                       fairness_measures=fairness_measures,
                       attr_cols=group_variables)
 
-    (_gv_df, report) = audit(df,
+    (_gv_df, _, report) = audit(df,
                              model_id=1,
                              configs=configs,
                              preprocessed=True)

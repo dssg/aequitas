@@ -1,0 +1,279 @@
+# The Bias Report 
+
+&nbsp;
+
+| column1                 | column2                                                                                                                                                               |
+|:------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Audit Date:**         | 28 Nov 2018                                                                                                                                                           |
+| **Data Audited:**       | 10 rows                                                                                                                                                               |
+| **Attributes Audited:** | class                                                                                                                                                                 |
+| **Audit Goal(s):**      | **Equal Parity** - Ensure all protected groups are have equal representation in the selected set.                                                                     |
+|                         | **Proportional Parity** - Ensure all protected groups are selected proportional to their percentage of the population.                                                |
+|                         | **False Positive Rate Parity** - Ensure all protected groups have the same false positive rates as the reference group).                                              |
+|                         | **False Discovery Rate Parity** - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).    |
+|                         | **False Negative Rate Parity** - Ensure all protected groups have the same false negative rates (as the reference group).                                             |
+|                         | **False Omission Rate Parity** - Ensure all protected groups have equally proportional false negatives within the non-selected set (compared to the reference group). |
+| **Reference Groups:**   | Custom group - The reference groups you selected for each attribute will be used  to calculate relative disparities in this audit.                                    |
+| **Fairness Threshold:** | 90%. If disparity for a group is within 90% and 111% of  the value of the reference group on a group metric (e.g. False Positive Rate), this audit will pass.         | 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+### Audit Results:
+
+1. [Summary](#audit-results-summary)
+
+2. [Details by Fairness Measures](#audit-results-details-by-fairness-measures)
+
+3. [Details by Protected Attributes](#audit-results-details-by-protected-attributes)
+
+4. [Bias Metrics Values](#audit-results-bias-metrics-values)
+
+5. [Base Metrics Calculated for Each Group](#audit-results-group-metrics-values)
+
+ 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+### Audit Results: Summary
+
+| column1                                                                                                                                                               | column2                                         | column3                                                                    |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------|:---------------------------------------------------------------------------|
+| **Equal Parity** - Ensure all protected groups are have equal representation in the selected set.                                                                     | ++span-green-init++**Passed**++span-green-end++ | [Details](#equal-parity-span-green-initpassedspan-green-end)               |
+| **Proportional Parity** - Ensure all protected groups are selected proportional to their percentage of the population.                                                | ++span-green-init++**Passed**++span-green-end++ | [Details](#proportional-parity-span-green-initpassedspan-green-end)        |
+| **False Positive Rate Parity** - Ensure all protected groups have the same false positive rates as the reference group).                                              | ++span-red-init++**Failed**++span-red-end++     | [Details](#false-positive-rate-parity-span-red-initfailedspan-red-end)     |
+| **False Discovery Rate Parity** - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).    | ++span-red-init++**Failed**++span-red-end++     | [Details](#false-discovery-rate-parity-span-red-initfailedspan-red-end)    |
+| **False Negative Rate Parity** - Ensure all protected groups have the same false negative rates (as the reference group).                                             | ++span-red-init++**Failed**++span-red-end++     | [Details](#false-negative-rate-parity-span-red-initfailedspan-red-end)     |
+| **False Omission Rate Parity** - Ensure all protected groups have equally proportional false negatives within the non-selected set (compared to the reference group). | ++span-green-init++**Passed**++span-green-end++ | [Details](#false-omission-rate-parity-span-green-initpassedspan-green-end) | 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+### Audit Results: Details by Fairness Measures 
+
+&nbsp;
+
+
+
+#### Equal Parity: ++span-green-init++Passed++span-green-end++
+
+| What is it?                                                                                                                                                                                                                                                                                                             | When does it matter?                                                                                                   | Which groups failed the audit:                                                                                                    |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have equal parity is every group is equally represented in the selected set. For example, if race (with possible values of white, black, other) has equal parity, it implies that all three races are equally represented (33% each)in the selected/intervention set. | ##border##If your desired outcome is to intervene equally on people from all races, then you care about this criteria. | ##border##++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric.++span-green-end++ | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+
+
+#### Proportional Parity: ++span-green-init++Passed++span-green-end++
+
+| What is it?                                                                                                                                                                                                                                                                                                                                                                                                          | When does it matter?                                                                                                          | Which groups failed the audit:                                                                                                    |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have proportional parity if every group is represented proportionally to their share of the population. For example, if race with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has proportional parity, it implies that all three races are represented in the same proportions (50%, 30%, 20%) in the selected set. | ##border##If your desired outcome is to intervene proportionally on people from all races, then you care about this criteria. | ##border##++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric.++span-green-end++ | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+
+
+#### False Positive Rate Parity: ++span-red-init++Failed++span-red-end++
+
+| What is it?                                                                                                                                                                                                                                                  | When does it matter?                                                                                                                                                                                                                                                                                                                                                                              | Which groups failed the audit:                                                                                                                                                                                                                                                                                      |
+|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have False Positive parity if every group has the same False Positive Error Rate. For example, if race has false positive parity, it implies that all three races have the same False Positive Error Rate. | ##border##If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and has a risk of adverse outcomes for individuals. Using this criteria allows you to make sure that you are not making false positive mistakes about any single group disproportionately. | ##border##**For class** (with reference group as **High**)##br##&emsp;&emsp;&emsp;##tooltip-start-title##false positive rate of this group is 0.67 compared to 0.5 for the reference group High.##tooltip-end-title##Low##tooltip-end-anchor## with ++span-red-init++1.33X++span-red-end++ Disparity ##br##  ##br## | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+
+
+#### False Discovery Rate Parity: ++span-red-init++Failed++span-red-end++
+
+| What is it?                                                                                                                                                                                                                                                          | When does it matter?                                                                                                                                                                                                                                                                              | Which groups failed the audit:                                                                                                                                                                                                                                                                                        |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have False Discovery Rate parity if every group has the same False Discovery Error Rate. For example, if race has false discovery parity, it implies that all three races have the same False Discvery Error Rate. | ##border##If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and can hurt individuals and where you are selecting a very small group for interventions. | ##border##**For class** (with reference group as **High**)##br##&emsp;&emsp;&emsp;##tooltip-start-title##false discovery rate of this group is 0.67 compared to 0.33 for the reference group High.##tooltip-end-title##Low##tooltip-end-anchor## with ++span-red-init++2.00X++span-red-end++ Disparity ##br##  ##br## | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+
+
+#### False Negative Rate Parity: ++span-red-init++Failed++span-red-end++
+
+| What is it?                                                                                                                                                                                                                                                  | When does it matter?                                                                                                                                                                                                                                                                                                                                                                                                                          | Which groups failed the audit:                                                                                                                                                                                                                                                                                      |
+|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have False Negative parity if every group has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three races have the same False Negative Error Rate. | ##border##If your desired outcome is to make false negative errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is assistive (providing helpful social services for example) and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure that you’re not missing people from certain groups disproportionately. | ##border##**For class** (with reference group as **High**)##br##&emsp;&emsp;&emsp;##tooltip-start-title##false negative rate of this group is 0.5 compared to 0.33 for the reference group High.##tooltip-end-title##Low##tooltip-end-anchor## with ++span-red-init++1.50X++span-red-end++ Disparity ##br##  ##br## | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+---- 
+
+&nbsp;
+
+ 
+
+&nbsp;
+
+
+
+#### False Omission Rate Parity: ++span-green-init++Passed++span-green-end++
+
+| What is it?                                                                                                                                                                                                                                                       | When does it matter?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Which groups failed the audit:                                                                                                    |
+|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| ##border##This criteria considers an attribute to have False Omission Rate parity if every group has the same False Omission Error Rate. For example, if race has false omission parity, it implies that all three races have the same False Omission Error Rate. | ##border##If your desired outcome is to make false negative errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is assistive (providing help social services for example) and missing an individual could lead to adverse outcomes for them , and where you are selecting a very small group for interventions. Using this criteria allows you to make sure that you’re not missing people from certain groups disproportionately. | ##border##++span-green-init++Based on the fairness threshold used, all groups passed the audit for this metric.++span-green-end++ | 
+
+&nbsp;
+
+
+
+[Go to Top](#) 
+
+&nbsp;
+
+----
+
+### Audit Results: Details by Protected Attributes 
+
+&nbsp;
+
+
+
+#### class 
+
+&nbsp;
+
+| Attribute Value   | Statistical Parity   | Impact Parity    | FDR Parity        | FPR Parity        | FOR Parity       | FNR Parity        |
+|:------------------|:---------------------|:-----------------|:------------------|:------------------|:-----------------|:------------------|
+| [High](#class-2)  | [Ref](#class-2)      | [Ref](#class-2)  | [Ref](#class-2)   | [Ref](#class-2)   | [Ref](#class-2)  | [Ref](#class-2)   |
+| [Low](#class-2)   | [True](#class-2)     | [True](#class-2) | [False](#class-2) | [False](#class-2) | [True](#class-2) | [False](#class-2) |
+
+[Go to Top](#)
+
+&nbsp;
+
+&nbsp;
+
+----
+
+### Audit Results: Bias Metrics Values 
+
+&nbsp;
+
+
+
+#### class 
+
+&nbsp;
+
+| Attribute Value   | PPR Disparity             | PPREV Disparity           | FDR Disparity          | FPR Disparity           | FOR Disparity             | FNR Disparity          |
+|:------------------|:--------------------------|:--------------------------|:-----------------------|:------------------------|:--------------------------|:-----------------------|
+| [High](#class-3)  | [1.0](#class-3)           | [1.0](#class-3)           | [1.0](#class-3)        | [1.0](#class-3)         | [1.0](#class-3)           | [1.0](#class-3)        |
+| [Low](#class-3)   | [##green## 1.0](#class-3) | [##green## 1.0](#class-3) | [##red##2.0](#class-3) | [##red##1.33](#class-3) | [##green## 1.0](#class-3) | [##red##1.5](#class-3) |
+
+[Go to Previous](#class)
+
+[Go to Top](#)
+
+&nbsp;
+
+&nbsp;
+
+----
+
+### Audit Results: Group Metrics Values 
+
+&nbsp;
+
+
+
+#### class 
+
+&nbsp;
+
+| Attribute Value   | Group Size Ratio   | PPR           | PPREV         | FDR         | FPR         | FOR           | FNR        |
+|:------------------|:-------------------|:--------------|:--------------|:------------|:------------|:--------------|:-----------|
+| High              | 0.5                | 0.5           | 0.6           | 0.33        | 0.5         | 0.5           | 0.33       |
+| Low               | 0.5                | ##green## 0.5 | ##green## 0.6 | ##red##0.67 | ##red##0.67 | ##green## 0.5 | ##red##0.5 |
+
+[Go to Previous](#class-2)
+
+[Go to Top](#)
+
+&nbsp;
+
+&nbsp;
+
+----

@@ -6,7 +6,7 @@ import pandas as pd
 from aequitas.bias import Bias
 from aequitas.fairness import Fairness
 from aequitas.group import Group
-from aequitas.plotting import Plotting
+from aequitas.plotting import Plot
 from aequitas.preprocessing import preprocess_input_df
 
 from aequitas_cli.utils.configs_loader import Configs
@@ -119,7 +119,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
 
-    aqp = Plotting()
+    aqp = Plot()
 
     if len(configs.plot_bias_metrics) == 1:
         fig1 = aqp.plot_disparity(bias_df, metrics=configs.plot_bias_metrics)
@@ -149,6 +149,7 @@ def audit(df, configs, model_id=1, preprocessed=False):
 
     print(fair_results)
     report = None
+
     if configs.report is True:
         mkdwn_report = audit_report_markdown(configs, group_value_df, f.fair_measures_depend, fair_results)
         report_html = report_html_conversion(mkdwn_report)

@@ -1,0 +1,465 @@
+<h1 style="color:#b37d4e;" id="the-bias-report" align="center">The Bias Report</h1>
+
+<p>&nbsp;</p>
+
+<table>
+
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Audit Date:</strong></td>
+  <td align="left" style=" padding:5px;">28 Nov 2018</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Data Audited:</strong></td>
+  <td align="left" style=" padding:5px;">10 rows</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Attributes Audited:</strong></td>
+  <td align="left" style=" padding:5px;">class</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Audit Goal(s):</strong></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Equal Parity</a> - Ensure all protected groups are have equal representation in the selected set.</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Group Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a> - Ensure all protected groups are selected proportional to their percentage of the population.</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a> - Ensure all protected groups have the same false positive rates as the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a> - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a> - Ensure all protected groups have the same false negative rates (as the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"></td>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Omission Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Omission Rate Parity</a> - Ensure all protected groups have equally proportional false negatives within the non-selected set (compared to the reference group).</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Reference Groups:</strong></td>
+  <td align="left" style=" padding:5px;">Custom group - The reference groups you selected for each attribute will be used  to calculate relative disparities in this audit.</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><strong>Fairness Threshold:</strong></td>
+  <td align="left" style=" padding:5px;">90%. If disparity for a group is within 90% and 111% of  the value of the reference group on a group metric (e.g. False Positive Rate), this audit will pass.</td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results">Audit Results:</h3>
+
+<ol>
+<li><p><a href="#audit-results-summary">Summary</a></p></li>
+<li><p><a href="#audit-results-details-by-fairness-measures">Details by Fairness Measures</a></p></li>
+<li><p><a href="#audit-results-details-by-protected-attributes">Details by Protected Attributes</a></p></li>
+<li><p><a href="#audit-results-bias-metrics-values">Bias Metrics Values</a></p></li>
+<li><p><a href="#audit-results-group-metrics-values">Base Metrics Calculated for Each Group</a></p></li>
+</ol>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-summary">Audit Results: Summary</h3>
+
+<table>
+
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Equal Parity</a> - Ensure all protected groups are have equal representation in the selected set.</td>
+  <td align="left" style=" padding:5px;"><span style="color:green"><b><strong>Passed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#equal-parity-span-green-initpassedspan-green-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Group Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a> - Ensure all protected groups are selected proportional to their percentage of the population.</td>
+  <td align="left" style=" padding:5px;"><span style="color:green"><b><strong>Passed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#proportional-parity-span-green-initpassedspan-green-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a> - Ensure all protected groups have the same false positive rates as the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-positive-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a> - Ensure all protected groups have equally proportional false positives within the selected set (compared to the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-discovery-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a> - Ensure all protected groups have the same false negative rates (as the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:red"><b><strong>Failed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-negative-rate-parity-span-red-initfailedspan-red-end">Details</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Omission Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Omission Rate Parity</a> - Ensure all protected groups have equally proportional false negatives within the non-selected set (compared to the reference group).</td>
+  <td align="left" style=" padding:5px;"><span style="color:green"><b><strong>Passed</strong></b> </span> </td>
+  <td align="left" style=" padding:5px;"><a href="#false-omission-rate-parity-span-green-initpassedspan-green-end">Details</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-details-by-fairness-measures">Audit Results: Details by Fairness Measures</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="equal-parity-span-green-initpassedspan-green-end">Equal Parity: <span style="color:green"><b>Passed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have equal parity is every group is equally represented in the selected set. For example, if race (with possible values of white, black, other) has equal parity, it implies that all three races are equally represented (33% each)in the selected/intervention set.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to intervene equally on people from all races, then you care about this criteria.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><span style="color:green"><b>Based on the fairness threshold used, all groups passed the audit for this metric.</b> </span> </td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="proportional-parity-span-green-initpassedspan-green-end">Proportional Parity: <span style="color:green"><b>Passed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have proportional parity if every group is represented proportionally to their share of the population. For example, if race with possible values of white, black, other being 50%, 30%, 20% of the population respectively) has proportional parity, it implies that all three races are represented in the same proportions (50%, 30%, 20%) in the selected set.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to intervene proportionally on people from all races, then you care about this criteria.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><span style="color:green"><b>Based on the fairness threshold used, all groups passed the audit for this metric.</b> </span> </td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-positive-rate-parity-span-red-initfailedspan-red-end">False Positive Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Positive parity if every group has the same False Positive Error Rate. For example, if race has false positive parity, it implies that all three races have the same False Positive Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and has a risk of adverse outcomes for individuals. Using this criteria allows you to make sure that you are not making false positive mistakes about any single group disproportionately.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For class</strong> (with reference group as <strong>High</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false positive rate of this group is 0.67 compared to 0.5 for the reference group High. ">Low</a> with <span style="color:red"><b>1.33X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-discovery-rate-parity-span-red-initfailedspan-red-end">False Discovery Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Discovery Rate parity if every group has the same False Discovery Error Rate. For example, if race has false discovery parity, it implies that all three races have the same False Discvery Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false positive errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is punitive and can hurt individuals and where you are selecting a very small group for interventions.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For class</strong> (with reference group as <strong>High</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false discovery rate of this group is 0.67 compared to 0.33 for the reference group High. ">Low</a> with <span style="color:red"><b>2.00X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-negative-rate-parity-span-red-initfailedspan-red-end">False Negative Rate Parity: <span style="color:red"><b>Failed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Negative parity if every group has the same False Negative Error Rate. For example, if race has false negative parity, it implies that all three races have the same False Negative Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false negative errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is assistive (providing helpful social services for example) and missing an individual could lead to adverse outcomes for them. Using this criteria allows you to make sure that you’re not missing people from certain groups disproportionately.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><strong>For class</strong> (with reference group as <strong>High</strong>)<br>&emsp;&emsp;&emsp;<a href="javascript:;" data-toggle="tooltip" title="false negative rate of this group is 0.5 compared to 0.33 for the reference group High. ">Low</a> with <span style="color:red"><b>1.50X</b> </span>  Disparity <br>  <br></td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="false-omission-rate-parity-span-green-initpassedspan-green-end">False Omission Rate Parity: <span style="color:green"><b>Passed</b> </span> </h4>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left" width="35%" >What is it?</th>
+  <th align="left">When does it matter?</th>
+  <th align="left" width="30%" >Which groups failed the audit:</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px; border: 15px solid white;">This criteria considers an attribute to have False Omission Rate parity if every group has the same False Omission Error Rate. For example, if race has false omission parity, it implies that all three races have the same False Omission Error Rate.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;">If your desired outcome is to make false negative errors equally on people from all races, then you care about this criteria. This is important in cases where your intervention is assistive (providing help social services for example) and missing an individual could lead to adverse outcomes for them , and where you are selecting a very small group for interventions. Using this criteria allows you to make sure that you’re not missing people from certain groups disproportionately.</td>
+  <td align="left" style=" padding:5px; border: 15px solid white;"><span style="color:green"><b>Based on the fairness threshold used, all groups passed the audit for this metric.</b> </span> </td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+<p><a href="#">Go to Top</a> </p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-details-by-protected-attributes">Audit Results: Details by Protected Attributes</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="class">class</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Equal Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Group Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the Predicted Positive Group Rate Disparity of each group is within the range allowed by the fairness threshold selected.">Proportional Parity</a></a></th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected."> <a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Discovery Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Discovery Rate Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Positive Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Positive Rate Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Omission Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Omission Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Omission Rate Parity</a></a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected." ><a href="javascript:;" data-toggle="tooltip" title="Fail/Pass test if the False Negative Rate Disparity of each group is within the range allowed by the fairness threshold selected.">False Negative Rate Parity</a></a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#class-2">High</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Ref</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#class-2">Low</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:red"><b>Failed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:green"><b>Passed</b></a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-2" style="color:red"><b>Failed</b></a></td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-bias-metrics-values">Audit Results: Bias Metrics Values</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="class-2">class</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The Predicted Positive Rate of each group divided by the same metric value of the reference group.">Predicted Positive Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The Predicted Positive Group Ratio of each group divided by the same metric value of the reference group. .">Predicted Positive Group Rate Disparity</a></th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="The False Discovery Rate of each group divided by the same metric value of the reference group.">False Discovery Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The False Positive Rate of each group divided by the same metric value of the reference group.">False Positive Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The False Omission Rate of each group divided by the same metric value of the reference group.">False Omission Rate Disparity</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="The False Negative Rate of each group divided by the same metric value of the reference group.">False Negative Rate Disparity</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#class-3">High</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3">1.0</a></td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;"><a href="#class-3">Low</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:green"> 1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:green"> 1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:red">2.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:red">1.33</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:green"> 1.0</a></td>
+  <td align="left" style=" padding:5px;"><a href="#class-3" style="color:red">1.5</a></td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#class">Go to Previous</a></p>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+
+<h3 style="color:#b37d4e;" style="color:#b37d4e;" id="audit-results-group-metrics-values">Audit Results: Group Metrics Values</h3>
+
+<p>&nbsp;</p>
+
+<h4 style="color:#286da8;" id="class-3">class</h4>
+
+<p>&nbsp;</p>
+
+<table class="table table-striped" padding=5 >
+<thead>
+<tr>
+  <th align="left">Attribute Value</th>
+  <th align="left">Group Size Ratio</th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of elements of the group selected divided by the total size of the interventation set.">Predicted Positive Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of elements of the group selected divided by the size of the group.">Predicted Positive Group Rate</a></th>
+  <th align="left"> <a href="javascript:;" data-toggle="tooltip" title="Number of false positives of the group divided by the size of the intervention set of the group (predicted positives within group).">False Discovery Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of false positives of the group divided by number of labeled negatives within the group.">False Positive Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of false negatives of the group divided by the size of the non-selected set of the group (predicted negatives within group).">False Omission Rate</a></th>
+  <th align="left" ><a href="javascript:;" data-toggle="tooltip" title="Number of false negative of the group divided by number of labeled positives in the group">False Negative Rate</a></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td align="left" style=" padding:5px;">High</td>
+  <td align="left" style=" padding:5px;">0.5</td>
+  <td align="left" style=" padding:5px;">0.5</td>
+  <td align="left" style=" padding:5px;">0.6</td>
+  <td align="left" style=" padding:5px;">0.33</td>
+  <td align="left" style=" padding:5px;">0.5</td>
+  <td align="left" style=" padding:5px;">0.5</td>
+  <td align="left" style=" padding:5px;">0.33</td>
+</tr>
+<tr>
+  <td align="left" style=" padding:5px;">Low</td>
+  <td align="left" style=" padding:5px;">0.5</td>
+  <td align="left" style="color:green; padding:10px;"> 0.5</td>
+  <td align="left" style="color:green; padding:10px;"> 0.6</td>
+  <td align="left" style="color:red; padding:10px;">0.67</td>
+  <td align="left" style="color:red; padding:10px;">0.67</td>
+  <td align="left" style="color:green; padding:10px;"> 0.5</td>
+  <td align="left" style="color:red; padding:10px;">0.5</td>
+</tr>
+</tbody>
+</table>
+
+<p><a href="#class-2">Go to Previous</a></p>
+
+<p><a href="#">Go to Top</a></p>
+
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+
+<hr />
+

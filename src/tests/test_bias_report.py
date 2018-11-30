@@ -5,6 +5,9 @@
 
 import os
 import sys
+import logging
+
+logging.getLogger(__name__)
 
 timeout = 60
 
@@ -69,16 +72,14 @@ def helper(input_filename, expected_filename, config_file):
                     pytest.fail(s)
 
 
-def markdown_test(input_filename, config_file):
-    # def markdown_test(input_filename, config_file, expected_markdown_filename):
+
+# def markdown_test(input_filename, config_file):
+def markdown_test(input_filename, config_file, expected_markdown_filename):
     '''
+    Test whether markdown generated from test df is correctly formatted.
 
+    To Do: integrate into helper fcn to test all at once.
     '''
-    input_filename = os.path.join(BASE_DIR, input_filename)
-
-    # with open(expected_markdown_filename) as f:
-    #     expected_mkdwn = f.read()
-
     if config_file:
         config_file = os.path.join(BASE_DIR, config_file)
 
@@ -87,12 +88,26 @@ def markdown_test(input_filename, config_file):
     _, mkdwn_report, html_report  = audit(pd.read_csv(os.path.join(BASE_DIR, input_filename)), config)
 
     s = ""
-    # match markdown strings
-    # if mkdwn_report != expected_mkdwn:
-    #     s += "Markdown test fails: markdown string created does not match expected markdown string.\n".format(col)
+    #match markdown strings
+
+    expected_markdown_filename = os.path.join(BASE_DIR, expected_markdown_filename)
+
+    with open(expected_markdown_filename) as f:
+        expected_mkdwn = f.read()
+
+    if mkdwn_report != expected_mkdwn:
+        s += "Markdown test fails: markdown string created does not match expected markdown string.\n"
+        return mkdwn_report
+        pytest.fail(s)
+
+    # with open(expected_html_filename) as h:
+    #     expected_html = h.read()
+    #
+    # if html_report != expected_html:
+    #     s += "HTML test fails: HTML string created does not match expected HTML string.\n"
     #     pytest.fail(s)
 
-    return mkdwn_report, html_report
+
 
 
 # simplest tests
@@ -140,7 +155,8 @@ def test_threshold_8():
     return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
 
 def test_markdwon_1():
-    return markdown_test('test_1.csv', 'test_4.yaml')
+    # return markdown_test('test_1.csv', 'test_4.yaml')
+    return markdown_test('test_1.csv', 'test_4.yaml', 'markdown_test_threshold_8.txt')
 
 
 def test_plot_fcns_1():
