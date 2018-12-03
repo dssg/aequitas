@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-from aequitas.preprocessing import preprocess_input_df
 from scipy import stats
 
 logging.getLogger(__name__)
@@ -22,8 +21,74 @@ class Group(object):
             (x[label_col] == 1).sum()
         self.group_functions = self.get_group_functions()
 
-    def get_statistical_significance(self, df, score_thresholds=None, model_id=1,
-                                     attr_cols=None):
+    @classmethod
+    def get_measure_sample(cls, df, attribute, measure):
+        return df.groupby(attribute).apply(lambda f: f[measure].values.tolist()).to_dict()
+
+    @classmethod
+    def check_equal_variance(cls, sample_dict, ref_group, alpha=5e-2):
+        eq_variance = {}
+        for attr_value, sample in sample_dict.items():
+            _, normality_p = stats.normaltest(sample, axis=None, nan_policy='omit')
+
+            if normality_p < alpha:
+                if attr_value == ref_group:
+                    # if ref_group is not normal, can't use f-test or bartlett, so
+                    # skip ahead to check for equal varience with ref_group using levene test
+                    # for all groups
+                    for group, sample_list in sample_dict.items():
+                        _, equal_variance_p = stats.levene(sample_dict[ref_group],
+                                                           sample_list,
+                                                           center='median')
+                        if equal_variance_p < alpha:
+                            eq_variance[group] = False
+                        else:
+                            eq_variance[group] = True
+                    return eq_variance
+
+                # if non-ref group is not normal, still can't use f-test or bartlett,
+                # check for equal varience with ref_group using levene test
+                _, equal_variance_p = stats.levene(sample_dict[ref_group], sample, center='median')
+                if equal_variance_p < alpha:
+                    eq_variance[attr_value] = False
+                else:
+                    eq_variance[attr_value] = True
+                if attr_value == ref_group:
+                    ref_group_normality = False
+
+        # case when some non-ref groups pass normality test, use bartlett test
+        # between each sample list and ref group to check for equal variance
+        untested_groups = sample_dict.keys() - eq_variance.keys()
+        untested = {key: val for (key, val) in sample_dict.items if key in untested_groups}
+        for sample, sample_list in untested:
+            _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
+            if equal_variance_p < alpha:
+                eq_variance[attr_value] = False
+            else:
+                eq_variance[attr_value] = True
+        return eq_variance
+
+    @classmethod
+    def calculate_significance(cls, df, attribute, measure, ref_group,
+                               alpha=5e-2):
+
+        sample_dict = cls.get_measure_sample(df=df, attribute=attribute,
+                                             measure=measure)
+        eq_variance_dict = cls.check_equal_variance(sample_dict=sample_dict,
+                                                    ref_group=ref_group,
+                                                    alpha=alpha)
+
+        for attr_val, eq_var in sample_dict.items():
+            _, difference_significance_p = stats.ttest_ind(
+                sample_dict[ref_group], sample_dict[attr_val], axis=None,
+                equal_var=eq_variance_dict[attr_val], nan_policy='omit')
+            df.loc[df[attribute] == attr_val, measure + '_siginificance'] = \
+                difference_significance_p
+        return df
+
+    @classmethod
+    def get_statistical_significance(cls, df, ref_group, score_thresholds=None,
+                                     model_id=1, attr_cols=None, aplha=5e-2):
         if 'label_value' not in df.columns:
             raise ValueError(
                 "Column 'label_value' not in dataframe. Label values are "
@@ -75,10 +140,10 @@ class Group(object):
         df['rank_pct'] = df['rank_abs'] / len(df)
 
         binary_true_pos = lambda rank_col, label_col, thres: lambda x: (
-                    (x[rank_col] < thres) & (x[label_col] == 1)).astype(int)
+                    (x[rank_col] <= thres) & (x[label_col] == 1)).astype(int)
 
         binary_false_pos = lambda rank_col, label_col, thres: lambda x: (
-                    (x[rank_col] < thres) & (x[label_col] == 0)).astype(int)
+                    (x[rank_col] <= thres) & (x[label_col] == 0)).astype(int)
 
         binary_true_neg = lambda rank_col, label_col, thres: lambda x: (
                     (x[rank_col] > thres) & (x[label_col] == 0)).astype(int)
@@ -86,44 +151,39 @@ class Group(object):
         binary_false_neg = lambda rank_col, label_col, thres: lambda x: (
                     (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
 
-        binary_col_functions = {'b_tp': binary_true_pos,
+        binary_score = lambda rank_col, label_col, thres: lambda x: (
+                    x[rank_col] <= thres).astype(int)
+
+        binary_col_functions = {'binary_score': binary_score,
+                                'b_tp': binary_true_pos,
                                 'b_fp': binary_false_pos,
                                 'b_tn': binary_true_neg,
                                 'b_fn': binary_false_neg
                                 }
 
-        for col in attr_cols:
+        for attribute in attr_cols:
             # find the priors_df
-            col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+            col_group = df.fillna({attribute: 'pd.np.nan'}).groupby(attribute)
 
             for thres_unit, thres_values in score_thresholds.items():
                 for thres_val in thres_values:
                     # flag = 0
                     # k = (df[thres_unit] <= thres_val).sum()
-                    # score_threshold = \
-                    #     'binary 0/1' if count_ones != None else str(thres_val) +\
-                    #                                             '_' + thres_unit[-3:]
+                    score_threshold = \
+                        'binary 0/1' if count_ones != None else \
+                            str(thres_val) + '_' + thres_unit[-3:]
+
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
-                        df[name] = col_group.apply(func).reset_index(level=0, drop=True)
-        #                 binary_df = pd.DataFrame({
-        #                     'model_id': [model_id] * len(feat_bias),
-        #                     'score_threshold': [score_threshold] * len(feat_bias),
-        #                     'k': [k] * len(feat_bias),
-        #                     'attribute_name': [col] * len(feat_bias),
-        #                     'attribute_value': feat_bias.index.values,
-        #                     name: feat_bias.values
-        #                 })
-        #
-        #                 if flag == 0:
-        #                     this_group_df = binary_df
-        #                     flag = 1
-        #                 else:
-        #                     this_group_df = this_group_df.merge(binary_df)
-        # return this_group_df
+                        df[name] = col_group.apply(func).reset_index(level=0,
+                                                                     drop=True)
+            for measure in binary_col_functions.keys():
+                cls.calculate_significance(df, attribute, measure,
+                                            ref_group=ref_group, alpha=aplha)
         return df
 
-    def get_group_functions(self):
+    @staticmethod
+    def get_group_functions():
         """
 
         :return:

@@ -11,34 +11,35 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 class Bias(object):
     """
     """
-    def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
+    default_key_columns = ('model_id', 'score_threshold', 'attribute_name')
+    all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
+                         'fnr', 'tpr', 'tnr', 'npv')
+
+    def __init__(self, key_columns=default_key_columns,
+                 input_group_metrics=all_group_metrics, fill_divbyzero=None):
         """
 
         :param key_columns:
         :param input_group_metrics:
         :param fill_divbyzero:
         """
-        if not key_columns:
-            self.key_columns = ['model_id', 'score_threshold', 'attribute_name']
-        else:
-            self.key_columns = key_columns
-        if not input_group_metrics:
-            self.input_group_metrics = ['ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr', 'fnr', 'tpr', 'tnr', 'npv']
-        else:
-            self.input_group_metrics = input_group_metrics
+        self.key_columns = list(key_columns)
+        self.input_group_metrics = list(input_group_metrics)
+
         if not fill_divbyzero:
             self.fill_divbyzero = 10.00000
         else:
             self.fill_divbyzero = fill_divbyzero
 
-    def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
-                                 fill_divbyzero=None):
+    def get_disparity_min_metric(self, df, key_columns=None,
+                                 input_group_metrics=None, fill_divbyzero=None):
         """
-            Calculates several ratios using the group metrics value and dividing by the minimum
-            group metric value among all groups defined by each attribute
+        Calculates several ratios using the group metrics value and dividing by
+        the minimum group metric value among all groups defined by each attribute
+
         :param df: the resulting dataframe from the group get_crosstabs
-        :param input_group_metrics: the columns list corresponding to the group metrics for each
-        we want to calculate the Disparity values
+        :param input_group_metrics: the columns list corresponding to the group
+        metrics for which we want to calculate the disparity values
         :return: a dataframe
         """
 
@@ -64,7 +65,7 @@ class Bias(object):
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
                 logging.error(
-                    'get_bias_min_metric:: one of the following columns is not on the input '
+                    'get_bias_min_metric:: one of the following columns is not in the input '
                     'dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics '
                     'list')
                 exit(1)
