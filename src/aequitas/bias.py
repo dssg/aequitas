@@ -2,6 +2,8 @@ import logging
 from sys import exit
 
 from aequitas.preprocessing import get_attr_cols
+from aequitas.plotting import Plot
+assemble_ref_groups = Plot._assemble_ref_groups
 
 import pandas as pd
 from scipy import stats
@@ -19,9 +21,11 @@ class Bias(object):
                          'fnr', 'tpr', 'tnr', 'npv')
     non_attr_cols = ('score', 'model_id', 'as_of_date', 'entity_id', 'rank_abs',
                      'rank_pct', 'id', 'label_value')
+    significance_measures = ('score', 'label_vlaue', 'fpr', 'fnr')
 
     def __init__(self, key_columns=default_key_columns, sample_df=None,
                  non_attr_cols=non_attr_cols,
+                 significance_cols=significance_measures,
                  input_group_metrics=all_group_metrics, fill_divbyzero=None):
         """
 
@@ -37,11 +41,13 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
+        self.significance_cols = significance_cols
         # if sample_df:
         #     self.samples = self.get_measure_sample(sample_df, attribute, measure)
 
     def get_disparity_min_metric(self, df, key_columns=None,
-                                 input_group_metrics=None, fill_divbyzero=None):
+                                 input_group_metrics=None, fill_divbyzero=None,
+                                 check_significance=None):
         """
         Calculates several ratios using the group metrics value and dividing by
         the minimum group metric value among all groups defined by each attribute
@@ -59,6 +65,9 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
+        if not check_significance:
+            check_significance = self.significance_cols
+
         print('get_disparity_min_metric')
         fill_zeros = {}
         for group_metric in input_group_metrics:
@@ -85,10 +94,45 @@ class Bias(object):
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
         # df = df.fillna(value=fill_zeros)
+
+        # add statisticall_siginificance
+
+        # {'race': {'fpr': 'Asian',
+        #   'fnr': 'Native American',
+        #   'label_value': 'African-American',
+        #   'score': 'African-American'},
+        #  'sex': {'fpr': 'Female',
+        #   'fnr': 'Male',
+        #   'label_value': 'Male',
+        #   'score': 'Male'},
+        #  'age_cat': {'fpr': 'Greater than 45',
+        #   'fnr': 'Less than 25',
+        #   'label_value': 'Less than 25',
+        #   'score': 'Less than 25'}}
+
+        check_significance = [measure for measure in check_significance if measure in df.columns]
+
+        ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                       specific_measures=['fpr', 'fnr'])
+
+        for attribute in df['attribute_name'].unique():
+
+            min_df = df_min_idx.loc[df_min_idx['attribute_name'] == attribute]
+            smallest_group = min_df.loc[min_df['group_size'].minidx
+
+            if 'fpr' in check_significance:
+                label_score_ref = ref_groups_dict[attribute]['fpr']
+            else:
+                label_score_ref = ref_groups_dict[attribute]['fnr']
+
+            ref_groups_dict[attribute]['label_value'] = smallest_group
+            ref_groups_dict[attribute]['score'] = smallest_group
+
+
         return df
 
     def get_disparity_major_group(self, df, key_columns=None, input_group_metrics=None,
-                                  fill_divbyzero=None):
+                                  fill_divbyzero=None, check_significance=None):
         """
             Calculates the bias (disparity) metrics for the predefined list of group metrics
             using the majority group within each attribute as the reference group (denominator)
@@ -104,6 +148,9 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
+        if not check_significance:
+            check_significance = self.significance_cols
+
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
@@ -127,6 +174,17 @@ class Bias(object):
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
+
+        check_significance = [measure for measure in check_significance if measure in df.columns]
+        ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                       specific_measures=['fpr', 'fnr'])
+
+        for attribute in df['attribute_name'].unique():
+            largest_group = df_major_group.loc[df_major_group['attribute_name'] == attribute,
+                                               'attribute_value'].values.tolist()[0]
+            ref_groups_dict[attribute]['label_value'] = largest_group
+            ref_groups_dict[attribute]['score'] = largest_group
+
         return df
 
     def verify_ref_groups_dict_len(self, df, ref_groups_dict):
@@ -138,7 +196,8 @@ class Bias(object):
             raise ValueError
 
     def get_disparity_predefined_groups(self, df, ref_groups_dict, key_columns=None,
-                                        input_group_metrics=None, fill_divbyzero=None):
+                                        input_group_metrics=None, fill_divbyzero=None,
+                                        check_significance=None):
         """
             Calculates the bias (disparity) metrics for the predefined list of input group metrics
             using a predefined reference group value for each attribute which is passed using
@@ -160,6 +219,8 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
+        if not check_significance:
+            check_significance = self.significance_cols
         try:
             self.verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
@@ -194,7 +255,25 @@ class Bias(object):
         # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
+
+        # for predefined groups, use the largest of the predefined groups as
+        # ref group for score and label value
+        check_significance = [measure for measure in check_significance if measure in df.columns]
+
+        full_ref_dict = {}
+        for key, val in ref_groups_dict.items():
+            full_ref_dict[key] = {'label_value': val,
+                                  'score': val}
+            for measure in check_significance:
+                full_ref_dict[key][measure] = val
+
+        #
+        #     self.get_statistical_significance(
+        #         original_df, ref_dict=ref_dict, score_thresholds=None, model_id=1,
+        #         aplha=5e-2, mask_significance=True)
+
         return df
+
 
     @classmethod
     def get_measure_sample(cls, df, attribute, measure):
@@ -248,7 +327,7 @@ class Bias(object):
         return eq_variance
 
     @classmethod
-    def calculate_significance(cls, original_df, attribute, measure, ref_group,
+    def calculate_significance(cls, original_df, attribute, measure, ref_dict,
                                alpha=5e-2, mask_significance=True):
 
         sample_dict = cls.get_measure_sample(df=original_df, attribute=attribute,
@@ -264,21 +343,24 @@ class Bias(object):
 
             measure = "".join(measure.split('b_'))
 
-            if mask_significance:
-                if difference_significance_p < alpha:
-                    significance_value = True
-                else:
-                    significance_value = False
-            else:
-                significance_value = difference_significance_p
-
             original_df.loc[original_df[attribute] == attr_val, measure + '_siginificance'] = \
-                significance_value
+                difference_significance_p
+
+        if mask_significance:
+            significance_cols = original_df.columns[original_df.columns.str.contains('_siginificance')]
+            # original_df.loc[:, significance_cols] = original_df.loc[:, significance_cols].mask(
+            #     original_df.loc[:,significance_cols] < alpha, True)
+
+            truemask = original_df.loc[:, significance_cols] < alpha
+            falsemask = original_df.loc[:, significance_cols] >= alpha
+
+            original_df.loc[:, significance_cols] = pd.np.select(
+                [truemask, falsemask], [True, False], default="")
 
         return original_df
 
     @classmethod
-    def get_statistical_significance(cls, original_df, ref_group, score_thresholds=None,
+    def get_statistical_significance(cls, original_df, ref_dict, score_thresholds=None,
                                      model_id=1, attr_cols=None, aplha=5e-2,
                                      mask_significance=True):
         if 'label_value' not in original_df.columns:
@@ -364,11 +446,12 @@ class Bias(object):
             measures = list(binary_col_functions.keys())
             measures += ['label_value']
             measures.sort()
-            print(measures)
+
             for measure in measures:
-                cls.calculate_significance(original_df, attribute, measure,
-                                           ref_group=ref_group, alpha=aplha,
-                                            mask_significance=mask_significance)
+                cls.calculate_significance(
+                    original_df, attribute, measure,
+                    ref_dict=ref_dict,
+                    alpha=aplha, mask_significance=mask_significance)
         return original_df
 
     def list_disparities(self, df):
