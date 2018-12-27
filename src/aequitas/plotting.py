@@ -113,7 +113,7 @@ class Plot(object):
 
     @staticmethod
     def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
-                             specific_measures=None):
+                             specific_measures=None, label_score_ref=None):
         """
         Creates a dictionary of reference groups for each metric in a data_table
 
@@ -143,7 +143,17 @@ class Plot(object):
                 metric_key = "".join(col.split(ref_group_flag))
                 attr_refs[metric_key] = \
                     attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
+            if label_score_ref:
+                if label_score_ref + ref_group_flag in ref_group_cols:
+                    attr_refs['label_value'] = label_score_ref
+                    attr_refs['score'] = label_score_ref
+                else:
+                    raise ValueError("The specified reference measure for label"
+                                     " value and score is not included in the "
+                                     "data frame.")
+
             ref_groups[attribute] = attr_refs
+
         return ref_groups
 
     @classmethod
