@@ -203,7 +203,7 @@ class Group(object):
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
-        return groups_df, attr_cols, score_thresholds
+        return groups_df, attr_cols
 
     def list_absolute_metrics(self, df):
         '''

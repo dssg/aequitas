@@ -145,8 +145,8 @@ class Plot(object):
                     attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
             if label_score_ref:
                 if label_score_ref + ref_group_flag in ref_group_cols:
-                    attr_refs['label_value'] = label_score_ref
-                    attr_refs['score'] = label_score_ref
+                    attr_refs['label_value'] = attr_refs[label_score_ref]
+                    attr_refs['score'] = attr_refs[label_score_ref]
                 else:
                     raise ValueError("The specified reference measure for label"
                                      " value and score is not included in the "

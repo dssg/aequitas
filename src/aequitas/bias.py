@@ -45,9 +45,10 @@ class Bias(object):
         # if sample_df:
         #     self.samples = self.get_measure_sample(sample_df, attribute, measure)
 
-    def get_disparity_min_metric(self, df, key_columns=None,
+    def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
-                                 check_significance=None):
+                                 check_significance=None,  alpha = 5e-2,
+                                 mask_significance = True):
         """
         Calculates several ratios using the group metrics value and dividing by
         the minimum group metric value among all groups defined by each attribute
@@ -95,31 +96,51 @@ class Bias(object):
         df = df.replace(pd.np.inf, fill_divbyzero)
         # df = df.fillna(value=fill_zeros)
 
-        # add statisticall_siginificance
+        # add statisticall_significance
 
         check_significance = [measure for measure in check_significance if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                       specific_measures=check_significance)
+                                       specific_measures=check_significance,
+                                       label_score_ref='fpr')
 
-        for attribute in df['attribute_name'].unique():
+        attr_cols = df['attribute_name'].unique()
 
-            if 'fpr' in check_significance:
-                label_score_ref = ref_groups_dict[attribute]['fpr']
-            else:
-                label_score_ref = ref_groups_dict[attribute]['fnr']
+        # for attribute in attr_cols:
+        #
+        #     if 'fpr' in check_significance:
+        #         label_score_ref = ref_groups_dict[attribute]['fpr']
+        #     else:
+        #         label_score_ref = ref_groups_dict[attribute]['fnr']
+        #
+        #     if 'label_value' in original_df.columns:
+        #         ref_groups_dict[attribute]['label_value'] = label_score_ref
+        #
+        #     ref_groups_dict[attribute]['score'] = label_score_ref
 
-            if 'label_value' in df.columns:
-                ref_groups_dict[attribute]['label_value'] = label_score_ref
+        # run significance method on bias-augmented crosstab based on false
+        # positives, false negatives, scores, and label values in original df
+        self.get_statistical_significance(
+            original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
+            model_id=1, attr_cols=attr_cols, aplha=5e-2,
+            mask_significance=mask_significance)
 
-            ref_groups_dict[attribute]['score'] = label_score_ref
+        # if specified, apply T/F mask to significance columns
+        if mask_significance:
+            significance_cols = df.columns[df.columns.str.contains('_significance')]
+            truemask = df.loc[:, significance_cols] < alpha
+            falsemask = df.loc[:, significance_cols] >= alpha
 
+            df.loc[:, significance_cols] = pd.np.select(
+                [truemask, falsemask], [True, False], default="")
 
         return df
 
 
 
-    def get_disparity_major_group(self, df, key_columns=None, input_group_metrics=None,
-                                  fill_divbyzero=None, check_significance=None):
+    def get_disparity_major_group(self, df, original_df, key_columns=None,
+                                  input_group_metrics=None,
+                                  fill_divbyzero=None, check_significance=None,
+                                  alpha = 5e-2, mask_significance = True):
         """
             Calculates the bias (disparity) metrics for the predefined list of group metrics
             using the majority group within each attribute as the reference group (denominator)
@@ -166,11 +187,28 @@ class Bias(object):
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                        specific_measures=['fpr', 'fnr'])
 
-        for attribute in df['attribute_name'].unique():
+        attr_cols = df['attribute_name'].unique()
+        for attribute in attr_cols:
             largest_group = df_major_group.loc[df_major_group['attribute_name'] == attribute,
                                                'attribute_value'].values.tolist()[0]
             ref_groups_dict[attribute]['label_value'] = largest_group
             ref_groups_dict[attribute]['score'] = largest_group
+
+        # run significance method on bias-augmented crosstab based on false
+        # positives, false negatives, scores, and label values in original df
+        self.get_statistical_significance(
+            original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
+            model_id=1, attr_cols=attr_cols, aplha=5e-2,
+            mask_significance=mask_significance)
+
+        # if specified, apply T/F mask to significance columns
+        if mask_significance:
+            significance_cols = df.columns[df.columns.str.contains('_significance')]
+            truemask = df.loc[:, significance_cols] < alpha
+            falsemask = df.loc[:, significance_cols] >= alpha
+
+            df.loc[:, significance_cols] = pd.np.select(
+                [truemask, falsemask], [True, False], default="")
 
         return df
 
@@ -186,7 +224,7 @@ class Bias(object):
                                         key_columns=None,
                                         input_group_metrics=None,
                                         fill_divbyzero=None,
-                                        check_significance=None,
+                                        check_significance=None, alpha=5e-2,
                                         mask_significance=True):
         """
             Calculates the bias (disparity) metrics for the predefined list of input group metrics
@@ -251,6 +289,7 @@ class Bias(object):
         check_significance = \
             [measure for measure in check_significance if measure in df.columns]
 
+        # complile dictionary of reference groups based on bias-augmented crosstab
         full_ref_dict = {}
         for key, val in ref_groups_dict.items():
             full_ref_dict[key] = {'label_value': val,
@@ -258,10 +297,21 @@ class Bias(object):
             for measure in check_significance:
                 full_ref_dict[key][measure] = val
 
+        # run significance method on bias-augmented crosstab based on false
+        # positives, false negatives, scores, and label values in original df
         self.get_statistical_significance(
             original_df, df, ref_dict=full_ref_dict, score_thresholds=None,
             model_id=1, attr_cols=None, aplha=5e-2,
             mask_significance=mask_significance)
+
+        # if specified, apply T/F mask to significance columns
+        if mask_significance:
+            significance_cols = df.columns[df.columns.str.contains('_significance')]
+            truemask = df.loc[:, significance_cols] < alpha
+            falsemask = df.loc[:, significance_cols] >= alpha
+
+            df.loc[:, significance_cols] = pd.np.select(
+                [truemask, falsemask], [True, False], default="")
 
         return df
 
@@ -276,15 +326,15 @@ class Bias(object):
 
     @classmethod
     def check_equal_variance(cls, sample_dict, ref_group, alpha=5e-2):
-        eq_variance = {}
+        eq_variance = {ref_group: True}
         for attr_value, sample in sample_dict.items():
             _, normality_p = stats.normaltest(sample, axis=None, nan_policy='omit')
 
             if normality_p < alpha:
                 if attr_value == ref_group:
-                    # if ref_group is not normal, can't use f-test or bartlett, so
-                    # skip ahead to check for equal varience with ref_group using levene test
-                    # for all groups
+                    # if ref_group is not normal, can't use f-test or bartlett,
+                    # so skip ahead to check for equal varience with ref_group
+                    # using levene test for all groups
                     for group, sample_list in sample_dict.items():
                         _, equal_variance_p = stats.levene(sample_dict[ref_group],
                                                            sample_list,
@@ -295,8 +345,8 @@ class Bias(object):
                             eq_variance[group] = True
                     return eq_variance
 
-                # if non-ref group is not normal, still can't use f-test or bartlett,
-                # check for equal varience with ref_group using levene test
+                # if a non-ref group is not normal, can't use f-test or bartlett,
+                # check for equal variance with ref_group using levene test
                 _, equal_variance_p = stats.levene(sample_dict[ref_group], sample, center='median')
                 if equal_variance_p < alpha:
                     eq_variance[attr_value] = False
@@ -307,9 +357,10 @@ class Bias(object):
 
         # case when some non-ref groups pass normality test, use bartlett test
         # between each sample list and ref group to check for equal variance
-        untested_groups = sample_dict.keys() - eq_variance.keys()
-        untested = {key: val for (key, val) in sample_dict.items if key in untested_groups}
-        for sample, sample_list in untested:
+        untested_groups = sample_dict.keys() - eq_variance.keys() - set(ref_group)
+        untested = {key: val for (key, val) in sample_dict.items() if key in untested_groups}
+
+        for sample, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
             if equal_variance_p < alpha:
                 eq_variance[attr_value] = False
@@ -319,6 +370,7 @@ class Bias(object):
 
     @classmethod
     def check_alpha(cls, x, alpha=5e-2):
+        print(f"{x}: {type(x)}")
         if x >= alpha:
             return False
         else:
@@ -328,30 +380,24 @@ class Bias(object):
     @classmethod
     def calculate_significance(cls, original_df, disparity_df, attribute, measure, ref_dict,
                                alpha=5e-2, mask_significance=True):
-        # {'race': {'fpr': 'Asian',
-        #           'fnr': 'Native American',
-        #           'label_value': 'African-American',
-        #           'score': 'African-American'},
-        #  'sex': {'fpr': 'Female',
-        #          'fnr': 'Male',
-        #          'label_value': 'Male',
-        #          'score': 'Male'},
-        #  'age_cat': {'fpr': 'Greater than 45',
-        #              'fnr': 'Less than 25',
-        #              'label_value': 'Less than 25',
-        #              'score': 'Less than 25'}}
-
         binaries_lookup = {'label_value': 'label_value', 'binary_fp': 'fpr',
                            'binary_fn': 'fnr', 'binary_score': 'score'}
 
         ref_group = ref_dict[attribute][binaries_lookup.get(measure)]
 
+        # create dictionary of "samples" (binary values for false positive,
+        # false negative, label value, score) based on original data frame
         sample_dict = cls.get_measure_sample(df=original_df, attribute=attribute,
                                              measure=measure)
+        # run SciPy equal variance tests between each group and a given
+        # reference group, store results in dictionary to pass to statistical
+        # significance tests
         eq_variance_dict = cls.check_equal_variance(sample_dict=sample_dict,
                                                     ref_group=ref_group,
                                                     alpha=alpha)
 
+        # run SciPy statistical significance test between each group and
+        # reference group
         for attr_val, eq_var in sample_dict.items():
             _, difference_significance_p = stats.ttest_ind(
                 sample_dict[ref_group], sample_dict[attr_val], axis=None,
@@ -359,20 +405,10 @@ class Bias(object):
 
             measure = "".join(measure.split('binary_'))
 
-            disparity_df.loc[disparity_df['attribute_value'] == attr_val, measure + '_siginificance'] = \
+            # add column to crosstab to indicate statistical significance
+            disparity_df.loc[disparity_df['attribute_value'] == attr_val, measure + '_significance'] = \
                 difference_significance_p
 
-        if mask_significance:
-            significance_cols = disparity_df.columns[disparity_df.columns.str.contains('_siginificance')]
-        #
-        #     truemask = disparity_df.loc[:, significance_cols] < alpha
-        #     falsemask = disparity_df.loc[:, significance_cols] >= alpha
-        #
-        #     disparity_df.loc[:, significance_cols] = pd.np.select(
-        #         [truemask, falsemask], [True, False], default="")
-            disparity_df.loc[:, significance_cols] = \
-                disparity_df.loc[:, significance_cols].applymap(
-                    lambda x: cls.check_alpha(x, alpha=alpha))
 
         return disparity_df
 
@@ -389,7 +425,7 @@ class Bias(object):
                 "required for computing statistical significance of supervised "
                 "metrics.")
 
-        if not attr_cols:
+        if attr_cols is None:
             non_attr_cols = [
                 'id', 'model_id', 'entity_id', 'score', 'label_value',
                 'rank_abs', 'rank_pct']
@@ -415,8 +451,8 @@ class Bias(object):
 
         if non_string_cols.empty is False:
             logging.error(
-                'get_crosstabs: input df was not preprocessed. There are '
-                'non-string cols within attr_cols!')
+                'get_statistical_significance: statistical significance was '
+                'not calculated. There are non-string cols within attr_cols.')
             exit(1)
 
         # if no score_thresholds are provided, we assume that rank_abs equals
@@ -448,16 +484,16 @@ class Bias(object):
                                 }
 
         for attribute in attr_cols:
-            # find the priors_df
+            # fill missing values with NaN
             col_group = original_df.fillna({attribute: 'pd.np.nan'}).groupby(attribute)
 
             for thres_unit, thres_values in score_thresholds.items():
                 for thres_val in thres_values:
                     # flag = 0
                     # k = (original_df[thres_unit] <= thres_val).sum()
-                    score_threshold = \
-                        'binary 0/1' if count_ones != None else \
-                            str(thres_val) + '_' + thres_unit[-3:]
+                    # score_threshold = \
+                    #     'binary 0/1' if count_ones != None else \
+                    #         str(thres_val) + '_' + thres_unit[-3:]
 
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
@@ -480,6 +516,13 @@ class Bias(object):
         :return: list of disparity metrics
         '''
         return list(df.columns[df.columns.str.contains('_disparity')])
+
+    def list_significance(self, df):
+        '''
+        View all calculated disparities in table
+        :return: list of disparity metrics
+        '''
+        return list(df.columns[df.columns.str.contains('_significance')])
 
     def list_absolute_metrics(self, df):
         '''
