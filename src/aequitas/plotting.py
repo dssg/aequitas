@@ -436,14 +436,14 @@ class Plot(object):
             cb_green = '#1b7837'
             cb_red = '#a50026'
 
-            measure = self._metric_parity_mapping[group_metric]
-            if (measure not in table_columns):
+            parity = self._metric_parity_mapping[group_metric]
+            if (parity not in table_columns):
                 raise ValueError(
                     f"Related fairness determination for {group_metric} must be "
                     f"included in data table to color visualization based on "
                     f"metric fairness.")
             clrs = [cb_green if val == True else
-                    cb_red for val in sorted_df[measure]]
+                    cb_red for val in sorted_df[parity]]
 
         else:
             aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
@@ -475,9 +475,28 @@ class Plot(object):
         else:
             labels = sorted_df['attribute_value'].values
 
+
+        if 'fnr' in group_metric:
+        # if measure is fpr or fnr, want to add a star to label value if and
+        # only if fp_significance is True or fn_siginificance is true,
+        # respectively --
+        # 1) find what attr values have True value for each of those two columns,
+        # 2) find their order in label value list,
+            fn_to_star = sorted_df[sorted_df['fn_significance'].astype('bool')].index.tolist()
+            for idx in fn_to_star:
+                label_values[idx] = label_values[idx] + "**"
+
+        if 'fpr' in group_metric:
+            fp_to_star = sorted_df[sorted_df['fp_significance'].astype('bool')].index.tolist()
+        # 3) add a star to label value.
+            for idx in fp_to_star:
+                label_values[idx] = label_values[idx] + "**"
+
+        # TO FIX: significance columns not reading properly--should only return indexes
+        # where value is True
+
         normed = sf.normalize_sizes(scaled_values, width, height)
 
-        #     rects = sf.squarify(normed, x, y, width, height)
         padded_rects = sf.padded_squarify(normed, x, y, width, height)
 
         # make plot
@@ -565,13 +584,13 @@ class Plot(object):
             # determinations
             cb_green = '#1b7837'
             cb_red = '#a50026'
-            measure = self._metric_parity_mapping[group_metric]
-            measure_colors = [cb_green if val == True else
-                              cb_red for val in attribute_data[measure]]
+            parity = self._metric_parity_mapping[group_metric]
+            parity_colors = [cb_green if val == True else
+                              cb_red for val in attribute_data[parity]]
 
             # Set white text for red bars and black text for green bars
             label_colors = [(0, 0, 0, 1) if val == True else
-                            (1, 1, 1, 1) for val in attribute_data[measure]]
+                            (1, 1, 1, 1) for val in attribute_data[parity]]
 
             attribute_indices = \
                 np.arange(next_bar_height, next_bar_height + attribute_data.shape[0],
@@ -583,7 +602,7 @@ class Plot(object):
 
             h_attribute = ax.barh(attribute_indices,
                                   width=values,
-                                  color=measure_colors,
+                                  color=parity_colors,
                                   align='edge', edgecolor='grey', alpha=0.8)
 
             if label_dict:

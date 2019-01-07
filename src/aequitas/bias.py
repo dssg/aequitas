@@ -183,6 +183,8 @@ class Bias(object):
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
 
+        # default is to use the same ref groups as df, need to add functionality to
+        # complie ref_groups_dict based on a passed ref group for a given measure
         check_significance = [measure for measure in check_significance if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                        specific_measures=['fpr', 'fnr'])
