@@ -3,7 +3,6 @@ import math
 import re
 
 import numpy as np
-#import pandas as pd
 import collections
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -339,7 +338,8 @@ class Plot(object):
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
                        color_mapping=None, model_id=1, ax=None, fig=None,
                        label_dict=None, title=True,
-                       highlight_fairness=False, min_group_size=None):
+                       highlight_fairness=False, min_group_size=None,
+                       alpha=0.05):
         '''
         Create treemap from disparity or absolute metric values
 
@@ -476,21 +476,38 @@ class Plot(object):
             labels = sorted_df['attribute_value'].values
 
 
-        if 'fnr' in group_metric:
+        if 'fpr' in group_metric:
         # if measure is fpr or fnr, want to add a star to label value if and
         # only if fp_significance is True or fn_siginificance is true,
         # respectively --
         # 1) find what attr values have True value for each of those two columns,
         # 2) find their order in label value list,
-            fn_to_star = sorted_df[sorted_df['fn_significance'].astype('bool')].index.tolist()
-            for idx in fn_to_star:
-                label_values[idx] = label_values[idx] + "**"
+            # unmasked significance
+            if np.issubdtype(sorted_df['fp_significance'].dtype, np.number):
+                fp_to_star = sorted_df.loc[sorted_df['fp_significance'] < alpha].index.tolist()
 
-        if 'fpr' in group_metric:
-            fp_to_star = sorted_df[sorted_df['fp_significance'].astype('bool')].index.tolist()
-        # 3) add a star to label value.
-            for idx in fp_to_star:
-                label_values[idx] = label_values[idx] + "**"
+                for idx in fp_to_star:
+                    idx_adj = sorted_df.index.get_loc(idx)
+                    label_values[idx_adj] = label_values[idx_adj] + "**"
+
+            # masked significance
+            else:
+                print(sorted_df[['attribute_value', 'fp_significance']])
+                print(label_values)
+                fp_to_star = sorted_df.loc[sorted_df['fp_significance'].astype('bool') == 1].index.tolist()
+                print(fp_to_star)
+                for idx in fp_to_star:
+                    # convert idx location to relative index in sorted df and label_values list
+                    idx_adj = sorted_df.index.get_loc(idx)
+                    # star significanct disparities in visualizations
+                    label_values[idx_adj] = label_values[idx_adj] + "**"
+                print(label_values)
+
+        # elif 'fpr' in group_metric:
+        #     fp_to_star = sorted_df[sorted_df['fp_significance'].astype('bool')].index.tolist()
+        # # 3) add a star to label value.
+        #     for idx in fp_to_star:
+        #         label_values[idx] = label_values[idx] + "**"
 
         # TO FIX: significance columns not reading properly--should only return indexes
         # where value is True
