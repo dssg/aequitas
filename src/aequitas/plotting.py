@@ -1,7 +1,7 @@
 import logging
 import math
 import re
-
+import pandas as pd
 import numpy as np
 import collections
 import seaborn as sns
@@ -52,6 +52,19 @@ class Plot(object):
         'tpr': 'TPR Parity',
         'tnr': 'TNR Parity',
         'npv': 'NPV Parity'
+    }
+
+    _significance_disparity_mapping = {
+        'ppr_disparity': 'score_significance',
+        'pprev_disparity': 'score_significance',
+        'precision_disparity': 'fp_significance',
+        'fdr_disparity': 'fp_significance',
+        'for_disparity': 'fn_significance',
+        'fpr_disparity': 'fp_significance',
+        'fnr_disparity': 'fn_significance',
+        'tpr_disparity': 'fp_significance',
+        'tnr_disparity': 'fn_significance',
+        'npv_disparity': 'fn_significance'
     }
 
     def __init__(self, key_metrics=default_absolute_metrics,
@@ -475,42 +488,35 @@ class Plot(object):
         else:
             labels = sorted_df['attribute_value'].values
 
-
-        if 'fpr' in group_metric:
         # if measure is fpr or fnr, want to add a star to label value if and
         # only if fp_significance is True or fn_siginificance is true,
         # respectively --
         # 1) find what attr values have True value for each of those two columns,
         # 2) find their order in label value list,
             # unmasked significance
-            if np.issubdtype(sorted_df['fp_significance'].dtype, np.number):
-                fp_to_star = sorted_df.loc[sorted_df['fp_significance'] < alpha].index.tolist()
+            if np.issubdtype(
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]].dtype,
+                    np.number):
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] < alpha].index.tolist()
 
-                for idx in fp_to_star:
+                for idx in to_star:
                     idx_adj = sorted_df.index.get_loc(idx)
                     label_values[idx_adj] = label_values[idx_adj] + "**"
 
             # masked significance
             else:
-                print(sorted_df[['attribute_value', 'fp_significance']])
-                print(label_values)
-                fp_to_star = sorted_df.loc[sorted_df['fp_significance'].astype('bool') == 1].index.tolist()
-                print(fp_to_star)
-                for idx in fp_to_star:
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
+                for idx in to_star:
                     # convert idx location to relative index in sorted df and label_values list
                     idx_adj = sorted_df.index.get_loc(idx)
                     # star significanct disparities in visualizations
                     label_values[idx_adj] = label_values[idx_adj] + "**"
-                print(label_values)
 
-        # elif 'fpr' in group_metric:
-        #     fp_to_star = sorted_df[sorted_df['fp_significance'].astype('bool')].index.tolist()
-        # # 3) add a star to label value.
-        #     for idx in fp_to_star:
-        #         label_values[idx] = label_values[idx] + "**"
-
-        # TO FIX: significance columns not reading properly--should only return indexes
-        # where value is True
 
         normed = sf.normalize_sizes(scaled_values, width, height)
 

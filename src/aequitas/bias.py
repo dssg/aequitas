@@ -131,7 +131,7 @@ class Bias(object):
             falsemask = df.loc[:, significance_cols] >= alpha
 
             df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default="")
+                [truemask, falsemask], [True, False], default=None)
 
         return df
 
@@ -210,7 +210,7 @@ class Bias(object):
             falsemask = df.loc[:, significance_cols] >= alpha
 
             df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default="")
+                [truemask, falsemask], [True, False], default=None)
 
         return df
 
@@ -313,7 +313,7 @@ class Bias(object):
             falsemask = df.loc[:, significance_cols] >= alpha
 
             df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default="")
+                [truemask, falsemask], [True, False], default=None)
 
         return df
 
