@@ -48,7 +48,7 @@ class Bias(object):
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
                                  check_significance=None,  alpha = 5e-2,
-                                 mask_significance = True):
+                                 mask_significance = True, label_score_ref='fpr'):
         """
         Calculates several ratios using the group metrics value and dividing by
         the minimum group metric value among all groups defined by each attribute
@@ -113,7 +113,7 @@ class Bias(object):
         check_significance = [measure for measure in check_significance if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                        specific_measures=check_significance,
-                                       label_score_ref='fpr')
+                                       label_score_ref=label_score_ref)
 
         attr_cols = df['attribute_name'].unique()
 
@@ -202,7 +202,7 @@ class Bias(object):
         # complie ref_groups_dict based on a passed ref group for a given measure
         check_significance = [measure for measure in check_significance if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                       specific_measures=['fpr', 'fnr'])
+                                       specific_measures=check_significance)
 
         attr_cols = df['attribute_name'].unique()
         for attribute in attr_cols:
