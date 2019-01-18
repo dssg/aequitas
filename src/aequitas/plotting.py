@@ -499,41 +499,42 @@ class Plot(object):
         else:
             labels = sorted_df['attribute_value'].values
 
-
+        # if df includes significance columns, add stars to indicate significance
+        if len(list(sorted_df.columns[sorted_df.columns.str.contains('_significance')])) > 0:
         # unmasked significance
         # find indices where related significance have smaller value than significance_alpha
-        if np.issubdtype(
-                sorted_df[
-                    self._significance_disparity_mapping[related_disparity]].dtype,
-                np.number):
-            to_star = sorted_df.loc[
-                sorted_df[
-                    self._significance_disparity_mapping[related_disparity]] < significance_alpha].index.tolist()
+            if np.issubdtype(
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]].dtype,
+                    np.number):
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] < significance_alpha].index.tolist()
 
 
-        # masked significance
-        # find indices where attr values have True value for each of those two columns,
-        else:
-            to_star = sorted_df.loc[
-                sorted_df[
-                    self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
-
-
-        # add stars to label value where significant
-        for idx in to_star:
-            # convert idx location to relative index in sorted df and label_values list
-            idx_adj = sorted_df.index.get_loc(idx)
-
-            # star significanct disparities in visualizations based on significance level
-            if 0.10 >= significance_alpha > 0.05:
-                significance_stars = '*'
-            elif 0.05 >= significance_alpha > 0.01:
-                significance_stars = '**'
-            elif significance_alpha <= 0.01:
-                significance_stars = '***'
+            # masked significance
+            # find indices where attr values have True value for each of those two columns,
             else:
-                significance_stars = ''
-            label_values[idx_adj] = label_values[idx_adj] + significance_stars
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
+
+
+            # add stars to label value where significant
+            for idx in to_star:
+                # convert idx location to relative index in sorted df and label_values list
+                idx_adj = sorted_df.index.get_loc(idx)
+
+                # star significanct disparities in visualizations based on significance level
+                if 0.10 >= significance_alpha > 0.05:
+                    significance_stars = '*'
+                elif 0.05 >= significance_alpha > 0.01:
+                    significance_stars = '**'
+                elif significance_alpha <= 0.01:
+                    significance_stars = '***'
+                else:
+                    significance_stars = ''
+                label_values[idx_adj] = label_values[idx_adj] + significance_stars
 
 
         normed = sf.normalize_sizes(scaled_values, width, height)
