@@ -74,7 +74,7 @@ class Bias(object):
 
         print('get_disparity_min_metric()')
         if not key_columns:
-            key_columns = self.key_columns
+            key_columns = [col for col in self.key_columns if col in df.columns]
         if not input_group_metrics:
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
@@ -90,6 +90,9 @@ class Bias(object):
                 # this groupby is being called every cycle. maybe we can create a list of df_groups
                 # and merge df at the end? it can not be simply put outside the loop(the merge...)
                 df_min_idx = df.loc[df.groupby(key_columns)[group_metric].idxmin()]
+
+                print("should be letter:", df.groupby(key_columns)[group_metric].idxmin())
+
                 # but we also want to get the group_value of the reference group for each bias metric
                 df_to_merge = pd.DataFrame()
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
@@ -98,7 +101,7 @@ class Bias(object):
             except KeyError:
                 logging.error(
                     'get_bias_min_metric:: one of the following columns is not in the input '
-                    'dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics '
+                    'dataframe: model_id, score_threshold, attribute_name or any of the input_group_metrics '
                     'list')
                 exit(1)
             df = df.merge(df_to_merge, on=key_columns)
@@ -164,7 +167,7 @@ class Bias(object):
         """
         print('get_disparity_major_group()')
         if not key_columns:
-            key_columns = self.key_columns
+            key_columns = [col for col in self.key_columns if col in df.columns]
         if not input_group_metrics:
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
@@ -243,9 +246,9 @@ class Bias(object):
                                         check_significance=None, alpha=5e-2,
                                         mask_significance=True):
         """
-            Calculates the bias (disparity) metrics for the predefined list of input group metrics
-            using a predefined reference group value for each attribute which is passed using
-            ref_groups_dict ({'attr1':'val1', 'attr2':'val2'})
+        Calculates the bias (disparity) metrics for the predefined list of input group metrics
+        using a predefined reference group value for each attribute which is passed using
+        ref_groups_dict ({'attr1':'val1', 'attr2':'val2'})
 
         :param df: the output dataframe of the group.get_crosstabs
         :param original_df: a dataframe containing a required raw 'score' column
@@ -270,7 +273,7 @@ class Bias(object):
         """
         print('get_disparity_predefined_group()')
         if not key_columns:
-            key_columns = self.key_columns
+            key_columns = [col for col in self.key_columns if col in df.columns]
         if not input_group_metrics:
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
@@ -378,15 +381,28 @@ class Bias(object):
         :return: Dictionary indicating whether each group has equal variance
         (in comparison with reference group)
         '''
-        eq_variance = {ref_group: True}
-        for attr_value, sample in sample_dict.items():
-            _, normality_p = stats.normaltest(sample, axis=None, nan_policy='omit')
 
-            if normality_p < alpha:
+        # Immediately set ref_group status for equal variance (with itself): True
+
+        eq_variance = {ref_group: True}
+
+        for attr_value, sample in sample_dict.items():
+            # make default normality_p value (only used when len(sample) < 8)
+            # large enough that it is always greater than alpha
+            normality_p = pd.np.inf
+
+            # skew test requires at least 8 samples
+            if len(sample) >= 8:
+                _, normality_p = stats.normaltest(sample, axis=None, nan_policy='omit')
+
+            # if tested normality is False or less than 8 samples, use levene
+            # test to check equal variance between groups
+            if normality_p < alpha or len(sample) < 8:
+                # if ref_group is not normal, can't use f-test or bartlett test
+                # for any samples, so check for equal varience against ref_group
+                # using levene test for all groups and return dict
+                # (since includes all groups)
                 if attr_value == ref_group:
-                    # if ref_group is not normal, can't use f-test or bartlett,
-                    # so skip ahead to check for equal varience with ref_group
-                    # using levene test for all groups
                     for group, sample_list in sample_dict.items():
                         _, equal_variance_p = stats.levene(sample_dict[ref_group],
                                                            sample_list,
@@ -395,29 +411,31 @@ class Bias(object):
                             eq_variance[group] = False
                         else:
                             eq_variance[group] = True
+
                     return eq_variance
 
-                # if a non-ref group is not normal, can't use f-test or bartlett,
-                # check for equal variance with ref_group using levene test
-                _, equal_variance_p = stats.levene(sample_dict[ref_group], sample, center='median')
+                # if a non-ref group is not normal, can't use f-test or bartlett
+                # for that group, check for equal variance (against ref_group)
+                # using levene test and add result to dictionary
+                _, equal_variance_p = stats.levene(
+                    sample_dict[ref_group], sample, center='median')
+
                 if equal_variance_p < alpha:
                     eq_variance[attr_value] = False
                 else:
                     eq_variance[attr_value] = True
-                if attr_value == ref_group:
-                    ref_group_normality = False
 
-        # case when some non-ref groups pass normality test, use bartlett test
-        # between each sample list and ref group to check for equal variance
+        # for all normally distributed non-ref groups, use bartlett test to
+        # check for equal variance (against ref_group). Add results to dict
         untested_groups = sample_dict.keys() - eq_variance.keys() - set(ref_group)
         untested = {key: val for (key, val) in sample_dict.items() if key in untested_groups}
-
         for sample, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
             if equal_variance_p < alpha:
                 eq_variance[attr_value] = False
             else:
                 eq_variance[attr_value] = True
+
         return eq_variance
 
     @classmethod
@@ -469,6 +487,7 @@ class Bias(object):
         # false negative, label value, score) based on original data frame
         sample_dict = cls.get_measure_sample(original_df=original_df, attribute=attribute,
                                              measure=measure)
+
         # run SciPy equal variance tests between each group and a given
         # reference group, store results in dictionary to pass to statistical
         # significance tests

@@ -111,11 +111,11 @@ def audit(df, configs, model_id=1, preprocessed=False):
     # todo move this to the new configs object / the attr_cols now are passed through the configs object...
     ref_groups_method = configs.ref_groups_method
     if ref_groups_method == 'predefined' and configs.ref_groups:
-        bias_df = b.get_disparity_predefined_groups(groups_model, configs.ref_groups)
+        bias_df = b.get_disparity_predefined_groups(groups_model, df, configs.ref_groups)
     elif ref_groups_method == 'majority':
-        bias_df = b.get_disparity_major_group(groups_model)
+        bias_df = b.get_disparity_major_group(groups_model, df)
     else:
-        bias_df = b.get_disparity_min_metric(groups_model)
+        bias_df = b.get_disparity_min_metric(groups_model, df)
     print('Any NaN?: ', bias_df.isnull().values.any())
     print('bias_df shape:', bias_df.shape)
 
