@@ -86,9 +86,12 @@ class Bias(object):
         fill_zeros = {}
         for group_metric in input_group_metrics:
             fill_zeros[group_metric + '_disparity'] = 1.000000
+
             try:
                 # this groupby is being called every cycle. maybe we can create a list of df_groups
                 # and merge df at the end? it can not be simply put outside the loop(the merge...)
+                print(key_columns)
+                print(set(df.columns) & set(key_columns))
                 df_min_idx = df.loc[df.groupby(key_columns)[group_metric].idxmin()]
 
                 print("should be letter:", df.groupby(key_columns)[group_metric].idxmin())
@@ -108,9 +111,10 @@ class Bias(object):
             # creating disparity by dividing each group metric value by the corresponding min
             # value from the groups of the target attribute
             df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
+
+
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
-        # df = df.fillna(value=fill_zeros)
 
         # add statistical_significance
         check_significance = [measure for measure in check_significance if measure in df.columns]
