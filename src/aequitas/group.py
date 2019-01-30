@@ -172,13 +172,27 @@ class Group(object):
                 'total_entities': [len(df)] * len(counts)
             })
             this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
-            # for each model_id and as_of_date the priors_df has length attribute_names * attribute_values
+            # for each model_id and as_of_date the priors_df has length
+            # attribute_names * attribute_values
             prior_dfs.append(this_prior_df)
-            # we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)
+
+            # we calculate the bias for two different types of score_thresholds
+            # units (percentage ranks and absolute ranks)
+            # YAML ex: thresholds:
+            #              rank_abs: [300]
+            #              rank_pct: [1.0, 5.0, 10.0]
             for thres_unit, thres_values in score_thresholds.items():
+
                 for thres_val in thres_values:
                     flag = 0
+
+                    # To discuss with Pedro: believe this might be the reason
+                    # for cutoff error - if nunmbers are cumulative, per
+                    # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
+
+                    # denote threshold as binarhy if numeric count_ones value
+                    # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
