@@ -82,26 +82,30 @@ class Bias(object):
         if not check_significance:
             check_significance = self.significance_cols
 
-        print('get_disparity_min_metric')
         for group_metric in input_group_metrics:
 
             try:
                 # this groupby is being called every cycle. maybe we can create a list of df_groups
                 # and merge df at the end? it can not be simply put outside the loop(the merge...)
                 idxmin = df.groupby(key_columns)[group_metric].idxmin()
-                # cast nan's to same index as any other group for that attribute
-                # name/ value combo. if NaN, find another way to reference
 
-                # if any(pd.np.isnan(val) for val in idxmin.values):
-                #     print([(x, type(x)) for x in idxmin.values])
-                #     print(idxmin.values)
-                #     print("inside loc:", idxmin)
-                if len(idxmin) >= 1:
-                    idxmin.loc[idxmin.isna()] = 0
+                # if entire column for a group metric is NaN, cast min value
+                # index column to same index as any other group for that attribute
+                if any(pd.np.isnan(val) for val in idxmin.values):
+                    if (len(idxmin) >= 1):
+                        idxmin.loc[idxmin.isna()] = df.loc[
+                            df["attribute_name"].isin(
+                                idxmin.index.get_level_values('attribute_name').values
+                            )
+                        ].index[0]
+                    else:
+                        logging.error(f"A minimum value for group_metric "
+                                      f"{group_metric} could not be calculated.")
+                        continue
+
 
                 df_min_idx = df.loc[idxmin]
-                # print("inside_loc:", df.groupby(key_columns)[group_metric].idxmin())
-                # print("min_df:", df_min_idx)
+
                 # but we also want to get the group_value of the reference group for each bias metric
                 df_to_merge = pd.DataFrame()
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
