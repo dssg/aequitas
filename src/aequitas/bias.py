@@ -83,19 +83,25 @@ class Bias(object):
             check_significance = self.significance_cols
 
         print('get_disparity_min_metric')
-        fill_zeros = {}
         for group_metric in input_group_metrics:
-            fill_zeros[group_metric + '_disparity'] = 1.000000
 
             try:
                 # this groupby is being called every cycle. maybe we can create a list of df_groups
                 # and merge df at the end? it can not be simply put outside the loop(the merge...)
-                print(key_columns)
-                print(set(df.columns) & set(key_columns))
-                df_min_idx = df.loc[df.groupby(key_columns)[group_metric].idxmin()]
+                idxmin = df.groupby(key_columns)[group_metric].idxmin()
+                # cast nan's to same index as any other group for that attribute
+                # name/ value combo. if NaN, find another way to reference
 
-                print("should be letter:", df.groupby(key_columns)[group_metric].idxmin())
+                # if any(pd.np.isnan(val) for val in idxmin.values):
+                #     print([(x, type(x)) for x in idxmin.values])
+                #     print(idxmin.values)
+                #     print("inside loc:", idxmin)
+                if len(idxmin) >= 1:
+                    idxmin.loc[idxmin.isna()] = 0
 
+                df_min_idx = df.loc[idxmin]
+                # print("inside_loc:", df.groupby(key_columns)[group_metric].idxmin())
+                # print("min_df:", df_min_idx)
                 # but we also want to get the group_value of the reference group for each bias metric
                 df_to_merge = pd.DataFrame()
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
@@ -103,24 +109,22 @@ class Bias(object):
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
                 logging.error(
-                    'get_bias_min_metric:: one of the following columns is not in the input '
-                    'dataframe: model_id, score_threshold, attribute_name or any of the input_group_metrics '
+                    'get_bias_min_metric:: one of the following columns is not on the input '
+                    'dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics '
                     'list')
                 exit(1)
             df = df.merge(df_to_merge, on=key_columns)
             # creating disparity by dividing each group metric value by the corresponding min
             # value from the groups of the target attribute
             df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
-
-
-        # We are capping the disparity values to 10.0 when divided by zero...
+            # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
 
         # add statistical_significance
         check_significance = [measure for measure in check_significance if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                       specific_measures=check_significance,
-                                       label_score_ref=label_score_ref)
+                                              specific_measures=check_significance,
+                                              label_score_ref=label_score_ref)
 
         attr_cols = df['attribute_name'].unique()
 
@@ -140,8 +144,6 @@ class Bias(object):
                 [truemask, falsemask], [True, False], default=None)
 
         return df
-
-
 
     def get_disparity_major_group(self, df, original_df, key_columns=None,
                                   input_group_metrics=None,

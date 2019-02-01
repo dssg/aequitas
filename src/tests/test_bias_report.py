@@ -56,6 +56,9 @@ def helper(input_filename, expected_filename, config_file):
             print('testing {} ...'.format(col))
 
             try:
+                # TypeError: numpy boolean subtract, the `-` operator, is
+                # deprecated, use the bitwise_xor, the `^` operator, or the
+                # logical_xor function instead.
                 if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
                     aeq_mean = np.mean(combined_data[col + "_y"])
