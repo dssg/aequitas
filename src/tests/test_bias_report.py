@@ -59,7 +59,9 @@ def helper(input_filename, expected_filename, config_file):
                 # TypeError: numpy boolean subtract, the `-` operator, is
                 # deprecated, use the bitwise_xor, the `^` operator, or the
                 # logical_xor function instead.
-                if np.mean(combined_data[col + "_x"] - combined_data[col + "_y"]) > EPS:
+                # found online that casting as float64 will go around, but
+                # would like to get Jesse's take on best way to avoid issue.
+                if np.mean(combined_data[col + "_x"].astype("float64") - combined_data[col + "_y"].astype("float64")) > EPS:
                     exp_mean = np.mean(combined_data[col + "_x"])
                     aeq_mean = np.mean(combined_data[col + "_y"])
                     s += "{} fails: Expected {} on average, but aequitas returned {}\n".format(col, exp_mean,                                                                              aeq_mean)
