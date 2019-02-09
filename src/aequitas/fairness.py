@@ -102,26 +102,26 @@ class Fairness(object):
             fair_measures_requested = self.fair_measures_supported
         for fair, input in self.fair_measures_depend.items():
             if fair in fair_measures_requested:
-                bias_df[fair] = bias_df[input].apply(self.fair_eval(tau))
+                bias_df.loc[:,fair] = bias_df[input].apply(self.fair_eval(tau))
         for fair, input in self.type_parity_depend.items():
 
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
-                    bias_df[fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
+                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
                 else:
-                    bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
+                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
             elif input[1] in bias_df.columns:
-                bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
+                bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
                 print('get_group_value_fairness: No Parity measure input found on bias_df')
         for fair, input in self.high_level_fairness_depend.items():
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
-                    bias_df[fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
+                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
                 else:
-                    bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
+                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
             elif input[1] in bias_df.columns:
-                bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
+                bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
         if 'Unsupervised Fairness' not in bias_df.columns and 'Supervised Fairness' not in bias_df.columns:
             logging.info('get_group_value_fairness: No high level measure input found on bias_df' + input[1])
         return bias_df

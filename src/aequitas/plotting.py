@@ -151,15 +151,20 @@ class Plot(object):
                 [measure + ref_group_flag for measure in specific_measures if
                  measure + ref_group_flag in ref_group_cols]
 
-        attributes = list(disparities_table.attribute_name.unique())
+        attributes = list(disparities_table['attribute_name'].unique())
+
+
         for attribute in attributes:
+
             attr_table = \
                 disparities_table.loc[disparities_table['attribute_name'] == attribute]
             attr_refs = {}
             for col in ref_group_cols:
                 metric_key = "".join(col.split(ref_group_flag))
+
                 attr_refs[metric_key] = \
                     attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
+
             if label_score_ref:
                 if label_score_ref + ref_group_flag in ref_group_cols:
                     attr_refs['label_value'] = attr_refs[label_score_ref]
@@ -192,6 +197,7 @@ class Plot(object):
         :return: Integer indicating relative index of reference group value row.
         """
         # get absolute metric name from passed group metric (vs. a disparity name)
+
         abs_metric = "".join(group_metric.split('_disparity'))
 
         all_ref_groups = cls._assemble_ref_groups(disparities_table, ref_group_flag)
@@ -210,7 +216,7 @@ class Plot(object):
 
 
     def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
-                          title=True, label_dict=None,
+                          title=True, label_dict=None, model_id=1,
                           min_group_size = None):
         '''
         Plot a single group metric's absolute metrics
@@ -267,7 +273,8 @@ class Plot(object):
         for attribute_name in attribute_names:
 
             attribute_data = group_table.loc[
-                (group_table['attribute_name'] == attribute_name)]
+                (group_table['attribute_name'] == attribute_name) &
+                (group_table['model_id'] == model_id)]
 
             values = attribute_data[group_metric].values
             grp_sizes = attribute_data['group_size'].values
@@ -349,7 +356,8 @@ class Plot(object):
         ax.set_xlabel("Absolute Metric Magnitude")
 
         if title:
-            ax.set_title(f"{group_metric.upper()}", fontsize=20)
+            ax.set_title(f"MODEL {model_id}:\n{group_metric.upper()}",
+                         fontsize=20)
 
         return ax
 
@@ -388,13 +396,13 @@ class Plot(object):
         '''
         # Use matplotlib to truncate colormap, scale metric values
         # between the min and max, then assign colors to individual values
-
         table_columns = set(disparity_table.columns)
         if group_metric not in table_columns:
            raise ValueError(f"Specified disparity metric {group_metric} not in 'disparity_table'.")
 
         attribute_table = \
-            disparity_table.loc[disparity_table['attribute_name'] == attribute_name]
+            disparity_table.loc[(disparity_table['attribute_name'] == attribute_name) &
+                                (disparity_table['model_id'] == model_id)]
 
         # sort by group size, as box size is indicative of group size
         sorted_df = attribute_table.sort_values('group_size', ascending=False)
@@ -404,10 +412,12 @@ class Plot(object):
         width = 100.
         height = 100.
 
+        # TO DO: move this call post-trimming df for min size
         ref_group_rel_idx, ref_group_name = \
             self._locate_ref_group_indices(disparities_table=sorted_df,
                                             attribute_name=attribute_name,
-                                            group_metric=group_metric)
+                                            group_metric=group_metric,
+                                            model_id=model_id)
 
         if min_group_size:
             if min_group_size > (disparity_table.group_size.max() /
@@ -437,7 +447,8 @@ class Plot(object):
         ref_group_rel_idx, _ = \
             self._locate_ref_group_indices(disparities_table=sorted_df,
                                             attribute_name=attribute_name,
-                                            group_metric=group_metric)
+                                            group_metric=group_metric,
+                                            model_id=model_id)
 
         # labels for squares in tree map:
         # label should always be disparity value (but boxes visualized should be
@@ -548,14 +559,9 @@ class Plot(object):
         ax = sf.squarify_plot_rects(padded_rects, color=clrs, labels=labels,
                                  values=label_values, ax=ax, alpha=0.8)
 
-        # TO DO: build out in next phase (model comparison)
-        # if model_id:
-        #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
-        #              fontsize=23, fontweight="bold")
-
         if title:
-            ax.set_title(f"{(' ').join(related_disparity.split('_')).upper()} ({attribute_name.upper()})",
-                     fontsize=23, fontweight="bold")
+            ax.set_title(f"MODEL {model_id}:\n{(' ').join(related_disparity.split('_')).upper()} ({attribute_name.upper()})",
+                     fontsize=20)
 
         if not highlight_fairness:
             # create dummy invisible image with a color map to leverage for color bar
@@ -568,8 +574,8 @@ class Plot(object):
 
 
     def plot_fairness_group(self, fairness_table, group_metric, ax=None,
-                            ax_lim=None, title=False, label_dict=None,
-                            min_group_size=None):
+                            ax_lim=None, title=True, label_dict=None,
+                            min_group_size=None, model_id=1):
         '''
         This function plots absolute group metrics as indicated by the config file,
             colored based on calculated parity
@@ -608,7 +614,7 @@ class Plot(object):
         if min_group_size:
             if min_group_size > (fairness_table.group_size.max() / fairness_table.group_size.sum()):
                 raise ValueError(f"'min_group_size' proportion specified: '{min_group_size}' "
-                                f"is larger than all groups in sample.")
+                                 f"is larger than all groups in sample.")
 
             min_size = min_group_size * fairness_table.group_size.sum()
             fairness_table = fairness_table.loc[fairness_table['group_size'] >= min_size]
@@ -623,7 +629,8 @@ class Plot(object):
 
         for attribute in attributes:
             attribute_data = fairness_table.loc[
-                fairness_table['attribute_name'] == attribute]
+                (fairness_table['attribute_name'] == attribute) &
+                (fairness_table['model_id'] == model_id)]
             values = attribute_data[group_metric].values
             grp_sizes = attribute_data['group_size'].values
 
@@ -712,7 +719,8 @@ class Plot(object):
         ax.set_xlabel('Absolute Metric Magnitude')
 
         if title:
-            ax.set_title(f"{group_metric.upper()}", fontsize=20)
+            ax.set_title(f"MODEL {model_id}:\n{group_metric.upper()}",
+                         fontsize=20)
 
         return ax
 
@@ -753,7 +761,7 @@ class Plot(object):
 
     def _plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True,
                         title=True, ncols=3, label_dict=None, show_figure=True,
-                        min_group_size=None):
+                        min_group_size=None, models=None):
         """
         This function plots bar charts of absolute metrics indicated by config
         file
@@ -812,7 +820,15 @@ class Plot(object):
 
             ax_lim = min(10, self._nearest_quartile(max(data_table[metrics].max())) + 0.1)
 
-        num_metrics = len(metrics)
+        viz_title = f"{', '.join(map(lambda x: x.upper(), metrics))} " \
+            f"ACROSS POPULATION GROUPS"
+        # double-checked models passed are actually in df, or else plot for all
+        if models:
+            models = [m for m in models if m in data_table.model_id.unique()]
+        else:
+            models = data_table.model_id.unique()
+
+        num_metrics = len(metrics) * len(models)
         rows = math.ceil(num_metrics / ncols)
         if ncols == 1 or (num_metrics % ncols == 0):
             axes_to_remove = 0
@@ -835,35 +851,62 @@ class Plot(object):
         fig, axs = plt.subplots(nrows=rows, ncols=ncols,
                                 figsize=(total_plot_width, 6 * rows),
                                 sharey=True,
-                                gridspec_kw={'wspace': 0.075, 'hspace': 0.25})
+                                gridspec_kw={'wspace': 0.075, 'hspace': 0.3})
 
         # set a different metric to be plotted in each subplot
         ax_col = 0
         ax_row = 0
 
-        for group_metric in metrics:
-            if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
-                ax_row += 1
-                ax_col = 0
+        for model in models:
+            for group_metric in metrics:
+                if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
+                    ax_row += 1
+                    ax_col = 0
 
-            if rows == 1:
-                current_subplot = axs[ax_col]
+                if rows == 1:
+                    current_subplot = axs[ax_col]
 
-            elif ncols == 1:
-                current_subplot = axs[ax_row]
-                ax_row += 1
-            else:
-                current_subplot = axs[ax_row, ax_col]
+                elif ncols == 1:
+                    current_subplot = axs[ax_row]
+                    ax_row += 1
+                else:
+                    current_subplot = axs[ax_row, ax_col]
 
-            plot_fcn(data_table, group_metric=group_metric, ax=current_subplot,
-                     ax_lim=ax_lim, title=title, label_dict=label_dict,
-                     min_group_size=min_group_size)
-            ax_col += 1
+                if all(data_table.loc[data_table['model_id'] == model, group_metric].isna()) or all(
+                        data_table.loc[data_table['model_id'] == model, group_metric] == 0):
+                    print(f"All Model {model} values for metric '{group_metric}' are "
+                          f"NA, '{group_metric}' not visualized.")
+                    axes_to_remove += 1
+                    continue
+                else:
+                    plot_fcn(data_table.loc[data_table['model_id'] == model],
+                             group_metric=group_metric, ax=current_subplot,
+                             ax_lim=ax_lim, title=title, label_dict=label_dict,
+                             min_group_size=min_group_size, model_id = model)
+                    ax_col += 1
 
         # disable axes not being used
         if axes_to_remove > 0:
-            for i in np.arange(axes_to_remove):
-                axs[-1, -(i + 1)].axis('off')
+            if axes_to_remove < ncols:
+                for i in np.arange(1, axes_to_remove + 1):
+                    axs[-1, -i].axis('off')
+            else:
+                remove_full_rows = (axes_to_remove // ncols)
+                for i in np.arange(1, remove_full_rows + 1):
+                    for j in np.arange(1, ncols+1):
+                        fig.delaxes(axs[-1, -j])
+                        axes_to_remove -= 1
+
+                for i in np.arange(1, axes_to_remove + 1):
+                    fig.delaxes(axs[-(remove_full_rows+1), -i])
+
+        if title:
+            fig.suptitle(f"{viz_title}", fontsize=25, fontweight="bold")
+
+        if rows >= 2:
+            fig.subplots_adjust(top=0.90)
+        # else:
+        #     fig.subplots_adjust(top=0.90)
 
         if show_figure:
             plt.show()
@@ -873,8 +916,8 @@ class Plot(object):
     def _plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None,
                                  metrics=None, fillzeros=True, title=True,
                                  label_dict=None, highlight_fairness=False,
-                                 show_figure=True, min_group_size=None,
-                                significance_alpha=0.05):
+                                 show_figure=False, min_group_size=None,
+                                significance_alpha=0.05, models=None):
         """
         This function plots treemaps of disparities indicated by config file
 
@@ -909,6 +952,7 @@ class Plot(object):
         if fillzeros:
             data_table = data_table.fillna(0)
 
+        # params check
         if all(v is None for v in [attributes, metrics]):
             raise ValueError("One of the following parameters must be specified: " \
                         "'attribute', 'metrics'.")
@@ -918,7 +962,7 @@ class Plot(object):
                 metrics = [abs_m for abs_m in self.key_metrics if
                            abs_m in data_table.columns]
 
-            #         metrics = list(set(self.input_group_metrics) &
+            #   metrics = list(set(self.input_group_metrics) &
             # set(data_table.columns))
             elif metrics == 'all':
                 all_abs_metrics = ['tpr_disparity', 'tnr_disparity', 'for_disparity',
@@ -929,9 +973,12 @@ class Plot(object):
                     [abs_m for abs_m in all_abs_metrics if abs_m in data_table.columns]
 
             viz_title = \
-                f"DISPARITY METRICS by {(', ').join(list(map(lambda x:x.upper(), attributes)))}"
+                f"DISPARITY METRICS by " \
+                f"{', '.join(list(map(lambda x:x.upper(), attributes)))}"
 
         elif not attributes:
+            # Note: if attributes not passed, must have passed metric (or else
+            # would be caught by earlier params check)
             attributes = list(data_table.attribute_name.unique())
             if metrics == 'all':
                 all_disparities = ['tpr_disparity', 'tnr_disparity', 'for_disparity',
@@ -940,10 +987,17 @@ class Plot(object):
                                'ppr_disparity', 'pprev_disparity']
                 metrics = [disparity for disparity in all_disparities if
                            disparity in data_table.columns]
-            viz_title = f"{(', ').join(map(lambda x:x.upper(), metrics))} " \
+            viz_title = f"{', '.join(map(lambda x:x.upper(), metrics))} " \
                         f"ACROSS ATTRIBUTES"
 
-        num_metrics = len(attributes) * len(metrics)
+        # double-checked models passed are actually in df, or else plot for all
+        if models:
+            models = [m for m in models if m in data_table.model_id.unique()]
+        else:
+            models = data_table.model_id.unique()
+
+
+        num_metrics = len(attributes) * len(metrics) * len(models)
         if num_metrics > 1:
             ncols = 3
         else:
@@ -971,7 +1025,7 @@ class Plot(object):
 
         fig, axs = plt.subplots(nrows=rows, ncols=ncols,
                                 figsize=(total_plot_width, 8 * rows),
-                                gridspec_kw={'wspace': 0.025, 'hspace': 0.5},
+                                gridspec_kw={'wspace': 0.025, 'hspace': 0.3},
                                 subplot_kw={'aspect': 'equal'})
 
         if highlight_fairness:
@@ -986,53 +1040,73 @@ class Plot(object):
         ax_col = 0
         ax_row = 0
 
-        models = list(data_table.model_id.unique())
 
         # to do: (next iteration) plot for multiple models based on metrics/
         # attributes in that model
-        #
-        # for model in models:
-        #     model = lambda x: x if len(models) > 1 else None
-        for group_metric in metrics:
-            for attr in attributes:
-                if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
-                    ax_row += 1
-                    ax_col = 0
 
-                if num_metrics == 1:
-                    current_subplot = axs
+        for model in models:
+            # model = lambda x: x if len(models) > 1 else None
+            for group_metric in metrics:
 
-                elif (num_metrics > 1) and (rows == 1):
-                    current_subplot = axs[ax_col]
+                for attr in attributes:
+                    if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
+                        ax_row += 1
+                        ax_col = 0
 
-                elif (num_metrics > 1) and (ncols == 1):
-                    current_subplot = axs[ax_row]
-                    ax_row += 1
-                else:
-                    current_subplot = axs[ax_row, ax_col]
+                    if num_metrics == 1:
+                        current_subplot = axs
 
-                plot_fcn(data_table, group_metric=group_metric,
-                         attribute_name=attr, color_mapping=mapping,
-                         ax=current_subplot, fig=fig, title=title,
-                         label_dict=label_dict,
-                         highlight_fairness=highlight_fairness,
-                         min_group_size=min_group_size, significance_alpha=significance_alpha)
+                    elif (num_metrics > 1) and (rows == 1):
+                        current_subplot = axs[ax_col]
 
-                ax_col += 1
+                    elif (num_metrics > 1) and (ncols == 1):
+                        current_subplot = axs[ax_row]
+                        ax_row += 1
+                    else:
+                        current_subplot = axs[ax_row, ax_col]
+
+                    if all(data_table.loc[data_table['model_id'] == model, group_metric].isna()) or all(
+                            data_table.loc[data_table['model_id'] == model, group_metric] == 0):
+                        print(f"All Model {model} values for metric '{group_metric}' are "
+                              f"NA, '{group_metric}' not visualized.")
+                        axes_to_remove += 1
+                        continue
+                    else:
+                        plot_fcn(data_table.loc[data_table['model_id'] == model],
+                                 group_metric=group_metric,
+                                 attribute_name=attr, model_id=model,
+                                 color_mapping=mapping, ax=current_subplot,
+                                 fig=fig, title=title, label_dict=label_dict,
+                                 highlight_fairness=highlight_fairness,
+                                 min_group_size=min_group_size,
+                                 significance_alpha=significance_alpha)
+
+                        ax_col += 1
 
         # disable axes not being used
         if axes_to_remove > 0:
-            for i in np.arange(axes_to_remove):
-                axs[-1, -(i + 1)].axis('off')
+            if axes_to_remove < ncols:
+                for i in np.arange(1, axes_to_remove + 1):
+                    axs[-1, -i].axis('off')
+            else:
+                remove_full_rows = (axes_to_remove // ncols)
+                for i in np.arange(1, remove_full_rows + 1):
+                    for j in np.arange(1, ncols+1):
+                        fig.delaxes(axs[-1, -j])
+                        axes_to_remove -= 1
 
-        plt.suptitle(f"{viz_title}", fontsize=25, fontweight="bold")
+                for i in np.arange(1, axes_to_remove + 1):
+                    fig.delaxes(axs[-(remove_full_rows+1), -i])
+
+        if title:
+            fig.suptitle(f"{viz_title}", fontsize=25, fontweight="bold")
 
         # fig.tight_layout()
 
-        if rows > 2:
-            fig.subplots_adjust(top=0.95)
-        else:
+        if rows >= 2:
             fig.subplots_adjust(top=0.90)
+        # else:
+        #     fig.subplots_adjust(top=0.90)
 
         if show_figure:
             plt.show()
@@ -1042,7 +1116,7 @@ class Plot(object):
 
     def plot_group_metric_all(self, data_table, metrics=None, fillzeros=True,
                               ncols=3, title=True, label_dict=None,
-                              show_figure=True, min_group_size=None):
+                              show_figure=True, min_group_size=None, models=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1071,13 +1145,13 @@ class Plot(object):
         return self._plot_multiple(
             data_table, plot_fcn=self.plot_group_metric, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
-            show_figure=show_figure, min_group_size=min_group_size)
+            show_figure=show_figure, min_group_size=min_group_size, models=models)
 
 
     def plot_disparity_all(self, data_table, attributes=None, metrics=None,
                            fillzeros=True, title=True, label_dict=None,
                            show_figure=True, min_group_size=None,
-                           significance_alpha=0.05):
+                           significance_alpha=0.05, models=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -1111,11 +1185,12 @@ class Plot(object):
             data_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             highlight_fairness=False, show_figure=show_figure, title=title,
-            min_group_size=min_group_size, significance_alpha=significance_alpha)
+            min_group_size=min_group_size, significance_alpha=significance_alpha,
+            models=models)
 
     def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True,
                                 ncols=3, title=True, label_dict=None,
-                                show_figure=True, min_group_size=None):
+                                show_figure=True, min_group_size=None, models=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1142,12 +1217,13 @@ class Plot(object):
         return self._plot_multiple(
             fairness_table, plot_fcn=self.plot_fairness_group, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
-            show_figure=show_figure, min_group_size=min_group_size)
+            show_figure=show_figure, min_group_size=min_group_size, models=models)
 
     def plot_fairness_disparity_all(self, fairness_table, attributes=None,
                                     metrics=None, fillzeros=True, title=True,
                                     label_dict=None, show_figure=True,
-                                    min_group_size=None, significance_alpha=0.05):
+                                    min_group_size=None, significance_alpha=0.05,
+                                    models=None):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1179,4 +1255,5 @@ class Plot(object):
             fairness_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             title=title, highlight_fairness=True, show_figure=show_figure,
-            min_group_size=min_group_size, significance_alpha=significance_alpha)
+            min_group_size=min_group_size, significance_alpha=significance_alpha,
+            models=models)

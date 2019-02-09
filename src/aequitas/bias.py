@@ -588,7 +588,7 @@ class Bias(object):
 
         count_ones = None
         if not score_thresholds:
-            original_df['score'] = original_df['score'].astype(float)
+            original_df.loc[:,'score'] = original_df.loc[:, 'score'].astype(float)
             count_ones = original_df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 

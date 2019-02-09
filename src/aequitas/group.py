@@ -124,7 +124,7 @@ class Group(object):
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
-        # check if all attr_cols exist in df
+        # double-check if all attr_cols exist in df
         check = [col in df.columns for col in attr_cols]
         if False in check:
             # todo: create separate check method that raises exception...
