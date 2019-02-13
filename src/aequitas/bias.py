@@ -82,8 +82,9 @@ class Bias(object):
         for group_metric in input_group_metrics:
 
             try:
-                # this groupby is being called every cycle. maybe we can create a list of df_groups
-                # and merge df at the end? it can not be simply put outside the loop(the merge...)
+                # this groupby is being called every cycle. maybe we can create
+                # a list of df_groups and merge df at the end? it can not be
+                # simply put outside the loop(the merge...)
                 idxmin = df.groupby(key_columns)[group_metric].idxmin()
 
                 # if entire column for a group metric is NaN, cast min value
@@ -103,26 +104,30 @@ class Bias(object):
 
                 df_min_idx = df.loc[idxmin]
 
-                # but we also want to get the group_value of the reference group for each bias metric
+                # but we also want to get the group_value of the reference group
+                # for each bias metric
                 df_to_merge = pd.DataFrame()
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
                                            '_ref_group_value']] = \
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
                 logging.error(
-                    'get_bias_min_metric:: one of the following columns is not on the input '
-                    'dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics '
+                    'get_bias_min_metric:: one of the following columns is not '
+                    'on the input dataframe : model_id, parameter, attribute_name '
+                    'or any of the input_group_metrics '
                     'list')
                 exit(1)
             df = df.merge(df_to_merge, on=key_columns)
-            # creating disparity by dividing each group metric value by the corresponding min
-            # value from the groups of the target attribute
-            df[group_metric + '_disparity'] = df[group_metric] / df[group_metric + '_disparity']
+            # creating disparity by dividing each group metric value by the
+            # corresponding min value from the groups of the target attribute
+            df[group_metric + '_disparity'] = \
+                df[group_metric] / df[group_metric + '_disparity']
             # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
 
         # add statistical_significance
-        check_significance = [measure for measure in check_significance if measure in df.columns]
+        check_significance = [measure for measure in check_significance
+                              if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                               specific_measures=check_significance,
                                               label_score_ref=label_score_ref)
@@ -151,8 +156,9 @@ class Bias(object):
                                   fill_divbyzero=None, check_significance=None,
                                   alpha = 5e-2, mask_significance=True):
         """
-            Calculates the bias (disparity) metrics for the predefined list of group metrics
-            using the majority group within each attribute as the reference group (denominator)
+        Calculates the bias (disparity) metrics for the predefined list of group
+        metrics using the majority group within each attribute as the reference
+        group (denominator)
 
         :param df: the returning dataframe from the group.get_crosstabs
         :param original_df: a dataframe containing a required 'score 'column
@@ -185,13 +191,15 @@ class Bias(object):
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
-            logging.error('get_bias_major_group:: one of the following columns is not on the input '
-                          'dataframe : model_id ,parameter,attribute_name, group_size ')
+            logging.error('get_bias_major_group:: one of the following columns '
+                          'is not on the input dataframe : model_id, parameter, '
+                          'attribute_name, group_size')
             exit(1)
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
-        # we created the df_to_merge has a subset of the df_ref_group containing the target ref
-        # group values which are now labeled as _disparity but we still need to perform the division
+        # we created the df_to_merge has a subset of the df_ref_group containing
+        # the target ref group values which are now labeled as _disparity but
+        # we still need to perform the division
         df_to_merge[key_columns + disparity_metrics] = df_major_group[
             key_columns + input_group_metrics]
         # we now need to create the ref_group_value columns in the df_to_merge
@@ -202,15 +210,17 @@ class Bias(object):
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
 
-        # when there is a zero in the numerator and a zero in denominator it is considered NaN
-        # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
+        # when there is a zero in the numerator and a zero in denominator it is
+        # considered NaN after division, so if 0/0 we assume 1.0 disparity
+        # (they are the same...)
 
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
 
         # default is to use the same ref groups as df, need to add functionality to
         # complie ref_groups_dict based on a passed ref group for a given measure
-        check_significance = [measure for measure in check_significance if measure in df.columns]
+        check_significance = [measure for measure in check_significance
+                              if measure in df.columns]
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                        specific_measures=check_significance)
 
@@ -253,9 +263,10 @@ class Bias(object):
                                         check_significance=None, alpha=5e-2,
                                         mask_significance=True):
         """
-        Calculates the bias (disparity) metrics for the predefined list of input group metrics
-        using a predefined reference group value for each attribute which is passed using
-        ref_groups_dict ({'attr1':'val1', 'attr2':'val2'})
+        Calculates the bias (disparity) metrics for the predefined list of input
+        group metrics using a predefined reference group value for each
+        attribute which is passed using ref_groups_dict
+        of format:{'attr1':'val1', 'attr2':'val2'}
 
         :param df: the output dataframe of the group.get_crosstabs
         :param original_df: a dataframe containing a required raw 'score' column
@@ -290,35 +301,44 @@ class Bias(object):
         try:
             self._verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
-            logging.error('Bias.get_disparity_predefined_groups(): the number of predefined group '
-                          'values to use as reference is less than the actual number of '
-                          'attributes in the input dataframe.')
+            logging.error('Bias.get_disparity_predefined_groups(): the number of '
+                          'predefined group values to use as reference is less '
+                          'than the actual number of attributes in the input '
+                          'dataframe.')
             exit(1)
         df_ref_group = pd.DataFrame()
         try:
             for key, val in ref_groups_dict.items():
-                group_slice = df.loc[(df['attribute_name'] == key) & (df['attribute_value'] == val)]
+                group_slice = df.loc[(df['attribute_name'] == key) &
+                                     (df['attribute_value'] == val)]
                 self._verify_ref_group_loc(group_slice)
                 df_ref_group = pd.concat([df_ref_group, group_slice])
         except (KeyError, ValueError):
-            logging.error('get_disparity_predefined_groups(): reference groups and values provided '
-                          'do not exist as columns/values in the input dataframe.(Note: check for syntax errors)')
+            logging.error('get_disparity_predefined_groups(): reference groups '
+                          'and values provided do not exist as columns/values '
+                          'in the input dataframe.(Note: check for syntax errors)')
             exit(1)
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
-        # we created the df_to_merge has a subset of the df_ref_group containing the target ref
-        # group values which are now labeled as _disparity but we still need to perform the division
+
+        # we created the df_to_merge has a subset of the df_ref_group containing
+        # the target ref group values which are now labeled as _disparity but
+        # we still need to perform the division
         df_to_merge[key_columns + disparity_metrics] = df_ref_group[
             key_columns + input_group_metrics]
+
         # we now need to create the ref_group_value columns in the df_to_merge
         for col in input_group_metrics:
             df_to_merge[col + '_ref_group_value'] = df_ref_group['attribute_value']
         df = df.merge(df_to_merge, on=key_columns)
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
+
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
-        # when there is a zero in the numerator and a zero in denominator it is considered NaN
-        # after division, so if 0/0 we assume 1.0 disparity (they are the same...)
+
+        # when there is a zero in the numerator and a zero in denominator it is
+        # considered NaN  after division, so if 0/0 we assume 1.0 disparity
+        # (they are the same...)
         fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
         # df = df.fillna(value=fill_zeros)
 
@@ -369,7 +389,8 @@ class Bias(object):
 
         :return: A dictionary of binary 'samples' for each attribute group
         '''
-        return original_df.groupby(attribute).apply(lambda f: f[measure].values.tolist()).to_dict()
+        return original_df.groupby(attribute).apply(
+            lambda f: f[measure].values.tolist()).to_dict()
 
 
     @staticmethod
@@ -431,7 +452,8 @@ class Bias(object):
         # for all normally distributed non-ref groups, use bartlett test to
         # check for equal variance (against ref_group). Add results to dict
         untested_groups = sample_dict.keys() - eq_variance.keys() - set(ref_group)
-        untested = {key: val for (key, val) in sample_dict.items() if key in untested_groups}
+        untested = {key: val for (key, val) in sample_dict.items()
+                    if key in untested_groups}
         for sample, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
 
@@ -476,8 +498,8 @@ class Bias(object):
 
         # create dictionary of "samples" (binary values for false positive,
         # false negative, label value, score) based on original data frame
-        sample_dict = cls._get_measure_sample(original_df=original_df, attribute=attribute,
-                                             measure=measure)
+        sample_dict = cls._get_measure_sample(original_df=original_df,
+                                              attribute=attribute, measure=measure)
 
         # run SciPy equal variance tests between each group and a given
         # reference group, store results in dictionary to pass to statistical
@@ -490,14 +512,17 @@ class Bias(object):
         # reference group
         for attr_val, eq_var in sample_dict.items():
             _, difference_significance_p = stats.ttest_ind(
-                sample_dict[ref_group], sample_dict[attr_val], axis=None,
-                equal_var=eq_variance_dict[attr_val], nan_policy='omit')
+                sample_dict[ref_group],
+                sample_dict[attr_val],
+                axis=None,
+                equal_var=eq_variance_dict[attr_val],
+                nan_policy='omit')
 
             measure = "".join(measure.split('binary_'))
 
             # add column to crosstab to indicate statistical significance
-            disparity_df.loc[disparity_df['attribute_value'] == attr_val, measure + '_significance'] = \
-                difference_significance_p
+            disparity_df.loc[disparity_df['attribute_value'] == attr_val,
+                             measure + '_significance'] = difference_significance_p
 
         return disparity_df
 
@@ -554,8 +579,10 @@ class Bias(object):
 
         # check if all columns are strings:
         non_string_cols = \
-            original_df.columns[(original_df.dtypes != object) & (original_df.dtypes != str) & (
-                original_df.columns.isin(attr_cols))]
+            original_df.columns[
+                (original_df.dtypes != object) &
+                (original_df.dtypes != str) &
+                (original_df.columns.isin(attr_cols))]
 
         if non_string_cols.empty is False:
             logging.error(
@@ -607,8 +634,8 @@ class Bias(object):
 
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
-                        original_df[name] = col_group.apply(func).reset_index(level=0,
-                                                                     drop=True)
+                        original_df[name] = col_group.apply(
+                            func).reset_index(level=0, drop=True)
             measures = list(binary_col_functions.keys())
             measures += ['label_value']
             measures.sort()
