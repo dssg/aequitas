@@ -2,8 +2,7 @@ import logging
 from sys import exit
 
 from aequitas.preprocessing import get_attr_cols
-from aequitas.plotting import Plot
-assemble_ref_groups = Plot._assemble_ref_groups
+from aequitas.plotting import Plot, assemble_ref_groups
 
 import pandas as pd
 from scipy import stats
@@ -42,8 +41,6 @@ class Bias(object):
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
         self.significance_cols = significance_cols
-        # if sample_df:
-        #     self.samples = self.get_measure_sample(sample_df, attribute, measure)
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
@@ -241,11 +238,11 @@ class Bias(object):
 
         return df
 
-    def verify_ref_groups_dict_len(self, df, ref_groups_dict):
+    def _verify_ref_groups_dict_len(self, df, ref_groups_dict):
         if len(ref_groups_dict) != len(df['attribute_name'].unique()):
             raise ValueError
 
-    def verify_ref_group_loc(self, group_slice):
+    def _verify_ref_group_loc(self, group_slice):
         if len(group_slice) < 1:
             raise ValueError
 
@@ -291,7 +288,7 @@ class Bias(object):
         if not check_significance:
             check_significance = self.significance_cols
         try:
-            self.verify_ref_groups_dict_len(df, ref_groups_dict)
+            self._verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
             logging.error('Bias.get_disparity_predefined_groups(): the number of predefined group '
                           'values to use as reference is less than the actual number of '
@@ -301,7 +298,7 @@ class Bias(object):
         try:
             for key, val in ref_groups_dict.items():
                 group_slice = df.loc[(df['attribute_name'] == key) & (df['attribute_value'] == val)]
-                self.verify_ref_group_loc(group_slice)
+                self._verify_ref_group_loc(group_slice)
                 df_ref_group = pd.concat([df_ref_group, group_slice])
         except (KeyError, ValueError):
             logging.error('get_disparity_predefined_groups(): reference groups and values provided '
@@ -356,8 +353,8 @@ class Bias(object):
         return df
 
 
-    @classmethod
-    def get_measure_sample(cls, original_df, attribute, measure):
+    @staticmethod
+    def _get_measure_sample(original_df, attribute, measure):
         '''
         Helper function for get_statistical_significance() (via
         calculate_significance() function). Convert dataframe to samples for
@@ -375,8 +372,8 @@ class Bias(object):
         return original_df.groupby(attribute).apply(lambda f: f[measure].values.tolist()).to_dict()
 
 
-    @classmethod
-    def check_equal_variance(cls, sample_dict, ref_group, alpha=5e-2):
+    @staticmethod
+    def _check_equal_variance(sample_dict, ref_group, alpha=5e-2):
         '''
         Helper function for get_statistical_significance() (via
         calculate_significance() function).
@@ -417,10 +414,9 @@ class Bias(object):
                         _, equal_variance_p = stats.levene(sample_dict[ref_group],
                                                            sample_list,
                                                            center='median')
-                        if equal_variance_p < alpha:
-                            eq_variance[group] = False
-                        else:
-                            eq_variance[group] = True
+
+                        eq_variance[group] = equal_variance_p >= alpha
+
 
                     return eq_variance
 
@@ -430,10 +426,7 @@ class Bias(object):
                 _, equal_variance_p = stats.levene(
                     sample_dict[ref_group], sample, center='median')
 
-                if equal_variance_p < alpha:
-                    eq_variance[attr_value] = False
-                else:
-                    eq_variance[attr_value] = True
+                eq_variance[attr_value] = equal_variance_p >= alpha
 
         # for all normally distributed non-ref groups, use bartlett test to
         # check for equal variance (against ref_group). Add results to dict
@@ -441,23 +434,11 @@ class Bias(object):
         untested = {key: val for (key, val) in sample_dict.items() if key in untested_groups}
         for sample, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
-            if equal_variance_p < alpha:
-                eq_variance[attr_value] = False
-            else:
-                eq_variance[attr_value] = True
+
+            eq_variance[attr_value] = equal_variance_p >= alpha
+
 
         return eq_variance
-
-    @classmethod
-    def check_alpha(cls, x, alpha=5e-2):
-        '''
-        Check whether a number is less than a given alpha
-        '''
-        print(f"{x}: {type(x)}")
-        if x >= alpha:
-            return False
-        else:
-            return True
 
 
     @classmethod
@@ -495,13 +476,13 @@ class Bias(object):
 
         # create dictionary of "samples" (binary values for false positive,
         # false negative, label value, score) based on original data frame
-        sample_dict = cls.get_measure_sample(original_df=original_df, attribute=attribute,
+        sample_dict = cls._get_measure_sample(original_df=original_df, attribute=attribute,
                                              measure=measure)
 
         # run SciPy equal variance tests between each group and a given
         # reference group, store results in dictionary to pass to statistical
         # significance tests
-        eq_variance_dict = cls.check_equal_variance(sample_dict=sample_dict,
+        eq_variance_dict = cls._check_equal_variance(sample_dict=sample_dict,
                                                     ref_group=ref_group,
                                                     alpha=alpha)
 

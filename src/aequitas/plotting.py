@@ -18,6 +18,59 @@ __author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
+
+# module-level function
+def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
+                         specific_measures=None, label_score_ref=None):
+    """
+    Creates a dictionary of reference groups for each metric in a data_table
+
+   :param disparities_table: A disparity table. Output of bias.get_disparity or
+        fairness.get_fairness functions
+    :param ref_group_flag: string indicating column indicates reference group
+        flag value. Default is '_ref_group_value'.
+    :param specific_measures: Limits reference dictionary to only specified
+        metrics in a data table. Default is None.
+    :param label_score_ref: Defines a metric (ex: 'fpr' (false positive rate)
+        to mimic reference group when calculating label value and score
+        statistical significance. Default is None.
+
+    :return: A dictionary
+    """
+    ref_groups = {}
+    ref_group_cols = \
+        list(disparities_table.columns[disparities_table.columns.str.contains(
+            ref_group_flag)])
+
+    if specific_measures:
+        ref_group_cols = \
+            [measure + ref_group_flag for measure in specific_measures if
+             measure + ref_group_flag in ref_group_cols]
+
+    attributes = list(disparities_table.attribute_name.unique())
+    for attribute in attributes:
+        attr_table = \
+            disparities_table.loc[disparities_table['attribute_name'] == attribute]
+        attr_refs = {}
+        for col in ref_group_cols:
+            metric_key = "".join(col.split(ref_group_flag))
+            attr_refs[metric_key] = \
+                attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
+        if label_score_ref:
+            if label_score_ref + ref_group_flag in ref_group_cols:
+                attr_refs['label_value'] = attr_refs[label_score_ref]
+                attr_refs['score'] = attr_refs[label_score_ref]
+            else:
+                raise ValueError("The specified reference measure for label"
+                                 " value and score is not included in the "
+                                 "data frame.")
+
+        ref_groups[attribute] = attr_refs
+
+    return ref_groups
+
+
+# Plot() class
 class Plot(object):
     """
     Plotting object allows for visualization of absolute group bias metrics and
@@ -123,55 +176,6 @@ class Plot(object):
             cmap(np.linspace(min_value, max_value, num_colors)))
         return new_cmap
 
-    @staticmethod
-    def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
-                             specific_measures=None, label_score_ref=None):
-        """
-        Creates a dictionary of reference groups for each metric in a data_table
-
-       :param disparities_table: A disparity table. Output of bias.get_disparity or
-            fairness.get_fairness functions
-        :param ref_group_flag: string indicating column indicates reference group
-            flag value. Default is '_ref_group_value'.
-        :param specific_measures: Limits reference dictionary to only specified
-            metrics in a data table. Default is None.
-        :param label_score_ref: Defines a metric (ex: 'fpr' (false positive rate)
-            to mimic reference group when calculating label value and score
-            statistical significance. Default is None.
-
-        :return: A dictionary
-        """
-        ref_groups = {}
-        ref_group_cols = \
-            list(disparities_table.columns[disparities_table.columns.str.contains(
-                ref_group_flag)])
-
-        if specific_measures:
-            ref_group_cols = \
-                [measure + ref_group_flag for measure in specific_measures if
-                 measure + ref_group_flag in ref_group_cols]
-
-        attributes = list(disparities_table.attribute_name.unique())
-        for attribute in attributes:
-            attr_table = \
-                disparities_table.loc[disparities_table['attribute_name'] == attribute]
-            attr_refs = {}
-            for col in ref_group_cols:
-                metric_key = "".join(col.split(ref_group_flag))
-                attr_refs[metric_key] = \
-                    attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
-            if label_score_ref:
-                if label_score_ref + ref_group_flag in ref_group_cols:
-                    attr_refs['label_value'] = attr_refs[label_score_ref]
-                    attr_refs['score'] = attr_refs[label_score_ref]
-                else:
-                    raise ValueError("The specified reference measure for label"
-                                     " value and score is not included in the "
-                                     "data frame.")
-
-            ref_groups[attribute] = attr_refs
-
-        return ref_groups
 
     @classmethod
     def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
@@ -194,20 +198,19 @@ class Plot(object):
         # get absolute metric name from passed group metric (vs. a disparity name)
         abs_metric = "".join(group_metric.split('_disparity'))
 
-        all_ref_groups = cls._assemble_ref_groups(disparities_table, ref_group_flag)
+        all_ref_groups = assemble_ref_groups(disparities_table, ref_group_flag)
         ref_group_name = all_ref_groups[attribute_name][abs_metric]
 
         # get index for row associated with reference group for that model
         ind = list(disparities_table.loc[(disparities_table['attribute_name'] == attribute_name) &
-                                     (disparities_table['attribute_value'] == ref_group_name) &
-                                     (disparities_table['model_id'] == model_id)].index)
+                                         (disparities_table['attribute_value'] == ref_group_name) &
+                                         (disparities_table['model_id'] == model_id)].index)
 
         # there should only ever be one item in list, but JIC, select first
         idx = ind[0]
 
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
-
 
     def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
                           title=True, label_dict=None,
@@ -466,8 +469,7 @@ class Plot(object):
                     f"Related fairness determination for {group_metric} must be "
                     f"included in data table to color visualization based on "
                     f"metric fairness.")
-            clrs = [cb_green if val == True else
-                    cb_red for val in sorted_df[parity]]
+            clrs = [cb_green if val else cb_red for val in sorted_df[parity]]
 
         else:
             aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
@@ -500,7 +502,8 @@ class Plot(object):
             labels = sorted_df['attribute_value'].values
 
         # if df includes significance columns, add stars to indicate significance
-        if len(list(sorted_df.columns[sorted_df.columns.str.contains('_significance')])) > 0:
+        if sorted_df.columns[
+            sorted_df.columns.str.contains('_significance')].value_counts().sum() > 0:
         # unmasked significance
         # find indices where related significance have smaller value than significance_alpha
             if np.issubdtype(
