@@ -566,7 +566,7 @@ class Bias(object):
 
         # check if all attr_cols exist in df
         check = [col in original_df.columns for col in attr_cols]
-        if False in check:
+        if any(col not in original_df.columns for col in attr_cols):
             raise ValueError(
                 f"Not all attribute columns provided '{attr_cols}' exist in "
                 f"input dataframe!")
