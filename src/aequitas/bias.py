@@ -329,9 +329,9 @@ class Bias(object):
 
         # we now need to create the ref_group_value columns in the df_to_merge
         for col in input_group_metrics:
-            df_to_merge[col + '_ref_group_value'] = df_ref_group['attribute_value']
+            df_to_merge.loc[:, col + '_ref_group_value'] = df_ref_group['attribute_value']
         df = df.merge(df_to_merge, on=key_columns)
-        df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
+        df.loc[:,disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
 
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
@@ -454,6 +454,7 @@ class Bias(object):
         untested_groups = sample_dict.keys() - eq_variance.keys() - set(ref_group)
         untested = {key: val for (key, val) in sample_dict.items()
                     if key in untested_groups}
+
         for sample, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
 

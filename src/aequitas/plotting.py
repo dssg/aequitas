@@ -237,8 +237,26 @@ class Plot(object):
             raise ValueError(f"Specified disparity metric '{group_metric}' not "
                              f"in 'group_table'.")
 
-        if group_table[group_metric].isnull().any():
-            raise ValueError(f"Cannot plot {group_metric}, has NaN values.")
+        if group_table.loc[group_table['model_id'] == model_id, group_metric].isnull().all():
+            raise ValueError(f"Cannot plot metric '{group_metric}', only NaN values.")
+
+        elif group_table.loc[group_table['model_id'] == model_id, group_metric].isnull().any():
+            # determine which group(s) have missing values
+            missing = ", ".join(group_table.loc[(group_table['model_id'] == model_id) &
+                            (group_table[group_metric].isnull()), 'attribute_value'].values.tolist())
+
+            attr = ", ".join(group_table.loc[(group_table['model_id'] == model_id) &
+                                                (group_table[
+                                                     group_metric].isnull()), 'attribute_name'].values.tolist())
+
+            logging.warning(f"Model {model_id} '{attr}' group '{missing}' value for metric "
+                         f"'{group_metric}' is NA, group not included in visualization.")
+            group_table = group_table.dropna(axis=0, subset=[group_metric])
+
+        # previously errored out if any of groupings' metric was not present, does not
+        # support multi-model
+        # if group_table[group_metric].isnull().any():
+        #     raise ValueError(f"Cannot plot {group_metric}, has NaN values.")
 
         if ax is None:
             (_fig, ax) = plt.subplots(figsize=(10, 5))
@@ -599,8 +617,27 @@ class Plot(object):
             raise ValueError(f"Specified disparity metric {group_metric} not "
                              f"in 'fairness_table'.")
 
-        if fairness_table[group_metric].isnull().any():
-            raise ValueError(f"Cannot plot {group_metric}, has NaN values.")
+        if fairness_table.loc[fairness_table['model_id'] == model_id, group_metric].isnull().all():
+            raise ValueError(f"Cannot plot metric '{group_metric}', only NaN values.")
+
+        elif fairness_table.loc[fairness_table['model_id'] == model_id, group_metric].isnull().any():
+            # determine which group(s) have missing values
+            missing = ", ".join(fairness_table.loc[(fairness_table['model_id'] == model_id) &
+                            (fairness_table[group_metric].isnull()), 'attribute_value'].values.tolist())
+
+            attr = ", ".join(fairness_table.loc[(fairness_table['model_id'] == model_id) &
+                                                (fairness_table[
+                                                     group_metric].isnull()), 'attribute_name'].values.tolist())
+
+            logging.warning(f"Model {model_id} '{attr}' group '{missing}' value for metric "
+                         f"'{group_metric}' is NA, group not included in visualization.")
+            fairness_table = fairness_table.dropna(axis=0, subset=[group_metric])
+
+        # previously errored out if any of groupings' metric was not present, does not
+        # support multi-model
+        # if fairness_table[group_metric].isnull().any():
+        #     raise ValueError(f"Cannot plot {group_metric}, has NaN values.")
+
 
         if ax is None:
             fig, ax = plt.subplots(figsize=(10, 5))
@@ -873,8 +910,8 @@ class Plot(object):
 
                 if all(data_table.loc[data_table['model_id'] == model, group_metric].isna()) or all(
                         data_table.loc[data_table['model_id'] == model, group_metric] == 0):
-                    print(f"All Model {model} values for metric '{group_metric}' are "
-                          f"NA, '{group_metric}' not visualized.")
+                    logging.warning(f"All Model {model} values for metric '{group_metric}' are "
+                          f"NA, '{group_metric}' not visualized for this model.")
                     axes_to_remove += 1
                     continue
                 else:
@@ -1066,8 +1103,8 @@ class Plot(object):
 
                     if all(data_table.loc[data_table['model_id'] == model, group_metric].isna()) or all(
                             data_table.loc[data_table['model_id'] == model, group_metric] == 0):
-                        print(f"All Model {model} values for metric '{group_metric}' are "
-                              f"NA, '{group_metric}' not visualized.")
+                        logging.warning(f"All Model {model} values for metric '{group_metric}' are "
+                              f"NA, '{group_metric}' not visualized for this model.")
                         axes_to_remove += 1
                         continue
                     else:
