@@ -635,7 +635,7 @@ class Plot(object):
             cb_green = '#1b7837'
             cb_red = '#a50026'
             parity = self._metric_parity_mapping[group_metric]
-            parity_colors = [cb_green if val == True else
+            parity_colors = [cb_green if val else
                               cb_red for val in attribute_data[parity]]
 
             # Set white text for red bars and black text for green bars
