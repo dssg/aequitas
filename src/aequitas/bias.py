@@ -116,7 +116,7 @@ class Bias(object):
                     'on the input dataframe : model_id, parameter, attribute_name '
                     'or any of the input_group_metrics '
                     'list')
-                exit(1)
+
             df = df.merge(df_to_merge, on=key_columns)
             # creating disparity by dividing each group metric value by the
             # corresponding min value from the groups of the target attribute
@@ -194,7 +194,7 @@ class Bias(object):
             logging.error('get_bias_major_group:: one of the following columns '
                           'is not on the input dataframe : model_id, parameter, '
                           'attribute_name, group_size')
-            exit(1)
+
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
         # we created the df_to_merge has a subset of the df_ref_group containing
@@ -305,7 +305,7 @@ class Bias(object):
                           'predefined group values to use as reference is less '
                           'than the actual number of attributes in the input '
                           'dataframe.')
-            exit(1)
+
         df_ref_group = pd.DataFrame()
         try:
             for key, val in ref_groups_dict.items():
@@ -317,7 +317,7 @@ class Bias(object):
             logging.error('get_disparity_predefined_groups(): reference groups '
                           'and values provided do not exist as columns/values '
                           'in the input dataframe.(Note: check for syntax errors)')
-            exit(1)
+
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
 
@@ -390,7 +390,7 @@ class Bias(object):
         :return: A dictionary of binary 'samples' for each attribute group
         '''
         return original_df.groupby(attribute).apply(
-            lambda f: f[measure].values.tolist()).to_dict()
+            lambda f: f.loc[f[measure].notnull(), measure].values.tolist()).to_dict()
 
 
     @staticmethod
@@ -454,7 +454,7 @@ class Bias(object):
         untested_groups = sample_dict.keys() - eq_variance.keys() - set(ref_group)
         untested = {key: val for (key, val) in sample_dict.items()
                     if key in untested_groups}
-        for sample, sample_list in untested.items():
+        for attr_value, sample_list in untested.items():
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
 
             eq_variance[attr_value] = equal_variance_p >= alpha
@@ -588,7 +588,7 @@ class Bias(object):
             logging.error(
                 'get_statistical_significance: statistical significance was '
                 'not calculated. There are non-string cols within attr_cols.')
-            exit(1)
+
 
         # if no score_thresholds are provided, we assume that rank_abs equals
         # the number  of 1s in the score column; it also serves as flag to set
@@ -607,10 +607,10 @@ class Bias(object):
         # Define formula for binary false positive, false negative, and binary
         # score
         binary_false_pos = lambda rank_col, label_col, thres: lambda x: (
-                (x[rank_col] <= thres) & (x[label_col] == 0)).astype(int)
+            (x[rank_col] <= thres) & (x[label_col] == 0)).astype(int)
 
         binary_false_neg = lambda rank_col, label_col, thres: lambda x: (
-                (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
+            (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
 
         binary_score = lambda rank_col, label_col, thres: lambda x: (
                 x[rank_col] <= thres).astype(int)
@@ -636,6 +636,12 @@ class Bias(object):
                         func = func(thres_unit, 'label_value', thres_val)
                         original_df[name] = col_group.apply(
                             func).reset_index(level=0, drop=True)
+
+            # ensure only top-k values included in false positive and false
+            # negative rates
+            original_df.loc[original_df['binary_score'] == 0, 'binary_fp'] = pd.np.nan
+            original_df.loc[original_df['binary_score'] == 1, 'binary_fn'] = pd.np.nan
+
             measures = list(binary_col_functions.keys())
             measures += ['label_value']
             measures.sort()
