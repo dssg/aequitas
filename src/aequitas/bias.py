@@ -71,7 +71,7 @@ class Bias(object):
 
         print('get_disparity_min_metric()')
         if not key_columns:
-            key_columns = [col for col in self.key_columns if col in df.columns]
+            key_columns = df.columns.intersection(self.key_columns).tolist()
         if not input_group_metrics:
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
