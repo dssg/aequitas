@@ -584,7 +584,7 @@ class Bias(object):
                 (original_df.dtypes != str) &
                 (original_df.columns.isin(attr_cols))]
 
-        if non_string_cols.empty is False:
+        if not non_string_cols.empty:
             logging.error(
                 'get_statistical_significance: statistical significance was '
                 'not calculated. There are non-string cols within attr_cols.')
