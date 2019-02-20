@@ -83,7 +83,6 @@ class Bias(object):
             check_significance = self.significance_cols
 
 
-
         for group_metric in input_group_metrics:
 
             try:
@@ -154,7 +153,15 @@ class Bias(object):
             df.loc[:, significance_cols] = pd.np.select(
                 [truemask, falsemask], [True, False], default=None)
 
-        return df
+        # check what new columns are
+        new_cols = sorted(list(set(df.columns) - set(df_cols)))
+
+        # currently in alpha order, need to generate significance columns for every
+        # disparity metric and order as disparity, ref_group, significance for each
+
+        return df[df_cols.tolist() + new_cols]
+
+
 
     def get_disparity_major_group(self, df, original_df, key_columns=None,
                                   input_group_metrics=None,
