@@ -70,14 +70,19 @@ class Bias(object):
         """
 
         print('get_disparity_min_metric()')
+        # record df column order
+        df_cols = df.columns
+
         if not key_columns:
-            key_columns = df.columns.intersection(self.key_columns).tolist()
+            key_columns = df_cols.intersection(self.key_columns).tolist()
         if not input_group_metrics:
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
         if not check_significance:
             check_significance = self.significance_cols
+
+
 
         for group_metric in input_group_metrics:
 
@@ -571,8 +576,8 @@ class Bias(object):
             counts = col_group.size()
 
         # check if all attr_cols exist in df
-        check = [col in original_df.columns for col in attr_cols]
-        if any(col not in original_df.columns for col in attr_cols):
+
+        if set(attr_cols) - set(original_df.columns):
             raise ValueError(
                 f"Not all attribute columns provided '{attr_cols}' exist in "
                 f"input dataframe!")
