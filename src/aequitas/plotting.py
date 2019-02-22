@@ -108,16 +108,16 @@ class Plot(object):
     }
 
     _significance_disparity_mapping = {
-        'ppr_disparity': 'score_significance',
-        'pprev_disparity': 'score_significance',
-        'precision_disparity': 'fp_significance',
-        'fdr_disparity': 'fp_significance',
-        'for_disparity': 'fn_significance',
-        'fpr_disparity': 'fp_significance',
-        'fnr_disparity': 'fn_significance',
-        'tpr_disparity': 'fn_significance',
-        'tnr_disparity': 'fp_significance',
-        'npv_disparity': 'fn_significance'
+        'ppr_disparity': 'ppr_significance',
+        'pprev_disparity': 'pprev_significance',
+        'precision_disparity': 'precision_significance',
+        'fdr_disparity': 'fdr_significance',
+        'for_disparity': 'fnr_significance',
+        'fpr_disparity': 'fpr_significance',
+        'fnr_disparity': 'fnr_significance',
+        'tpr_disparity': 'tpr_significance',
+        'tnr_disparity': 'tnr_significance',
+        'npv_disparity': 'npv_significance'
     }
 
     def __init__(self, key_metrics=default_absolute_metrics,

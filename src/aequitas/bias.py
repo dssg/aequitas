@@ -20,11 +20,10 @@ class Bias(object):
                          'fnr', 'tpr', 'tnr', 'npv')
     non_attr_cols = ('score', 'model_id', 'as_of_date', 'entity_id', 'rank_abs',
                      'rank_pct', 'id', 'label_value')
-    significance_measures = ('fpr', 'fnr')
 
     def __init__(self, key_columns=default_key_columns, sample_df=None,
                  non_attr_cols=non_attr_cols,
-                 significance_cols=significance_measures,
+                 significance_cols=all_group_metrics,
                  input_group_metrics=all_group_metrics, fill_divbyzero=None):
         """
 
@@ -503,8 +502,13 @@ class Bias(object):
 
         '''
 
-        binaries_lookup = {'label_value': 'label_value', 'binary_fp': 'fpr',
-                           'binary_fn': 'fnr', 'binary_score': 'score'}
+        binaries_lookup = {'label_value': 'label_value', 'binary_fpr': 'fpr',
+                           'binary_tpr': 'tpr', 'binary_tnr': 'tnr',
+                           'binary_fnr': 'fnr', 'binary_score': 'score',
+                           'binary_precision': 'precision', 'binary_npv': 'npv',
+                           'binary_for': 'for', 'binary_fdr': 'fdr',
+                           'binary_ppr': 'ppr', 'binary_pprev': 'pprev'
+                            }
 
         ref_group = ref_dict[attribute][binaries_lookup.get(measure)]
 
@@ -624,12 +628,20 @@ class Bias(object):
         binary_false_neg = lambda rank_col, label_col, thres: lambda x: (
             (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
 
+        binary_true_pos = lambda rank_col, label_col, thres: lambda x: (
+            (x[rank_col] <= thres) & (x[label_col] == 1)).astype(int)
+
+        binary_true_neg = lambda rank_col, label_col, thres: lambda x: (
+            (x[rank_col] > thres) & (x[label_col] == 0)).astype(int)
+
         binary_score = lambda rank_col, label_col, thres: lambda x: (
                 x[rank_col] <= thres).astype(int)
 
         binary_col_functions = {'binary_score': binary_score,
-                                'binary_fp': binary_false_pos,
-                                'binary_fn': binary_false_neg,
+                                'binary_fpr': binary_false_pos,
+                                'binary_fnr': binary_false_neg,
+                                'binary_tpr': binary_true_pos,
+                                'binary_tnr': binary_true_neg
                                 }
 
         for attribute in attr_cols:
@@ -649,10 +661,28 @@ class Bias(object):
                         original_df[name] = col_group.apply(
                             func).reset_index(level=0, drop=True)
 
-            # ensure only top-k values included in false positive and false
-            # negative rates
-            original_df.loc[original_df['binary_score'] == 0, 'binary_fp'] = pd.np.nan
-            original_df.loc[original_df['binary_score'] == 1, 'binary_fn'] = pd.np.nan
+            # add columns for error-based significance
+            # precision numerator matches tnr numerator
+            original_df.loc[:, 'binary_precision'] = original_df.loc[:, 'binary_tpr']
+            # npv numerator matches tnr numerator
+            original_df.loc[:, 'binary_npv'] = ~original_df.loc[:, 'binary_tnr']
+
+            # for numerator matches fnr numerator
+            original_df.loc[:, 'binary_for'] = original_df.loc[:, 'binary_fnr']
+            # fdr numerator matches fpr numerator
+            original_df.loc[:, 'binary_fdr'] = ~original_df.loc[:, 'binary_fpr']
+
+            # pprev and ppr based on score
+            original_df.loc[:, 'binary_ppr'] = ~original_df.loc[:, 'binary_score']
+            original_df.loc[:, 'binary_pprev'] = ~original_df.loc[:, 'binary_score']
+
+
+            # ensure only predicted positive/ predicted negative values
+            # included in true/ false positive error based metrics, respectively
+            original_df.loc[original_df['binary_score'] == 0,
+                            ['binary_fpr', 'binary_tpr', 'binary_precision', 'binary_fdr']] = pd.np.nan
+            original_df.loc[original_df['binary_score'] == 1,
+                            ['binary_fnr', 'binary_tnr', 'binary_npv', 'binary_for']] = pd.np.nan
 
             measures = list(binary_col_functions.keys())
             measures += ['label_value']

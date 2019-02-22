@@ -129,12 +129,12 @@ class Group(object):
         if False in check:
             # todo: create separate check method that raises exception...
             logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-            exit(1)
+            # exit(1)
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-            exit(1)
+            # exit(1)
 
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
