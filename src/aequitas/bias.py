@@ -710,7 +710,6 @@ class Bias(object):
 
             measures = list(original_df.columns[original_df.columns.str.contains('binary_')])
             measures += ['label_value']
-            measures.sort()
 
             for measure in measures:
                 cls.calculate_significance(
