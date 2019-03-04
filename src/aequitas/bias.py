@@ -56,12 +56,15 @@ class Bias(object):
             Defualts are 'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: optional, the columns list corresponding to
             the group metrics for which we want to calculate disparity values
+        :param fill_divbyzero: optional, fill value to use when divided by zero
         :param check_significance: Measures for which to determine statistical
             significance beyond label_value and score. Defaults are 'fpr' and 'fnr'.
         :param alpha: Level at which to determine statistical significance.
             Default is 5e-2 (0.05).
         :param mask_significance: Whether to display a T/F mask over calculated
             p-values from statistical significance determination. Default is True.
+        :param label_score_ref: Default reference group to use for score and
+            label_value statistical significance calculations
 
         :return: a dataframe with same number of rows as the input (crosstab)
             but with additional disparity metrics columns, ref_group_values, and
@@ -176,15 +179,18 @@ class Bias(object):
         :param original_df: a dataframe containing a required 'score 'column
             and possible 'label_value' column.
         :param key_columns: optional, the key columns to use on joins.
-            Defualts are 'model_id', 'score_threshold', 'attribute_name'.
+            Defaults are 'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: optional, the columns list corresponding to
             the group metrics for which we want to calculate disparity values
+        :param fill_divbyzero: optional, fill value to use when divided by zero
         :param check_significance: Measures for which to determine statistical
             significance beyond label_value and score. Defaults are 'fpr' and 'fnr'.
         :param alpha: Level at which to determine statistical significance.
             Default is 5e-2 (0.05).
         :param mask_significance: Whether to display a T/F mask over calculated
             p-values from statistical significance determination. Default is True.
+        :param label_score_ref: Metric which eference group to use for score and
+            label_value statistical significance calculations.
 
         :return: a dataframe with same number of rows as the input (crosstab)
             but with additional disparity metrics columns, ref_group_values, and

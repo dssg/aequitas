@@ -31,9 +31,9 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
         flag value. Default is '_ref_group_value'.
     :param specific_measures: Limits reference dictionary to only specified
         metrics in a data table. Default is None.
-    :param label_score_ref: Defines a metric (ex: 'fpr' (false positive rate)
-        to mimic reference group when calculating label value and score
-        statistical significance. Default is None.
+    :param label_score_ref: Defines a metric, ex: 'fpr' (false positive rate)
+        from which to mimic reference group for label_value and score. Used for
+        statistical significance calculations in Bias() class. Default is None.
 
     :return: A dictionary
     """
@@ -131,6 +131,9 @@ class Plot(object):
 
     @staticmethod
     def _nearest_quartile(x):
+        '''
+        Return nearest quartile for given value x.
+        '''
         rounded = round(x * 4) / 4
         if rounded > x:
             return rounded
@@ -166,6 +169,15 @@ class Plot(object):
         '''
         Use only part of a colormap (min_value to max_value) across a given number
         of partiions.
+
+        :param orig_cmap: An existing Matplotlib colormap
+        :param min_value: Desired minimum value (0.0 to 1.0) for truncated
+            colormap. Default is 0.0.
+        :param max_value: Desired maximum value (0.0 to 1.0) for truncated
+            colormap. Default is 1.0.
+        :param num_colors: Number of colors to spread colormap gradient across
+            before truncating. Default is 100.
+        :return: Truncated color map
 
         Attribution: Adapted from: https://stackoverflow.com/questions/
         18926031/how-to-extract-a-subset-of-a-colormap-as-a-new-colormap-in-matplotlib
@@ -212,17 +224,14 @@ class Plot(object):
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
-    def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
-                          title=True, label_dict=None,
-                          min_group_size = None):
+    def plot_group_metric(self, group_table, group_metric, ax=None, title=True,
+                          label_dict=None, min_group_size = None):
         '''
         Plot a single group metric's absolute metrics
 
         :param group_table: A group table
         :param group_metric: The metric to plot. Must be a column in the group_table
         :param ax: A matplotlib Axis. If not passed a new figure will be created.
-        :param ax_lim: Maximum value on x-axis, used to match axes across subplots
-            when plotting multiple metrics. Default is None.
         :param title: Whether a title should be added to the plot. Default is True.
         :param label_dict: Optional dictionary of replacement labels for data.
             Default is None.
@@ -377,7 +386,12 @@ class Plot(object):
         :param color_mapping: matplotlib colormapping for treemap value boxes.
         :param model_id: Which model to plot for. Default is 1.
         :param ax: A matplotlib Axis. If not passed, a new figure will be created.
-        :param fig: A matplotlib Figure. If not passed, a new figure will be created.
+        :param fig: A matplotlib Figure. If not passed, a new figure will be
+            created.
+        :param label_dict: Optional dictionary of replacement labels for data.
+            Default is None.
+        :param title: Whether a title should be added to the plot. Default is
+            True.
         :param highlight_fairness: Whether to highlight treemaps by disparity
             magnitude, or by related fairness determination.
         :param min_group_size: Minimum proportion of total group size (all data)
@@ -883,9 +897,14 @@ class Plot(object):
 
         :param data_table: Output of bias.get_disparity, or fairness.get_fairness
             functions
-        :param metrics: which metric(s) to plot, or 'all.'
-            If this value is null, will plot the following absolute metrics (or
-            related disparity measures):
+        :param plot_fcn: Plotting function to use to plot individual disparity
+            or fairness treemaps in grid
+        :param attributes: which attributes to plot against. Must be specified
+            if no metrics speficied.
+        :param metrics: which metric(s) to plot, or 'all.' MUST be specified if
+            no attributes specified. If this value is null, the following
+            absolute metrics/ related disparity measures will be plotted against
+            specified attributes:
                 - Predicted Prevalence (pprev),
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
@@ -991,11 +1010,6 @@ class Plot(object):
 
         models = list(data_table.model_id.unique())
 
-        # to do: (next iteration) plot for multiple models based on metrics/
-        # attributes in that model
-        #
-        # for model in models:
-        #     model = lambda x: x if len(models) > 1 else None
         for group_metric in metrics:
             for attr in attributes:
                 if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:

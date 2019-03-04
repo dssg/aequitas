@@ -62,7 +62,7 @@ def preprocess_input_df(df, required_cols=None):
     """
 
     :param df: A data frame of model results
-    :param non_attr_cols: Names of columns not associated with attributes.
+    :param required_cols: Names of columns required for bias calculations.
         Default is None.
     :return: A data frame, list of columns associated with sample attributes
     """

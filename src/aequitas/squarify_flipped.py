@@ -15,6 +15,15 @@ import matplotlib.pyplot as plt
 import itertools
 
 def normalize_sizes(sizes, dx, dy):
+    '''
+    Return list of normalized values corresponding to a list of supplied values
+    and specified width (dx)/ height (dy) dimensions.
+
+    :param sizes: Ordered (desc) list of values to be plotted as treemap squares
+    :param dx: Total treemap width
+    :param dy: Total treemap height
+    :return: List of normalized values corresponding to original list
+    '''
     total_size = sum(sizes)
     total_area = dx * dy
     sizes = map(float, sizes)
@@ -23,10 +32,20 @@ def normalize_sizes(sizes, dx, dy):
 
 
 def layoutrow(sizes, x, y, dx, dy):
-    # generate rects for each size in sizes
-    # dx >= dy
-    # they will fill up height dy, and width will be determined by their area
-    # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
+    '''
+    Generate rectangle dimensions for each size in sizes when remaining width
+    exceeds remaining height (dx >= dy). Rectangles will fill up height dy,
+    and width will be determined by their area. Sizes should be pre-normalized
+    with respect to dx * dy (i.e., they should be same units)
+
+    :param sizes: Ordered (desc) ist of values normalized with respect to
+        overall height (dy) and width values (dx)
+    :param x: Rectangle start point on treemap x-axis
+    :param y: Rectangle start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: List of dictionaries of rectangle dimensions
+    '''
     covered_area = sum(sizes)
     width = covered_area / dy
     rects = []
@@ -38,10 +57,21 @@ def layoutrow(sizes, x, y, dx, dy):
 
 
 def layoutcol(sizes, x, y, dx, dy):
-    # generate rects for each size in sizes
-    # dx < dy
-    # they will fill up width dx, and height will be determined by their area
-    # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
+    '''
+    Generate rectangle dimensions for each size in sizes when remaining height
+    exceeds remaining width (dx < dy). Rectangles will fill up width dx,
+    and height will be determined by their area. Sizes should be pre-normalized
+    with respect to dx * dy (i.e., they should be same units)
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Rectangle start point on treemap x-axis
+    :param y: Rectangle start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: List of dictionaries of rectangle dimensions
+    '''
+
     covered_area = sum(sizes)
     height = covered_area / dx
     rects = []
@@ -52,11 +82,35 @@ def layoutcol(sizes, x, y, dx, dy):
 
 
 def layout(sizes, x, y, dx, dy):
+    '''
+    Call applicable helper function to generate dictionary of treemap rectangle
+    dimensions based on relative width and height of remaining treemap area
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Rectangle start point on treemap x-axis
+    :param y: Rectangle start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: List of dictionaries of rectangle dimensions
+    '''
     return layoutrow(sizes, x, y, dx, dy) if dx >= dy else layoutcol(sizes, x, y, dx, dy)
 
 
 def leftoverrow(sizes, x, y, dx, dy):
-    # compute remaining area when dx >= dy
+    '''
+    Compute relative x-axis start, y-axis start, width, and height of overall
+    treemap area when remaining width exceeds remaining height (dx >= dy)
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: Tuple of remaining area dimensions
+
+    '''
     covered_area = sum(sizes)
     width = covered_area / dy
     leftover_x = x + width
@@ -67,7 +121,18 @@ def leftoverrow(sizes, x, y, dx, dy):
 
 
 def leftovercol(sizes, x, y, dx, dy):
-    # compute remaining area when dx < dy
+    '''
+    Compute relative x-axis start, y-axis start, width, and height of remaining
+    treemap area when remaining height exceeds remaining width (dx < dy)
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: Tuple of remaining area dimensions
+    '''
     covered_area = sum(sizes)
     height = covered_area / dx
     leftover_x = x
@@ -78,10 +143,35 @@ def leftovercol(sizes, x, y, dx, dy):
 
 
 def leftover(sizes, x, y, dx, dy):
+    '''
+    Call applicable helper function to generate tuple of dimensions for
+    remaining plottable area for rectangles
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: Tuple of remaining area dimensions
+    '''
     return leftoverrow(sizes, x, y, dx, dy) if dx >= dy else leftovercol(sizes, x, y, dx, dy)
 
 
 def worst_ratio(sizes, x, y, dx, dy):
+    '''
+    Calculate worst possible ratio between width (dx) and height (dy) to
+    determine ideal layout for a given list of rectangle dimensions
+
+    :param sizes: List of values normalized with respect to overall height (dy)
+        and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: Numeric value indicating worst ratio between height/width
+        dimensions
+    '''
     return max(
         max(
             rect['dx'] / rect['dy'],
@@ -92,9 +182,21 @@ def worst_ratio(sizes, x, y, dx, dy):
 
 
 def squarify(sizes, x, y, dx, dy):
+    '''
+    Calculate rectangle dimensions relative to a given width (dx) and height (dy)
+    starting at given x-axis and y-axis values.
+
+    :param sizes: Ordered (desc) list of values normalized with respect to
+        overall height (dy) and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: List of dictionaries of rectangle dimensions
+
+    '''
     # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
     # or dx * dy == sum(sizes)
-    # sizes should be sorted biggest to smallest
     sizes = list(map(float, sizes))
 
     if len(sizes) == 0:
@@ -103,7 +205,8 @@ def squarify(sizes, x, y, dx, dy):
     if len(sizes) == 1:
         return layout(sizes, x, y, dx, dy)
 
-    # figure out where 'split' should be
+    # figure out where 'split' should be based on utilization of remaining area
+    # determined by ratio between width (dx) and height (dy)
     i = 1
     while i < len(sizes) and worst_ratio(sizes[:i], x, y, dx, dy) >= worst_ratio(sizes[:(i + 1)], x, y, dx, dy):
         i += 1
@@ -118,6 +221,13 @@ def squarify(sizes, x, y, dx, dy):
 
 
 def pad_rectangle(rect):
+    '''
+    Decrease rectangle dimensions to show whitespace in treemap
+
+    :param rect: Dictionary of rectangle dimensions to be decreased to enable
+        whitespace padding in treemap visualization
+    :return: Dictionary of updated rectangle dimensions
+    '''
     if rect['dx'] > 2:
         rect['x'] += 1
         rect['dx'] -= 2
@@ -127,6 +237,21 @@ def pad_rectangle(rect):
 
 
 def padded_squarify(sizes, x, y, dx, dy):
+    '''
+    Calculate rectangle dimensions relative to a given width (dx) and height (dy)
+    starting at given x-axis and y-axis values, leaving room for whitespace
+    padding between treemap rectangles
+
+
+    :param sizes: Ordered (desc) list of values normalized with respect to
+        overall height (dy) and width values (dx)
+    :param x: Remaining area start point on treemap x-axis
+    :param y: Remaining area start point on treemap y-axis
+    :param dx: Remaining treemap width
+    :param dy: Remaining treemap height
+    :return: List of dictionaries of rectangle dimensions
+
+    '''
     rects = squarify(sizes, x, y, dx, dy)
     for rect in rects:
         pad_rectangle(rect)
