@@ -183,8 +183,9 @@ def worst_ratio(sizes, x, y, dx, dy):
 
 def squarify(sizes, x, y, dx, dy):
     '''
-    Calculate rectangle dimensions relative to a given width (dx) and height (dy)
-    starting at given x-axis and y-axis values.
+    Calculate rectangle dimensions for list of values relative to a given
+    width (dx) and height (dy), starting at given x-axis and y-axis values.
+    List 'sizes' must be normalized, unless dx * dy == sum(sizes).
 
     :param sizes: Ordered (desc) list of values normalized with respect to
         overall height (dy) and width values (dx)
@@ -195,8 +196,6 @@ def squarify(sizes, x, y, dx, dy):
     :return: List of dictionaries of rectangle dimensions
 
     '''
-    # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
-    # or dx * dy == sum(sizes)
     sizes = list(map(float, sizes))
 
     if len(sizes) == 0:

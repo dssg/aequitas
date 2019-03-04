@@ -11,14 +11,21 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 class Fairness(object):
     """
     """
-    def __init__(self, fair_eval=None, tau=None, fair_measures_depend=None, type_parity_depend=None,
-                 high_level_fairness_depend=None):
+    def __init__(self, fair_eval=None, tau=None, fair_measures_depend=None,
+                 type_parity_depend=None, high_level_fairness_depend=None):
         """
 
-        :param fair_eval: a lambda function that is used to assess fairness (e.g. 80% rule)
-        :param tau: the threshold for fair/unfair
-        :param fair_measures_depend: a dictionary containing fairness measures as keys and the
-        corresponding input bias metric as values
+        :param fair_eval: a lambda function that is used to assess fairness
+            (e.g. 80% rule)
+        :param tau: the threshold for fair/unfair evaluation
+        :param fair_measures_depend: a dictionary containing fairness measures
+            as keys and the corresponding input bias disparity as values
+        :param type_parity_depend: a dictionary with Type I, Type II, and
+            Equalized Odds fairness measures as keys and lists of their
+            underlying bias metric parities as values
+        :param high_level_fairness_depend: a dictionary with supervised and
+            unsupervised fairness as keys and lists of their underlying metric
+            parities as values.
         """
 
         if not fair_eval:
@@ -79,21 +86,27 @@ class Fairness(object):
             self.high_level_fairness_depend = high_level_fairness_depend
 
     def get_fairness_measures_supported(self, input_df):
+        '''
+        Determine fairness mseasures supported based on columns in data frame
+        '''
         if 'label_value' not in input_df.columns:
             self.fair_measures_supported = ['Statistical Parity', 'Impact Parity']
         return self.fair_measures_supported
 
     def get_group_value_fairness(self, bias_df, tau=None, fair_measures_requested=None):
         """
-            Calculates the fairness measures defined in the fair_measures dictionary and adds
-            them as columns to the input bias_df
+        Calculates the fairness measures defined in fair_measures_requested
+        dictionary and adds them as columns to the input bias_df
 
-        :param bias_df: the output dataframe from the bias/disparities calculations
-        :param fair_eval: (optional) see __init__()
-        :param tau: (optional) see __init__()
-        :param fair_measures: (optional) see __init__()
-        :return: the input bias_df dataframe with additional columns for each of the fairness
-        measures defined in the fair_measures dictionary
+        :param bias_df: the output dataframe from the bias/disparities
+            calculations
+        :param fair_eval: (optional) a lambda function that is used to assess
+            fairness (e.g. 80% rule)
+        :param tau: (optional) the threshold for fair/unfair evaluation
+        :param fair_measures: (optional) a dictionary containing fairness
+            measures as keys and the corresponding input bias disparity as values
+        :return: the input bias_df dataframe with additional columns for each
+            of the fairness measures defined in the fair_measures dictionary
         """
         logging.info('get_group_value_fairness...')
         if not tau:
@@ -126,14 +139,10 @@ class Fairness(object):
             logging.info('get_group_value_fairness: No high level measure input found on bias_df' + input[1])
         return bias_df
 
-    def fill_groupby_attribute_fairness(self, groupby_obj, key_columns, group_attribute_df, measures):
+    def fill_groupby_attribute_fairness(self, groupby_obj, key_columns,
+                                        group_attribute_df, measures):
         """
-
-        :param groupby_obj:
-        :param key_columns:
-        :param group_attribute_df:
-        :param measures:
-        :return:
+        Returns dataframe with values grouped by attribute_value
         """
         logging.info('fill_groupby_attribute_fairness')
         for key in measures:
@@ -156,12 +165,14 @@ class Fairness(object):
 
     def get_group_attribute_fairness(self, group_value_df, fair_measures_requested=None):
         """
+        Determines whether the minimum value for each fairness measure in
+        fair_measures_requested is 'False' across all attribute_values defined
+        by a group attribute_name. If 'False' is present, determination for the
+        attribute is False for given fairness measure.
 
-        :param group_value_df: the output dataframe of the get_group_value_fairness()
-        :return: a new dataframe at the group_attribute level (no group_values) with fairness
-        measures at the group_attribute level. Checks for the min (False) across the groups
-        defined by the group_attribute. IF the minimum is False then all group_attribute is false
-        for the given fairness measure.
+        :param group_value_df: output dataframe of the get_group_value_fairness()
+        :return: a new dataframe at the attribute level (no attribute_values)
+        with fairness measures at the attribute level.
         """
         logging.info('get_group_attribute_fairness')
         if not fair_measures_requested:
@@ -184,8 +195,9 @@ class Fairness(object):
 
     def get_overall_fairness(self, group_attribute_df):
         """
-            Calculates overall fairness regardless of the group_attributes. It searches for
-            unfairness across group_attributes and outputs fairness if all group_attributes are fair
+        Calculates overall fairness regardless of the group_attributes.
+        Searches for 'False' parity determinations across group_attributes and
+        outputs 'True' determination if all group_attributes are fair
 
         :param group_attribute_df: the output df of the get_group_attributes_fairness
         :return: dictionary with overall unsupervised/supervised fairness and fairness in general
@@ -209,7 +221,7 @@ class Fairness(object):
 
     def list_parities(self, df):
         '''
-        View all parity determinations in table
+        View all parity determinations in given df
         :return: list of absolute group metrics
         '''
         all_fairness = self.type_parity_depend.keys() | \
