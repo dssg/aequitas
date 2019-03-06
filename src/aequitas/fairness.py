@@ -98,14 +98,13 @@ class Fairness(object):
         Calculates the fairness measures defined in fair_measures_requested
         dictionary and adds them as columns to the input bias_df
 
-        :param bias_df: the output dataframe from the bias/disparities
-            calculations
+        :param bias_df: the output dataframe from bias/ disparity calculation methods
         :param fair_eval: (optional) a lambda function that is used to assess
             fairness (e.g. 80% rule)
-        :param tau: (optional) the threshold for fair/unfair evaluation
+        :param tau: (optional) the threshold for fair/ unfair evaluation
         :param fair_measures: (optional) a dictionary containing fairness
             measures as keys and the corresponding input bias disparity as values
-        :return: the input bias_df dataframe with additional columns for each
+        :return: Bias_df dataframe with additional columns for each
             of the fairness measures defined in the fair_measures dictionary
         """
         logging.info('get_group_value_fairness...')
@@ -170,9 +169,8 @@ class Fairness(object):
         by a group attribute_name. If 'False' is present, determination for the
         attribute is False for given fairness measure.
 
-        :param group_value_df: output dataframe of the get_group_value_fairness()
-        :return: a new dataframe at the attribute level (no attribute_values)
-        with fairness measures at the attribute level.
+        :param group_value_df: output dataframe of get_group_value_fairness() method
+        :return: A dataframe of fairness measures at the attribute level (no attribute_values)
         """
         logging.info('get_group_attribute_fairness')
         if not fair_measures_requested:
@@ -200,7 +198,7 @@ class Fairness(object):
         outputs 'True' determination if all group_attributes are fair
 
         :param group_attribute_df: the output df of the get_group_attributes_fairness
-        :return: dictionary with overall unsupervised/supervised fairness and fairness in general
+        :return: A dictionary of overall, unsupervised, and supervised fairness determinations
         """
         overall_fairness = {}
         if 'Unsupervised Fairness' in group_attribute_df.columns:
@@ -221,8 +219,7 @@ class Fairness(object):
 
     def list_parities(self, df):
         '''
-        View all parity determinations in given df
-        :return: list of absolute group metrics
+        View list of all parity determinations in given df
         '''
         all_fairness = self.type_parity_depend.keys() | \
                        self.high_level_fairness_depend.keys() | \

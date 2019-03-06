@@ -22,8 +22,8 @@ class Group(object):
 
     def get_group_functions():
         """
-
-        :return:
+        Helper function to accumulate lambda functions used in bias metrics
+        calculations
         """
 
         divide = lambda x, y: x / y if y != 0 else pd.np.nan
@@ -117,8 +117,8 @@ class Group(object):
 
         :param df: a dataframe containing the following required columns [score,  label_value]
         :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id:
-        :return:
+        :param model_id: the model ID on which to subset the df
+        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
@@ -216,8 +216,7 @@ class Group(object):
 
     def list_absolute_metrics(self, df):
         '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
+        View list of all calculated absolute bias metrics in df
         '''
         return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
                                            'fdr', 'npv', 'precision', 'ppr',

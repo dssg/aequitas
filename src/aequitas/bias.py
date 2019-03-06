@@ -14,10 +14,11 @@ class Bias(object):
     def __init__(self, key_columns=None, input_group_metrics=None, fill_divbyzero=None):
         """
 
-        :param key_columns: Key identifying columns for grouping variables and
-            bias metrics
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defualts are
+            'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: List of absolute bias metrics to calculate
-        :param fill_divbyzero: (optional) fill value to use when divided by
+        :param fill_divbyzero: optional, fill value to use when divided by
             zero. Default is None.
         """
         if not key_columns:
@@ -36,17 +37,19 @@ class Bias(object):
     def get_disparity_min_metric(self, df, key_columns=None, input_group_metrics=None,
                                  fill_divbyzero=None):
         """
-        Calculates several ratios using the group metrics value and dividing by
-        the minimum group metric value among all groups defined by each attribute
+        Calculates disparities between groups for the predefined list of
+        group metrics using the group with the minimum value for each absolute
+        bias metric as the reference group (denominator).
 
-        :param df: the resulting dataframe from the group get_crosstabs
-        :param key_columns: optional, the key columns to use on joins.
-            Defualts are 'model_id', 'score_threshold', 'attribute_name'.
+        :param df: output dataframe of Group class get_crosstabs() method
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defualts are
+            'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: optional, the columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: (optional) fill value to use when divided by
+        :param fill_divbyzero: optional, fill value to use when divided by
             zero. Default is None.
-        :return: a dataframe with same number of rows as the input (crosstab)
+        :return: A dataframe with same number of rows as the input (crosstab)
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
@@ -89,17 +92,19 @@ class Bias(object):
     def get_disparity_major_group(self, df, key_columns=None, input_group_metrics=None,
                                   fill_divbyzero=None):
         """
-        Calculates the bias (disparity) metrics for the predefined list of group
+        Calculates disparities between groups for the predefined list of group
         metrics using the majority group within each attribute as the reference
-        group (denominator)
+        group (denominator).
 
         :param df: the returning dataframe from the group.get_crosstabs
-        :param key_columns: optional, the key columns to use on joins.
-            Defaults are 'model_id', 'score_threshold', 'attribute_name'.
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defualts are
+            'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: optional, the columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: optional, fill value to use when divided by zero
-        :return: a dataframe with same number of rows as the input (crosstab)
+        :param fill_divbyzero: optional, fill value to use when divided by zero.
+            Default is None.
+        :return: A dataframe with same number of rows as the input (crosstab)
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
@@ -148,20 +153,19 @@ class Bias(object):
                                         input_group_metrics=None,
                                         fill_divbyzero=None):
         """
-        Calculates the bias (disparity) metrics for the predefined list of input
-        group metrics using a predefined reference group value for each
-        attribute which is passed using ref_groups_dict
-        of format:{'attr1':'val1', 'attr2':'val2'}
+        Calculates disparities between groups for the predefined list of group
+        metrics using a predefined reference group value for each attribute.
 
-        :param df: the output dataframe of the group.get_crosstabs
-        :param ref_groups_dict: a dictionary {attribute_name:attribute_value, ...}
-        :param key_columns: (optional)  key identifying columns for grouping
-            variables and bias metrics and joins. Defualts are 'model_id',
-            'score_threshold', 'attribute_name'.
+        :param df: output dataframe of Group class get_crosstabs() method
+        :param ref_groups_dict: a dictionary of format: {'attribute_name': 'attribute_value', ...}
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defualts are
+            'model_id', 'score_threshold', 'attribute_name'.
         :param input_group_metrics: optional, the columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: (optional) fill value to use when divided by zero
-        :return: a dataframe with same number of rows as the input (crosstab)
+        :param fill_divbyzero: optional, fill value to use when divided by zero.
+            Default is None.
+        :return: A dataframe with same number of rows as the input (crosstab)
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
@@ -211,14 +215,12 @@ class Bias(object):
 
     def list_disparities(self, df):
         '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
+        View list of all calculated disparities in df
         '''
         return list(df.columns[df.columns.str.contains('_disparity')])
 
     def list_absolute_metrics(self, df):
         '''
-        View all calculated disparities in table
-        :return: list of absolute group metrics
+        View list of all calculated absolute bias metrics in df
         '''
         return list(set(self.input_group_metrics) & set(df.columns))
