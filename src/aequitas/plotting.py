@@ -1,9 +1,8 @@
 import logging
 import math
 import re
-
+import pandas as pd
 import numpy as np
-#import pandas as pd
 import collections
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -19,6 +18,59 @@ __author__ = "Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
+
+# module-level function
+def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
+                         specific_measures=None, label_score_ref=None):
+    """
+    Creates a dictionary of reference groups for each metric in a data_table
+
+   :param disparities_table: A disparity table. Output of bias.get_disparity or
+        fairness.get_fairness functions
+    :param ref_group_flag: string indicating column indicates reference group
+        flag value. Default is '_ref_group_value'.
+    :param specific_measures: Limits reference dictionary to only specified
+        metrics in a data table. Default is None.
+    :param label_score_ref: Defines a metric, ex: 'fpr' (false positive rate)
+        from which to mimic reference group for label_value and score. Used for
+        statistical significance calculations in Bias() class. Default is None.
+
+    :return: A dictionary
+    """
+    ref_groups = {}
+    ref_group_cols = \
+        list(disparities_table.columns[disparities_table.columns.str.contains(
+            ref_group_flag)])
+
+    if specific_measures:
+        ref_group_cols = \
+            [measure + ref_group_flag for measure in specific_measures if
+             measure + ref_group_flag in ref_group_cols]
+
+    attributes = list(disparities_table.attribute_name.unique())
+    for attribute in attributes:
+        attr_table = \
+            disparities_table.loc[disparities_table['attribute_name'] == attribute]
+        attr_refs = {}
+        for col in ref_group_cols:
+            metric_key = "".join(col.split(ref_group_flag))
+            attr_refs[metric_key] = \
+                attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
+        if label_score_ref:
+            if label_score_ref + ref_group_flag in ref_group_cols:
+                attr_refs['label_value'] = attr_refs[label_score_ref]
+                attr_refs['score'] = attr_refs[label_score_ref]
+            else:
+                raise ValueError("The specified reference measure for label"
+                                 " value and score is not included in the "
+                                 "data frame.")
+
+        ref_groups[attribute] = attr_refs
+
+    return ref_groups
+
+
+# Plot() class
 class Plot(object):
     """
     Plotting object allows for visualization of absolute group bias metrics and
@@ -55,6 +107,19 @@ class Plot(object):
         'npv': 'NPV Parity'
     }
 
+    _significance_disparity_mapping = {
+        'ppr_disparity': 'ppr_significance',
+        'pprev_disparity': 'pprev_significance',
+        'precision_disparity': 'precision_significance',
+        'fdr_disparity': 'fdr_significance',
+        'for_disparity': 'fnr_significance',
+        'fpr_disparity': 'fpr_significance',
+        'fnr_disparity': 'fnr_significance',
+        'tpr_disparity': 'tpr_significance',
+        'tnr_disparity': 'tnr_significance',
+        'npv_disparity': 'npv_significance'
+    }
+
     def __init__(self, key_metrics=default_absolute_metrics,
                  key_disparities=default_disparities):
         """
@@ -66,6 +131,9 @@ class Plot(object):
 
     @staticmethod
     def _nearest_quartile(x):
+        '''
+        Return nearest quartile for given value x.
+        '''
         rounded = round(x * 4) / 4
         if rounded > x:
             return rounded
@@ -102,6 +170,15 @@ class Plot(object):
         Use only part of a colormap (min_value to max_value) across a given number
         of partiions.
 
+        :param orig_cmap: An existing Matplotlib colormap
+        :param min_value: Desired minimum value (0.0 to 1.0) for truncated
+            colormap. Default is 0.0.
+        :param max_value: Desired maximum value (0.0 to 1.0) for truncated
+            colormap. Default is 1.0.
+        :param num_colors: Number of colors to spread colormap gradient across
+            before truncating. Default is 100.
+        :return: Truncated color map
+
         Attribution: Adapted from: https://stackoverflow.com/questions/
         18926031/how-to-extract-a-subset-of-a-colormap-as-a-new-colormap-in-matplotlib
         '''
@@ -111,33 +188,6 @@ class Plot(object):
             cmap(np.linspace(min_value, max_value, num_colors)))
         return new_cmap
 
-    @staticmethod
-    def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value'):
-        """
-        Creates a dictionary of reference groups for each metric in a data_table
-
-       :param disparities_table: A disparity table. Output of bias.get_disparity or
-            fairness.get_fairness functions
-        :param ref_group_flag: string indicating column indicates reference group
-            flag value. Default is '_ref_group_value'.
-
-        :return: A dictionary
-        """
-        ref_groups = {}
-        ref_group_cols = \
-            list(disparities_table.columns[disparities_table.columns.str.contains(
-                ref_group_flag)])
-        attributes = list(disparities_table.attribute_name.unique())
-        for attribute in attributes:
-            attr_table = \
-                disparities_table.loc[disparities_table['attribute_name'] == attribute]
-            attr_refs = {}
-            for col in ref_group_cols:
-                metric_key = "".join(col.split(ref_group_flag))
-                attr_refs[metric_key] = \
-                    attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
-            ref_groups[attribute] = attr_refs
-        return ref_groups
 
     @classmethod
     def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
@@ -160,13 +210,13 @@ class Plot(object):
         # get absolute metric name from passed group metric (vs. a disparity name)
         abs_metric = "".join(group_metric.split('_disparity'))
 
-        all_ref_groups = cls._assemble_ref_groups(disparities_table, ref_group_flag)
+        all_ref_groups = assemble_ref_groups(disparities_table, ref_group_flag)
         ref_group_name = all_ref_groups[attribute_name][abs_metric]
 
         # get index for row associated with reference group for that model
         ind = list(disparities_table.loc[(disparities_table['attribute_name'] == attribute_name) &
-                                     (disparities_table['attribute_value'] == ref_group_name) &
-                                     (disparities_table['model_id'] == model_id)].index)
+                                         (disparities_table['attribute_value'] == ref_group_name) &
+                                         (disparities_table['model_id'] == model_id)].index)
 
         # there should only ever be one item in list, but JIC, select first
         idx = ind[0]
@@ -174,18 +224,14 @@ class Plot(object):
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
-
-    def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
-                          title=True, label_dict=None,
-                          min_group_size = None):
+    def plot_group_metric(self, group_table, group_metric, ax=None, title=True,
+                          label_dict=None, min_group_size = None):
         '''
         Plot a single group metric's absolute metrics
 
         :param group_table: A group table
         :param group_metric: The metric to plot. Must be a column in the group_table
         :param ax: A matplotlib Axis. If not passed a new figure will be created.
-        :param ax_lim: Maximum value on x-axis, used to match axes across subplots
-            when plotting multiple metrics. Default is None.
         :param title: Whether a title should be added to the plot. Default is True.
         :param label_dict: Optional dictionary of replacement labels for data.
             Default is None.
@@ -322,7 +368,8 @@ class Plot(object):
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
                        color_mapping=None, model_id=1, ax=None, fig=None,
                        label_dict=None, title=True,
-                       highlight_fairness=False, min_group_size=None):
+                       highlight_fairness=False, min_group_size=None,
+                       significance_alpha=0.05):
         '''
         Create treemap from disparity or absolute metric values
 
@@ -339,9 +386,20 @@ class Plot(object):
         :param color_mapping: matplotlib colormapping for treemap value boxes.
         :param model_id: Which model to plot for. Default is 1.
         :param ax: A matplotlib Axis. If not passed, a new figure will be created.
-        :param fig: A matplotlib Figure. If not passed, a new figure will be created.
+        :param fig: A matplotlib Figure. If not passed, a new figure will be
+            created.
+        :param label_dict: Optional dictionary of replacement labels for data.
+            Default is None.
+        :param title: Whether a title should be added to the plot. Default is
+            True.
         :param highlight_fairness: Whether to highlight treemaps by disparity
             magnitude, or by related fairness determination.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in bias metric
+            visualization
+        :param significance_alpha: Statistical significance level to determine
+            visual representation of significance (number of asterisks on
+            treemap)
 
         :return: matplotlib.Axis
         '''
@@ -419,14 +477,13 @@ class Plot(object):
             cb_green = '#1b7837'
             cb_red = '#a50026'
 
-            measure = self._metric_parity_mapping[group_metric]
-            if (measure not in table_columns):
+            parity = self._metric_parity_mapping[group_metric]
+            if (parity not in table_columns):
                 raise ValueError(
                     f"Related fairness determination for {group_metric} must be "
                     f"included in data table to color visualization based on "
                     f"metric fairness.")
-            clrs = [cb_green if val == True else
-                    cb_red for val in sorted_df[measure]]
+            clrs = [cb_green if val else cb_red for val in sorted_df[parity]]
 
         else:
             aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
@@ -458,9 +515,47 @@ class Plot(object):
         else:
             labels = sorted_df['attribute_value'].values
 
+        # if df includes significance columns, add stars to indicate significance
+        if sorted_df.columns[
+            sorted_df.columns.str.contains('_significance')].value_counts().sum() > 0:
+        # unmasked significance
+        # find indices where related significance have smaller value than significance_alpha
+            if np.issubdtype(
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]].dtype,
+                    np.number):
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] < significance_alpha].index.tolist()
+
+
+            # masked significance
+            # find indices where attr values have True value for each of those two columns,
+            else:
+                to_star = sorted_df.loc[
+                    sorted_df[
+                        self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
+
+
+            # add stars to label value where significant
+            for idx in to_star:
+                # convert idx location to relative index in sorted df and label_values list
+                idx_adj = sorted_df.index.get_loc(idx)
+
+                # star significanct disparities in visualizations based on significance level
+                if 0.10 >= significance_alpha > 0.05:
+                    significance_stars = '*'
+                elif 0.05 >= significance_alpha > 0.01:
+                    significance_stars = '**'
+                elif significance_alpha <= 0.01:
+                    significance_stars = '***'
+                else:
+                    significance_stars = ''
+                label_values[idx_adj] = label_values[idx_adj] + significance_stars
+
+
         normed = sf.normalize_sizes(scaled_values, width, height)
 
-        #     rects = sf.squarify(normed, x, y, width, height)
         padded_rects = sf.padded_squarify(normed, x, y, width, height)
 
         # make plot
@@ -469,6 +564,8 @@ class Plot(object):
 
         ax = sf.squarify_plot_rects(padded_rects, color=clrs, labels=labels,
                                  values=label_values, ax=ax, alpha=0.8)
+
+        # TO DO: build out in next phase (model comparison)
         # if model_id:
         #     ax.set_title(f"MODEL {model_id}, {(' ').join(group_metric.split('_')).upper()} ({attribute_name.upper()})",
         #              fontsize=23, fontweight="bold")
@@ -504,6 +601,9 @@ class Plot(object):
         :param title: Whether a title should be added to the plot. Default is True.
         :param label_dict: Optional dictionary of replacement values for data.
             Default is None.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in fairness
+            visualization
 
         :return: matplotlib.Axis
         '''
@@ -548,13 +648,13 @@ class Plot(object):
             # determinations
             cb_green = '#1b7837'
             cb_red = '#a50026'
-            measure = self._metric_parity_mapping[group_metric]
-            measure_colors = [cb_green if val == True else
-                              cb_red for val in attribute_data[measure]]
+            parity = self._metric_parity_mapping[group_metric]
+            parity_colors = [cb_green if val else
+                              cb_red for val in attribute_data[parity]]
 
             # Set white text for red bars and black text for green bars
             label_colors = [(0, 0, 0, 1) if val == True else
-                            (1, 1, 1, 1) for val in attribute_data[measure]]
+                            (1, 1, 1, 1) for val in attribute_data[parity]]
 
             attribute_indices = \
                 np.arange(next_bar_height, next_bar_height + attribute_data.shape[0],
@@ -566,7 +666,7 @@ class Plot(object):
 
             h_attribute = ax.barh(attribute_indices,
                                   width=values,
-                                  color=measure_colors,
+                                  color=parity_colors,
                                   align='edge', edgecolor='grey', alpha=0.8)
 
             if label_dict:
@@ -637,7 +737,8 @@ class Plot(object):
 
     def plot_fairness_disparity(self, fairness_table, group_metric,
                                 attribute_name, model_id=1, ax=None, fig=None,
-                                title=True, min_group_size=None):
+                                title=True, min_group_size=None,
+                                significance_alpha=0.05):
         """
         Plot disparity metrics colored based on calculated disparity.
 
@@ -649,6 +750,13 @@ class Plot(object):
             created.
         :param fig: A matplotlib Figure. If not passed, a new figure will be
             created.
+        :param title: Whether to include a title in visulations. Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in bias metric
+            visualization
+        :param significance_alpha: Statistical significance level to determine
+            visual representation of significance (number of asterisks on
+            treemap)
 
         :return:
         """
@@ -657,7 +765,8 @@ class Plot(object):
                                    attribute_name=attribute_name,
                                    color_mapping=None, model_id=model_id,
                                    ax=ax, fig=fig, highlight_fairness=True,
-                                   min_group_size=min_group_size, title=title)
+                                   min_group_size=min_group_size, title=title,
+                                   significance_alpha=significance_alpha)
 
     def _plot_multiple(self, data_table, plot_fcn, metrics=None, fillzeros=True,
                         title=True, ncols=3, label_dict=None, show_figure=True,
@@ -688,6 +797,8 @@ class Plot(object):
             None.
         :param show_figure: Whether to show figure (plt.show()). Default is
             True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in visualization
 
         :return: Returns a figure
         """
@@ -779,15 +890,21 @@ class Plot(object):
     def _plot_multiple_treemaps(self, data_table, plot_fcn, attributes=None,
                                  metrics=None, fillzeros=True, title=True,
                                  label_dict=None, highlight_fairness=False,
-                                 show_figure=True, min_group_size=None):
+                                 show_figure=True, min_group_size=None,
+                                significance_alpha=0.05):
         """
         This function plots treemaps of disparities indicated by config file
 
         :param data_table: Output of bias.get_disparity, or fairness.get_fairness
             functions
-        :param metrics: which metric(s) to plot, or 'all.'
-            If this value is null, will plot the following absolute metrics (or
-            related disparity measures):
+        :param plot_fcn: Plotting function to use to plot individual disparity
+            or fairness treemaps in grid
+        :param attributes: which attributes to plot against. Must be specified
+            if no metrics speficied.
+        :param metrics: which metric(s) to plot, or 'all.' MUST be specified if
+            no attributes specified. If this value is null, the following
+            absolute metrics/ related disparity measures will be plotted against
+            specified attributes:
                 - Predicted Prevalence (pprev),
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
@@ -802,6 +919,11 @@ class Plot(object):
         :param highlight_fairness: Whether to highlight treemaps by disparity
             magnitude, or by related fairness determination.
         :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in visualization
+        :param significance_alpha: Statistical significance level to determine
+            visual representation of significance (number of asterisks on
+            treemap)
 
         :return: Returns a figure
         """
@@ -888,11 +1010,6 @@ class Plot(object):
 
         models = list(data_table.model_id.unique())
 
-        # to do: (next iteration) plot for multiple models based on metrics/
-        # attributes in that model
-        #
-        # for model in models:
-        #     model = lambda x: x if len(models) > 1 else None
         for group_metric in metrics:
             for attr in attributes:
                 if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
@@ -916,7 +1033,7 @@ class Plot(object):
                          ax=current_subplot, fig=fig, title=title,
                          label_dict=label_dict,
                          highlight_fairness=highlight_fairness,
-                         min_group_size=min_group_size)
+                         min_group_size=min_group_size, significance_alpha=significance_alpha)
 
                 ax_col += 1
 
@@ -962,6 +1079,9 @@ class Plot(object):
         :param label_dict: Optional dictionary of label replacements. Default is
             None.
         :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in group metric
+            visualization
 
         :return:
         '''
@@ -973,7 +1093,8 @@ class Plot(object):
 
     def plot_disparity_all(self, data_table, attributes=None, metrics=None,
                            fillzeros=True, title=True, label_dict=None,
-                           show_figure=True, min_group_size=None):
+                           show_figure=True, min_group_size=None,
+                           significance_alpha=0.05):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
@@ -994,6 +1115,12 @@ class Plot(object):
         :param label_dict: Optional dictionary of label replacements. Default is
             None.
         :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in metric
+            visualization
+        :param significance_alpha: Statistical significance level to determine
+            visual representation of significance (number of asterisks on
+            treemap)
 
         :return: Returns a figure
         '''
@@ -1001,7 +1128,7 @@ class Plot(object):
             data_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             highlight_fairness=False, show_figure=show_figure, title=title,
-            min_group_size=min_group_size)
+            min_group_size=min_group_size, significance_alpha=significance_alpha)
 
     def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True,
                                 ncols=3, title=True, label_dict=None,
@@ -1023,6 +1150,9 @@ class Plot(object):
         :param label_dict: Optional dictionary of label replacements. Default is
             None.
         :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in fairness
+            visualization
 
         :return: Returns a figure
         '''
@@ -1034,7 +1164,7 @@ class Plot(object):
     def plot_fairness_disparity_all(self, fairness_table, attributes=None,
                                     metrics=None, fillzeros=True, title=True,
                                     label_dict=None, show_figure=True,
-                                    min_group_size=None):
+                                    min_group_size=None, significance_alpha=0.05):
         '''
         Plot multiple metrics at once from a fairness object table.
         :param fairness_table: Output of fairness.get_fairness functions.
@@ -1053,6 +1183,12 @@ class Plot(object):
         :param label_dict: Optional dictionary of label replacements. Default is
             None.
         :param show_figure: Whether to show figure (plt.show()). Default is True.
+        :param min_group_size: Minimum proportion of total group size (all data)
+            a population group must meet in order to be included in fairness
+            visualization
+        :param significance_alpha: Statistical significance level to determine
+            visual representation of significance (number of asterisks on
+            treemap)
 
         :return: Returns a figure
         '''
@@ -1060,4 +1196,4 @@ class Plot(object):
             fairness_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             title=title, highlight_fairness=True, show_figure=show_figure,
-            min_group_size=min_group_size)
+            min_group_size=min_group_size, significance_alpha=significance_alpha)

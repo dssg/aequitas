@@ -20,7 +20,8 @@ class Group(object):
             (x[label_col] == 1).sum()
         self.group_functions = self.get_group_functions()
 
-    def get_group_functions(self):
+    @staticmethod
+    def get_group_functions():
         """
 
         :return:
@@ -128,12 +129,12 @@ class Group(object):
         if False in check:
             # todo: create separate check method that raises exception...
             logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-            exit(1)
+            # exit(1)
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-            exit(1)
+            # exit(1)
 
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
@@ -171,13 +172,27 @@ class Group(object):
                 'total_entities': [len(df)] * len(counts)
             })
             this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
-            # for each model_id and as_of_date the priors_df has length attribute_names * attribute_values
+            # for each model_id and as_of_date the priors_df has length
+            # attribute_names * attribute_values
             prior_dfs.append(this_prior_df)
-            # we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)
+
+            # we calculate the bias for two different types of score_thresholds
+            # units (percentage ranks and absolute ranks)
+            # YAML ex: thresholds:
+            #              rank_abs: [300]
+            #              rank_pct: [1.0, 5.0, 10.0]
             for thres_unit, thres_values in score_thresholds.items():
+
                 for thres_val in thres_values:
                     flag = 0
+
+                    # To discuss with Pedro: believe this might be the reason
+                    # for cutoff error - if nunmbers are cumulative, per
+                    # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
+
+                    # denote threshold as binarhy if numeric count_ones value
+                    # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
