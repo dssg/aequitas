@@ -974,7 +974,8 @@ class Plot(object):
 
         :param data_table:  output of group.get_crosstabs, bias.get_disparity, or
             fairness.get_fairness functions
-        :param metrics: which metric(s) to plot, or 'all.' If this value is null, will plot:
+        :param metrics: which metric(s) to plot, or 'all.'
+            If this value is null, will plot:
                 - Predicted Prevalence (pprev),
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
@@ -986,8 +987,8 @@ class Plot(object):
         :param ncols: number of subplots per row in figure. Default is 3.
         :param title: whether to display a title on each plot. Default is True.
         :param label_dict: optional dictionary of label replacements. Default is None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in group metric
             visualization
 
@@ -1009,7 +1010,8 @@ class Plot(object):
             fairness.get_fairness functions.
         :param attributes: which attribute(s) to plot metrics for. If this
             value is null, will plot metrics against all attributes.
-        :param metrics: which metric(s) to plot, or 'all.' If this value is null, will plot:
+        :param metrics: which metric(s) to plot, or 'all.'
+            If this value is null, will plot:
                 - Predicted Prevalence Disparity (pprev_disparity),
                 - Predicted Positive Rate Disparity (ppr_disparity),
                 - False Discovery Rate Disparity (fdr_disparity),
@@ -1041,7 +1043,8 @@ class Plot(object):
         Plot multiple metrics at once from a fairness object table.
 
         :param fairness_table: Output of fairness.get_fairness functions.
-        :param metrics: which metric(s) to plot, or 'all.' If this value is null, will plot:
+        :param metrics: which metric(s) to plot, or 'all.'
+            If this value is null, will plot:
                 - Predicted Prevalence (pprev),
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
@@ -1074,7 +1077,8 @@ class Plot(object):
 
         :param fairness_table: output of fairness.get_fairness functions.
         :param attributes: which attribute(s) to plot metrics for. If this value is null, will plot metrics against all attributes.
-        :param metrics: which metric(s) to plot, or 'all.' If this value is null, will plot:
+        :param metrics: which metric(s) to plot, or 'all.'
+            If this value is null, will plot:
                 - Predicted Prevalence Disparity (pprev_disparity),
                 - Predicted Positive Rate Disparity (ppr_disparity),
                 - False Discovery Rate Disparity (fdr_disparity),
@@ -1086,7 +1090,7 @@ class Plot(object):
         :param label_dict: optional dictionary of label replacements. Default is
             None.
         :param show_figure: whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in fairness
             visualization
 
