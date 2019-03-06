@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -158,10 +160,8 @@
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="c1"># Authors: Pedro Saleiro &lt;saleiro@uchicago.edu&gt;</span>
-<span class="c1">#          Rayid Ghani</span>
-<span class="c1">#</span>
-<span class="c1"># License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved.</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Rayid Ghani, Pedro Saleiro &lt;saleiro@uchicago.edu&gt;, Loren Hinkson&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright </span><span class="se">\xa9</span><span class="s2"> 2018. The University of Chicago. All Rights Reserved.&quot;</span>
 
 <div class="viewcode-block" id="Bias"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias">[docs]</a><span class="k">class</span> <span class="nc">Bias</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -169,9 +169,12 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">        :param key_columns:</span>
-<span class="sd">        :param input_group_metrics:</span>
-<span class="sd">        :param fill_divbyzero:</span>
+<span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
+<span class="sd">        :param input_group_metrics: List of absolute bias metrics to calculate</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
+<span class="sd">            zero. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span>
@@ -189,12 +192,21 @@
 <div class="viewcode-block" id="Bias.get_disparity_min_metric"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_min_metric">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_min_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Calculates several ratios using the group metrics value and dividing by the minimum</span>
-<span class="sd">            group metric value among all groups defined by each attribute</span>
-<span class="sd">        :param df: the resulting dataframe from the group get_crosstabs</span>
-<span class="sd">        :param input_group_metrics: the columns list corresponding to the group metrics for each</span>
-<span class="sd">        we want to calculate the Disparity values</span>
-<span class="sd">        :return: a dataframe</span>
+<span class="sd">        Calculates disparities between groups for the predefined list of</span>
+<span class="sd">        group metrics using the group with the minimum value for each absolute</span>
+<span class="sd">        bias metric as the reference group (denominator).</span>
+
+<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method</span>
+<span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
+<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">            the group metrics for which we want to calculate disparity values</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
+<span class="sd">            zero. Default is None.</span>
+<span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
+<span class="sd">            with additional disparity metrics columns and ref_group_values</span>
+<span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_min_metric()&#39;</span><span class="p">)</span>
@@ -235,12 +247,21 @@
 <div class="viewcode-block" id="Bias.get_disparity_major_group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_major_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_major_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Calculates the bias (disparity) metrics for the predefined list of group metrics</span>
-<span class="sd">            using the majority group within each attribute as the reference group (denominator)</span>
+<span class="sd">        Calculates disparities between groups for the predefined list of group</span>
+<span class="sd">        metrics using the majority group within each attribute as the reference</span>
+<span class="sd">        group (denominator).</span>
 
 <span class="sd">        :param df: the returning dataframe from the group.get_crosstabs</span>
-<span class="sd">        :return: a dataframe with the bias metrics as new columns and the ref group,</span>
-<span class="sd">                it must have the same number of rows as the input dataframe</span>
+<span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
+<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">            the group metrics for which we want to calculate disparity values</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
+<span class="sd">            with additional disparity metrics columns and ref_group_values</span>
+<span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_major_group()&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
@@ -271,7 +292,7 @@
         <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
         <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
         <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
-        <span class="c1">#df = df.fillna(value=fill_zeros)</span>
+        <span class="c1"># df = df.fillna(value=fill_zeros)</span>
         <span class="k">return</span> <span class="n">df</span></div>
 
     <span class="k">def</span> <span class="nf">verify_ref_groups_dict_len</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">):</span>
@@ -282,21 +303,26 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
 
-<div class="viewcode-block" id="Bias.get_disparity_predefined_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_predefined_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                        <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Bias.get_disparity_predefined_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_predefined_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">,</span>
+                                        <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Calculates the bias (disparity) metrics for the predefined list of input group metrics</span>
-<span class="sd">            using a predefined reference group value for each attribute which is passed using</span>
-<span class="sd">            ref_groups_dict ({&#39;attr1&#39;:&#39;val1&#39;, &#39;attr2&#39;:&#39;val2&#39;})</span>
+<span class="sd">        Calculates disparities between groups for the predefined list of group</span>
+<span class="sd">        metrics using a predefined reference group value for each attribute.</span>
 
-<span class="sd">        :param df: the output dataframe of the group.get_crosstabs</span>
-<span class="sd">        :param ref_groups_dict: a dictionary {attribute_name:attribute_value, ...}</span>
-<span class="sd">        :param key_columns: optional, the key columns to use on joins</span>
-<span class="sd">        :param input_group_metrics: optional, the group metrics to be used for creating the new</span>
-<span class="sd">        disparity metrics</span>
-<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero</span>
-<span class="sd">        :return: a dataframe with same number of rows as the input but with additional</span>
-<span class="sd">        disparity metrics columns and ref_group_values</span>
+<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method</span>
+<span class="sd">        :param ref_groups_dict: a dictionary of format: {&#39;attribute_name&#39;: &#39;attribute_value&#39;, ...}</span>
+<span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
+<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">            the group metrics for which we want to calculate disparity values</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
+<span class="sd">            with additional disparity metrics columns and ref_group_values</span>
+<span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_group()&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
@@ -338,8 +364,21 @@
         <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
         <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
         <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
-        <span class="c1">#df = df.fillna(value=fill_zeros)</span>
-        <span class="k">return</span> <span class="n">df</span></div></div>
+        <span class="c1"># df = df.fillna(value=fill_zeros)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="Bias.list_disparities"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.list_disparities">[docs]</a>    <span class="k">def</span> <span class="nf">list_disparities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        View list of all calculated disparities in df</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_disparity&#39;</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="Bias.list_absolute_metrics"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.list_absolute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">list_absolute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        View list of all calculated absolute bias metrics in df</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span></div></div>
 </pre></div>
 
            </div>
@@ -352,7 +391,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -369,32 +408,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

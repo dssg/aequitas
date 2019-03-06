@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Aequitas API" href="api/aequitas.html" />
     <link rel="prev" title="Using Aequitas with Python" href="using_python.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -177,11 +179,15 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="Running-the-webapp-locally">
 <h1>Running the webapp locally<a class="headerlink" href="#Running-the-webapp-locally" title="Permalink to this headline">¶</a></h1>
-<p>You can run the same <a class="reference external" href="http://aequitas.dssg.io">webapp available
-online</a> locally.</p>
+<p>You can run the same <a class="reference external" href="http://aequitas.dssg.io">webapp available online</a> locally.</p>
 <p>After installing Aequitas, run the following command in your terminal.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">serve</span>
 </pre></div>
@@ -192,8 +198,7 @@ online</a> locally.</p>
 </div>
 <div class="section" id="Load-data">
 <h2>Load data<a class="headerlink" href="#Load-data" title="Permalink to this headline">¶</a></h2>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">browse</span> <span class="pre">...</span></code> button to select a properly formated csv. (see
-<a class="reference external" href="./input_data">input data</a>) Hit <code class="docutils literal notranslate"><span class="pre">upload</span></code>.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">browse</span> <span class="pre">...</span></code> button to select a properly formated csv. (see <a class="reference external" href="./input_data">input data</a>) Hit <code class="docutils literal notranslate"><span class="pre">upload</span></code>.</p>
 </div>
 <div class="section" id="Customize-report">
 <h2>Customize report<a class="headerlink" href="#Customize-report" title="Permalink to this headline">¶</a></h2>
@@ -204,8 +209,7 @@ online</a> locally.</p>
 </li>
 <li>choose reference group<ul>
 <li>majority: for a given attribute use the majority group</li>
-<li>min metric: for a given attribute use the group with the lowest
-scores as a baseline</li>
+<li>min metric: for a given attribute use the group with the lowest scores as a baseline</li>
 <li>custom group: pick groups to serve as reference</li>
 </ul>
 </li>
@@ -221,8 +225,7 @@ scores as a baseline</li>
 </div>
 <div class="section" id="Get-‘The-Bias-Report’">
 <h2>Get ‘The Bias Report’<a class="headerlink" href="#Get-‘The-Bias-Report’" title="Permalink to this headline">¶</a></h2>
-<p>The webapp returns descriptive interpretation of the results along with
-three sets of tables.</p>
+<p>The webapp returns descriptive interpretation of the results along with three sets of tables.</p>
 <ul class="simple">
 <li>Fairness Measures Results</li>
 <li>Bias Metrics Results</li>
@@ -243,7 +246,7 @@ three sets of tables.</p>
         <a href="api/aequitas.html" class="btn btn-neutral float-right" title="Aequitas API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="using_python.html" class="btn btn-neutral" title="Using Aequitas with Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="using_python.html" class="btn btn-neutral float-left" title="Using Aequitas with Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -252,7 +255,7 @@ three sets of tables.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -269,32 +272,16 @@ three sets of tables.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

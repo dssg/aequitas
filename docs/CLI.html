@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Configurations" href="config.html" />
     <link rel="prev" title="Understanding the Metrics" href="metrics.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -187,33 +189,34 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="Using-the-CLI">
 <h1>Using the CLI<a class="headerlink" href="#Using-the-CLI" title="Permalink to this headline">¶</a></h1>
-<p>Aequitas command line interface (CLI) allows you to generate ‘The Bias
-Report’ with one line in the terminal. At minimum enter:</p>
+<p>Aequitas command line interface (CLI) allows you to generate ‘The Bias Report’ with one line in the terminal. At minimum enter:</p>
 <p><code class="docutils literal notranslate"><span class="pre">aequitas-report</span> <span class="pre">--input</span> <span class="pre">&lt;file&gt;</span></code></p>
-<p>The command line interface allows the user to produce reports with more
-flexability than the webapp without coding in Python. Here we detail the
-command and provide use cases with different types of data inputs.</p>
+<p>The command line interface allows the user to produce reports with more flexability than the webapp without coding in Python. Here we detail the command and provide use cases with different types of data inputs.</p>
 <div class="section" id="CLI-use-cases">
 <h2>CLI use cases<a class="headerlink" href="#CLI-use-cases" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="Use-with-binary-scores-and-csv">
 <h3>Use with binary scores and csv<a class="headerlink" href="#Use-with-binary-scores-and-csv" title="Permalink to this headline">¶</a></h3>
-<p>This use case is presented in <a class="reference external" href="./30_seconds_aequitas.html">getting started with
-aequitas-report</a>.</p>
+<p>This use case is presented in <a class="reference external" href="./30_seconds_aequitas.html">getting started with aequitas-report</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aequitas</span><span class="o">-</span><span class="n">report</span> <span class="o">--</span><span class="nb">input</span> <span class="o">&lt;</span><span class="n">csv</span> <span class="k">with</span> <span class="n">binary</span> <span class="n">scores</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p><strong>Input data</strong>: Use when the input data has binary 0/1 scores.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="12%" />
-<col width="22%" />
-<col width="31%" />
-<col width="14%" />
-<col width="8%" />
-<col width="14%" />
+<col width="11%" />
+<col width="23%" />
+<col width="34%" />
+<col width="13%" />
+<col width="6%" />
+<col width="13%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">score</th>
@@ -241,9 +244,7 @@ aequitas-report</a>.</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Configs</strong>: With no configs, the reference group would be determined
-automatically based on the majority group for a given attribute and all
-metrics will be calculated.</p>
+<p><strong>Configs</strong>: With no configs, the reference group would be determined automatically based on the majority group for a given attribute and all metrics will be calculated.</p>
 </div>
 <div class="section" id="Use-with-continuous-scores-or-risk-scores">
 <h3>Use with continuous scores or risk scores<a class="headerlink" href="#Use-with-continuous-scores-or-risk-scores" title="Permalink to this headline">¶</a></h3>
@@ -254,12 +255,11 @@ metrics will be calculated.</p>
 <p>Use when the input data has continuous scores.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="13%" />
-<col width="24%" />
-<col width="31%" />
-<col width="15%" />
-<col width="13%" />
-<col width="4%" />
+<col width="12%" />
+<col width="26%" />
+<col width="36%" />
+<col width="14%" />
+<col width="12%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">score</th>
@@ -267,7 +267,6 @@ metrics will be calculated.</p>
 <th class="head">race</th>
 <th class="head">sex</th>
 <th class="head">age</th>
-<th class="head">&#160;</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -276,26 +275,23 @@ metrics will be calculated.</p>
 <td>Asian-American</td>
 <td>Male</td>
 <td>&lt;30</td>
-<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>.68</td>
 <td>0</td>
 <td>Native American</td>
 <td>Female</td>
 <td>30-50</td>
-<td>&#160;</td>
 </tr>
 </tbody>
 </table>
 <p>or the input data has risk scores.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="13%" />
-<col width="24%" />
-<col width="31%" />
-<col width="15%" />
-<col width="13%" />
-<col width="4%" />
+<col width="12%" />
+<col width="26%" />
+<col width="36%" />
+<col width="14%" />
+<col width="12%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">score</th>
@@ -303,7 +299,6 @@ metrics will be calculated.</p>
 <th class="head">race</th>
 <th class="head">sex</th>
 <th class="head">age</th>
-<th class="head">&#160;</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -312,21 +307,16 @@ metrics will be calculated.</p>
 <td>Asian-American</td>
 <td>Male</td>
 <td>&lt;30</td>
-<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>8</td>
 <td>0</td>
 <td>Native American</td>
 <td>Female</td>
 <td>30-50</td>
-<td>&#160;</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Configs</strong>: When scores are continuous, we have flexibility in who is
-classified in the positive or negative class based on a thresholds.
-(Described <a class="reference external" href="config.html">here</a> or see
-<a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_example.yaml">example</a>).</p>
+<p><strong>Configs</strong>: When scores are continuous, we have flexibility in who is classified in the positive or negative class based on a thresholds. (Described <a class="reference external" href="config.html">here</a> or see <a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_example.yaml">example</a>).</p>
 </div>
 <div class="section" id="Use-with-binary-scores-from-a-database">
 <h3>Use with binary scores from a database<a class="headerlink" href="#Use-with-binary-scores-from-a-database" title="Permalink to this headline">¶</a></h3>
@@ -334,22 +324,18 @@ classified in the positive or negative class based on a thresholds.
 </pre></div>
 </div>
 <p><strong>Input data</strong>: Pulled from database based on command in config file.</p>
-<p><strong>Configs</strong>: In the configuration file, you must provide database
-credentials and a SQL query. Described <a class="reference external" href="config.html">here</a> or see
-<a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_database_example.yaml">example</a>.</p>
+<p><strong>Configs</strong>: In the configuration file, you must provide database credentials and a SQL query. Described <a class="reference external" href="config.html">here</a> or see <a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_database_example.yaml">example</a>.</p>
 </div>
 </div>
 <div class="section" id="CLI-flags">
 <h2>CLI flags<a class="headerlink" href="#CLI-flags" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="--input---&lt;-path-to-.csv-file-&gt;">
 <h3><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--input---<-path-to-.csv-file->" title="Permalink to this headline">¶</a></h3>
-<p>Absolute filepath for input dataset in csv format. If no input is
-provided we assume there is a db configuration in the configs.yaml file.</p>
+<p>Absolute filepath for input dataset in csv format. If no input is provided we assume there is a db configuration in the configs.yaml file.</p>
 </div>
 <div class="section" id="--config---&lt;-path-to-config.yaml-&gt;">
 <h3><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--config---<-path-to-config.yaml->" title="Permalink to this headline">¶</a></h3>
-<p>To change default behavior uniformly across applications use a
-configuration file.</p>
+<p>To change default behavior uniformly across applications use a configuration file.</p>
 </div>
 <div class="section" id="--output-folder-&lt;path-to-folder&gt;">
 <h3><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code><a class="headerlink" href="#--output-folder-<path-to-folder>" title="Permalink to this headline">¶</a></h3>
@@ -357,10 +343,7 @@ configuration file.</p>
 </div>
 <div class="section" id="--create-tables">
 <h3><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code><a class="headerlink" href="#--create-tables" title="Permalink to this headline">¶</a></h3>
-<p>If you are working with a database, the flag tells aequitas to create
-table from scratch and drop existing tables. Otherwise, it will append
-aequitas output. Note, database functionality must be configured in the
-config.yaml file.</p>
+<p>If you are working with a database, the flag tells aequitas to create table from scratch and drop existing tables. Otherwise, it will append aequitas output. Note, database functionality must be configured in the config.yaml file.</p>
 </div>
 </div>
 </div>
@@ -376,7 +359,7 @@ config.yaml file.</p>
         <a href="config.html" class="btn btn-neutral float-right" title="Configurations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metrics.html" class="btn btn-neutral" title="Understanding the Metrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metrics.html" class="btn btn-neutral float-left" title="Understanding the Metrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -385,7 +368,7 @@ config.yaml file.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -402,32 +385,16 @@ config.yaml file.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

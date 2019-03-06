@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Using Aequitas with Python" href="using_python.html" />
     <link rel="prev" title="Using the CLI" href="CLI.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -181,25 +183,23 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="Configurations">
 <h1>Configurations<a class="headerlink" href="#Configurations" title="Permalink to this headline">¶</a></h1>
-<p>Configurations can be set in .yml file. See example
-<a class="reference external" href="https://github.com/dssg/aequitas/tree/master/src/aequitas_cli">config.yml</a>
-on github.</p>
+<p>Configurations can be set in .yml file. See example <a class="reference external" href="https://github.com/dssg/aequitas/tree/master/src/aequitas_cli">config.yml</a> on github.</p>
 <div class="section" id="Define-reference-groups">
 <h2>Define reference groups<a class="headerlink" href="#Define-reference-groups" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">--ref-group-method</span> <span class="pre">&lt;type&gt;</span></code></p>
-<p>Fairness is always determined in relation to a reference group. By
-default, aequitas uses the majority group level for a given group as the
-reference group.</p>
+<p>Fairness is always determined in relation to a reference group. By default, aequitas uses the majority group level for a given group as the reference group.</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">&quot;majority&quot;</span></code> Define fairness in relation to the majority in a
-group.</li>
-<li><code class="docutils literal notranslate"><span class="pre">&quot;min_metric&quot;</span></code> Define fairness in relation to the subgroup with the
-lowest value on a given metric.</li>
-<li><code class="docutils literal notranslate"><span class="pre">&quot;predefined&quot;</span></code> Define fairness in relation to groups of your
-choice.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;majority&quot;</span></code> Define fairness in relation to the majority in a group.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;min_metric&quot;</span></code> Define fairness in relation to the subgroup with the lowest value on a given metric.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;predefined&quot;</span></code> Define fairness in relation to groups of your choice.</li>
 </ul>
 <p>The predefined reference groups are set in the configuration file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_groups_method</span><span class="p">:</span> <span class="s2">&quot;predefind&quot;</span>
@@ -212,17 +212,14 @@ choice.</li>
 </div>
 <div class="section" id="Score-threshholds">
 <h2>Score threshholds<a class="headerlink" href="#Score-threshholds" title="Permalink to this headline">¶</a></h2>
-<p>If the input <code class="docutils literal notranslate"><span class="pre">score</span></code> column is not binary, you can test the impact of
-alternative cutoffs on fairness metrics.</p>
+<p>If the input <code class="docutils literal notranslate"><span class="pre">score</span></code> column is not binary, you can test the impact of alternative cutoffs on fairness metrics.</p>
 <p>Thresholds are set in the configuration file.</p>
 <div class="highlight-{bash} notranslate"><div class="highlight"><pre><span></span>thresholds:
    rank_abs: [300]
    rank_pct: [1.0, 5.0, 10.0 ]
 </pre></div>
 </div>
-<p>With <code class="docutils literal notranslate"><span class="pre">rank_abs</span></code> classify the observations with the top n as 1 and the
-remainder as 0. With <code class="docutils literal notranslate"><span class="pre">rank_pct</span></code> classify the top n percent as 1 and
-the rest as 0.</p>
+<p>With <code class="docutils literal notranslate"><span class="pre">rank_abs</span></code> classify the observations with the top n as 1 and the remainder as 0. With <code class="docutils literal notranslate"><span class="pre">rank_pct</span></code> classify the top n percent as 1 and the rest as 0.</p>
 </div>
 <div class="section" id="Choosing-Metrics">
 <h2>Choosing Metrics<a class="headerlink" href="#Choosing-Metrics" title="Permalink to this headline">¶</a></h2>
@@ -241,10 +238,7 @@ the rest as 0.</p>
 </div>
 <div class="section" id="Fairness-threshold">
 <h2>Fairness threshold<a class="headerlink" href="#Fairness-threshold" title="Permalink to this headline">¶</a></h2>
-<p>Disparity is determined in terms of ratios. When the disparity ratio
-cross the fairness threshold, the decision is deemed unfair on that
-metric. Notice this is different from the webapp, which is
-<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">fairness_threshold</span></code></p>
+<p>Disparity is determined in terms of ratios. When the disparity ratio cross the fairness threshold, the decision is deemed unfair on that metric. Notice this is different from the webapp, which is <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">-</span> <span class="pre">fairness_threshold</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fairness_threshold</span><span class="p">:</span> <span class="mf">0.8</span>
 </pre></div>
 </div>
@@ -267,8 +261,7 @@ metric. Notice this is different from the webapp, which is
 </div>
 <div class="section" id="Databases">
 <h2>Databases<a class="headerlink" href="#Databases" title="Permalink to this headline">¶</a></h2>
-<p>To connect to a database instead of using “–input ”, use the db key,
-credentials, and input_query. These are set in config.yaml.</p>
+<p>To connect to a database instead of using “–input ”, use the db key, credentials, and input_query. These are set in config.yaml.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">:</span>
     <span class="n">db_credentials</span><span class="p">:</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">your_host</span>
@@ -278,8 +271,7 @@ credentials, and input_query. These are set in config.yaml.</p>
         <span class="n">port</span><span class="p">:</span> <span class="mi">5432</span>
 </pre></div>
 </div>
-<p>The input query should return a table with score, label_value columns
-and then each attribute you want to use for bias analysis</p>
+<p>The input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_query</span><span class="p">:</span> <span class="s2">&quot;select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ...&quot;</span>
 </pre></div>
 </div>
@@ -302,7 +294,7 @@ and then each attribute you want to use for bias analysis</p>
         <a href="using_python.html" class="btn btn-neutral float-right" title="Using Aequitas with Python" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="CLI.html" class="btn btn-neutral" title="Using the CLI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="CLI.html" class="btn btn-neutral float-left" title="Using the CLI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -311,7 +303,7 @@ and then each attribute you want to use for bias analysis</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -328,32 +320,16 @@ and then each attribute you want to use for bias analysis</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
