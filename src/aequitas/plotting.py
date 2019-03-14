@@ -1,7 +1,5 @@
 import logging
 import math
-import re
-import pandas as pd
 import numpy as np
 import collections
 import seaborn as sns
@@ -82,7 +80,7 @@ class Plot(object):
                            'fdr_disparity', 'for_disparity',
                            'fpr_disparity', 'fnr_disparity')
 
-    # Define mapping for condiitonal coloring based on fairness
+    # Define mapping for conditional coloring based on fairness
     # determinations
     _metric_parity_mapping = {
         'ppr_disparity': 'Statistical Parity',
@@ -168,14 +166,14 @@ class Plot(object):
     def _truncate_colormap(orig_cmap, min_value=0.0, max_value=1.0, num_colors=100):
         '''
         Use only part of a colormap (min_value to max_value) across a given number
-        of partiions.
+        of partitions.
 
-        :param orig_cmap: An existing Matplotlib colormap
-        :param min_value: Desired minimum value (0.0 to 1.0) for truncated
+        :param orig_cmap: an existing Matplotlib colormap.
+        :param min_value: desired minimum value (0.0 to 1.0) for truncated
             colormap. Default is 0.0.
-        :param max_value: Desired maximum value (0.0 to 1.0) for truncated
+        :param max_value: desired maximum value (0.0 to 1.0) for truncated
             colormap. Default is 1.0.
-        :param num_colors: Number of colors to spread colormap gradient across
+        :param num_colors: number of colors to spread colormap gradient across
             before truncating. Default is 100.
         :return: Truncated color map
 
@@ -189,21 +187,50 @@ class Plot(object):
         return new_cmap
 
 
+    @staticmethod
+    def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value'):
+        """
+        Creates a dictionary of reference groups for each metric in a data_table
+
+       :param disparities_table: a disparity table. Output of bias.get_disparity or
+            fairness.get_fairness functions
+        :param ref_group_flag: string indicating column indicates reference group
+            flag value. Default is '_ref_group_value'.
+
+        :return: A dictionary
+        """
+        ref_groups = {}
+        ref_group_cols = \
+            list(disparities_table.columns[disparities_table.columns.str.contains(
+                ref_group_flag)])
+        attributes = list(disparities_table.attribute_name.unique())
+        for attribute in attributes:
+            attr_table = \
+                disparities_table.loc[disparities_table['attribute_name'] == attribute]
+            attr_refs = {}
+            for col in ref_group_cols:
+                metric_key = "".join(col.split(ref_group_flag))
+                attr_refs[metric_key] = \
+                    attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
+            ref_groups[attribute] = attr_refs
+        return ref_groups
+
+
     @classmethod
     def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
                                  ref_group_flag='_ref_group_value', model_id=1):
         """
         Finds relative index (row) of reference group value for a given metric.
 
-        :param disparities_table: A disparity table. Output of bias.get_disparity or
+        :param disparities_table: a disparity table. Output of bias.get_disparity or
             fairness.get_fairness functions
-        :param attribute_name: The attribute to plot metric against. Must be a column
+        :param attribute_name: the attribute to plot metric against. Must be a column
             in the disparities_table.
-        :param group_metric: The metric to plot. Must be a column in the
+        :param group_metric: the metric to plot. Must be a column in the
             disparities_table.
         :param ref_group_flag: string indicating column indicates reference group
             flag value. Default is '_ref_group_value'.
-        :param model_id: Model ID number. Default is 1.
+        :param model_id: model ID number. Default is 1.
 
         :return: Integer indicating relative index of reference group value row.
         """
@@ -224,22 +251,22 @@ class Plot(object):
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
-    def plot_group_metric(self, group_table, group_metric, ax=None, title=True,
-                          label_dict=None, min_group_size = None):
-        '''
+    def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
+                          title=True, label_dict=None, min_group_size = None):
+        """
         Plot a single group metric's absolute metrics
 
-        :param group_table: A group table
-        :param group_metric: The metric to plot. Must be a column in the group_table
-        :param ax: A matplotlib Axis. If not passed a new figure will be created.
-        :param title: Whether a title should be added to the plot. Default is True.
-        :param label_dict: Optional dictionary of replacement labels for data.
+        :param group_table: a group table
+        :param group_metric: the metric to plot. Must be a column in the group_table.
+        :param ax: a matplotlib Axis. If not passed, a new figure will be created.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param label_dict: optional, dictionary of replacement labels for data.
             Default is None.
-        :param min_group_size: Minimum size for groups to include in visualization
+        :param min_group_size: minimum size for groups to include in visualization
             (as a proportion of total sample)
 
         :return: matplotlib.Axis
-        '''
+        """
         if group_metric not in group_table.columns:
             raise ValueError(f"Specified disparity metric '{group_metric}' not "
                              f"in 'group_table'.")
@@ -273,7 +300,8 @@ class Plot(object):
         mapping = matplotlib.cm.ScalarMappable(norm=norm, cmap=lighter_coppers)
 
         # Lock absolute value metric plot x-axis to (0, 1)
-        ax_lim = 1
+        if not ax_lim:
+            ax_lim = 1
         ax.set_xlim(0, ax_lim)
 
         for attribute_name in attribute_names:
@@ -370,7 +398,7 @@ class Plot(object):
                        label_dict=None, title=True,
                        highlight_fairness=False, min_group_size=None,
                        significance_alpha=0.05):
-        '''
+        """
         Create treemap from disparity or absolute metric values
 
         Adapted from https://plot.ly/python/treemaps/,
@@ -378,31 +406,29 @@ class Plot(object):
         and https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib
 
         Plot a single group metric's disparity
-        :param disparity_table: A disparity table. Output of bias.get_disparity or
+        :param disparity_table: a disparity table. Output of bias.get_disparity or
             fairness.get_fairness functions.
-        :param group_metric: The metric to plot. Must be a column in the
+        :param group_metric: the metric to plot. Must be a column in the
             disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
         :param color_mapping: matplotlib colormapping for treemap value boxes.
-        :param model_id: Which model to plot for. Default is 1.
-        :param ax: A matplotlib Axis. If not passed, a new figure will be created.
-        :param fig: A matplotlib Figure. If not passed, a new figure will be
-            created.
-        :param label_dict: Optional dictionary of replacement labels for data.
+        :param model_id: which model to plot for. Default is 1.
+        :param ax: a matplotlib Axis. If not passed, a new figure will be created.
+        :param fig: a matplotlib Figure. If not passed, a new figure will be created.
+        :param label_dict: optional, dictionary of replacement labels for data.
             Default is None.
-        :param title: Whether a title should be added to the plot. Default is
-            True.
-        :param highlight_fairness: Whether to highlight treemaps by disparity
+        :param title: whether to include a title in visualizations. Default is True.
+        :param highlight_fairness: whether to highlight treemaps by disparity
             magnitude, or by related fairness determination.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in bias metric
             visualization
-        :param significance_alpha: Statistical significance level to determine
-            visual representation of significance (number of asterisks on
-            treemap)
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
 
         :return: matplotlib.Axis
-        '''
+        """
         # Use matplotlib to truncate colormap, scale metric values
         # between the min and max, then assign colors to individual values
 
@@ -542,7 +568,7 @@ class Plot(object):
                 # convert idx location to relative index in sorted df and label_values list
                 idx_adj = sorted_df.index.get_loc(idx)
 
-                # star significanct disparities in visualizations based on significance level
+                # star significant disparities in visualizations based on significance level
                 if 0.10 >= significance_alpha > 0.05:
                     significance_stars = '*'
                 elif 0.05 >= significance_alpha > 0.01:
@@ -563,7 +589,8 @@ class Plot(object):
             fig, ax = plt.subplots(figsize=(5, 4))
 
         ax = sf.squarify_plot_rects(padded_rects, color=clrs, labels=labels,
-                                 values=label_values, ax=ax, alpha=0.8)
+                                 values=label_values, ax=ax, alpha=0.8,
+                                    acronyms=False)
 
         # TO DO: build out in next phase (model comparison)
         # if model_id:
@@ -591,17 +618,15 @@ class Plot(object):
         This function plots absolute group metrics as indicated by the config file,
             colored based on calculated parity
 
-        :param fairness_table: A fairness table. Output of fairness.get_fairness
-            functions.
-        :param group_metric: The fairness metric to plot. Must be a column in the
-            fairness_table.
-        :param ax: A matplotlib Axis. If not passed a new figure will be created.
-        :param ax_lim: Maximum value on x-axis, used to match axes across subplots
+        :param fairness_table: a fairness table. Output of fairness.get_fairness functions.
+        :param group_metric: the fairness metric to plot. Must be a column in the fairness_table.
+        :param ax: a matplotlib Axis. If not passed a new figure will be created.
+        :param ax_lim: maximum value on x-axis, used to match axes across subplots
             when plotting multiple metrics. Default is None.
-        :param title: Whether a title should be added to the plot. Default is True.
-        :param label_dict: Optional dictionary of replacement values for data.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param label_dict: optional dictionary of replacement values for data.
             Default is None.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in fairness
             visualization
 
@@ -742,23 +767,19 @@ class Plot(object):
         """
         Plot disparity metrics colored based on calculated disparity.
 
-        :param group_metric: The metric to plot. Must be a column in the
-            disparity_table.
+        :param group_metric: the metric to plot. Must be a column in the disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
-        :param model_id: Which model to plot for. Default is None.
-        :param ax: A matplotlib Axis. If not passed, a new figure will be
-            created.
-        :param fig: A matplotlib Figure. If not passed, a new figure will be
-            created.
-        :param title: Whether to include a title in visulations. Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param model_id: which model to plot for. Default is None.
+        :param ax: a matplotlib Axis. If not passed, a new figure will be created.
+        :param fig: a matplotlib Figure. If not passed, a new figure will be created.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in bias metric
             visualization
-        :param significance_alpha: Statistical significance level to determine
-            visual representation of significance (number of asterisks on
-            treemap)
-
-        :return:
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
+        :return:  matplotlib.Axis
         """
         return self.plot_disparity(disparity_table=fairness_table,
                                    group_metric=group_metric,
@@ -775,17 +796,17 @@ class Plot(object):
         This function plots bar charts of absolute metrics indicated by config
         file
 
-        :param data_table: Output of group.get_crosstabs, bias.get_disparity, or
+        :param data_table: output of group.get_crosstabs, bias.get_disparity, or
             fairness.get_fairness functions
-        :param plot_fcn: The single-metric plotting function to use for subplots
-        :param metrics: which metric(s) to plot, or 'all.'
-            If this value is null, will plot the following absolute metrics (or
-            related disparity measures):
+        :param plot_fcn: the single-metric plotting function to use for subplots
+        :param metrics: which metric(s) to plot, or 'all.' If this value is
+            null, will plot the following absolute metrics (or related disparity
+            measures):
                 - Predicted Prevalence (pprev),
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
                 - False Omission Rate (for),
-                - False Positve Rate (fpr),
+                - False Positive Rate (fpr),
                 - False Negative Rate (fnr)
         :param fillzeros: Should null values be filled with zeros. Default is
             True.
@@ -900,7 +921,7 @@ class Plot(object):
         :param plot_fcn: Plotting function to use to plot individual disparity
             or fairness treemaps in grid
         :param attributes: which attributes to plot against. Must be specified
-            if no metrics speficied.
+            if no metrics specified.
         :param metrics: which metric(s) to plot, or 'all.' MUST be specified if
             no attributes specified. If this value is null, the following
             absolute metrics/ related disparity measures will be plotted against
@@ -909,7 +930,7 @@ class Plot(object):
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
                 - False Omission Rate (for),
-                - False Positve Rate (fpr),
+                - False Positive Rate (fpr),
                 - False Negative Rate (fnr)
         :param fillzeros: Whether null values should be filled with zeros. Default
             is True.
@@ -921,9 +942,9 @@ class Plot(object):
         :param show_figure: Whether to show figure (plt.show()). Default is True.
         :param min_group_size: Minimum proportion of total group size (all data)
             a population group must meet in order to be included in visualization
-        :param significance_alpha: Statistical significance level to determine
-            visual representation of significance (number of asterisks on
-            treemap)
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
 
         :return: Returns a figure
         """
@@ -1060,9 +1081,10 @@ class Plot(object):
     def plot_group_metric_all(self, data_table, metrics=None, fillzeros=True,
                               ncols=3, title=True, label_dict=None,
                               show_figure=True, min_group_size=None):
-        '''
+        """
         Plot multiple metrics at once from a fairness object table.
-        :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
+
+        :param data_table:  output of group.get_crosstabs, bias.get_disparity, or
             fairness.get_fairness functions
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
@@ -1070,21 +1092,20 @@ class Plot(object):
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
                 - False Omission Rate (for),
-                - False Positve Rate (fpr),
+                - False Positive Rate (fpr),
                 - False Negative Rate (fnr)
-        :param fillzeros: Whether to fill null values with zeros. Default is
+        :param fillzeros: whether to fill null values with zeros. Default is
             True.
-        :param ncols: Number of subplots per row in figure. Default is 3.
-        :param title: Whether to display a title on each plot. Default is True.
-        :param label_dict: Optional dictionary of label replacements. Default is
-            None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param ncols: number of subplots per row in figure. Default is 3.
+        :param title: whether to display a title on each plot. Default is True.
+        :param label_dict: optional dictionary of label replacements. Default is None.
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in group metric
-            visualization
+            visualization.
 
-        :return:
-        '''
+        :return: A Matplotlib figure
+        """
         return self._plot_multiple(
             data_table, plot_fcn=self.plot_group_metric, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
@@ -1092,38 +1113,38 @@ class Plot(object):
 
 
     def plot_disparity_all(self, data_table, attributes=None, metrics=None,
-                           fillzeros=True, title=True, label_dict=None,
+                           fillzeros=True, title=True, label_dict=None, ncols=3,
                            show_figure=True, min_group_size=None,
                            significance_alpha=0.05):
-        '''
+        """
         Plot multiple metrics at once from a fairness object table.
-        :param data_table:  Output of group.get_crosstabs, bias.get_disparity, or
+
+        :param data_table:  output of group.get_crosstabs, bias.get_disparity, or
             fairness.get_fairness functions.
-        :param attributes: which attribute(s) to plot metrics for.
-            If this value is null, will plot metrics against all attributes.
+        :param attributes: which attribute(s) to plot metrics for. If this
+            value is null, will plot metrics against all attributes.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
                 - Predicted Prevalence Disparity (pprev_disparity),
                 - Predicted Positive Rate Disparity (ppr_disparity),
                 - False Discovery Rate Disparity (fdr_disparity),
                 - False Omission Rate Disparity (for_disparity),
-                - False Positve Rate Disparity (fpr_disparity),
+                - False Positive Rate Disparity (fpr_disparity),
                 - False Negative Rate Disparity (fnr_disparity)
-        :param fillzeros: Whether to fill null values with zeros. Default is True.
-        :param ncols: Number of subplots per row in figure. Default is 3.
-        :param title: Whether to display a title on each plot. Default is True.
-        :param label_dict: Optional dictionary of label replacements. Default is
+        :param fillzeros: whether to fill null values with zeros. Default is True.
+        :param title: whether to display a title on each plot. Default is True.
+        :param label_dict: optional dictionary of label replacements. Default is
             None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in metric
-            visualization
-        :param significance_alpha: Statistical significance level to determine
-            visual representation of significance (number of asterisks on
-            treemap)
+            visualization.
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
 
-        :return: Returns a figure
-        '''
+        :return: A Matplotlib figure
+        """
         return self._plot_multiple_treemaps(
             data_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
@@ -1133,8 +1154,9 @@ class Plot(object):
     def plot_fairness_group_all(self, fairness_table, metrics=None, fillzeros=True,
                                 ncols=3, title=True, label_dict=None,
                                 show_figure=True, min_group_size=None):
-        '''
+        """
         Plot multiple metrics at once from a fairness object table.
+
         :param fairness_table: Output of fairness.get_fairness functions.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
@@ -1142,20 +1164,20 @@ class Plot(object):
                 - Predicted Positive Rate (ppr),
                 - False Discovery Rate (fdr),
                 - False Omission Rate (for),
-                - False Positve Rate (fpr),
+                - False Positive Rate (fpr),
                 - False Negative Rate (fnr)
-        :param fillzeros: Whether to fill null values with zeros. Default is True.
-        :param ncols: Number of subplots per row in figure. Default is 3.
-        :param title: Whether to display a title on each plot. Default is True.
-        :param label_dict: Optional dictionary of label replacements. Default is
+        :param fillzeros: whether to fill null values with zeros. Default is True.
+        :param ncols: number of subplots per row in figure. Default is 3.
+        :param title: whether to display a title on each plot. Default is True.
+        :param label_dict: optional dictionary of label replacements. Default is
             None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+        :param min_group_size: minimum proportion of total group size (all data).
             a population group must meet in order to be included in fairness
             visualization
 
-        :return: Returns a figure
-        '''
+        :return: A Matplotlib figure
+        """
         return self._plot_multiple(
             fairness_table, plot_fcn=self.plot_fairness_group, metrics=metrics,
             fillzeros=fillzeros, title=title, ncols=ncols, label_dict=label_dict,
@@ -1165,33 +1187,33 @@ class Plot(object):
                                     metrics=None, fillzeros=True, title=True,
                                     label_dict=None, show_figure=True,
                                     min_group_size=None, significance_alpha=0.05):
-        '''
+        """
         Plot multiple metrics at once from a fairness object table.
-        :param fairness_table: Output of fairness.get_fairness functions.
-        :param attributes: which attribute(s) to plot metrics for.
-            If this value is null, will plot metrics against all attributes.
+
+        :param fairness_table: output of fairness.get_fairness functions.
+        :param attributes: which attribute(s) to plot metrics for. If this value is null, will plot metrics against all attributes.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
                 - Predicted Prevalence Disparity (pprev_disparity),
                 - Predicted Positive Rate Disparity (ppr_disparity),
                 - False Discovery Rate Disparity (fdr_disparity),
                 - False Omission Rate Disparity (for_disparity),
-                - False Positve Rate Disparity (fpr_disparity),
+                - False Positive Rate Disparity (fpr_disparity),
                 - False Negative Rate Disparity (fnr_disparity)
-        :param fillzeros: Whether to fill null values with zeros. Default is True.
-        :param title: Whether to display a title on each plot. Default is True.
-        :param label_dict: Optional dictionary of label replacements. Default is
+        :param fillzeros: whether to fill null values with zeros. Default is True.
+        :param title: whether to display a title on each plot. Default is True.
+        :param label_dict: optional dictionary of label replacements. Default is
             None.
-        :param show_figure: Whether to show figure (plt.show()). Default is True.
-        :param min_group_size: Minimum proportion of total group size (all data)
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+        :param min_group_size: minimum proportion of total group size (all data)
             a population group must meet in order to be included in fairness
             visualization
-        :param significance_alpha: Statistical significance level to determine
-            visual representation of significance (number of asterisks on
-            treemap)
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap)
 
-        :return: Returns a figure
-        '''
+        :return: A Matplotlib figure
+        """
         return self._plot_multiple_treemaps(
             fairness_table, plot_fcn=self.plot_disparity, attributes=attributes,
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,

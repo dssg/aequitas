@@ -98,10 +98,11 @@ class Fairness(object):
         Calculates the fairness measures defined in fair_measures_requested
         dictionary and adds them as columns to the input bias_df
 
-        :param bias_df: the output dataframe from bias/ disparity calculation methods
-        :param tau: optional, the threshold for fair/ unfair evaluation
+        :param bias_df: the output dataframe from bias/ disparity calculation methods.
+        :param tau: optional, the threshold for fair/ unfair evaluation.
         :param fair_measures_requested: optional, a dictionary containing fairness
-            measures as keys and the corresponding input bias disparity as values
+            measures as keys and the corresponding input bias disparity as values.
+
         :return: Bias_df dataframe with additional columns for each
             of the fairness measures defined in the fair_measures dictionary
         """
