@@ -18,10 +18,10 @@ class Group(object):
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
-        self.group_functions = self.get_group_functions()
+        self.group_functions = self._get_group_functions()
 
     @staticmethod
-    def get_group_functions():
+    def _get_group_functions():
         """
         Helper function to accumulate lambda functions used in bias metrics
         calculations.
