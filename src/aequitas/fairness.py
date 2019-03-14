@@ -87,7 +87,7 @@ class Fairness(object):
 
     def get_fairness_measures_supported(self, input_df):
         """
-        Determine fairness measures supported based on columns in data frame
+        Determine fairness measures supported based on columns in data frame.
         """
         if 'label_value' not in input_df.columns:
             self.fair_measures_supported = ['Statistical Parity', 'Impact Parity']
@@ -96,7 +96,7 @@ class Fairness(object):
     def get_group_value_fairness(self, bias_df, tau=None, fair_measures_requested=None):
         """
         Calculates the fairness measures defined in fair_measures_requested
-        dictionary and adds them as columns to the input bias_df
+        dictionary and adds them as columns to the input bias_df.
 
         :param bias_df: the output dataframe from bias/ disparity calculation methods.
         :param tau: optional, the threshold for fair/ unfair evaluation.
@@ -137,7 +137,7 @@ class Fairness(object):
             logging.info('get_group_value_fairness: No high level measure input found on bias_df' + input[1])
         return bias_df
 
-    def fill_groupby_attribute_fairness(self, groupby_obj, key_columns,
+    def _fill_groupby_attribute_fairness(self, groupby_obj, key_columns,
                                         group_attribute_df, measures):
         """
         Returns dataframe with values grouped by attribute_value
@@ -178,15 +178,15 @@ class Fairness(object):
         key_columns = ['model_id', 'score_threshold', 'attribute_name']
         groupby_variable = group_value_df.groupby(key_columns)
         # We need to do this because of NaNs. idxmin() on pandas raises keyerror if there is a NaN...
-        group_attribute_df = self.fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
+        group_attribute_df = self._fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
                                                                   fair_measures_requested)
         if group_attribute_df.empty:
             logging.error('get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns')
             exit(1)
         parity_cols = [col for col in self.type_parity_depend if col in group_value_df.columns]
-        group_attribute_df = self.fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df, parity_cols)
+        group_attribute_df = self._fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df, parity_cols)
         highlevel_cols = [col for col in self.high_level_fairness_depend if col in group_value_df.columns]
-        group_attribute_df = self.fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
+        group_attribute_df = self._fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
                                                                   highlevel_cols)
         return group_attribute_df
 
@@ -194,7 +194,7 @@ class Fairness(object):
         """
         Calculates overall fairness regardless of the group_attributes.
         Searches for 'False' parity determinations across group_attributes and
-        outputs 'True' determination if all group_attributes are fair
+        outputs 'True' determination if all group_attributes are fair.
 
         :param group_attribute_df: the output df of the get_group_attributes_fairness
         :return: A dictionary of overall, unsupervised, and supervised fairness determinations
@@ -218,7 +218,7 @@ class Fairness(object):
 
     def list_parities(self, df):
         """
-        View list of all parity determinations in given df
+        View list of all parity determinations in df
         """
         all_fairness = self.type_parity_depend.keys() | \
                        self.high_level_fairness_depend.keys() | \

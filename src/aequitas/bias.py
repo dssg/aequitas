@@ -144,7 +144,7 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
             model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
@@ -258,7 +258,7 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
             model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
@@ -296,7 +296,8 @@ class Bias(object):
                                         mask_significance=True):
         """
         Calculates disparities between groups for the predefined list of group
-        metrics using a predefined reference group value for each attribute.
+        metrics using a predefined reference group (denominator) value for each
+        attribute.
 
         :param df: output dataframe of Group class get_crosstabs() method.
         :param original_df: dataframe of sample features and model results.
@@ -383,7 +384,7 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=full_ref_dict, score_thresholds=None,
             model_id=1, attr_cols=None, alpha=5e-2)
 
@@ -407,8 +408,8 @@ class Bias(object):
     @staticmethod
     def _get_measure_sample(original_df, attribute, measure):
         """
-        Helper function for get_statistical_significance() (via
-        calculate_significance() function). Convert dataframe to samples for
+        Helper function for _get_statistical_significance() (via
+        _calculate_significance() function). Convert dataframe to samples for
         given attribute group.
 
         :param original_df: a dataframe containing a required raw 'score' column
@@ -427,8 +428,8 @@ class Bias(object):
     @staticmethod
     def _check_equal_variance(sample_dict, ref_group, alpha=5e-2):
         """
-        Helper function for get_statistical_significance() (via
-        calculate_significance() function).
+        Helper function for _get_statistical_significance() (via
+        _calculate_significance() function).
 
         :param sample_dict: dictionary of binary samples for equal variance
             comparison.
@@ -495,10 +496,10 @@ class Bias(object):
 
 
     @classmethod
-    def calculate_significance(cls, original_df, disparity_df, attribute,
+    def _calculate_significance(cls, original_df, disparity_df, attribute,
                                measure, ref_dict, alpha=5e-2):
         """
-        Helper function for get_statistical_significance. Pulls samples from
+        Helper function for _get_statistical_significance. Pulls samples from
         original df, checks for equal variance between population groups and
         reference group, runs t-test between groups and reference group, and
         adds p-values to disparity_df for a given measure (ex: false positives)
@@ -565,7 +566,7 @@ class Bias(object):
 
 
     @classmethod
-    def get_statistical_significance(cls, original_df, disparity_df, ref_dict,
+    def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
                                      score_thresholds=None, model_id=1,
                                      attr_cols=None, alpha=5e-2):
         """
@@ -700,7 +701,7 @@ class Bias(object):
             measures += ['label_value']
 
             for measure in measures:
-                cls.calculate_significance(
+                cls._calculate_significance(
                     original_df, disparity_df, attribute, measure,
                     ref_dict=ref_dict,
                     alpha=alpha)
@@ -715,7 +716,6 @@ class Bias(object):
     def list_significance(self, df):
         """
         View list of all calculated disparities in df
-        :return: list of disparity metrics
         """
         return list(df.columns[df.columns.str.contains('_significance')])
 

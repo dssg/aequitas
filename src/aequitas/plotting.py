@@ -21,9 +21,9 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
                          specific_measures=None, label_score_ref=None):
     """
-    Creates a dictionary of reference groups for each metric in a data_table
+    Creates a dictionary of reference groups for each metric in a data_table.
 
-   :param disparities_table: A disparity table. Output of bias.get_disparity or
+   :param disparities_table: a disparity table. Output of bias.get_disparity or
         fairness.get_fairness functions
     :param ref_group_flag: string indicating column indicates reference group
         flag value. Default is '_ref_group_value'.
@@ -187,35 +187,6 @@ class Plot(object):
         return new_cmap
 
 
-    @staticmethod
-    def _assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value'):
-        """
-        Creates a dictionary of reference groups for each metric in a data_table
-
-       :param disparities_table: a disparity table. Output of bias.get_disparity or
-            fairness.get_fairness functions
-        :param ref_group_flag: string indicating column indicates reference group
-            flag value. Default is '_ref_group_value'.
-
-        :return: A dictionary
-        """
-        ref_groups = {}
-        ref_group_cols = \
-            list(disparities_table.columns[disparities_table.columns.str.contains(
-                ref_group_flag)])
-        attributes = list(disparities_table.attribute_name.unique())
-        for attribute in attributes:
-            attr_table = \
-                disparities_table.loc[disparities_table['attribute_name'] == attribute]
-            attr_refs = {}
-            for col in ref_group_cols:
-                metric_key = "".join(col.split(ref_group_flag))
-                attr_refs[metric_key] = \
-                    attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
-            ref_groups[attribute] = attr_refs
-        return ref_groups
-
-
     @classmethod
     def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
                                  ref_group_flag='_ref_group_value', model_id=1):
@@ -223,7 +194,7 @@ class Plot(object):
         Finds relative index (row) of reference group value for a given metric.
 
         :param disparities_table: a disparity table. Output of bias.get_disparity or
-            fairness.get_fairness functions
+            fairness.get_fairness functions.
         :param attribute_name: the attribute to plot metric against. Must be a column
             in the disparities_table.
         :param group_metric: the metric to plot. Must be a column in the
@@ -254,9 +225,10 @@ class Plot(object):
     def plot_group_metric(self, group_table, group_metric, ax=None, ax_lim=None,
                           title=True, label_dict=None, min_group_size = None):
         """
-        Plot a single group metric's absolute metrics
+        Plot a single group metric across all attribute groups.
 
-        :param group_table: a group table
+        :param group_table: group table. Output of of group.get_crosstabs() or
+            bias.get_disparity functions.
         :param group_metric: the metric to plot. Must be a column in the group_table.
         :param ax: a matplotlib Axis. If not passed, a new figure will be created.
         :param title: whether to include a title in visualizations. Default is True.
@@ -265,7 +237,7 @@ class Plot(object):
         :param min_group_size: minimum size for groups to include in visualization
             (as a proportion of total sample)
 
-        :return: matplotlib.Axis
+        :return: A Matplotlib axis
         """
         if group_metric not in group_table.columns:
             raise ValueError(f"Specified disparity metric '{group_metric}' not "
@@ -399,20 +371,20 @@ class Plot(object):
                        highlight_fairness=False, min_group_size=None,
                        significance_alpha=0.05):
         """
-        Create treemap from disparity or absolute metric values
+        Create treemap based on a single bias disparity metric across attribute
+        groups.
 
         Adapted from https://plot.ly/python/treemaps/,
         https://gist.github.com/gVallverdu/0b446d0061a785c808dbe79262a37eea,
         and https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib
 
-        Plot a single group metric's disparity
         :param disparity_table: a disparity table. Output of bias.get_disparity or
-            fairness.get_fairness functions.
+            fairness.get_fairness function.
         :param group_metric: the metric to plot. Must be a column in the
             disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
         :param color_mapping: matplotlib colormapping for treemap value boxes.
-        :param model_id: which model to plot for. Default is 1.
+        :param model_id: model ID number. Default is 1.
         :param ax: a matplotlib Axis. If not passed, a new figure will be created.
         :param fig: a matplotlib Figure. If not passed, a new figure will be created.
         :param label_dict: optional, dictionary of replacement labels for data.
@@ -427,7 +399,7 @@ class Plot(object):
             determine visual representation of significance (number of
             asterisks on treemap).
 
-        :return: matplotlib.Axis
+        :return: A Matplotlib axis
         """
         # Use matplotlib to truncate colormap, scale metric values
         # between the min and max, then assign colors to individual values
@@ -616,9 +588,10 @@ class Plot(object):
                             min_group_size=None):
         '''
         This function plots absolute group metrics as indicated by the config file,
-            colored based on calculated parity
+        colored based on calculated parity.
 
-        :param fairness_table: a fairness table. Output of fairness.get_fairness functions.
+        :param fairness_table: a fairness table. Output of fairness.get_fairness
+            function.
         :param group_metric: the fairness metric to plot. Must be a column in the fairness_table.
         :param ax: a matplotlib Axis. If not passed a new figure will be created.
         :param ax_lim: maximum value on x-axis, used to match axes across subplots
@@ -630,7 +603,7 @@ class Plot(object):
             a population group must meet in order to be included in fairness
             visualization
 
-        :return: matplotlib.Axis
+        :return: A Matplotlib axis
         '''
         if group_metric not in fairness_table.columns:
             raise ValueError(f"Specified disparity metric {group_metric} not "
@@ -769,7 +742,7 @@ class Plot(object):
 
         :param group_metric: the metric to plot. Must be a column in the disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
-        :param model_id: which model to plot for. Default is None.
+        :param model_id: model ID number. Default is 1.
         :param ax: a matplotlib Axis. If not passed, a new figure will be created.
         :param fig: a matplotlib Figure. If not passed, a new figure will be created.
         :param title: whether to include a title in visualizations. Default is True.
@@ -779,7 +752,7 @@ class Plot(object):
         :param significance_alpha: statistical significance level. Used to
             determine visual representation of significance (number of
             asterisks on treemap).
-        :return:  matplotlib.Axis
+        :return: A Matplotlib axis
         """
         return self.plot_disparity(disparity_table=fairness_table,
                                    group_metric=group_metric,
@@ -916,7 +889,7 @@ class Plot(object):
         """
         This function plots treemaps of disparities indicated by config file
 
-        :param data_table: Output of bias.get_disparity, or fairness.get_fairness
+        :param data_table: output of bias.get_disparity, or fairness.get_fairness
             functions
         :param plot_fcn: Plotting function to use to plot individual disparity
             or fairness treemaps in grid
@@ -1085,7 +1058,7 @@ class Plot(object):
         Plot multiple metrics at once from a fairness object table.
 
         :param data_table:  output of group.get_crosstabs, bias.get_disparity, or
-            fairness.get_fairness functions
+            fairness.get_fairness functions.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
                 - Predicted Prevalence (pprev),
@@ -1157,7 +1130,7 @@ class Plot(object):
         """
         Plot multiple metrics at once from a fairness object table.
 
-        :param fairness_table: Output of fairness.get_fairness functions.
+        :param fairness_table: output of fairness.get_fairness functions.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
                 - Predicted Prevalence (pprev),
