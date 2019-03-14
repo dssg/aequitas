@@ -86,9 +86,9 @@ class Fairness(object):
             self.high_level_fairness_depend = high_level_fairness_depend
 
     def get_fairness_measures_supported(self, input_df):
-        '''
-        Determine fairness mseasures supported based on columns in data frame
-        '''
+        """
+        Determine fairness measures supported based on columns in data frame
+        """
         if 'label_value' not in input_df.columns:
             self.fair_measures_supported = ['Statistical Parity', 'Impact Parity']
         return self.fair_measures_supported
@@ -99,10 +99,8 @@ class Fairness(object):
         dictionary and adds them as columns to the input bias_df
 
         :param bias_df: the output dataframe from bias/ disparity calculation methods
-        :param fair_eval: (optional) a lambda function that is used to assess
-            fairness (e.g. 80% rule)
-        :param tau: (optional) the threshold for fair/ unfair evaluation
-        :param fair_measures: (optional) a dictionary containing fairness
+        :param tau: optional, the threshold for fair/ unfair evaluation
+        :param fair_measures_requested: optional, a dictionary containing fairness
             measures as keys and the corresponding input bias disparity as values
         :return: Bias_df dataframe with additional columns for each
             of the fairness measures defined in the fair_measures dictionary
@@ -178,7 +176,7 @@ class Fairness(object):
         group_attribute_df = pd.DataFrame()
         key_columns = ['model_id', 'score_threshold', 'attribute_name']
         groupby_variable = group_value_df.groupby(key_columns)
-        # We need to do this beacause of NaNs. idxmin() on pandas raises keyerror if there is a NaN...
+        # We need to do this because of NaNs. idxmin() on pandas raises keyerror if there is a NaN...
         group_attribute_df = self.fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
                                                                   fair_measures_requested)
         if group_attribute_df.empty:
@@ -218,9 +216,9 @@ class Fairness(object):
         return overall_fairness
 
     def list_parities(self, df):
-        '''
+        """
         View list of all parity determinations in given df
-        '''
+        """
         all_fairness = self.type_parity_depend.keys() | \
                        self.high_level_fairness_depend.keys() | \
                        self.fair_measures_depend.keys()

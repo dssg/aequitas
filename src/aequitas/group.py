@@ -20,10 +20,11 @@ class Group(object):
             (x[label_col] == 1).sum()
         self.group_functions = self.get_group_functions()
 
+    @staticmethod
     def get_group_functions():
         """
-        Helper function to accumulate lambda functions used in bias metrics
-        calculations
+
+        :return:
         """
 
         divide = lambda x, y: x / y if y != 0 else pd.np.nan
@@ -117,8 +118,8 @@ class Group(object):
 
         :param df: a dataframe containing the following required columns [score,  label_value]
         :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id: the model ID on which to subset the df
-        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
+        :param model_id:
+        :return:
         """
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
@@ -128,12 +129,12 @@ class Group(object):
         if False in check:
             # todo: create separate check method that raises exception...
             logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-            exit(1)
+            # exit(1)
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
             logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-            exit(1)
+            # exit(1)
 
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
@@ -184,9 +185,13 @@ class Group(object):
 
                 for thres_val in thres_values:
                     flag = 0
+
+                    # To discuss with Pedro: believe this might be the reason
+                    # for cutoff error - if nunmbers are cumulative, per
+                    # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
 
-                    # denote threshold as binary if numeric count_ones value
+                    # denote threshold as binarhy if numeric count_ones value
                     # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
@@ -216,7 +221,8 @@ class Group(object):
 
     def list_absolute_metrics(self, df):
         '''
-        View list of all calculated absolute bias metrics in df
+        View all calculated disparities in table
+        :return: list of disparity metrics
         '''
         return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
                                            'fdr', 'npv', 'precision', 'ppr',
