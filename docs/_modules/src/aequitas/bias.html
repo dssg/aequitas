@@ -154,9 +154,11 @@
             
   <h1>Source code for src.aequitas.bias</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">exit</span>
+
+<span class="kn">from</span> <span class="nn">aequitas.plotting</span> <span class="k">import</span> <span class="n">assemble_ref_groups</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">stats</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -166,120 +168,219 @@
 <div class="viewcode-block" id="Bias"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias">[docs]</a><span class="k">class</span> <span class="nc">Bias</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">default_key_columns</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">)</span>
+    <span class="n">all_group_metrics</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ppr&#39;</span><span class="p">,</span> <span class="s1">&#39;pprev&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span> <span class="s1">&#39;npv&#39;</span><span class="p">)</span>
+    <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;as_of_date&#39;</span><span class="p">,</span> <span class="s1">&#39;entity_id&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_abs&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;rank_pct&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="n">default_key_columns</span><span class="p">,</span> <span class="n">sample_df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">non_attr_cols</span><span class="o">=</span><span class="n">non_attr_cols</span><span class="p">,</span>
+                 <span class="n">significance_cols</span><span class="o">=</span><span class="n">all_group_metrics</span><span class="p">,</span>
+                 <span class="n">input_group_metrics</span><span class="o">=</span><span class="n">all_group_metrics</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
-<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defaults are</span>
 <span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
 <span class="sd">        :param input_group_metrics: List of absolute bias metrics to calculate</span>
 <span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
 <span class="sd">            zero. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="n">key_columns</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ppr&#39;</span><span class="p">,</span> <span class="s1">&#39;pprev&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span> <span class="s1">&#39;npv&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span> <span class="o">=</span> <span class="n">input_group_metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_group_metrics</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="mf">10.00000</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="n">fill_divbyzero</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_attr_cols</span> <span class="o">=</span> <span class="n">non_attr_cols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">significance_cols</span> <span class="o">=</span> <span class="n">significance_cols</span>
 
-<div class="viewcode-block" id="Bias.get_disparity_min_metric"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_min_metric">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_min_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Bias.get_disparity_min_metric"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_min_metric">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_min_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">original_df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">check_significance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="n">alpha</span> <span class="o">=</span> <span class="mf">5e-2</span><span class="p">,</span>
+                                 <span class="n">mask_significance</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">label_score_ref</span><span class="o">=</span><span class="s1">&#39;fpr&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates disparities between groups for the predefined list of</span>
 <span class="sd">        group metrics using the group with the minimum value for each absolute</span>
 <span class="sd">        bias metric as the reference group (denominator).</span>
 
-<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method</span>
+<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method.</span>
+<span class="sd">        :param original_df: a dataframe of sample features and model results.</span>
+<span class="sd">            Includes a required &#39;score &#39;column and possible &#39;label_value&#39; column.</span>
 <span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
-<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defaults are</span>
 <span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
-<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">        :param input_group_metrics: optional, columns list corresponding to</span>
 <span class="sd">            the group metrics for which we want to calculate disparity values</span>
 <span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
 <span class="sd">            zero. Default is None.</span>
+<span class="sd">        :param check_significance: measures for which to determine statistical</span>
+<span class="sd">            significance beyond label_value and score. Default is all metrics.</span>
+<span class="sd">        :param alpha: statistical significance level to use in significance</span>
+<span class="sd">            determination. Default is 5e-2 (0.05).</span>
+<span class="sd">        :param mask_significance: whether to display a T/F mask over calculated</span>
+<span class="sd">            p-values from statistical significance determination. Default is True.</span>
+<span class="sd">        :param label_score_ref: default reference group to use for score and</span>
+<span class="sd">            label_value statistical significance calculations.</span>
 <span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
 <span class="sd">            with additional disparity metrics columns and ref_group_values</span>
 <span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_min_metric()&#39;</span><span class="p">)</span>
+        <span class="c1"># record df column order</span>
+        <span class="n">df_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
-            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
             <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
             <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_min_metric&#39;</span><span class="p">)</span>
-        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_significance</span><span class="p">:</span>
+            <span class="n">check_significance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">significance_cols</span>
+
         <span class="k">for</span> <span class="n">group_metric</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">:</span>
-            <span class="n">fill_zeros</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.000000</span>
+
             <span class="k">try</span><span class="p">:</span>
-                <span class="c1"># this groupby is being called every cycle. maybe we can create a list of df_groups</span>
-                <span class="c1"># and merge df at the end? it can not be simply put outside the loop(the merge...)</span>
-                <span class="n">df_min_idx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)[</span><span class="n">group_metric</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()]</span>
-                <span class="c1"># but we also want to get the group_value of the reference group for each bias metric</span>
+                <span class="c1"># this groupby is being called every cycle. maybe we can create</span>
+                <span class="c1"># a list of df_groups and merge df at the end? it can not be</span>
+                <span class="c1"># simply put outside the loop(the merge...)</span>
+                <span class="n">idxmin</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)[</span><span class="n">group_metric</span><span class="p">]</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+
+                <span class="c1"># if entire column for a group metric is NaN, cast min value</span>
+                <span class="c1"># index column to same index as any other group for that attribute</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">idxmin</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxmin</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">idxmin</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxmin</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                            <span class="n">df</span><span class="p">[</span><span class="s2">&quot;attribute_name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                                <span class="n">idxmin</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+                            <span class="p">)</span>
+                        <span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;A minimum value for group_metric &quot;</span>
+                                      <span class="n">f</span><span class="s2">&quot;</span><span class="si">{group_metric}</span><span class="s2"> could not be calculated.&quot;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+
+                <span class="n">df_min_idx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idxmin</span><span class="p">]</span>
+
+                <span class="c1"># but we also want to get the group_value of the reference group</span>
+                <span class="c1"># for each bias metric</span>
                 <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
                 <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">,</span> <span class="n">group_metric</span> <span class="o">+</span>
                                            <span class="s1">&#39;_ref_group_value&#39;</span><span class="p">]]</span> <span class="o">=</span> \
                     <span class="n">df_min_idx</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">group_metric</span><span class="p">,</span> <span class="s1">&#39;attribute_value&#39;</span><span class="p">]]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                    <span class="s1">&#39;get_bias_min_metric:: one of the following columns is not on the input &#39;</span>
-                    <span class="s1">&#39;dataframe : model_id ,parameter,attribute_name or any of the input_group_metrics &#39;</span>
+                    <span class="s1">&#39;get_bias_min_metric:: one of the following columns is not &#39;</span>
+                    <span class="s1">&#39;on the input dataframe : model_id, parameter, attribute_name &#39;</span>
+                    <span class="s1">&#39;or any of the input_group_metrics &#39;</span>
                     <span class="s1">&#39;list&#39;</span><span class="p">)</span>
-                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
-            <span class="c1"># creating disparity by dividing each group metric value by the corresponding min</span>
-            <span class="c1"># value from the groups of the target attribute</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span>
-        <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
-        <span class="c1"># df = df.fillna(value=fill_zeros)</span>
-        <span class="k">return</span> <span class="n">df</span></div>
 
-<div class="viewcode-block" id="Bias.get_disparity_major_group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_major_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_major_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                  <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
+            <span class="c1"># creating disparity by dividing each group metric value by the</span>
+            <span class="c1"># corresponding min value from the groups of the target attribute</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="n">group_metric</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span><span class="p">]</span>
+            <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
+
+        <span class="c1"># add statistical_significance</span>
+        <span class="n">check_significance</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">check_significance</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="n">ref_groups_dict</span> <span class="o">=</span> <span class="n">assemble_ref_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">,</span>
+                                              <span class="n">specific_measures</span><span class="o">=</span><span class="n">check_significance</span><span class="p">,</span>
+                                              <span class="n">label_score_ref</span><span class="o">=</span><span class="n">label_score_ref</span><span class="p">)</span>
+
+        <span class="n">attr_cols</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+
+        <span class="c1"># run significance method on bias-augmented crosstab based on false</span>
+        <span class="c1"># positives, false negatives, scores, and label values in original df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_statistical_significance</span><span class="p">(</span>
+            <span class="n">original_df</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_dict</span><span class="o">=</span><span class="n">ref_groups_dict</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="n">attr_cols</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span>
+
+        <span class="c1"># if specified, apply T/F mask to significance columns</span>
+        <span class="k">if</span> <span class="n">mask_significance</span><span class="p">:</span>
+            <span class="n">significance_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_significance&#39;</span><span class="p">)]</span>
+            <span class="n">truemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span>
+            <span class="n">falsemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">truemask</span><span class="p">,</span> <span class="n">falsemask</span><span class="p">],</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># check what new disparity columns are and order as disparity,</span>
+        <span class="c1"># ref_group, significance for each</span>
+        <span class="n">new_cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_cols</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;score_significance&#39;</span><span class="p">})</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df_cols</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;score_significance&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_cols</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Bias.get_disparity_major_group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_major_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_major_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">original_df</span><span class="p">,</span> <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_significance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">alpha</span> <span class="o">=</span> <span class="mf">5e-2</span><span class="p">,</span> <span class="n">mask_significance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">label_score_ref</span><span class="o">=</span><span class="s1">&#39;fpr&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates disparities between groups for the predefined list of group</span>
 <span class="sd">        metrics using the majority group within each attribute as the reference</span>
 <span class="sd">        group (denominator).</span>
 
-<span class="sd">        :param df: the returning dataframe from the group.get_crosstabs</span>
+<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method.</span>
+<span class="sd">        :param original_df: a dataframe of sample features and model results.</span>
+<span class="sd">            Includes a required &#39;score &#39;column and possible &#39;label_value&#39; column.</span>
 <span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
-<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defaults are</span>
 <span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
-<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">        :param input_group_metrics: optional, columns list corresponding to</span>
 <span class="sd">            the group metrics for which we want to calculate disparity values</span>
-<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero.</span>
-<span class="sd">            Default is None.</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
+<span class="sd">            zero. Default is None.</span>
+<span class="sd">        :param check_significance: measures for which to determine statistical</span>
+<span class="sd">            significance beyond label_value and score. Default is all metrics.</span>
+<span class="sd">        :param alpha: statistical significance level to use in significance</span>
+<span class="sd">            determination. Default is 5e-2 (0.05).</span>
+<span class="sd">        :param mask_significance: whether to display a T/F mask over calculated</span>
+<span class="sd">            p-values from statistical significance determination. Default is True.</span>
+<span class="sd">        :param label_score_ref: default reference group to use for score and</span>
+<span class="sd">            label_value statistical significance calculations.</span>
 <span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
 <span class="sd">            with additional disparity metrics columns and ref_group_values</span>
 <span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_major_group()&#39;</span><span class="p">)</span>
+        <span class="c1"># record df column order</span>
+        <span class="n">df_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
-            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
             <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
             <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_significance</span><span class="p">:</span>
+            <span class="n">check_significance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">significance_cols</span>
+
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">df_major_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)[</span><span class="s1">&#39;group_size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_bias_major_group:: one of the following columns is not on the input &#39;</span>
-                          <span class="s1">&#39;dataframe : model_id ,parameter,attribute_name, group_size &#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_bias_major_group:: one of the following columns &#39;</span>
+                          <span class="s1">&#39;is not on the input dataframe : model_id, parameter, &#39;</span>
+                          <span class="s1">&#39;attribute_name, group_size&#39;</span><span class="p">)</span>
+
         <span class="n">disparity_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">]</span>
         <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing the target ref</span>
-        <span class="c1"># group values which are now labeled as _disparity but we still need to perform the division</span>
+        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing</span>
+        <span class="c1"># the target ref group values which are now labeled as _disparity but</span>
+        <span class="c1"># we still need to perform the division</span>
         <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_major_group</span><span class="p">[</span>
             <span class="n">key_columns</span> <span class="o">+</span> <span class="n">input_group_metrics</span><span class="p">]</span>
         <span class="c1"># we now need to create the ref_group_value columns in the df_to_merge</span>
@@ -289,95 +390,494 @@
         <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
-        <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
-        <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
-        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
-        <span class="c1"># df = df.fillna(value=fill_zeros)</span>
-        <span class="k">return</span> <span class="n">df</span></div>
 
-    <span class="k">def</span> <span class="nf">verify_ref_groups_dict_len</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">):</span>
+        <span class="c1"># when there is a zero in the numerator and a zero in denominator it is</span>
+        <span class="c1"># considered NaN after division, so if 0/0 we assume 1.0 disparity</span>
+        <span class="c1"># (they are the same...)</span>
+
+        <span class="c1"># default is to use the same ref groups as df, need to add functionality to</span>
+        <span class="c1"># compile ref_groups_dict based on a passed ref group for a given measure</span>
+        <span class="n">check_significance</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">check_significance</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="n">ref_groups_dict</span> <span class="o">=</span> <span class="n">assemble_ref_groups</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">,</span>
+                                       <span class="n">specific_measures</span><span class="o">=</span><span class="n">check_significance</span><span class="p">,</span>
+                                              <span class="n">label_score_ref</span><span class="o">=</span><span class="n">label_score_ref</span><span class="p">)</span>
+
+
+        <span class="n">attr_cols</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="n">largest_group</span> <span class="o">=</span> <span class="n">df_major_group</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_major_group</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span><span class="p">,</span>
+                                               <span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ref_groups_dict</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;label_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">largest_group</span>
+            <span class="n">ref_groups_dict</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">largest_group</span>
+
+        <span class="c1"># run significance method on bias-augmented crosstab based on false</span>
+        <span class="c1"># positives, false negatives, scores, and label values in original df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_statistical_significance</span><span class="p">(</span>
+            <span class="n">original_df</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_dict</span><span class="o">=</span><span class="n">ref_groups_dict</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="n">attr_cols</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span>
+
+        <span class="c1"># if specified, apply T/F mask to significance columns</span>
+        <span class="k">if</span> <span class="n">mask_significance</span><span class="p">:</span>
+            <span class="n">significance_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_significance&#39;</span><span class="p">)]</span>
+            <span class="n">truemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span>
+            <span class="n">falsemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">truemask</span><span class="p">,</span> <span class="n">falsemask</span><span class="p">],</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># check what new disparity columns are and order as disparity,</span>
+        <span class="c1"># ref_group, significance for each</span>
+        <span class="n">new_cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_cols</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span> <span class="s1">&#39;score_significance&#39;</span><span class="p">})</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df_cols</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span> <span class="s1">&#39;score_significance&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_cols</span><span class="p">]</span></div>
+
+
+
+    <span class="k">def</span> <span class="nf">_verify_ref_groups_dict_len</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_groups_dict</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
 
-    <span class="k">def</span> <span class="nf">verify_ref_group_loc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_verify_ref_group_loc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_slice</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
 
-<div class="viewcode-block" id="Bias.get_disparity_predefined_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_predefined_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">,</span>
+<div class="viewcode-block" id="Bias.get_disparity_predefined_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups">[docs]</a>    <span class="k">def</span> <span class="nf">get_disparity_predefined_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">original_df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">,</span>
                                         <span class="n">key_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">input_group_metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                        <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                        <span class="n">fill_divbyzero</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">check_significance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">,</span>
+                                        <span class="n">mask_significance</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates disparities between groups for the predefined list of group</span>
-<span class="sd">        metrics using a predefined reference group value for each attribute.</span>
+<span class="sd">        metrics using a predefined reference group (denominator) value for each</span>
+<span class="sd">        attribute.</span>
 
-<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method</span>
-<span class="sd">        :param ref_groups_dict: a dictionary of format: {&#39;attribute_name&#39;: &#39;attribute_value&#39;, ...}</span>
+<span class="sd">        :param df: output dataframe of Group class get_crosstabs() method.</span>
+<span class="sd">        :param original_df: dataframe of sample features and model results.</span>
+<span class="sd">            Includes a required &#39;score &#39;column and possible &#39;label_value&#39; column.</span>
+<span class="sd">        :param ref_groups_dict: dictionary of format: {&#39;attribute_name&#39;: &#39;attribute_value&#39;, ...}</span>
 <span class="sd">        :param key_columns: optional, key identifying columns for grouping</span>
-<span class="sd">            variables and bias metrics in intermediate joins. Defualts are</span>
+<span class="sd">            variables and bias metrics in intermediate joins. Defaults are</span>
 <span class="sd">            &#39;model_id&#39;, &#39;score_threshold&#39;, &#39;attribute_name&#39;.</span>
-<span class="sd">        :param input_group_metrics: optional, the columns list corresponding to</span>
+<span class="sd">        :param input_group_metrics: optional, columns list corresponding to</span>
 <span class="sd">            the group metrics for which we want to calculate disparity values</span>
-<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by zero.</span>
-<span class="sd">            Default is None.</span>
+<span class="sd">        :param fill_divbyzero: optional, fill value to use when divided by</span>
+<span class="sd">            zero. Default is None.</span>
+<span class="sd">        :param check_significance: measures for which to determine statistical</span>
+<span class="sd">            significance beyond label_value and score. Default is all metrics.</span>
+<span class="sd">        :param alpha: statistical significance level to use in significance</span>
+<span class="sd">            determination. Default is 5e-2 (0.05).</span>
+<span class="sd">        :param mask_significance: whether to display a T/F mask over calculated</span>
+<span class="sd">            p-values from statistical significance determination. Default is True.</span>
 <span class="sd">        :return: A dataframe with same number of rows as the input (crosstab)</span>
 <span class="sd">            with additional disparity metrics columns and ref_group_values</span>
 <span class="sd">            for each metric.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_group()&#39;</span><span class="p">)</span>
+        <span class="c1"># record df column order</span>
+        <span class="n">df_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_columns</span><span class="p">:</span>
-            <span class="n">key_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span>
+            <span class="n">key_columns</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key_columns</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">input_group_metrics</span><span class="p">:</span>
             <span class="n">input_group_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fill_divbyzero</span><span class="p">:</span>
             <span class="n">fill_divbyzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_divbyzero</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">check_significance</span><span class="p">:</span>
+            <span class="n">check_significance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">significance_cols</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verify_ref_groups_dict_len</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_verify_ref_groups_dict_len</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Bias.get_disparity_predefined_groups(): the number of predefined group &#39;</span>
-                          <span class="s1">&#39;values to use as reference is less than the actual number of &#39;</span>
-                          <span class="s1">&#39;attributes in the input dataframe.&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Bias.get_disparity_predefined_groups(): the number of &#39;</span>
+                          <span class="s1">&#39;predefined group values to use as reference is less &#39;</span>
+                          <span class="s1">&#39;than the actual number of attributes in the input &#39;</span>
+                          <span class="s1">&#39;dataframe.&#39;</span><span class="p">)</span>
+
         <span class="n">df_ref_group</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ref_groups_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">group_slice</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">)]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">verify_ref_group_loc</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span>
+                <span class="n">group_slice</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">)</span> <span class="o">&amp;</span>
+                                     <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">val</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_verify_ref_group_loc</span><span class="p">(</span><span class="n">group_slice</span><span class="p">)</span>
                 <span class="n">df_ref_group</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_ref_group</span><span class="p">,</span> <span class="n">group_slice</span><span class="p">])</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_groups(): reference groups and values provided &#39;</span>
-                          <span class="s1">&#39;do not exist as columns/values in the input dataframe.(Note: check for syntax errors)&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_disparity_predefined_groups(): reference groups &#39;</span>
+                          <span class="s1">&#39;and values provided do not exist as columns/values &#39;</span>
+                          <span class="s1">&#39;in the input dataframe.(Note: check for syntax errors)&#39;</span><span class="p">)</span>
+
         <span class="n">disparity_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_disparity&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">]</span>
         <span class="n">df_to_merge</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing the target ref</span>
-        <span class="c1"># group values which are now labeled as _disparity but we still need to perform the division</span>
+
+        <span class="c1"># we created the df_to_merge has a subset of the df_ref_group containing</span>
+        <span class="c1"># the target ref group values which are now labeled as _disparity but</span>
+        <span class="c1"># we still need to perform the division</span>
         <span class="n">df_to_merge</span><span class="p">[</span><span class="n">key_columns</span> <span class="o">+</span> <span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ref_group</span><span class="p">[</span>
             <span class="n">key_columns</span> <span class="o">+</span> <span class="n">input_group_metrics</span><span class="p">]</span>
+
         <span class="c1"># we now need to create the ref_group_value columns in the df_to_merge</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">input_group_metrics</span><span class="p">:</span>
             <span class="n">df_to_merge</span><span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_ref_group_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ref_group</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df_to_merge</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">input_group_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">disparity_metrics</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
         <span class="c1"># We are capping the disparity values to 10.0 when divided by zero...</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">fill_divbyzero</span><span class="p">)</span>
-        <span class="c1"># when there is a zero in the numerator and a zero in denominator it is considered NaN</span>
-        <span class="c1"># after division, so if 0/0 we assume 1.0 disparity (they are the same...)</span>
-        <span class="n">fill_zeros</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mf">1.000000</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">disparity_metrics</span><span class="p">}</span>
-        <span class="c1"># df = df.fillna(value=fill_zeros)</span>
-        <span class="k">return</span> <span class="n">df</span></div>
 
+        <span class="c1"># for predefined groups, use the largest of the predefined groups as</span>
+        <span class="c1"># ref group for score and label value</span>
+        <span class="n">check_significance</span> <span class="o">=</span> <span class="n">df_cols</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">check_significance</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="c1"># compile dictionary of reference groups based on bias-augmented crosstab</span>
+        <span class="n">full_ref_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ref_groups_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">full_ref_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label_value&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">,</span>
+                                  <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">val</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">check_significance</span><span class="p">:</span>
+                <span class="n">full_ref_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="c1"># run significance method on bias-augmented crosstab based on false</span>
+        <span class="c1"># positives, false negatives, scores, and label values in original df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_statistical_significance</span><span class="p">(</span>
+            <span class="n">original_df</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_dict</span><span class="o">=</span><span class="n">full_ref_dict</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">)</span>
+
+        <span class="c1"># if specified, apply T/F mask to significance columns</span>
+        <span class="k">if</span> <span class="n">mask_significance</span><span class="p">:</span>
+            <span class="n">significance_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_significance&#39;</span><span class="p">)]</span>
+            <span class="n">truemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">alpha</span>
+            <span class="n">falsemask</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">significance_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">truemask</span><span class="p">,</span> <span class="n">falsemask</span><span class="p">],</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># check what new disparity columns are and order as disparity,</span>
+        <span class="c1"># ref_group, significance for each</span>
+        <span class="n">new_cols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_cols</span><span class="p">)</span> <span class="o">-</span> <span class="p">{</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span> <span class="s1">&#39;score_significance&#39;</span><span class="p">})</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">df_cols</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;label_value_significance&#39;</span><span class="p">,</span> <span class="s1">&#39;score_significance&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_cols</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_measure_sample</span><span class="p">(</span><span class="n">original_df</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">measure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function for _get_statistical_significance() (via</span>
+<span class="sd">        _calculate_significance() function). Convert dataframe to samples for</span>
+<span class="sd">        given attribute group.</span>
+
+<span class="sd">        :param original_df: a dataframe containing a required raw &#39;score&#39; column</span>
+<span class="sd">            and possible raw &#39;label_value&#39; column.</span>
+<span class="sd">        :param attribute: Attribute of interest in dataset (ex: race, sex, age</span>
+<span class="sd">            category)</span>
+<span class="sd">        :param measure: Metric of interest for which to calculate significance</span>
+<span class="sd">            (false positives, false negatives, score, label_value)</span>
+
+<span class="sd">        :return: A dictionary of binary &#39;samples&#39; for each attribute group</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">original_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">(),</span> <span class="n">measure</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_equal_variance</span><span class="p">(</span><span class="n">sample_dict</span><span class="p">,</span> <span class="n">ref_group</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function for _get_statistical_significance() (via</span>
+<span class="sd">        _calculate_significance() function).</span>
+
+<span class="sd">        :param sample_dict: dictionary of binary samples for equal variance</span>
+<span class="sd">            comparison.</span>
+<span class="sd">        :param ref_group: Group to use as reference group for statistical</span>
+<span class="sd">            significance calculation.</span>
+<span class="sd">        :param alpha: Level at which to determine statistical significance.</span>
+<span class="sd">            Default is 5e-2 (0.05).</span>
+
+<span class="sd">        :return: Dictionary indicating whether each group has equal variance</span>
+<span class="sd">        (in comparison with reference group)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Immediately set ref_group status for equal variance (with itself): True</span>
+
+        <span class="n">eq_variance</span> <span class="o">=</span> <span class="p">{</span><span class="n">ref_group</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">attr_value</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">sample_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># make default normality_p value (only used when len(sample) &lt; 8)</span>
+            <span class="c1"># large enough that it is always greater than alpha</span>
+            <span class="n">normality_p</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+            <span class="c1"># skew test requires at least 8 samples</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">normality_p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">normaltest</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s1">&#39;omit&#39;</span><span class="p">)</span>
+
+            <span class="c1"># if tested normality is False or less than 8 samples, use levene</span>
+            <span class="c1"># test to check equal variance between groups</span>
+            <span class="k">if</span> <span class="n">normality_p</span> <span class="o">&lt;</span> <span class="n">alpha</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="c1"># if ref_group is not normal, can&#39;t use f-test or bartlett test</span>
+                <span class="c1"># for any samples, so check for equal variance against ref_group</span>
+                <span class="c1"># using levene test for all groups and return dict</span>
+                <span class="c1"># (since includes all groups)</span>
+                <span class="k">if</span> <span class="n">attr_value</span> <span class="o">==</span> <span class="n">ref_group</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">sample_list</span> <span class="ow">in</span> <span class="n">sample_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">equal_variance_p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">levene</span><span class="p">(</span><span class="n">sample_dict</span><span class="p">[</span><span class="n">ref_group</span><span class="p">],</span>
+                                                           <span class="n">sample_list</span><span class="p">,</span>
+                                                           <span class="n">center</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
+
+                        <span class="n">eq_variance</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal_variance_p</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+
+                    <span class="k">return</span> <span class="n">eq_variance</span>
+
+                <span class="c1"># if a non-ref group is not normal, can&#39;t use f-test or bartlett</span>
+                <span class="c1"># for that group, check for equal variance (against ref_group)</span>
+                <span class="c1"># using levene test and add result to dictionary</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">equal_variance_p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">levene</span><span class="p">(</span>
+                    <span class="n">sample_dict</span><span class="p">[</span><span class="n">ref_group</span><span class="p">],</span> <span class="n">sample</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
+
+                <span class="n">eq_variance</span><span class="p">[</span><span class="n">attr_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal_variance_p</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+        <span class="c1"># for all normally distributed non-ref groups, use bartlett test to</span>
+        <span class="c1"># check for equal variance (against ref_group). Add results to dict</span>
+        <span class="n">untested_groups</span> <span class="o">=</span> <span class="n">sample_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">eq_variance</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">ref_group</span><span class="p">)</span>
+        <span class="n">untested</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sample_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">untested_groups</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">attr_value</span><span class="p">,</span> <span class="n">sample_list</span> <span class="ow">in</span> <span class="n">untested</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">equal_variance_p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">bartlett</span><span class="p">(</span><span class="n">sample_dict</span><span class="p">[</span><span class="n">ref_group</span><span class="p">],</span> <span class="n">sample_list</span><span class="p">)</span>
+
+            <span class="n">eq_variance</span><span class="p">[</span><span class="n">attr_value</span><span class="p">]</span> <span class="o">=</span> <span class="n">equal_variance_p</span> <span class="o">&gt;=</span> <span class="n">alpha</span>
+
+
+        <span class="k">return</span> <span class="n">eq_variance</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_significance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">original_df</span><span class="p">,</span> <span class="n">disparity_df</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span>
+                               <span class="n">measure</span><span class="p">,</span> <span class="n">ref_dict</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function for _get_statistical_significance. Pulls samples from</span>
+<span class="sd">        original df, checks for equal variance between population groups and</span>
+<span class="sd">        reference group, runs t-test between groups and reference group, and</span>
+<span class="sd">        adds p-values to disparity_df for a given measure (ex: false positives)</span>
+
+<span class="sd">        :param original_df: a dataframe containing a required raw &#39;score&#39; column</span>
+<span class="sd">            and possible raw &#39;label_value&#39; column.</span>
+<span class="sd">        :param disparity_df: Expansion of get_crosstabs() output with additional</span>
+<span class="sd">            columns for disparity metrics and each metric&#39;s reference group to</span>
+<span class="sd">            which significance must be added</span>
+<span class="sd">        :param attribute: Attribute for which to calculate statistical</span>
+<span class="sd">            significance of a measure</span>
+<span class="sd">        :param measure: Measure for which to calculate statistical significance</span>
+<span class="sd">        :param ref_dict: Dictionary indicating reference group for each</span>
+<span class="sd">            attribute/ measure combination</span>
+<span class="sd">        :param alpha: Level at which to determine statistical significance.</span>
+<span class="sd">            Default is 5e-2 (0.05).</span>
+
+<span class="sd">        :return: dataframe with same number of rows as the input (crosstab)</span>
+<span class="sd">            but with additional disparity metrics columns, ref_group_values, and</span>
+<span class="sd">            statistical significance (p-values) of specific metrics.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">binaries_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label_value&#39;</span><span class="p">:</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_fpr&#39;</span><span class="p">:</span> <span class="s1">&#39;fpr&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;binary_tpr&#39;</span><span class="p">:</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_tnr&#39;</span><span class="p">:</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;binary_fnr&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_score&#39;</span><span class="p">:</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;binary_precision&#39;</span><span class="p">:</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_npv&#39;</span><span class="p">:</span> <span class="s1">&#39;npv&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;binary_for&#39;</span><span class="p">:</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_fdr&#39;</span><span class="p">:</span> <span class="s1">&#39;fdr&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;binary_ppr&#39;</span><span class="p">:</span> <span class="s1">&#39;ppr&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_pprev&#39;</span><span class="p">:</span> <span class="s1">&#39;pprev&#39;</span>
+                            <span class="p">}</span>
+
+        <span class="n">ref_group</span> <span class="o">=</span> <span class="n">ref_dict</span><span class="p">[</span><span class="n">attribute</span><span class="p">][</span><span class="n">binaries_lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">measure</span><span class="p">)]</span>
+
+        <span class="c1"># create dictionary of &quot;samples&quot; (binary values for false positive,</span>
+        <span class="c1"># false negative, label value, score) based on original data frame</span>
+        <span class="n">sample_dict</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_measure_sample</span><span class="p">(</span><span class="n">original_df</span><span class="o">=</span><span class="n">original_df</span><span class="p">,</span>
+                                              <span class="n">attribute</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="n">measure</span><span class="p">)</span>
+
+        <span class="c1"># run SciPy equal variance tests between each group and a given</span>
+        <span class="c1"># reference group, store results in dictionary to pass to statistical</span>
+        <span class="c1"># significance tests</span>
+        <span class="n">eq_variance_dict</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_check_equal_variance</span><span class="p">(</span><span class="n">sample_dict</span><span class="o">=</span><span class="n">sample_dict</span><span class="p">,</span>
+                                                    <span class="n">ref_group</span><span class="o">=</span><span class="n">ref_group</span><span class="p">,</span>
+                                                    <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+
+        <span class="c1"># run SciPy statistical significance test between each group and</span>
+        <span class="c1"># reference group</span>
+        <span class="k">for</span> <span class="n">attr_val</span><span class="p">,</span> <span class="n">eq_var</span> <span class="ow">in</span> <span class="n">sample_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">difference_significance_p</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span>
+                <span class="n">sample_dict</span><span class="p">[</span><span class="n">ref_group</span><span class="p">],</span>
+                <span class="n">sample_dict</span><span class="p">[</span><span class="n">attr_val</span><span class="p">],</span>
+                <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">equal_var</span><span class="o">=</span><span class="n">eq_variance_dict</span><span class="p">[</span><span class="n">attr_val</span><span class="p">],</span>
+                <span class="n">nan_policy</span><span class="o">=</span><span class="s1">&#39;omit&#39;</span><span class="p">)</span>
+
+            <span class="n">measure</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">measure</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;binary_&#39;</span><span class="p">))</span>
+
+            <span class="c1"># add column to crosstab to indicate statistical significance</span>
+            <span class="n">disparity_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">disparity_df</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attr_val</span><span class="p">,</span>
+                             <span class="n">measure</span> <span class="o">+</span> <span class="s1">&#39;_significance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">difference_significance_p</span>
+
+        <span class="k">return</span> <span class="n">disparity_df</span>
+
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_statistical_significance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">original_df</span><span class="p">,</span> <span class="n">disparity_df</span><span class="p">,</span> <span class="n">ref_dict</span><span class="p">,</span>
+                                     <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                     <span class="n">attr_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">5e-2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param original_df: a dataframe containing a required raw &#39;score&#39; column</span>
+<span class="sd">            and possible raw &#39;label_value&#39; column.</span>
+<span class="sd">        :param disparity_df: Expansion of get_crosstabs() output with additional</span>
+<span class="sd">            columns for disparity metrics and each metric&#39;s reference group to</span>
+<span class="sd">            which significance must be added</span>
+<span class="sd">        :param ref_dict: Dictionary indicating reference group for each</span>
+<span class="sd">            attribute/ measure combination</span>
+<span class="sd">        :param score_thresholds: a dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
+<span class="sd">        :param model_id: (Future functionality) ID(s) of models for which to check</span>
+<span class="sd">            statistical significance</span>
+<span class="sd">        :param attr_cols: Columns indicating attribute values in original_df</span>
+<span class="sd">        :param alpha: Level at which to determine statistical significance.</span>
+<span class="sd">            Default is 5e-2 (0.05).</span>
+
+<span class="sd">        :return: dataframe with same number of rows as the input (crosstab)</span>
+<span class="sd">            but with additional disparity metrics columns, ref_group_values, and</span>
+<span class="sd">            statistical significance (p-values) of specific metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;label_value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Column &#39;label_value&#39; not in dataframe. Label values are &quot;</span>
+                <span class="s2">&quot;required for computing statistical significance of supervised &quot;</span>
+                <span class="s2">&quot;metrics.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attr_cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;entity_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;rank_abs&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_pct&#39;</span><span class="p">]</span>
+            <span class="c1"># index of the columns that are attributes</span>
+            <span class="n">attr_cols</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">~</span><span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_attr_cols</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="c1"># find the priors_df</span>
+            <span class="n">col_group</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="s1">&#39;pd.np.nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+        <span class="c1"># check if all attr_cols exist in df</span>
+
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;Not all attribute columns provided &#39;</span><span class="si">{attr_cols}</span><span class="s2">&#39; exist in &quot;</span>
+                <span class="n">f</span><span class="s2">&quot;input dataframe!&quot;</span><span class="p">)</span>
+
+        <span class="c1"># check if all columns are strings:</span>
+        <span class="n">non_string_cols</span> <span class="o">=</span> \
+            <span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">original_df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">object</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="p">(</span><span class="n">original_df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="p">(</span><span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">))]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">non_string_cols</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;get_statistical_significance: statistical significance was &#39;</span>
+                <span class="s1">&#39;not calculated. There are non-string cols within attr_cols.&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># if no score_thresholds are provided, we assume that rank_abs equals</span>
+        <span class="c1"># the number  of 1s in the score column; it also serves as flag to set</span>
+        <span class="c1"># parameter to &#39;binary&#39;</span>
+
+        <span class="n">count_ones</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">score_thresholds</span><span class="p">:</span>
+            <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">count_ones</span> <span class="o">=</span> <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">score_thresholds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">count_ones</span><span class="p">]}</span>
+
+        <span class="n">original_df</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_df</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;rank_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_df</span><span class="p">)</span>
+
+        <span class="c1"># Define formula for binary false positive, false negative, and binary</span>
+        <span class="c1"># score</span>
+        <span class="n">binary_false_pos</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">binary_false_neg</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">binary_score</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="n">thres</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">binary_col_functions</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;binary_score&#39;</span><span class="p">:</span> <span class="n">binary_score</span><span class="p">,</span>
+                                <span class="s1">&#39;binary_fpr&#39;</span><span class="p">:</span> <span class="n">binary_false_pos</span><span class="p">,</span>
+                                <span class="s1">&#39;binary_fnr&#39;</span><span class="p">:</span> <span class="n">binary_false_neg</span><span class="p">,</span>
+                                <span class="c1"># &#39;binary_tpr&#39;: binary_true_pos,</span>
+                                <span class="c1"># &#39;binary_tnr&#39;: binary_true_neg</span>
+                                <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="c1"># fill missing values with NaN</span>
+            <span class="n">col_group</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">attribute</span><span class="p">:</span> <span class="s1">&#39;pd.np.nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">thres_unit</span><span class="p">,</span> <span class="n">thres_values</span> <span class="ow">in</span> <span class="n">score_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">thres_val</span> <span class="ow">in</span> <span class="n">thres_values</span><span class="p">:</span>
+
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">binary_col_functions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">thres_unit</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="n">thres_val</span><span class="p">)</span>
+                        <span class="n">original_df</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                            <span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># add columns for error-based significance</span>
+            <span class="c1"># precision, tnr, fdr are based on false positives</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_precision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fpr&#39;</span><span class="p">]</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_tnr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fpr&#39;</span><span class="p">]</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fdr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fpr&#39;</span><span class="p">]</span>
+
+            <span class="c1"># npv, for, tpr are based on false negatives</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_npv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fnr&#39;</span><span class="p">]</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_tpr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fnr&#39;</span><span class="p">]</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_for&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_fnr&#39;</span><span class="p">]</span>
+            <span class="c1"># fdr numerator matches fpr numerator</span>
+
+            <span class="c1"># pprev and ppr based on score</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_ppr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_score&#39;</span><span class="p">]</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_pprev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;binary_score&#39;</span><span class="p">]</span>
+
+
+            <span class="c1"># ensure only predicted positive/ predicted negative values</span>
+            <span class="c1"># included in true/ false positive error based metrics, respectively</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;binary_score&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="p">[</span><span class="s1">&#39;binary_fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_tnr&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;binary_precision&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_fdr&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">original_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">original_df</span><span class="p">[</span><span class="s1">&#39;binary_score&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="p">[</span><span class="s1">&#39;binary_fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_tpr&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;binary_npv&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_for&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+            <span class="n">measures</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">original_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;binary_&#39;</span><span class="p">)])</span>
+            <span class="n">measures</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;label_value&#39;</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_calculate_significance</span><span class="p">(</span>
+                    <span class="n">original_df</span><span class="p">,</span> <span class="n">disparity_df</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">measure</span><span class="p">,</span>
+                    <span class="n">ref_dict</span><span class="o">=</span><span class="n">ref_dict</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">disparity_df</span>
 
 <div class="viewcode-block" id="Bias.list_disparities"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.list_disparities">[docs]</a>    <span class="k">def</span> <span class="nf">list_disparities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        View list of all calculated disparities in df</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_disparity&#39;</span><span class="p">)])</span></div>
 
+<div class="viewcode-block" id="Bias.list_significance"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.list_significance">[docs]</a>    <span class="k">def</span> <span class="nf">list_significance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View list of all calculated disparities in df</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_significance&#39;</span><span class="p">)])</span></div>
+
 <div class="viewcode-block" id="Bias.list_absolute_metrics"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.bias.Bias.list_absolute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">list_absolute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        View list of all calculated absolute bias metrics in df</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_group_metrics</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span></div></div>
 </pre></div>
 

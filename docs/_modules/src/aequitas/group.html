@@ -173,12 +173,13 @@
             <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">label_col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
             <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_group_functions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_group_functions</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Group.get_group_functions"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_group_functions">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_functions</span><span class="p">():</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_group_functions</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to accumulate lambda functions used in bias metrics</span>
-<span class="sd">        calculations</span>
+<span class="sd">        calculations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -264,15 +265,18 @@
                            <span class="s1">&#39;tn&#39;</span><span class="p">:</span> <span class="n">true_neg_count</span><span class="p">,</span>
                            <span class="s1">&#39;tp&#39;</span><span class="p">:</span> <span class="n">true_pos_count</span><span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">group_functions</span></div>
+        <span class="k">return</span> <span class="n">group_functions</span>
 
 <div class="viewcode-block" id="Group.get_crosstabs"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_crosstabs">[docs]</a>    <span class="k">def</span> <span class="nf">get_crosstabs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates univariate groups and calculates group metrics.</span>
 
-<span class="sd">        :param df: a dataframe containing the following required columns [score,  label_value]</span>
-<span class="sd">        :param score_thresholds: a dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
-<span class="sd">        :param model_id: the model ID on which to subset the df</span>
+<span class="sd">        :param df: a dataframe containing the following required columns [score,  label_value].</span>
+<span class="sd">        :param score_thresholds: dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
+<span class="sd">        :param model_id: the model ID on which to subset the df.</span>
+<span class="sd">        :param attr_cols: optional, list of names of columns corresponding to</span>
+<span class="sd">            group attributes (i.e., gender, age category, race, etc.).</span>
+
 <span class="sd">        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_cols</span><span class="p">:</span>
@@ -283,12 +287,12 @@
         <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">check</span><span class="p">:</span>
             <span class="c1"># todo: create separate check method that raises exception...</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: not all attribute columns provided exist in input dataframe!&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># exit(1)</span>
         <span class="c1"># check if all columns are strings:</span>
         <span class="n">non_string_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">object</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">))]</span>
         <span class="k">if</span> <span class="n">non_string_cols</span><span class="o">.</span><span class="n">empty</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># exit(1)</span>
 
         <span class="c1"># if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column</span>
         <span class="n">count_ones</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># it also serves as flag to set parameter to &#39;binary&#39;</span>
@@ -339,6 +343,10 @@
 
                 <span class="k">for</span> <span class="n">thres_val</span> <span class="ow">in</span> <span class="n">thres_values</span><span class="p">:</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="c1"># To discuss with Pedro: believe this might be the reason</span>
+                    <span class="c1"># for cutoff error - if numbers are cumulative, per</span>
+                    <span class="c1"># line 149 and line 150, why taking sum for k vs. max?</span>
                     <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">thres_unit</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres_val</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
                     <span class="c1"># denote threshold as binary if numeric count_ones value</span>
@@ -370,9 +378,9 @@
         <span class="k">return</span> <span class="n">groups_df</span><span class="p">,</span> <span class="n">attr_cols</span></div>
 
 <div class="viewcode-block" id="Group.list_absolute_metrics"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.list_absolute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">list_absolute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        View list of all calculated absolute bias metrics in df</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">intersection</span><span class="p">([</span><span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span>
                                            <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;npv&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;ppr&#39;</span><span class="p">,</span>
                                            <span class="s1">&#39;pprev&#39;</span><span class="p">,</span> <span class="s1">&#39;prev&#39;</span>

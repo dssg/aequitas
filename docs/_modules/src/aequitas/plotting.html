@@ -155,10 +155,7 @@
   <h1>Source code for src.aequitas.plotting</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">re</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="c1">#import pandas as pd</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -174,6 +171,59 @@
 <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright </span><span class="se">\xa9</span><span class="s2"> 2018. The University of Chicago. All Rights Reserved.&quot;</span>
 
 
+
+<span class="c1"># module-level function</span>
+<div class="viewcode-block" id="assemble_ref_groups"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.assemble_ref_groups">[docs]</a><span class="k">def</span> <span class="nf">assemble_ref_groups</span><span class="p">(</span><span class="n">disparities_table</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">,</span>
+                         <span class="n">specific_measures</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_score_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a dictionary of reference groups for each metric in a data_table.</span>
+
+<span class="sd">   :param disparities_table: a disparity table. Output of bias.get_disparity or</span>
+<span class="sd">        fairness.get_fairness functions</span>
+<span class="sd">    :param ref_group_flag: string indicating column indicates reference group</span>
+<span class="sd">        flag value. Default is &#39;_ref_group_value&#39;.</span>
+<span class="sd">    :param specific_measures: Limits reference dictionary to only specified</span>
+<span class="sd">        metrics in a data table. Default is None.</span>
+<span class="sd">    :param label_score_ref: Defines a metric, ex: &#39;fpr&#39; (false positive rate)</span>
+<span class="sd">        from which to mimic reference group for label_value and score. Used for</span>
+<span class="sd">        statistical significance calculations in Bias() class. Default is None.</span>
+
+<span class="sd">    :return: A dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ref_groups</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ref_group_cols</span> <span class="o">=</span> \
+        <span class="nb">list</span><span class="p">(</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span>
+            <span class="n">ref_group_flag</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="n">specific_measures</span><span class="p">:</span>
+        <span class="n">ref_group_cols</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="n">measure</span> <span class="o">+</span> <span class="n">ref_group_flag</span> <span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="n">specific_measures</span> <span class="k">if</span>
+             <span class="n">measure</span> <span class="o">+</span> <span class="n">ref_group_flag</span> <span class="ow">in</span> <span class="n">ref_group_cols</span><span class="p">]</span>
+
+    <span class="n">attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">attribute_name</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+        <span class="n">attr_table</span> <span class="o">=</span> \
+            <span class="n">disparities_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span><span class="p">]</span>
+        <span class="n">attr_refs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">ref_group_cols</span><span class="p">:</span>
+            <span class="n">metric_key</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ref_group_flag</span><span class="p">))</span>
+            <span class="n">attr_refs</span><span class="p">[</span><span class="n">metric_key</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">attr_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">attr_table</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label_score_ref</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label_score_ref</span> <span class="o">+</span> <span class="n">ref_group_flag</span> <span class="ow">in</span> <span class="n">ref_group_cols</span><span class="p">:</span>
+                <span class="n">attr_refs</span><span class="p">[</span><span class="s1">&#39;label_value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_refs</span><span class="p">[</span><span class="n">label_score_ref</span><span class="p">]</span>
+                <span class="n">attr_refs</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_refs</span><span class="p">[</span><span class="n">label_score_ref</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The specified reference measure for label&quot;</span>
+                                 <span class="s2">&quot; value and score is not included in the &quot;</span>
+                                 <span class="s2">&quot;data frame.&quot;</span><span class="p">)</span>
+
+        <span class="n">ref_groups</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_refs</span>
+
+    <span class="k">return</span> <span class="n">ref_groups</span></div>
+
+
+<span class="c1"># Plot() class</span>
 <div class="viewcode-block" id="Plot"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot">[docs]</a><span class="k">class</span> <span class="nc">Plot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plotting object allows for visualization of absolute group bias metrics and</span>
@@ -185,7 +235,7 @@
                            <span class="s1">&#39;fdr_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;for_disparity&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;fpr_disparity&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Define mapping for condiitonal coloring based on fairness</span>
+    <span class="c1"># Define mapping for conditional coloring based on fairness</span>
     <span class="c1"># determinations</span>
     <span class="n">_metric_parity_mapping</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;ppr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span>
@@ -208,6 +258,19 @@
         <span class="s1">&#39;tpr&#39;</span><span class="p">:</span> <span class="s1">&#39;TPR Parity&#39;</span><span class="p">,</span>
         <span class="s1">&#39;tnr&#39;</span><span class="p">:</span> <span class="s1">&#39;TNR Parity&#39;</span><span class="p">,</span>
         <span class="s1">&#39;npv&#39;</span><span class="p">:</span> <span class="s1">&#39;NPV Parity&#39;</span>
+    <span class="p">}</span>
+
+    <span class="n">_significance_disparity_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ppr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;ppr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pprev_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;pprev_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;precision_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;precision_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fdr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;fdr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;for_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fpr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;fpr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tpr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;tpr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tnr_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;tnr_significance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;npv_disparity&#39;</span><span class="p">:</span> <span class="s1">&#39;npv_significance&#39;</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_metrics</span><span class="o">=</span><span class="n">default_absolute_metrics</span><span class="p">,</span>
@@ -258,9 +321,9 @@
     <span class="k">def</span> <span class="nf">_truncate_colormap</span><span class="p">(</span><span class="n">orig_cmap</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">num_colors</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Use only part of a colormap (min_value to max_value) across a given number</span>
-<span class="sd">        of partiions.</span>
+<span class="sd">        of partitions.</span>
 
-<span class="sd">        :param orig_cmap: an existing Matplotlib colormap</span>
+<span class="sd">        :param orig_cmap: an existing Matplotlib colormap.</span>
 <span class="sd">        :param min_value: desired minimum value (0.0 to 1.0) for truncated</span>
 <span class="sd">            colormap. Default is 0.0.</span>
 <span class="sd">        :param max_value: desired maximum value (0.0 to 1.0) for truncated</span>
@@ -278,33 +341,6 @@
             <span class="n">cmap</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">,</span> <span class="n">num_colors</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">new_cmap</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_assemble_ref_groups</span><span class="p">(</span><span class="n">disparities_table</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a dictionary of reference groups for each metric in a data_table</span>
-
-<span class="sd">       :param disparities_table: a disparity table. Output of bias.get_disparity or</span>
-<span class="sd">            fairness.get_fairness functions</span>
-<span class="sd">        :param ref_group_flag: string indicating column indicates reference group</span>
-<span class="sd">            flag value. Default is &#39;_ref_group_value&#39;.</span>
-
-<span class="sd">        :return: A dictionary</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ref_groups</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">ref_group_cols</span> <span class="o">=</span> \
-            <span class="nb">list</span><span class="p">(</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span>
-                <span class="n">ref_group_flag</span><span class="p">)])</span>
-        <span class="n">attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">attribute_name</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
-            <span class="n">attr_table</span> <span class="o">=</span> \
-                <span class="n">disparities_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span><span class="p">]</span>
-            <span class="n">attr_refs</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">ref_group_cols</span><span class="p">:</span>
-                <span class="n">metric_key</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ref_group_flag</span><span class="p">))</span>
-                <span class="n">attr_refs</span><span class="p">[</span><span class="n">metric_key</span><span class="p">]</span> <span class="o">=</span> \
-                    <span class="n">attr_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">attr_table</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-            <span class="n">ref_groups</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_refs</span>
-        <span class="k">return</span> <span class="n">ref_groups</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_locate_ref_group_indices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">disparities_table</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span>
@@ -313,7 +349,7 @@
 <span class="sd">        Finds relative index (row) of reference group value for a given metric.</span>
 
 <span class="sd">        :param disparities_table: a disparity table. Output of bias.get_disparity or</span>
-<span class="sd">            fairness.get_fairness functions</span>
+<span class="sd">            fairness.get_fairness functions.</span>
 <span class="sd">        :param attribute_name: the attribute to plot metric against. Must be a column</span>
 <span class="sd">            in the disparities_table.</span>
 <span class="sd">        :param group_metric: the metric to plot. Must be a column in the</span>
@@ -327,13 +363,13 @@
         <span class="c1"># get absolute metric name from passed group metric (vs. a disparity name)</span>
         <span class="n">abs_metric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_metric</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_disparity&#39;</span><span class="p">))</span>
 
-        <span class="n">all_ref_groups</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_assemble_ref_groups</span><span class="p">(</span><span class="n">disparities_table</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="p">)</span>
+        <span class="n">all_ref_groups</span> <span class="o">=</span> <span class="n">assemble_ref_groups</span><span class="p">(</span><span class="n">disparities_table</span><span class="p">,</span> <span class="n">ref_group_flag</span><span class="p">)</span>
         <span class="n">ref_group_name</span> <span class="o">=</span> <span class="n">all_ref_groups</span><span class="p">[</span><span class="n">attribute_name</span><span class="p">][</span><span class="n">abs_metric</span><span class="p">]</span>
 
         <span class="c1"># get index for row associated with reference group for that model</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">disparities_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">attribute_name</span><span class="p">)</span> <span class="o">&amp;</span>
-                                     <span class="p">(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ref_group_name</span><span class="p">)</span> <span class="o">&amp;</span>
-                                     <span class="p">(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                                         <span class="p">(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ref_group_name</span><span class="p">)</span> <span class="o">&amp;</span>
+                                         <span class="p">(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
         <span class="c1"># there should only ever be one item in list, but JIC, select first</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -341,24 +377,23 @@
         <span class="n">relative_ind</span> <span class="o">=</span> <span class="n">disparities_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">relative_ind</span><span class="p">,</span> <span class="n">ref_group_name</span>
 
-
 <div class="viewcode-block" id="Plot.plot_group_metric"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_group_metric">[docs]</a>    <span class="k">def</span> <span class="nf">plot_group_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_table</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">min_group_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Plot a single group metric&#39;s absolute metrics</span>
+                          <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_group_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a single group metric across all attribute groups.</span>
 
-<span class="sd">        :param group_table: a group table</span>
-<span class="sd">        :param group_metric: the metric to plot. Must be a column in the group_table</span>
-<span class="sd">        :param ax: a matplotlib Axis. If not passed a new figure will be created.</span>
-<span class="sd">        :param title: whether to include a title in visulations. Default is True.</span>
-<span class="sd">        :param label_dict: optional dictionary of replacement labels for data.</span>
+<span class="sd">        :param group_table: group table. Output of of group.get_crosstabs() or</span>
+<span class="sd">            bias.get_disparity functions.</span>
+<span class="sd">        :param group_metric: the metric to plot. Must be a column in the group_table.</span>
+<span class="sd">        :param ax: a matplotlib Axis. If not passed, a new figure will be created.</span>
+<span class="sd">        :param title: whether to include a title in visualizations. Default is True.</span>
+<span class="sd">        :param label_dict: optional, dictionary of replacement labels for data.</span>
 <span class="sd">            Default is None.</span>
 <span class="sd">        :param min_group_size: minimum size for groups to include in visualization</span>
 <span class="sd">            (as a proportion of total sample)</span>
 
-<span class="sd">        :return: matplotlib.Axis</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :return: A Matplotlib axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">group_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Specified disparity metric &#39;</span><span class="si">{group_metric}</span><span class="s2">&#39; not &quot;</span>
                              <span class="n">f</span><span class="s2">&quot;in &#39;group_table&#39;.&quot;</span><span class="p">)</span>
@@ -392,7 +427,8 @@
         <span class="n">mapping</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">lighter_coppers</span><span class="p">)</span>
 
         <span class="c1"># Lock absolute value metric plot x-axis to (0, 1)</span>
-        <span class="n">ax_lim</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ax_lim</span><span class="p">:</span>
+            <span class="n">ax_lim</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax_lim</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">attribute_name</span> <span class="ow">in</span> <span class="n">attribute_names</span><span class="p">:</span>
@@ -487,34 +523,39 @@
 <div class="viewcode-block" id="Plot.plot_disparity"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_disparity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_disparity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disparity_table</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span>
                        <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Create treemap from disparity or absolute metric values</span>
+                       <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create treemap based on a single bias disparity metric across attribute</span>
+<span class="sd">        groups.</span>
 
 <span class="sd">        Adapted from https://plot.ly/python/treemaps/,</span>
 <span class="sd">        https://gist.github.com/gVallverdu/0b446d0061a785c808dbe79262a37eea,</span>
 <span class="sd">        and https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib</span>
 
-<span class="sd">        Plot a single group metric&#39;s disparity</span>
 <span class="sd">        :param disparity_table: a disparity table. Output of bias.get_disparity or</span>
-<span class="sd">            fairness.get_fairness functions.</span>
+<span class="sd">            fairness.get_fairness function.</span>
 <span class="sd">        :param group_metric: the metric to plot. Must be a column in the</span>
 <span class="sd">            disparity_table.</span>
 <span class="sd">        :param attribute_name: which attribute to plot group_metric across.</span>
 <span class="sd">        :param color_mapping: matplotlib colormapping for treemap value boxes.</span>
-<span class="sd">        :param model_id: which model to plot for. Default is 1.</span>
+<span class="sd">        :param model_id: model ID number. Default is 1.</span>
 <span class="sd">        :param ax: a matplotlib Axis. If not passed, a new figure will be created.</span>
 <span class="sd">        :param fig: a matplotlib Figure. If not passed, a new figure will be created.</span>
-<span class="sd">        :param label_dict: optional dictionary of replacement labels for data. Default is None.</span>
-<span class="sd">        :param title: whether to include a title in visulations. Default is True.</span>
+<span class="sd">        :param label_dict: optional, dictionary of replacement labels for data.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        :param title: whether to include a title in visualizations. Default is True.</span>
 <span class="sd">        :param highlight_fairness: whether to highlight treemaps by disparity</span>
 <span class="sd">            magnitude, or by related fairness determination.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in bias metric</span>
 <span class="sd">            visualization</span>
+<span class="sd">        :param significance_alpha: statistical significance level. Used to</span>
+<span class="sd">            determine visual representation of significance (number of</span>
+<span class="sd">            asterisks on treemap).</span>
 
-<span class="sd">        :return: matplotlib.Axis</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :return: A Matplotlib axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Use matplotlib to truncate colormap, scale metric values</span>
         <span class="c1"># between the min and max, then assign colors to individual values</span>
 
@@ -589,14 +630,13 @@
             <span class="n">cb_green</span> <span class="o">=</span> <span class="s1">&#39;#1b7837&#39;</span>
             <span class="n">cb_red</span> <span class="o">=</span> <span class="s1">&#39;#a50026&#39;</span>
 
-            <span class="n">measure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_parity_mapping</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">measure</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_columns</span><span class="p">):</span>
+            <span class="n">parity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_parity_mapping</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">parity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_columns</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="n">f</span><span class="s2">&quot;Related fairness determination for </span><span class="si">{group_metric}</span><span class="s2"> must be &quot;</span>
                     <span class="n">f</span><span class="s2">&quot;included in data table to color visualization based on &quot;</span>
                     <span class="n">f</span><span class="s2">&quot;metric fairness.&quot;</span><span class="p">)</span>
-            <span class="n">clrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb_green</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">else</span>
-                    <span class="n">cb_red</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sorted_df</span><span class="p">[</span><span class="n">measure</span><span class="p">]]</span>
+            <span class="n">clrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb_green</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span> <span class="n">cb_red</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sorted_df</span><span class="p">[</span><span class="n">parity</span><span class="p">]]</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">aq_palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">diverging_palette</span><span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">as_cmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -628,9 +668,47 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">labels</span> <span class="o">=</span> <span class="n">sorted_df</span><span class="p">[</span><span class="s1">&#39;attribute_value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
+        <span class="c1"># if df includes significance columns, add stars to indicate significance</span>
+        <span class="k">if</span> <span class="n">sorted_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span>
+            <span class="n">sorted_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s1">&#39;_significance&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># unmasked significance</span>
+        <span class="c1"># find indices where related significance have smaller value than significance_alpha</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span>
+                    <span class="n">sorted_df</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_significance_disparity_mapping</span><span class="p">[</span><span class="n">related_disparity</span><span class="p">]]</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">):</span>
+                <span class="n">to_star</span> <span class="o">=</span> <span class="n">sorted_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">sorted_df</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_significance_disparity_mapping</span><span class="p">[</span><span class="n">related_disparity</span><span class="p">]]</span> <span class="o">&lt;</span> <span class="n">significance_alpha</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+            <span class="c1"># masked significance</span>
+            <span class="c1"># find indices where attr values have True value for each of those two columns,</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">to_star</span> <span class="o">=</span> <span class="n">sorted_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                    <span class="n">sorted_df</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_significance_disparity_mapping</span><span class="p">[</span><span class="n">related_disparity</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+
+            <span class="c1"># add stars to label value where significant</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">to_star</span><span class="p">:</span>
+                <span class="c1"># convert idx location to relative index in sorted df and label_values list</span>
+                <span class="n">idx_adj</span> <span class="o">=</span> <span class="n">sorted_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+                <span class="c1"># star significant disparities in visualizations based on significance level</span>
+                <span class="k">if</span> <span class="mf">0.10</span> <span class="o">&gt;=</span> <span class="n">significance_alpha</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">:</span>
+                    <span class="n">significance_stars</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+                <span class="k">elif</span> <span class="mf">0.05</span> <span class="o">&gt;=</span> <span class="n">significance_alpha</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">:</span>
+                    <span class="n">significance_stars</span> <span class="o">=</span> <span class="s1">&#39;**&#39;</span>
+                <span class="k">elif</span> <span class="n">significance_alpha</span> <span class="o">&lt;=</span> <span class="mf">0.01</span><span class="p">:</span>
+                    <span class="n">significance_stars</span> <span class="o">=</span> <span class="s1">&#39;***&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">significance_stars</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">label_values</span><span class="p">[</span><span class="n">idx_adj</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_values</span><span class="p">[</span><span class="n">idx_adj</span><span class="p">]</span> <span class="o">+</span> <span class="n">significance_stars</span>
+
+
         <span class="n">normed</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">normalize_sizes</span><span class="p">(</span><span class="n">scaled_values</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 
-        <span class="c1">#     rects = sf.squarify(normed, x, y, width, height)</span>
         <span class="n">padded_rects</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">padded_squarify</span><span class="p">(</span><span class="n">normed</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 
         <span class="c1"># make plot</span>
@@ -638,7 +716,10 @@
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
         <span class="n">ax</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">squarify_plot_rects</span><span class="p">(</span><span class="n">padded_rects</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">clrs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
-                                 <span class="n">values</span><span class="o">=</span><span class="n">label_values</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+                                 <span class="n">values</span><span class="o">=</span><span class="n">label_values</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                                    <span class="n">acronyms</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># TO DO: build out in next phase (model comparison)</span>
         <span class="c1"># if model_id:</span>
         <span class="c1">#     ax.set_title(f&quot;MODEL {model_id}, {(&#39; &#39;).join(group_metric.split(&#39;_&#39;)).upper()} ({attribute_name.upper()})&quot;,</span>
         <span class="c1">#              fontsize=23, fontweight=&quot;bold&quot;)</span>
@@ -662,21 +743,22 @@
                             <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This function plots absolute group metrics as indicated by the config file,</span>
-<span class="sd">            colored based on calculated parity</span>
+<span class="sd">        colored based on calculated parity.</span>
 
-<span class="sd">        :param fairness_table: a fairness table. Output of fairness.get_fairness functions.</span>
+<span class="sd">        :param fairness_table: a fairness table. Output of fairness.get_fairness</span>
+<span class="sd">            function.</span>
 <span class="sd">        :param group_metric: the fairness metric to plot. Must be a column in the fairness_table.</span>
 <span class="sd">        :param ax: a matplotlib Axis. If not passed a new figure will be created.</span>
 <span class="sd">        :param ax_lim: maximum value on x-axis, used to match axes across subplots</span>
 <span class="sd">            when plotting multiple metrics. Default is None.</span>
-<span class="sd">        :param title: whether to include a title in visulations. Default is True.</span>
+<span class="sd">        :param title: whether to include a title in visualizations. Default is True.</span>
 <span class="sd">        :param label_dict: optional dictionary of replacement values for data.</span>
 <span class="sd">            Default is None.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in fairness</span>
 <span class="sd">            visualization</span>
 
-<span class="sd">        :return: matplotlib.Axis</span>
+<span class="sd">        :return: A Matplotlib axis</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">group_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fairness_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Specified disparity metric </span><span class="si">{group_metric}</span><span class="s2"> not &quot;</span>
@@ -719,13 +801,13 @@
             <span class="c1"># determinations</span>
             <span class="n">cb_green</span> <span class="o">=</span> <span class="s1">&#39;#1b7837&#39;</span>
             <span class="n">cb_red</span> <span class="o">=</span> <span class="s1">&#39;#a50026&#39;</span>
-            <span class="n">measure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_parity_mapping</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span>
-            <span class="n">measure_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb_green</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">else</span>
-                              <span class="n">cb_red</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribute_data</span><span class="p">[</span><span class="n">measure</span><span class="p">]]</span>
+            <span class="n">parity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric_parity_mapping</span><span class="p">[</span><span class="n">group_metric</span><span class="p">]</span>
+            <span class="n">parity_colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb_green</span> <span class="k">if</span> <span class="n">val</span> <span class="k">else</span>
+                              <span class="n">cb_red</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribute_data</span><span class="p">[</span><span class="n">parity</span><span class="p">]]</span>
 
             <span class="c1"># Set white text for red bars and black text for green bars</span>
             <span class="n">label_colors</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">else</span>
-                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribute_data</span><span class="p">[</span><span class="n">measure</span><span class="p">]]</span>
+                            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attribute_data</span><span class="p">[</span><span class="n">parity</span><span class="p">]]</span>
 
             <span class="n">attribute_indices</span> <span class="o">=</span> \
                 <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">next_bar_height</span><span class="p">,</span> <span class="n">next_bar_height</span> <span class="o">+</span> <span class="n">attribute_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -737,7 +819,7 @@
 
             <span class="n">h_attribute</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">attribute_indices</span><span class="p">,</span>
                                   <span class="n">width</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
-                                  <span class="n">color</span><span class="o">=</span><span class="n">measure_colors</span><span class="p">,</span>
+                                  <span class="n">color</span><span class="o">=</span><span class="n">parity_colors</span><span class="p">,</span>
                                   <span class="n">align</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">label_dict</span><span class="p">:</span>
@@ -808,28 +890,32 @@
 
 <div class="viewcode-block" id="Plot.plot_fairness_disparity"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_fairness_disparity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_fairness_disparity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fairness_table</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span>
                                 <span class="n">attribute_name</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot disparity metrics colored based on calculated disparity.</span>
 
 <span class="sd">        :param group_metric: the metric to plot. Must be a column in the disparity_table.</span>
 <span class="sd">        :param attribute_name: which attribute to plot group_metric across.</span>
-<span class="sd">        :param model_id: which model to plot for. Default is None.</span>
+<span class="sd">        :param model_id: model ID number. Default is 1.</span>
 <span class="sd">        :param ax: a matplotlib Axis. If not passed, a new figure will be created.</span>
 <span class="sd">        :param fig: a matplotlib Figure. If not passed, a new figure will be created.</span>
-<span class="sd">        :param title: whether to include a title in visulations. Default is True.</span>
+<span class="sd">        :param title: whether to include a title in visualizations. Default is True.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in bias metric</span>
 <span class="sd">            visualization</span>
-
-<span class="sd">        :return:  matplotlib.Axis</span>
+<span class="sd">        :param significance_alpha: statistical significance level. Used to</span>
+<span class="sd">            determine visual representation of significance (number of</span>
+<span class="sd">            asterisks on treemap).</span>
+<span class="sd">        :return: A Matplotlib axis</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_disparity</span><span class="p">(</span><span class="n">disparity_table</span><span class="o">=</span><span class="n">fairness_table</span><span class="p">,</span>
                                    <span class="n">group_metric</span><span class="o">=</span><span class="n">group_metric</span><span class="p">,</span>
                                    <span class="n">attribute_name</span><span class="o">=</span><span class="n">attribute_name</span><span class="p">,</span>
                                    <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
                                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                   <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+                                   <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                                   <span class="n">significance_alpha</span><span class="o">=</span><span class="n">significance_alpha</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_plot_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -848,7 +934,7 @@
 <span class="sd">                - Predicted Positive Rate (ppr),</span>
 <span class="sd">                - False Discovery Rate (fdr),</span>
 <span class="sd">                - False Omission Rate (for),</span>
-<span class="sd">                - False Positve Rate (fpr),</span>
+<span class="sd">                - False Positive Rate (fpr),</span>
 <span class="sd">                - False Negative Rate (fnr)</span>
 <span class="sd">        :param fillzeros: Should null values be filled with zeros. Default is</span>
 <span class="sd">            True.</span>
@@ -953,16 +1039,17 @@
     <span class="k">def</span> <span class="nf">_plot_multiple_treemaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                  <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                 <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                 <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function plots treemaps of disparities indicated by config file</span>
 
-<span class="sd">        :param data_table: Output of bias.get_disparity, or fairness.get_fairness</span>
+<span class="sd">        :param data_table: output of bias.get_disparity, or fairness.get_fairness</span>
 <span class="sd">            functions</span>
 <span class="sd">        :param plot_fcn: Plotting function to use to plot individual disparity</span>
 <span class="sd">            or fairness treemaps in grid</span>
 <span class="sd">        :param attributes: which attributes to plot against. Must be specified</span>
-<span class="sd">            if no metrics speficied.</span>
+<span class="sd">            if no metrics specified.</span>
 <span class="sd">        :param metrics: which metric(s) to plot, or &#39;all.&#39; MUST be specified if</span>
 <span class="sd">            no attributes specified. If this value is null, the following</span>
 <span class="sd">            absolute metrics/ related disparity measures will be plotted against</span>
@@ -971,7 +1058,7 @@
 <span class="sd">                - Predicted Positive Rate (ppr),</span>
 <span class="sd">                - False Discovery Rate (fdr),</span>
 <span class="sd">                - False Omission Rate (for),</span>
-<span class="sd">                - False Positve Rate (fpr),</span>
+<span class="sd">                - False Positive Rate (fpr),</span>
 <span class="sd">                - False Negative Rate (fnr)</span>
 <span class="sd">        :param fillzeros: Whether null values should be filled with zeros. Default</span>
 <span class="sd">            is True.</span>
@@ -983,6 +1070,9 @@
 <span class="sd">        :param show_figure: Whether to show figure (plt.show()). Default is True.</span>
 <span class="sd">        :param min_group_size: Minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in visualization</span>
+<span class="sd">        :param significance_alpha: statistical significance level. Used to</span>
+<span class="sd">            determine visual representation of significance (number of</span>
+<span class="sd">            asterisks on treemap).</span>
 
 <span class="sd">        :return: Returns a figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1069,11 +1159,6 @@
 
         <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
-        <span class="c1"># to do: (next iteration) plot for multiple models based on metrics/</span>
-        <span class="c1"># attributes in that model</span>
-        <span class="c1">#</span>
-        <span class="c1"># for model in models:</span>
-        <span class="c1">#     model = lambda x: x if len(models) &gt; 1 else None</span>
         <span class="k">for</span> <span class="n">group_metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">ax_col</span> <span class="o">&gt;=</span> <span class="n">ncols</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">ax_col</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">ncols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -1097,7 +1182,7 @@
                          <span class="n">ax</span><span class="o">=</span><span class="n">current_subplot</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                          <span class="n">label_dict</span><span class="o">=</span><span class="n">label_dict</span><span class="p">,</span>
                          <span class="n">highlight_fairness</span><span class="o">=</span><span class="n">highlight_fairness</span><span class="p">,</span>
-                         <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">)</span>
+                         <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">significance_alpha</span><span class="o">=</span><span class="n">significance_alpha</span><span class="p">)</span>
 
                 <span class="n">ax_col</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -1124,18 +1209,18 @@
 <div class="viewcode-block" id="Plot.plot_group_metric_all"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_group_metric_all">[docs]</a>    <span class="k">def</span> <span class="nf">plot_group_metric_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_table</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                               <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                               <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot multiple metrics at once from a fairness object table.</span>
 
 <span class="sd">        :param data_table:  output of group.get_crosstabs, bias.get_disparity, or</span>
-<span class="sd">            fairness.get_fairness functions</span>
+<span class="sd">            fairness.get_fairness functions.</span>
 <span class="sd">        :param metrics: which metric(s) to plot, or &#39;all.&#39;</span>
 <span class="sd">            If this value is null, will plot:</span>
 <span class="sd">                - Predicted Prevalence (pprev),</span>
 <span class="sd">                - Predicted Positive Rate (ppr),</span>
 <span class="sd">                - False Discovery Rate (fdr),</span>
 <span class="sd">                - False Omission Rate (for),</span>
-<span class="sd">                - False Positve Rate (fpr),</span>
+<span class="sd">                - False Positive Rate (fpr),</span>
 <span class="sd">                - False Negative Rate (fnr)</span>
 <span class="sd">        :param fillzeros: whether to fill null values with zeros. Default is</span>
 <span class="sd">            True.</span>
@@ -1145,10 +1230,10 @@
 <span class="sd">        :param show_figure: whether to show figure (plt.show()). Default is True.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in group metric</span>
-<span class="sd">            visualization</span>
+<span class="sd">            visualization.</span>
 
 <span class="sd">        :return: A Matplotlib figure</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_multiple</span><span class="p">(</span>
             <span class="n">data_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_group_metric</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>
             <span class="n">fillzeros</span><span class="o">=</span><span class="n">fillzeros</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="n">label_dict</span><span class="p">,</span>
@@ -1156,9 +1241,10 @@
 
 
 <div class="viewcode-block" id="Plot.plot_disparity_all"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_disparity_all">[docs]</a>    <span class="k">def</span> <span class="nf">plot_disparity_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_table</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+                           <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                           <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot multiple metrics at once from a fairness object table.</span>
 
 <span class="sd">        :param data_table:  output of group.get_crosstabs, bias.get_disparity, or</span>
@@ -1171,40 +1257,42 @@
 <span class="sd">                - Predicted Positive Rate Disparity (ppr_disparity),</span>
 <span class="sd">                - False Discovery Rate Disparity (fdr_disparity),</span>
 <span class="sd">                - False Omission Rate Disparity (for_disparity),</span>
-<span class="sd">                - False Positve Rate Disparity (fpr_disparity),</span>
+<span class="sd">                - False Positive Rate Disparity (fpr_disparity),</span>
 <span class="sd">                - False Negative Rate Disparity (fnr_disparity)</span>
 <span class="sd">        :param fillzeros: whether to fill null values with zeros. Default is True.</span>
-<span class="sd">        :param ncols: number of subplots per row in figure. Default is 3.</span>
 <span class="sd">        :param title: whether to display a title on each plot. Default is True.</span>
 <span class="sd">        :param label_dict: optional dictionary of label replacements. Default is</span>
 <span class="sd">            None.</span>
 <span class="sd">        :param show_figure: whether to show figure (plt.show()). Default is True.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in metric</span>
-<span class="sd">            visualization</span>
+<span class="sd">            visualization.</span>
+<span class="sd">        :param significance_alpha: statistical significance level. Used to</span>
+<span class="sd">            determine visual representation of significance (number of</span>
+<span class="sd">            asterisks on treemap).</span>
 
 <span class="sd">        :return: A Matplotlib figure</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_multiple_treemaps</span><span class="p">(</span>
             <span class="n">data_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_disparity</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span>
             <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="n">fillzeros</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="n">label_dict</span><span class="p">,</span>
             <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-            <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">)</span></div>
+            <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">significance_alpha</span><span class="o">=</span><span class="n">significance_alpha</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Plot.plot_fairness_group_all"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_fairness_group_all">[docs]</a>    <span class="k">def</span> <span class="nf">plot_fairness_group_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fairness_table</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                 <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot multiple metrics at once from a fairness object table.</span>
 
-<span class="sd">        :param fairness_table: Output of fairness.get_fairness functions.</span>
+<span class="sd">        :param fairness_table: output of fairness.get_fairness functions.</span>
 <span class="sd">        :param metrics: which metric(s) to plot, or &#39;all.&#39;</span>
 <span class="sd">            If this value is null, will plot:</span>
 <span class="sd">                - Predicted Prevalence (pprev),</span>
 <span class="sd">                - Predicted Positive Rate (ppr),</span>
 <span class="sd">                - False Discovery Rate (fdr),</span>
 <span class="sd">                - False Omission Rate (for),</span>
-<span class="sd">                - False Positve Rate (fpr),</span>
+<span class="sd">                - False Positive Rate (fpr),</span>
 <span class="sd">                - False Negative Rate (fnr)</span>
 <span class="sd">        :param fillzeros: whether to fill null values with zeros. Default is True.</span>
 <span class="sd">        :param ncols: number of subplots per row in figure. Default is 3.</span>
@@ -1212,12 +1300,12 @@
 <span class="sd">        :param label_dict: optional dictionary of label replacements. Default is</span>
 <span class="sd">            None.</span>
 <span class="sd">        :param show_figure: whether to show figure (plt.show()). Default is True.</span>
-<span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
+<span class="sd">        :param min_group_size: minimum proportion of total group size (all data).</span>
 <span class="sd">            a population group must meet in order to be included in fairness</span>
 <span class="sd">            visualization</span>
 
 <span class="sd">        :return: A Matplotlib figure</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_multiple</span><span class="p">(</span>
             <span class="n">fairness_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_fairness_group</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>
             <span class="n">fillzeros</span><span class="o">=</span><span class="n">fillzeros</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="n">label_dict</span><span class="p">,</span>
@@ -1226,8 +1314,8 @@
 <div class="viewcode-block" id="Plot.plot_fairness_disparity_all"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_fairness_disparity_all">[docs]</a>    <span class="k">def</span> <span class="nf">plot_fairness_disparity_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fairness_table</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                     <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                     <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                    <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+                                    <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot multiple metrics at once from a fairness object table.</span>
 
 <span class="sd">        :param fairness_table: output of fairness.get_fairness functions.</span>
@@ -1238,24 +1326,27 @@
 <span class="sd">                - Predicted Positive Rate Disparity (ppr_disparity),</span>
 <span class="sd">                - False Discovery Rate Disparity (fdr_disparity),</span>
 <span class="sd">                - False Omission Rate Disparity (for_disparity),</span>
-<span class="sd">                - False Positve Rate Disparity (fpr_disparity),</span>
+<span class="sd">                - False Positive Rate Disparity (fpr_disparity),</span>
 <span class="sd">                - False Negative Rate Disparity (fnr_disparity)</span>
 <span class="sd">        :param fillzeros: whether to fill null values with zeros. Default is True.</span>
-<span class="sd">        :param title: ohether to display a title on each plot. Default is True.</span>
+<span class="sd">        :param title: whether to display a title on each plot. Default is True.</span>
 <span class="sd">        :param label_dict: optional dictionary of label replacements. Default is</span>
 <span class="sd">            None.</span>
 <span class="sd">        :param show_figure: whether to show figure (plt.show()). Default is True.</span>
 <span class="sd">        :param min_group_size: minimum proportion of total group size (all data)</span>
 <span class="sd">            a population group must meet in order to be included in fairness</span>
 <span class="sd">            visualization</span>
+<span class="sd">        :param significance_alpha: statistical significance level. Used to</span>
+<span class="sd">            determine visual representation of significance (number of</span>
+<span class="sd">            asterisks on treemap)</span>
 
 <span class="sd">        :return: A Matplotlib figure</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plot_multiple_treemaps</span><span class="p">(</span>
             <span class="n">fairness_table</span><span class="p">,</span> <span class="n">plot_fcn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_disparity</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">attributes</span><span class="p">,</span>
             <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">fillzeros</span><span class="o">=</span><span class="n">fillzeros</span><span class="p">,</span> <span class="n">label_dict</span><span class="o">=</span><span class="n">label_dict</span><span class="p">,</span>
             <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span>
-            <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">)</span></div></div>
+            <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">significance_alpha</span><span class="o">=</span><span class="n">significance_alpha</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

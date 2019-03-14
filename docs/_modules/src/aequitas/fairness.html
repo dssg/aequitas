@@ -241,9 +241,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="n">high_level_fairness_depend</span>
 
 <div class="viewcode-block" id="Fairness.get_fairness_measures_supported"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_fairness_measures_supported">[docs]</a>    <span class="k">def</span> <span class="nf">get_fairness_measures_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_df</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Determine fairness mseasures supported based on columns in data frame</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine fairness measures supported based on columns in data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;label_value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Impact Parity&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span></div>
@@ -251,14 +251,13 @@
 <div class="viewcode-block" id="Fairness.get_group_value_fairness"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_group_value_fairness">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_value_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bias_df</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fair_measures_requested</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates the fairness measures defined in fair_measures_requested</span>
-<span class="sd">        dictionary and adds them as columns to the input bias_df</span>
+<span class="sd">        dictionary and adds them as columns to the input bias_df.</span>
 
-<span class="sd">        :param bias_df: the output dataframe from bias/ disparity calculation methods</span>
-<span class="sd">        :param fair_eval: (optional) a lambda function that is used to assess</span>
-<span class="sd">            fairness (e.g. 80% rule)</span>
-<span class="sd">        :param tau: (optional) the threshold for fair/ unfair evaluation</span>
-<span class="sd">        :param fair_measures: (optional) a dictionary containing fairness</span>
-<span class="sd">            measures as keys and the corresponding input bias disparity as values</span>
+<span class="sd">        :param bias_df: the output dataframe from bias/ disparity calculation methods.</span>
+<span class="sd">        :param tau: optional, the threshold for fair/ unfair evaluation.</span>
+<span class="sd">        :param fair_measures_requested: optional, a dictionary containing fairness</span>
+<span class="sd">            measures as keys and the corresponding input bias disparity as values.</span>
+
 <span class="sd">        :return: Bias_df dataframe with additional columns for each</span>
 <span class="sd">            of the fairness measures defined in the fair_measures dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -293,7 +292,7 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness: No high level measure input found on bias_df&#39;</span> <span class="o">+</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">bias_df</span></div>
 
-<div class="viewcode-block" id="Fairness.fill_groupby_attribute_fairness"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.fill_groupby_attribute_fairness">[docs]</a>    <span class="k">def</span> <span class="nf">fill_groupby_attribute_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupby_obj</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupby_obj</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span>
                                         <span class="n">group_attribute_df</span><span class="p">,</span> <span class="n">measures</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns dataframe with values grouped by attribute_value</span>
@@ -314,7 +313,7 @@
                 <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">key_df</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">key_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">group_attribute_df</span></div>
+        <span class="k">return</span> <span class="n">group_attribute_df</span>
 
 
 <div class="viewcode-block" id="Fairness.get_group_attribute_fairness"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_group_attribute_fairness">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_attribute_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_value_df</span><span class="p">,</span> <span class="n">fair_measures_requested</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -333,16 +332,16 @@
         <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
         <span class="n">key_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span>
         <span class="n">groupby_variable</span> <span class="o">=</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)</span>
-        <span class="c1"># We need to do this beacause of NaNs. idxmin() on pandas raises keyerror if there is a NaN...</span>
-        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
+        <span class="c1"># We need to do this because of NaNs. idxmin() on pandas raises keyerror if there is a NaN...</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
                                                                   <span class="n">fair_measures_requested</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns&#39;</span><span class="p">)</span>
             <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">parity_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span> <span class="n">parity_cols</span><span class="p">)</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span> <span class="n">parity_cols</span><span class="p">)</span>
         <span class="n">highlevel_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
                                                                   <span class="n">highlevel_cols</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">group_attribute_df</span></div>
 
@@ -350,7 +349,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculates overall fairness regardless of the group_attributes.</span>
 <span class="sd">        Searches for &#39;False&#39; parity determinations across group_attributes and</span>
-<span class="sd">        outputs &#39;True&#39; determination if all group_attributes are fair</span>
+<span class="sd">        outputs &#39;True&#39; determination if all group_attributes are fair.</span>
 
 <span class="sd">        :param group_attribute_df: the output df of the get_group_attributes_fairness</span>
 <span class="sd">        :return: A dictionary of overall, unsupervised, and supervised fairness determinations</span>
@@ -373,9 +372,9 @@
         <span class="k">return</span> <span class="n">overall_fairness</span></div>
 
 <div class="viewcode-block" id="Fairness.list_parities"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.list_parities">[docs]</a>    <span class="k">def</span> <span class="nf">list_parities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        View list of all parity determinations in given df</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View list of all parity determinations in df</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">all_fairness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">|</span> \
                        <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">|</span> \
                        <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
