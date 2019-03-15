@@ -42,7 +42,7 @@ To view bias disparities, utilize the ``Plot()`` class:
     selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
 
 .. figure:: docs/_static/selected_group_metrics.png
-   :scale: 50 %
+   :scale: 40 %
 
 This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``:
 
@@ -61,7 +61,7 @@ The Plot() class visualizes disparities as treemaps colored by disparity relatio
     j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
 
 .. figure:: docs/_static/selected_treemaps.png
-   :scale: 50 %
+   :scale: 35 %
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
 
@@ -79,14 +79,14 @@ For group metrics:
     fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
 
 .. figure:: docs/_static/all_fairness_group.png
-   :scale: 50 %
+   :scale: 35 %
 
 For disparities:
 .. code-block:: python
     a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
 
-.. figure:: docs/_static/fairness_all_disparities_race.png
-   :scale: 50 %
+.. figure:: docs/_static/fairnessall_disparities_race.png
+   :scale: 35 %
 
 For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
@@ -112,7 +112,7 @@ Input data for Webapp
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
 .. figure:: docs/_static/webapp_input.jpg
-   :scale: 50 %
+   :scale: 15 %
 
 ``score``
 ---------
@@ -135,7 +135,7 @@ Input data for CLI
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
 
 .. figure:: docs/_static/CLI_input.jpg
-   :scale: 50 %
+   :scale: 15 %
 
 
 ``score``
@@ -183,7 +183,7 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
 
 
 .. figure:: docs/_static/python_input.jpg
-   :scale: 50 %
+   :scale: 15 %
 
 
 ``score``
@@ -198,9 +198,9 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 See CLI above. If you plan to bin or discritize continuous features manually, note that `get_crosstabs()` expects attribute columns to be type string. This excludes pandas 'categorical' data type, which is the default output of certain pandas discritizing functions. You can recast 'categorical' columns to strings as follows:
 
-``
-df['categorical_type'] = df['categorical_type'].astype(str)
-``
+.. codeblock:: python
+
+   df['categorical_type'] = df['categorical_type'].astype(str)
 
 ``model_id``
 ------------
