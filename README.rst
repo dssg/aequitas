@@ -4,7 +4,7 @@ The Bias and Fairness Audit Toolkit
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
-
+    :scale: 50 %
 
 
 --------
@@ -88,8 +88,7 @@ For disparities:
     a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
 
 .. image:: docs/_static/fairnessall_disparities_race.png
-   :height: 300px
-   :width: 600 px
+   :scale: 10%
 
 For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
