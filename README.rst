@@ -33,7 +33,7 @@ Find documentation `here <https://dssg.github.io/aequitas/>`_.
 Installation
 ============
 
-Aequitas requires Python 3.
+Aequitas is compatible with: **Python 3.6+**
 
 Install this Python library from source::
 
@@ -93,9 +93,195 @@ Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
 
 To contact the team, please email us at [aequitas at uchicago dot edu]
 
+Input Data
+==========
+
+Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. In general, input data is a single table with the following columns:
+
+- ``score``
+- ``label_value`` (for error-based metrics only)
+- at least one attribute e.g. ``race``, ``sex`` and ``age_cat`` (attribute categories defined by user)
+
+=====  ===========  ================  ==== === ======
+score  label_value  race              sex  age income
+=====  ===========  ================  ==== === ======
+0      1            African-American  Male 25  18000
+1      1            Caucasian         Male 37  34000
+=====  ===========  ================  ==== === ======
+
+Input data for Webapp
+---------------------
+
+The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
+
+.. figure:: docs/source/_static/webapp_input.jpg
+   :scale: 50 %
+
+``score``
+---------
+Aequitas webapp assumes the ``score`` column is a binary decision (0 or 1).
+
+
+``label_value``
+---------------
+This is the ground truth value of a binary decision. The data again must be binary 0 or 1.
+
+
+attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
+---------------------------------------------------------
+Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
+
+
+Input data for CLI
+---------------------
+
+The CLI accepts csv files and also accomodates database calls defined in Configuration files.
+
+.. figure:: docs/source/_static/CLI_input.jpg
+   :scale: 50 %
+
+
+``score``
+---------
+By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. See [configurations](./config.html) for more on thresholds.
+
+
+``label_value``
+---------------
+As with the webapp, this is the ground truth value of a binary decision. The data must be binary 0 or 1.
+
+
+attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
+---------------------------------------------------------
+Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles.
+
+``model_id``
+------------
+``model_id`` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
+
+
+Reserved column names:
+----------------------
+
+* ``id``
+* ``model_id``
+* ``entity_id``
+* ``rank_abs``
+* ``rank_pct``
+
+
+Input data for Python API
+-------------------------
+
+Python input data can be handled identically to CLI by using `preprocess_input_df()`. Otherwise, you must discretize continuous attribute columns prior to passing the data to `Group().get_crosstabs()`.::
+
+    from Aequitas.preprocessing import preprocess_input_df()
+
+
+Python input data can be handled identically to CLI by using `preprocess_input_df()`. Otherwise, you must discretize continuous attribute columns prior to passing the data to `Group().get_crosstabs()`.::
+
+    from Aequitas.preprocessing import preprocess_input_df()
+    # *input_data* matches CLI input data norms.
+    df, _ = preprocess_input_df(*input_data*)
+
+
+.. figure:: docs/source/_static/python_input.jpg
+   :scale: 50 %
+
+
+``score``
+---------
+See CLI above. Threshholds are set in a dictionary passed to `get_crosstabs()`.
+
+``label_value``
+---------------
+See CLI above.
+
+attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
+---------------------------------------------------------
+See CLI above. If you plan to bin or discritize continuous features manually, note that `get_crosstabs()` expects attribute columns to be type string. This excludes pandas 'categorical' data type, which is the default output of certain pandas discritizing functions. You can recast 'categorical' columns to strings as follows:
+
+``
+df['categorical_type'] = df['categorical_type'].astype(str)
+``
+
+``model_id``
+------------
+See CLI above.
+
+
+Reserved column names:
+----------------------
+* ``id``
+* ``model_id``
+* ``entity_id``
+* ``rank_abs``
+* ``rank_pct``
+
+
+
+
+30 Seconds to Aequitas
+======================
+Aequitas begins by creating a crosstab of your preprocessed data and absolute
+group metrics calculated from score and label value truth status (true/ false
+positives and true/ false negatives)::
+
+    from aequitas.group import Group
+    g = Group()
+    xtab, _ = g.get_crosstabs(df)
+
+To view bias disparities, utilize the ``Plot()`` class::
+
+    p = Plot()
+    selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
+
+.. figure:: docs/source/_static/selected_group_metrics.png
+   :scale: 50 %
+
+This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``::
+
+    b = Bias()
+    bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, alpha=0.05, mask_significance=True)
+
+`Learn more about reference group selection. <https://dssg.github.io/aequitas/config.html>`_
+
+
+The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_::
+
+    j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
+
+.. figure:: docs/source/_static/selected_treemaps.png
+   :scale: 50 %
+
+Now you're ready to obtain metric parities with the ``Fairness()`` class::
+
+    f = Fairness()
+    fdf = f.get_group_value_fairness(bdf)
+
+You now have parity determinations for your models that can be leveraged in model selection!
+
+To visualize fairness, use Plot() class fairness methods.
+
+For group metrics::
+
+    fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
+
+.. figure:: docs/source/_static/all_fairness_group.png
+   :scale: 50 %
+
+For disparities::
+
+    a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
+
+.. figure:: docs/source/_static/fairnessall_disparities_race.png
+   :scale: 50 %
+
+
+For a more detailed example, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
 Citing Aequitas
-====
+===============
 
 If you use Aequitas in a scientific publication, we would appreciate citations to the following paper:
 
@@ -107,6 +293,7 @@ Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jess
      author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid},
      journal={arXiv preprint arXiv:1811.05577},
      year={2018}}
+
 |
 |
 |
