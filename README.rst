@@ -20,32 +20,6 @@ Documentation
 
 Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
-Installation
-============
-
-Aequitas is compatible with: **Python 3.6+**
-
-Install this Python library from source::
-
-    python setup.py install
-
-...or named as an installation requirement, *e.g.* via ``pip``::
-
-    python -m pip install git+https://github.com/dssg/aequitas.git
-
-You may then import the ``aequitas`` module from Python::
-
-    import aequitas
-
-...or execute the auditor from the command line::
-
-    aequitas-report
-
-...or, also from the command line, launch the Web front-end::
-
-    python -m serve
-
-(Note: The above command launches a Web server only intended for development.)
 
 30 Seconds to Aequitas
 ======================
@@ -231,6 +205,33 @@ Reserved column names:
 * ``entity_id``
 * ``rank_abs``
 * ``rank_pct``
+
+Installation
+============
+
+Aequitas is compatible with: **Python 3.6+**
+
+Install this Python library from source::
+
+    python setup.py install
+
+...or named as an installation requirement, *e.g.* via ``pip``::
+
+    python -m pip install git+https://github.com/dssg/aequitas.git
+
+You may then import the ``aequitas`` module from Python::
+
+    import aequitas
+
+...or execute the auditor from the command line::
+
+    aequitas-report
+
+...or, also from the command line, launch the Web front-end::
+
+    python -m serve
+
+(Note: The above command launches a Web server only intended for development.)
 
 
 Development
