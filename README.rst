@@ -64,7 +64,7 @@ To view bias disparities, utilize the ``Plot()`` class::
     p = Plot()
     selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
 
-.. figure:: docs/source/_static/selected_group_metrics.png
+.. figure:: docs/_static/selected_group_metrics.png
    :scale: 50 %
 
 This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``::
