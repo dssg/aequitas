@@ -79,7 +79,7 @@ The Plot() class visualizes disparities as treemaps colored by disparity relatio
 
     j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
 
-.. figure:: docs/source/_static/selected_treemaps.png
+.. figure:: docs/_static/selected_treemaps.png
    :scale: 50 %
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class::
@@ -95,14 +95,14 @@ For group metrics::
 
     fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
 
-.. figure:: docs/source/_static/all_fairness_group.png
+.. figure:: docs/_static/all_fairness_group.png
    :scale: 50 %
 
 For disparities::
 
     a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
 
-.. figure:: docs/source/_static/fairnessall_disparities_race.png
+.. figure:: docs/_static/fairnessall_disparities_race.png
    :scale: 50 %
 
 For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
@@ -128,7 +128,7 @@ Input data for Webapp
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-.. figure:: docs/source/_static/webapp_input.jpg
+.. figure:: docs/_static/webapp_input.jpg
    :scale: 50 %
 
 ``score``
@@ -151,7 +151,7 @@ Input data for CLI
 
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
 
-.. figure:: docs/source/_static/CLI_input.jpg
+.. figure:: docs/_static/CLI_input.jpg
    :scale: 50 %
 
 
@@ -199,7 +199,7 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
     df, _ = preprocess_input_df(*input_data*)
 
 
-.. figure:: docs/source/_static/python_input.jpg
+.. figure:: docs/_static/python_input.jpg
    :scale: 50 %
 
 
