@@ -93,10 +93,71 @@ Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
 
 To contact the team, please email us at [aequitas at uchicago dot edu]
 
+
+30 Seconds to Aequitas
+======================
+Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package.  See section immediately below for requirements on your desired mechanism.
+
+Aequitas begins by creating a crosstab of your preprocessed data and absolute
+group metrics calculated from score and label value truth status (true/ false
+positives and true/ false negatives)::
+
+    from aequitas.group import Group
+    g = Group()
+    xtab, _ = g.get_crosstabs(df)
+
+To view bias disparities, utilize the ``Plot()`` class::
+
+    p = Plot()
+    selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
+
+.. figure:: docs/source/_static/selected_group_metrics.png
+   :scale: 50 %
+
+This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``::
+
+    b = Bias()
+    bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, alpha=0.05, mask_significance=True)
+
+`Learn more about reference group selection. <https://dssg.github.io/aequitas/config.html>`_
+
+
+The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_::
+
+    j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
+
+.. figure:: docs/source/_static/selected_treemaps.png
+   :scale: 50 %
+
+Now you're ready to obtain metric parities with the ``Fairness()`` class::
+
+    f = Fairness()
+    fdf = f.get_group_value_fairness(bdf)
+
+You now have parity determinations for your models that can be leveraged in model selection!
+
+To visualize fairness, use Plot() class fairness methods.
+
+For group metrics::
+
+    fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
+
+.. figure:: docs/source/_static/all_fairness_group.png
+   :scale: 50 %
+
+For disparities::
+
+    a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
+
+.. figure:: docs/source/_static/fairnessall_disparities_race.png
+   :scale: 50 %
+
+For a more detailed example, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
+
+
 Input Data
 ==========
-
-Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. In general, input data is a single table with the following columns:
+In general, input data is a single table with the following columns:
 
 - ``score``
 - ``label_value`` (for error-based metrics only)
@@ -218,67 +279,6 @@ Reserved column names:
 * ``rank_abs``
 * ``rank_pct``
 
-
-
-
-30 Seconds to Aequitas
-======================
-Aequitas begins by creating a crosstab of your preprocessed data and absolute
-group metrics calculated from score and label value truth status (true/ false
-positives and true/ false negatives)::
-
-    from aequitas.group import Group
-    g = Group()
-    xtab, _ = g.get_crosstabs(df)
-
-To view bias disparities, utilize the ``Plot()`` class::
-
-    p = Plot()
-    selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
-
-.. figure:: docs/source/_static/selected_group_metrics.png
-   :scale: 50 %
-
-This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``::
-
-    b = Bias()
-    bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, alpha=0.05, mask_significance=True)
-
-`Learn more about reference group selection. <https://dssg.github.io/aequitas/config.html>`_
-
-
-The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_::
-
-    j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
-
-.. figure:: docs/source/_static/selected_treemaps.png
-   :scale: 50 %
-
-Now you're ready to obtain metric parities with the ``Fairness()`` class::
-
-    f = Fairness()
-    fdf = f.get_group_value_fairness(bdf)
-
-You now have parity determinations for your models that can be leveraged in model selection!
-
-To visualize fairness, use Plot() class fairness methods.
-
-For group metrics::
-
-    fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
-
-.. figure:: docs/source/_static/all_fairness_group.png
-   :scale: 50 %
-
-For disparities::
-
-    a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
-
-.. figure:: docs/source/_static/fairnessall_disparities_race.png
-   :scale: 50 %
-
-
-For a more detailed example, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
 Citing Aequitas
 ===============
