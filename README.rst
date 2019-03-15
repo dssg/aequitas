@@ -15,16 +15,6 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
 
 `Learn more about the project <http://dsapp.uchicago.edu/aequitas/>`_.
 
-Demo
-====
-
-`See what Aequitas can do <http://aequitas.dssg.io/>`_.
-
-Sample Jupyter Notebook
-=======================
-
-`Explore bias analysis of the COMPAS data <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using the Aequitas library.
-
 Documentation
 =============
 
@@ -56,43 +46,6 @@ You may then import the ``aequitas`` module from Python::
     python -m serve
 
 (Note: The above command launches a Web server only intended for development.)
-
-Development
-===========
-
-Provision your development environment via the shell script ``develop``::
-
-    ./develop
-
-Common development tasks, such as deploying the webapp, may then be handled via ``manage``::
-
-    manage --help
-
-Containerization
-================
-
-To build a Docker container of Aequitas::
-
-    docker build -t aequitas .
-
-...or simply via ``manage``::
-
-    manage container build
-
-The Docker image's container defaults to launching the development Web server, though this can be overridden via the Docker "command" and/or "entrypoint".
-
-To run such a container, supporting the Web server, on-the-fly::
-
-    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
-
-...or, manage a development container via ``manage``::
-
-    manage container [create|start|stop]
-
-Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
-
-To contact the team, please email us at [aequitas at uchicago dot edu]
-
 
 30 Seconds to Aequitas
 ======================
@@ -152,7 +105,7 @@ For disparities::
 .. figure:: docs/source/_static/fairnessall_disparities_race.png
    :scale: 50 %
 
-For a more detailed example, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
+For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
 
 Input Data
@@ -278,6 +231,44 @@ Reserved column names:
 * ``entity_id``
 * ``rank_abs``
 * ``rank_pct``
+
+
+Development
+===========
+
+Provision your development environment via the shell script ``develop``::
+
+    ./develop
+
+Common development tasks, such as deploying the webapp, may then be handled via ``manage``::
+
+    manage --help
+
+Containerization
+================
+
+To build a Docker container of Aequitas::
+
+    docker build -t aequitas .
+
+...or simply via ``manage``::
+
+    manage container build
+
+The Docker image's container defaults to launching the development Web server, though this can be overridden via the Docker "command" and/or "entrypoint".
+
+To run such a container, supporting the Web server, on-the-fly::
+
+    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
+
+...or, manage a development container via ``manage``::
+
+    manage container [create|start|stop]
+
+Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
+
+To contact the team, please email us at [aequitas at uchicago dot edu]
+
 
 
 Citing Aequitas
