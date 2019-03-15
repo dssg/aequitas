@@ -4,7 +4,7 @@ The Bias and Fairness Audit Toolkit
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
-   :scale: 50 %
+
 
 
 --------
@@ -189,9 +189,8 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
     df, _ = preprocess_input_df(*input_data*)
 
 
-.. figure:: docs/_static/python_input.jpg
-   :height: 300px
-   :width: 600 px
+.. image:: docs/_static/python_input.jpg
+   :scale: 10%
 
 
 ``score``
