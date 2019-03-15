@@ -41,9 +41,7 @@ To view bias disparities, utilize the ``Plot()`` class:
     p = Plot()
     selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
 
-.. figure:: docs/_static/selected_group_metrics.png
-   :height: 300px
-   :width: 600 px
+.. image:: docs/_static/selected_group_metrics.png
    :scale: 25 %
 
 This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``:
@@ -62,10 +60,9 @@ The Plot() class visualizes disparities as treemaps colored by disparity relatio
 
     j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
 
-.. figure:: docs/_static/selected_treemaps.png
+.. image:: docs/_static/selected_treemaps.png
    :height: 300px
    :width: 600 px
-   :scale: 25 %
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
 
@@ -86,15 +83,13 @@ For group metrics:
    :height: 300px
    :width: 600 px
 
-
 For disparities:
 .. code-block:: python
     a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
 
-.. figure:: docs/_static/fairnessall_disparities_race.png
+.. image:: docs/_static/fairnessall_disparities_race.png
    :height: 300px
    :width: 600 px
-   :scale: 25 %
 
 For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
