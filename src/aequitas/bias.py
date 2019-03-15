@@ -21,7 +21,6 @@ class Bias(object):
 
     def __init__(self, key_columns=default_key_columns, sample_df=None,
                  non_attr_cols=non_attr_cols,
-                 significance_cols=all_group_metrics,
                  input_group_metrics=all_group_metrics, fill_divbyzero=None):
         """
 
@@ -40,7 +39,7 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
-        self.significance_cols = significance_cols
+        self.significance_cols = input_group_metrics
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
