@@ -82,10 +82,10 @@ For group metrics:
 
     fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
 
-.. figure:: docs/_static/all_fairness_group.png
+.. image:: docs/_static/all_fairness_group.png
    :height: 300px
    :width: 600 px
-   :scale: 25 %
+
 
 For disparities:
 .. code-block:: python
