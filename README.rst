@@ -42,7 +42,7 @@ To view bias disparities, utilize the ``Plot()`` class:
     selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
 
 .. image:: docs/_static/selected_group_metrics.png
-   :scale: 100%s
+   :scale: 100%
 
 This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``:
 
@@ -112,7 +112,7 @@ Input data for Webapp
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-.. figure:: docs/_static/webapp_input.jpg
+.. figure:: docs/_static/webapp_input.png
    :height: 240px
    :width: 320px
 
@@ -137,7 +137,7 @@ Input data for CLI
 
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
 
-.. figure:: docs/_static/CLI_input.jpg
+.. figure:: docs/_static/CLI_input.png
    :height: 240px
    :width: 320px
 
@@ -187,7 +187,7 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
 
 
 
-.. figure:: docs/_static/python_input.jpg
+.. figure:: docs/_static/python_input.png
    :height: 240px
    :width: 320px
 
