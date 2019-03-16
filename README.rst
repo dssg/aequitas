@@ -156,7 +156,7 @@ The CLI accepts CSV files and accomodates database calls defined in Configuratio
 
 ``score``
 ---------
-By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. `See configurations<./config.html>`_ for more on thresholds.
+By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds.
 
 
 ``label_value``
