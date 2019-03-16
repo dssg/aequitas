@@ -193,13 +193,6 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 .. code-block:: python
 
     from Aequitas.preprocessing import preprocess_input_df()
-
-
-Python input data can be handled identically to CLI by using ``preprocess_input_df()``. Otherwise, you must discretize continuous attribute columns prior to passing the data to ``Group().get_crosstabs()``.
-
-.. code-block:: python
-
-    from Aequitas.preprocessing import preprocess_input_df()
     # *input_data* matches CLI input data norms.
     df, _ = preprocess_input_df(*input_data*)
 
