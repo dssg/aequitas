@@ -62,7 +62,7 @@ The ``Plot()`` class can visualize a single group metric with ``plot_group_metri
 .. figure:: docs/_static/selected_group_metrics.png
    :scale: 100%
 
-The crosstab dataframe is augmented by every succeeding class with addiitonal layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
+The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
 
 .. code-block:: python
 
@@ -161,7 +161,7 @@ Group columns can be categorical or continuous. If categorical, Aequitas will pr
 Input data for CLI
 ------------------
 
-The CLI accepts CSV files and accomodates database calls defined in Configuration files. 
+The CLI accepts CSV files and accommodates database calls defined in Configuration files.
 
 .. figure:: docs/_static/CLI_input.png
    :height: 240px
@@ -217,7 +217,7 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 
 ``score``
 ---------
-By default, Aequitas assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Threshholds are set in a dictionary passed to `get_crosstabs()` of format {'rank_abs':[300] , 'rank_pct':[1.0, 5.0, 10.0]}. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds. 
+By default, Aequitas assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Thresholds are set in a dictionary passed to `get_crosstabs()` of format {'rank_abs':[300] , 'rank_pct':[1.0, 5.0, 10.0]}. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds.
 
 ``label_value``
 ---------------
