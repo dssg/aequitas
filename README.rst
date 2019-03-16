@@ -24,7 +24,7 @@ For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blo
 
 30 Seconds to Aequitas
 ======================
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `input requirements for each <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ in the section immediately below.
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ and specifics on the web app <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-webapp>`_, CLI <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-cli>`_, and Python API <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-python-api>`_ in the section immediately below.
 
 .. code-block:: python
 
@@ -81,7 +81,7 @@ Now you're ready to obtain metric parities with the ``Fairness()`` class:
 
 You now have parity determinations for your models that can be leveraged in model selection!
 
-To visualize fairness, use Plot() class fairness methods.
+To visualize fairness, use ``Plot()`` class fairness methods.
 
 To visualize ``'all'`` group absolute bias metric parity determinations:
 
@@ -205,15 +205,17 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 
 ``score``
 ---------
-See CLI above. Threshholds are set in a dictionary passed to `get_crosstabs()`.
+By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Threshholds are set in a dictionary passed to `get_crosstabs()`. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds. 
 
 ``label_value``
 ---------------
-See CLI above.
+This is the ground truth value of a binary decision. The data must be binary (0 or 1).
 
 attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
-See CLI above. If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain pandas discretizing functions. You can recast 'categorical' columns to strings:
+Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles.
+
+If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain pandas discretizing functions. You can recast 'categorical' columns to strings:
 
 .. code-block:: python
 
@@ -221,7 +223,7 @@ See CLI above. If you plan to bin or discretize continuous features manually, no
 
 ``model_id``
 ------------
-See CLI above.
+``model_id`` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
 
 
 Reserved column names:
