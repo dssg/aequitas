@@ -197,7 +197,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
 
 
 Input data for Python API
@@ -247,7 +247,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
 
 
 Installation
