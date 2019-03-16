@@ -22,7 +22,7 @@ Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
 For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
-30 Seconds to Aequitas CLI and API
+30 Seconds to Aequitas
 ======================
 
 CLI
@@ -129,7 +129,7 @@ score  label_value  race              sex  age income
 1      1            Caucasian         Male 37  34000
 =====  ===========  ================  ==== === ======
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 Input data for Webapp
 ---------------------
@@ -155,7 +155,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 
 Input data for CLI
@@ -197,7 +197,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 
 Input data for Python API
@@ -247,7 +247,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 
 Installation
