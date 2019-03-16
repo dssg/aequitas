@@ -30,6 +30,7 @@ group metrics calculated from score and label value truth status (true/ false
 positives and true/ false negatives)
 
 .. code-block:: python
+
     from aequitas.group import Group
     g = Group()
     xtab, _ = g.get_crosstabs(df)
@@ -41,8 +42,9 @@ To view bias disparities, utilize the ``Plot()`` class:
     p = Plot()
     selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
 
+
 .. figure:: docs/_static/selected_group_metrics.png
-   :scale: 100%s
+   :scale: 100%
 
 This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``:
 
@@ -67,6 +69,7 @@ The Plot() class visualizes disparities as treemaps colored by disparity relatio
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
 
 .. code-block:: python
+
     f = Fairness()
     fdf = f.get_group_value_fairness(bdf)
 
@@ -74,17 +77,22 @@ You now have parity determinations for your models that can be leveraged in mode
 
 To visualize fairness, use Plot() class fairness methods.
 
-For group metrics:
+To visualize ``'all'`` group metrics:
+
 .. code-block:: python
 
     fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
+    wheat
+
 
 .. figure:: docs/_static/all_fairness_group.png
    :scale: 100%
 
-For disparities:
+To visualize multiple disparities:
+
 .. code-block:: python
-    a_tm = aqp.plot_fairness_disparity_all(fdf, attributes=['race'], metrics='all')
+
+    f_maps = aqp.plot_fairness_disparity_all(fdf, metrics=['pprev_disparity', 'ppr_disparity'])
 
 .. figure:: docs/_static/fairness_selected_disparities_race.png
    :scale: 100%
@@ -112,7 +120,7 @@ Input data for Webapp
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-.. figure:: docs/_static/webapp_input.jpg
+.. figure:: docs/_static/webapp_input.png
    :height: 240px
    :width: 320px
 
@@ -137,7 +145,7 @@ Input data for CLI
 
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
 
-.. figure:: docs/_static/CLI_input.jpg
+.. figure:: docs/_static/CLI_input.png
    :height: 240px
    :width: 320px
 
@@ -187,7 +195,7 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
 
 
 
-.. figure:: docs/_static/python_input.jpg
+.. figure:: docs/_static/python_input.png
    :height: 240px
    :width: 320px
 
@@ -204,7 +212,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 See CLI above. If you plan to bin or discritize continuous features manually, note that `get_crosstabs()` expects attribute columns to be type string. This excludes pandas 'categorical' data type, which is the default output of certain pandas discritizing functions. You can recast 'categorical' columns to strings:
 
-.. codeblock:: python
+.. code-block:: python
 
    df['categorical_type'] = df['categorical_type'].astype(str)
 
@@ -234,7 +242,9 @@ Install this Python library from source::
 
     python -m pip install git+https://github.com/dssg/aequitas.git
 
-You may then import the ``aequitas`` module from Python::
+You may then import the ``aequitas`` module from Python:
+
+.. code-block:: python
 
     import aequitas
 
@@ -242,7 +252,7 @@ You may then import the ``aequitas`` module from Python::
 
     aequitas-report
 
-...or, also from the command line, launch the Web front-end::
+...or launch the Web front-end from the command line::
 
     python -m serve
 
@@ -281,11 +291,7 @@ To run such a container, supporting the Web server, on-the-fly::
 
     manage container [create|start|stop]
 
-Find out more at `the documentation  <https://dssg.github.io/aequitas/>`_.
-
 To contact the team, please email us at [aequitas at uchicago dot edu]
-
-
 
 Citing Aequitas
 ===============
