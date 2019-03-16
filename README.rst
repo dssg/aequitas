@@ -22,9 +22,19 @@ Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
 For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
-30 Seconds to Aequitas
+30 Seconds to Aequitas CLI and API
 ======================
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ and specifics on the `web app <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-webapp>`_, `CLI <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-cli>`_, and `Python API <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-python-api>`_ in the section immediately below.
+
+CLI
+---
+With ``aequitas-report``, uncovering bias is as simple as running a single command on a CSV.::
+
+    aequitas-report --input compas_for_aequitas.csv
+
+
+Python API
+----------
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ and specifics on the `web app <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-webapp>`_, `CLI <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-cli>`_, and `Python API <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-python-api>`_ in the section immediately below. 
 
 .. code-block:: python
 
