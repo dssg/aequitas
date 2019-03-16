@@ -129,6 +129,8 @@ score  label_value  race              sex  age income
 1      1            Caucasian         Male 37  34000
 =====  ===========  ================  ==== === ======
 
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
+
 Input data for Webapp
 ---------------------
 
@@ -153,7 +155,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
-`Back to 30 Seconds to Aequitas <https://github.com/dssg/aequitas/tree/issue_53_docs#30-seconds-to-aequitas>`_
+`Back to 30 Seconds to Aequitas <https://github.com/dssg/aequitas/tree/issue_53_docs#30-seconds-to-aequitas-cli-and-api>`_
 
 
 Input data for CLI
