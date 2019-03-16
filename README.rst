@@ -27,7 +27,7 @@ For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blo
 
 CLI
 ---
-With ``aequitas-report``, uncovering bias is as simple as running a single command on a CSV.::
+With ``aequitas-report``, uncovering bias is as simple as running a single command on a CSV::
 
     aequitas-report --input compas_for_aequitas.csv
 
