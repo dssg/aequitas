@@ -112,7 +112,7 @@ Input data for Webapp
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
 .. figure:: docs/_static/webapp_input.jpg
-   :scale: 15 %
+   :scale: 5 %
 
 ``score``
 ---------
@@ -135,7 +135,7 @@ Input data for CLI
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
 
 .. figure:: docs/_static/CLI_input.jpg
-   :scale: 15 %
+   :scale: 5 %
 
 
 ``score``
@@ -183,7 +183,7 @@ Python input data can be handled identically to CLI by using `preprocess_input_d
 
 
 .. figure:: docs/_static/python_input.jpg
-   :scale: 15 %
+   :scale: 5 %
 
 
 ``score``
