@@ -34,7 +34,7 @@ With ``aequitas-report``, uncovering bias is as simple as running a single comma
 
 Python API
 ----------
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <#input-data>`_ and specifics on the `web app <#input-data-for-webapp>`_, `CLI <#input-data-for-cli>`_, and `Python API <#input-data-for-python-api>`_ in the section immediately below. 
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `general input requirements <#input-data>`_ and specific requirements for the `web app <#input-data-for-webapp>`_, `CLI <#input-data-for-cli>`_, and `Python API <#input-data-for-python-api>`_ in the section immediately below. 
 
 .. code-block:: python
 
