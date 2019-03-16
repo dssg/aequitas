@@ -88,6 +88,7 @@ To visualize ``'all'`` group metrics:
 .. figure:: docs/_static/all_fairness_group.png
    :scale: 100%
 
+
 To visualize multiple disparities:
 
 .. code-block:: python
