@@ -146,10 +146,10 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
 
-Input data for CLI and Python
----------------------
+Input data for CLI
+------------------
 
-The CLI accepts csv files and also accomodates database calls defined in Configuration files.
+The CLI accepts CSV files and accomodates database calls defined in Configuration files. 
 
 .. figure:: docs/_static/CLI_input.png
    :height: 240px
@@ -187,7 +187,6 @@ Reserved column names:
 
 Input data for Python API
 -------------------------
-
 Python input data can be handled identically to CLI by using ``preprocess_input_df()``. Otherwise, you must discretize continuous attribute columns prior to passing the data to ``Group().get_crosstabs()``.
 
 .. code-block:: python
@@ -200,7 +199,6 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 .. figure:: docs/_static/python_input.png
    :height: 240px
    :width: 320px
-
 
 ``score``
 ---------
@@ -230,6 +228,7 @@ Reserved column names:
 * ``entity_id``
 * ``rank_abs``
 * ``rank_pct``
+
 
 Installation
 ============
