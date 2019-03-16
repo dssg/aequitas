@@ -20,6 +20,7 @@ Documentation
 
 Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
+For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
 
 30 Seconds to Aequitas
 ======================
@@ -102,9 +103,6 @@ To visualize parity treemaps for multiple disparities, pass metrics of interest 
 
 .. figure:: docs/_static/fairness_selected_disparities_race.png
    :scale: 100%
-
-For further examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
-
 
 Input Data
 ==========
