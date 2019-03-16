@@ -178,11 +178,11 @@ As with the webapp, this is the ground truth value of a binary decision. The dat
 
 attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
-Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles.
+Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group value. If continuous, Aequitas will first bin the data into quartiles.
 
 ``model_id``
 ------------
-``model_id`` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
+``model_id`` is an identifier tied to the output of a specific model. With a ``model_id`` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
 
 
 Reserved column names:
@@ -215,7 +215,7 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 
 ``score``
 ---------
-By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Threshholds are set in a dictionary passed to `get_crosstabs()`. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds. 
+By default, Aequitas assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Threshholds are set in a dictionary passed to `get_crosstabs()` of format {'rank_abs':[300] , 'rank_pct':[1.0, 5.0, 10.0]}. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds. 
 
 ``label_value``
 ---------------
@@ -225,7 +225,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles.
 
-If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain pandas discretizing functions. You can recast 'categorical' columns to strings:
+If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain ``pandas`` discretizing functions. You can recast 'categorical' columns to strings:
 
 .. code-block:: python
 
@@ -233,7 +233,7 @@ If you plan to bin or discretize continuous features manually, note that ``get_c
 
 ``model_id``
 ------------
-``model_id`` is an identifier tied to the output of a specific model. With a `model_id` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
+``model_id`` is an identifier tied to the output of a specific model. With a ``model_id`` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
 
 
 Reserved column names:
