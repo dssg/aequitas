@@ -34,7 +34,7 @@ With ``aequitas-report``, uncovering bias is as simple as running a single comma
 
 Python API
 ----------
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ and specifics on the `web app <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-webapp>`_, `CLI <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-cli>`_, and `Python API <https://github.com/dssg/aequitas/tree/issue_53_docs#input-data-for-python-api>`_ in the section immediately below. 
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See general `input requirements <#input-data>`_ and specifics on the `web app <#input-data-for-webapp>`_, `CLI <#input-data-for-cli>`_, and `Python API <#input-data-for-python-api>`_ in the section immediately below. 
 
 .. code-block:: python
 
@@ -155,7 +155,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
-`Back to 30 Seconds to Aequitas <https://github.com/dssg/aequitas/tree/issue_53_docs#30-seconds-to-aequitas-cli-and-api>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas-cli-and-api>`_
 
 
 Input data for CLI
@@ -197,7 +197,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <https://github.com/dssg/aequitas/tree/issue_53_docs#30-seconds-to-aequitas>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 
 Input data for Python API
@@ -247,7 +247,7 @@ Reserved column names:
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <https://github.com/dssg/aequitas/tree/issue_53_docs#30-seconds-to-aequitas>`_
+`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
 
 
 Installation
