@@ -23,11 +23,16 @@ Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
 30 Seconds to Aequitas
 ======================
-Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package.  See section immediately below for requirements on your desired mechanism.
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See input requirements for each in the section immediately below.
 
-Aequitas begins by creating a crosstab of your preprocessed data and absolute
-group metrics calculated from score and label value truth status (true/ false
-positives and true/ false negatives)
+.. code-block:: python
+
+    from Aequitas.preprocessing import preprocess_input_df()
+    
+    df['categorical_column_name'] = df['categorical_column_name'].astype(str)
+    df, _ = preprocess_input_df(*input_data*)
+
+The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, calculating absolute group metrics from score and label value truth status (true/ false positives and true/ false negatives)
 
 .. code-block:: python
 
@@ -35,7 +40,7 @@ positives and true/ false negatives)
     g = Group()
     xtab, _ = g.get_crosstabs(df)
 
-To view bias disparities, utilize the ``Plot()`` class:
+The Plot() class can visualize a single group metric with ``plot_group_metric()`, or a list of bias metrics with ``plot_group_metric_all()``:
 
 .. code-block:: python
 
@@ -46,7 +51,7 @@ To view bias disparities, utilize the ``Plot()`` class:
 .. figure:: docs/_static/selected_group_metrics.png
    :scale: 100%
 
-This crosstab dataframe is augmented by every class to add layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``:
+The crosstab dataframe is augmented by every succeeding class with addiitonal layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
 
 .. code-block:: python
 
@@ -56,7 +61,7 @@ This crosstab dataframe is augmented by every class to add layers of information
 `Learn more about reference group selection. <https://dssg.github.io/aequitas/config.html>`_
 
 
-The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_:
+The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_ with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
 
 .. code-block:: python
 
@@ -77,7 +82,7 @@ You now have parity determinations for your models that can be leveraged in mode
 
 To visualize fairness, use Plot() class fairness methods.
 
-To visualize ``'all'`` group metrics:
+To visualize ``'all'`` group absolute bias metric parity determinations:
 
 .. code-block:: python
 
@@ -89,7 +94,7 @@ To visualize ``'all'`` group metrics:
    :scale: 100%
 
 
-To visualize multiple disparities:
+To visualize parity treemaps for multiple disparities, pass metrics of interest as a list:
 
 .. code-block:: python
 
@@ -141,7 +146,7 @@ attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
 
-Input data for CLI
+Input data for CLI and Python
 ---------------------
 
 The CLI accepts csv files and also accomodates database calls defined in Configuration files.
@@ -183,17 +188,20 @@ Reserved column names:
 Input data for Python API
 -------------------------
 
-Python input data can be handled identically to CLI by using `preprocess_input_df()`. Otherwise, you must discretize continuous attribute columns prior to passing the data to `Group().get_crosstabs()`.::
+Python input data can be handled identically to CLI by using ``preprocess_input_df()``. Otherwise, you must discretize continuous attribute columns prior to passing the data to ``Group().get_crosstabs()``.
+
+.. code-block:: python
 
     from Aequitas.preprocessing import preprocess_input_df()
 
 
-Python input data can be handled identically to CLI by using `preprocess_input_df()`. Otherwise, you must discretize continuous attribute columns prior to passing the data to `Group().get_crosstabs()`.::
+Python input data can be handled identically to CLI by using ``preprocess_input_df()``. Otherwise, you must discretize continuous attribute columns prior to passing the data to ``Group().get_crosstabs()``.
+
+.. code-block:: python
 
     from Aequitas.preprocessing import preprocess_input_df()
     # *input_data* matches CLI input data norms.
     df, _ = preprocess_input_df(*input_data*)
-
 
 
 .. figure:: docs/_static/python_input.png
@@ -211,11 +219,11 @@ See CLI above.
 
 attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 ---------------------------------------------------------
-See CLI above. If you plan to bin or discritize continuous features manually, note that `get_crosstabs()` expects attribute columns to be type string. This excludes pandas 'categorical' data type, which is the default output of certain pandas discritizing functions. You can recast 'categorical' columns to strings:
+See CLI above. If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain pandas discretizing functions. You can recast 'categorical' columns to strings:
 
 .. code-block:: python
 
-   df['categorical_type'] = df['categorical_type'].astype(str)
+   df['categorical_column_name'] = df['categorical_column_name'].astype(str)
 
 ``model_id``
 ------------
