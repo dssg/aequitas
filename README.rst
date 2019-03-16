@@ -24,7 +24,7 @@ For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blo
 
 30 Seconds to Aequitas
 ======================
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `input requirements for each <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data-for-webapp>`_ in the section immediately below.
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `input requirements for each <https://github.com/dssg/aequitas/blob/issue_53_docs/README.rst#input-data>`_ in the section immediately below.
 
 .. code-block:: python
 
