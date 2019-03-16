@@ -61,7 +61,7 @@ The crosstab dataframe is augmented by every succeeding class with addiitonal la
 `Learn more about reference group selection. <https://dssg.github.io/aequitas/config.html>`_
 
 
-The Plot() class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_ with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
+The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_ with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
 
 .. code-block:: python
 
