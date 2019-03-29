@@ -18,7 +18,10 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
     :scale: 50 %
 
 
+
 `Visit the Aequitas project website <http://dsapp.uchicago.edu/aequitas/>`_.
+
+
 `Try out the Aequitas web application <http://aequitas.dssg.io/>`_.
 
 
