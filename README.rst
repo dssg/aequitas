@@ -32,6 +32,60 @@ Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
 For usage examples of the python library, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
+
+Installation
+============
+
+Aequitas is compatible with: **Python 3.6+**
+
+Install this Python library from source::
+
+    python setup.py install
+
+...or named as an installation requirement, *e.g.* via ``pip``::
+
+    python -m pip install git+https://github.com/dssg/aequitas.git
+
+You may then import the ``aequitas`` module from Python:
+
+.. code-block:: python
+
+    import aequitas
+
+...or execute the auditor from the command line::
+
+    aequitas-report
+
+...or launch the Web front-end from the command line::
+
+    python -m serve
+
+(Note: The above command launches a Web server only intended for development.)
+
+Containerization
+================
+
+To build a Docker container of Aequitas::
+
+    docker build -t aequitas .
+
+...or simply via ``manage``::
+
+    manage container build
+
+The Docker image's container defaults to launching the development Web server, though this can be overridden via the Docker "command" and/or "entrypoint".
+
+To run such a container, supporting the Web server, on-the-fly::
+
+    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
+
+...or, manage a development container via ``manage``::
+
+    manage container [create|start|stop]
+
+To contact the team, please email us at [aequitas at uchicago dot edu]
+
+
 30 Seconds to Aequitas
 ======================
 
@@ -123,60 +177,6 @@ To visualize parity treemaps for multiple disparities, pass metrics of interest 
 
 .. figure:: docs/_static/fairness_selected_disparities_race.png
    :scale: 100%
-
-
-Installation
-============
-
-Aequitas is compatible with: **Python 3.6+**
-
-Install this Python library from source::
-
-    python setup.py install
-
-...or named as an installation requirement, *e.g.* via ``pip``::
-
-    python -m pip install git+https://github.com/dssg/aequitas.git
-
-You may then import the ``aequitas`` module from Python:
-
-.. code-block:: python
-
-    import aequitas
-
-...or execute the auditor from the command line::
-
-    aequitas-report
-
-...or launch the Web front-end from the command line::
-
-    python -m serve
-
-(Note: The above command launches a Web server only intended for development.)
-
-Containerization
-================
-
-To build a Docker container of Aequitas::
-
-    docker build -t aequitas .
-
-...or simply via ``manage``::
-
-    manage container build
-
-The Docker image's container defaults to launching the development Web server, though this can be overridden via the Docker "command" and/or "entrypoint".
-
-To run such a container, supporting the Web server, on-the-fly::
-
-    docker run -p 5000:5000 -e "HOST=0.0.0.0" aequitas
-
-...or, manage a development container via ``manage``::
-
-    manage container [create|start|stop]
-
-To contact the team, please email us at [aequitas at uchicago dot edu]
-
 
 
 
