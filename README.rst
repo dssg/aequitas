@@ -13,10 +13,13 @@ Aequitas
 
 Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
 
-`Learn more about the project <http://dsapp.uchicago.edu/aequitas/>`_.
 
 .. figure:: src/aequitas_webapp/static/images/use_aequitas.png
     :scale: 50 %
+
+
+`Visit the Aequitas project website <http://dsapp.uchicago.edu/aequitas/>`_.
+`Try out the Aequitas web application <http://aequitas.dssg.io/>`_.
 
 
 Documentation
@@ -24,7 +27,7 @@ Documentation
 
 Find documentation `here <https://dssg.github.io/aequitas/>`_.
 
-For usage examples, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset, or `explore the Aequitas web application <http://aequitas.dssg.io/>`_.
+For usage examples of the python library, see our `demo notebook <https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb>`_ using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
 30 Seconds to Aequitas
 ======================
