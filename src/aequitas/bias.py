@@ -1,8 +1,6 @@
 import logging
-from sys import exit
 
-from aequitas.preprocessing import get_attr_cols
-from aequitas.plotting import Plot, assemble_ref_groups
+from aequitas.plotting import assemble_ref_groups
 
 import pandas as pd
 from scipy import stats
@@ -23,13 +21,15 @@ class Bias(object):
 
     def __init__(self, key_columns=default_key_columns, sample_df=None,
                  non_attr_cols=non_attr_cols,
-                 significance_cols=all_group_metrics,
                  input_group_metrics=all_group_metrics, fill_divbyzero=None):
         """
 
-        :param key_columns:
-        :param input_group_metrics:
-        :param fill_divbyzero:
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defaults are
+            'model_id', 'score_threshold', 'attribute_name'.
+        :param input_group_metrics: List of absolute bias metrics to calculate
+        :param fill_divbyzero: optional, fill value to use when divided by
+            zero. Default is None.
         """
         self.key_columns = list(key_columns)
         self.input_group_metrics = list(input_group_metrics)
@@ -39,36 +39,38 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
-        self.significance_cols = significance_cols
+        self.significance_cols = input_group_metrics
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
                                  check_significance=None,  alpha = 5e-2,
                                  mask_significance = True, label_score_ref='fpr'):
         """
-        Calculates several ratios using the group metrics value and dividing by
-        the minimum group metric value among all groups defined by each attribute
+        Calculates disparities between groups for the predefined list of
+        group metrics using the group with the minimum value for each absolute
+        bias metric as the reference group (denominator).
 
-        :param df: the resulting dataframe from the group get_crosstabs
-        :param original_df: a dataframe containing a required 'score 'column
-            and possible 'label_value' column.
-        :param key_columns: optional, the key columns to use on joins.
-            Defualts are 'model_id', 'score_threshold', 'attribute_name'.
-        :param input_group_metrics: optional, the columns list corresponding to
+        :param df: output dataframe of Group class get_crosstabs() method.
+        :param original_df: a dataframe of sample features and model results.
+            Includes a required 'score 'column and possible 'label_value' column.
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defaults are
+            'model_id', 'score_threshold', 'attribute_name'.
+        :param input_group_metrics: optional, columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: optional, fill value to use when divided by zero
-        :param check_significance: Measures for which to determine statistical
-            significance beyond label_value and score. Defaults are 'fpr' and 'fnr'.
-        :param alpha: Level at which to determine statistical significance.
-            Default is 5e-2 (0.05).
-        :param mask_significance: Whether to display a T/F mask over calculated
+        :param fill_divbyzero: optional, fill value to use when divided by
+            zero. Default is None.
+        :param check_significance: measures for which to determine statistical
+            significance beyond label_value and score. Default is all metrics.
+        :param alpha: statistical significance level to use in significance
+            determination. Default is 5e-2 (0.05).
+        :param mask_significance: whether to display a T/F mask over calculated
             p-values from statistical significance determination. Default is True.
-        :param label_score_ref: Default reference group to use for score and
-            label_value statistical significance calculations
-
-        :return: a dataframe with same number of rows as the input (crosstab)
-            but with additional disparity metrics columns, ref_group_values, and
-            statisitcal significance of specific metrics.
+        :param label_score_ref: default reference group to use for score and
+            label_value statistical significance calculations.
+        :return: A dataframe with same number of rows as the input (crosstab)
+            with additional disparity metrics columns and ref_group_values
+            for each metric.
         """
 
         print('get_disparity_min_metric()')
@@ -95,7 +97,7 @@ class Bias(object):
                 # if entire column for a group metric is NaN, cast min value
                 # index column to same index as any other group for that attribute
                 if any(pd.np.isnan(val) for val in idxmin.values):
-                    if (len(idxmin) >= 1):
+                    if len(idxmin) >= 1:
                         idxmin.loc[idxmin.isna()] = df.loc[
                             df["attribute_name"].isin(
                                 idxmin.index.get_level_values('attribute_name').values
@@ -141,9 +143,9 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
-            model_id=1, attr_cols=attr_cols, aplha=5e-2)
+            model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
         # if specified, apply T/F mask to significance columns
         if mask_significance:
@@ -171,30 +173,31 @@ class Bias(object):
                                   alpha = 5e-2, mask_significance=True,
                                   label_score_ref='fpr'):
         """
-        Calculates the bias (disparity) metrics for the predefined list of group
+        Calculates disparities between groups for the predefined list of group
         metrics using the majority group within each attribute as the reference
-        group (denominator)
+        group (denominator).
 
-        :param df: the returning dataframe from the group.get_crosstabs
-        :param original_df: a dataframe containing a required 'score 'column
-            and possible 'label_value' column.
-        :param key_columns: optional, the key columns to use on joins.
-            Defaults are 'model_id', 'score_threshold', 'attribute_name'.
-        :param input_group_metrics: optional, the columns list corresponding to
+        :param df: output dataframe of Group class get_crosstabs() method.
+        :param original_df: a dataframe of sample features and model results.
+            Includes a required 'score 'column and possible 'label_value' column.
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defaults are
+            'model_id', 'score_threshold', 'attribute_name'.
+        :param input_group_metrics: optional, columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: optional, fill value to use when divided by zero
-        :param check_significance: Measures for which to determine statistical
-            significance beyond label_value and score. Defaults are 'fpr' and 'fnr'.
-        :param alpha: Level at which to determine statistical significance.
-            Default is 5e-2 (0.05).
-        :param mask_significance: Whether to display a T/F mask over calculated
+        :param fill_divbyzero: optional, fill value to use when divided by
+            zero. Default is None.
+        :param check_significance: measures for which to determine statistical
+            significance beyond label_value and score. Default is all metrics.
+        :param alpha: statistical significance level to use in significance
+            determination. Default is 5e-2 (0.05).
+        :param mask_significance: whether to display a T/F mask over calculated
             p-values from statistical significance determination. Default is True.
-        :param label_score_ref: Metric which eference group to use for score and
+        :param label_score_ref: default reference group to use for score and
             label_value statistical significance calculations.
-
-        :return: a dataframe with same number of rows as the input (crosstab)
-            but with additional disparity metrics columns, ref_group_values, and
-            statisitcal significance of specific metrics.
+        :return: A dataframe with same number of rows as the input (crosstab)
+            with additional disparity metrics columns and ref_group_values
+            for each metric.
         """
         print('get_disparity_major_group()')
         # record df column order
@@ -236,11 +239,8 @@ class Bias(object):
         # considered NaN after division, so if 0/0 we assume 1.0 disparity
         # (they are the same...)
 
-        fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        # df = df.fillna(value=fill_zeros)
-
         # default is to use the same ref groups as df, need to add functionality to
-        # complie ref_groups_dict based on a passed ref group for a given measure
+        # compile ref_groups_dict based on a passed ref group for a given measure
         check_significance = df_cols.intersection(check_significance).tolist()
 
         ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
@@ -257,9 +257,9 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
-            model_id=1, attr_cols=attr_cols, aplha=5e-2)
+            model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
         # if specified, apply T/F mask to significance columns
         if mask_significance:
@@ -294,31 +294,30 @@ class Bias(object):
                                         check_significance=None, alpha=5e-2,
                                         mask_significance=True):
         """
-        Calculates the bias (disparity) metrics for the predefined list of input
-        group metrics using a predefined reference group value for each
-        attribute which is passed using ref_groups_dict
-        of format:{'attr1':'val1', 'attr2':'val2'}
+        Calculates disparities between groups for the predefined list of group
+        metrics using a predefined reference group (denominator) value for each
+        attribute.
 
-        :param df: the output dataframe of the group.get_crosstabs
-        :param original_df: a dataframe containing a required raw 'score' column
-            and possible raw 'label_value' column.
-        :param ref_groups_dict: a dictionary {attribute_name:attribute_value, ...}
-        :param key_columns: optional, the key columns to use on joins.
-            Defualts are 'model_id', 'score_threshold', 'attribute_name'.
-        :param input_group_metrics: optional, the columns list corresponding to
+        :param df: output dataframe of Group class get_crosstabs() method.
+        :param original_df: dataframe of sample features and model results.
+            Includes a required 'score 'column and possible 'label_value' column.
+        :param ref_groups_dict: dictionary of format: {'attribute_name': 'attribute_value', ...}
+        :param key_columns: optional, key identifying columns for grouping
+            variables and bias metrics in intermediate joins. Defaults are
+            'model_id', 'score_threshold', 'attribute_name'.
+        :param input_group_metrics: optional, columns list corresponding to
             the group metrics for which we want to calculate disparity values
-        :param fill_divbyzero: optional, fill value to use when divided by zero
-        :param check_significance: Measures for which to determine statistical
-            significance beyond label_value and score. Defaults are 'fpr' and 'fnr'.
-        :param alpha: Level at which to determine statistical significance.
-            Default is 5e-2 (0.05).
-        :param mask_significance: Whether to display a T/F mask over calculated
+        :param fill_divbyzero: optional, fill value to use when divided by
+            zero. Default is None.
+        :param check_significance: measures for which to determine statistical
+            significance beyond label_value and score. Default is all metrics.
+        :param alpha: statistical significance level to use in significance
+            determination. Default is 5e-2 (0.05).
+        :param mask_significance: whether to display a T/F mask over calculated
             p-values from statistical significance determination. Default is True.
-
-
-        :return: a dataframe with same number of rows as the input (crosstab)
-            but with additional disparity metrics columns, ref_group_values, and
-            statisitcal significance of specific metrics.
+        :return: A dataframe with same number of rows as the input (crosstab)
+            with additional disparity metrics columns and ref_group_values
+            for each metric.
         """
         print('get_disparity_predefined_group()')
         # record df column order
@@ -370,17 +369,11 @@ class Bias(object):
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
 
-        # when there is a zero in the numerator and a zero in denominator it is
-        # considered NaN  after division, so if 0/0 we assume 1.0 disparity
-        # (they are the same...)
-        fill_zeros = {metric: 1.000000 for metric in disparity_metrics}
-        # df = df.fillna(value=fill_zeros)
-
         # for predefined groups, use the largest of the predefined groups as
         # ref group for score and label value
         check_significance = df_cols.intersection(check_significance).tolist()
 
-        # complile dictionary of reference groups based on bias-augmented crosstab
+        # compile dictionary of reference groups based on bias-augmented crosstab
         full_ref_dict = {}
         for key, val in ref_groups_dict.items():
             full_ref_dict[key] = {'label_value': val,
@@ -390,9 +383,9 @@ class Bias(object):
 
         # run significance method on bias-augmented crosstab based on false
         # positives, false negatives, scores, and label values in original df
-        self.get_statistical_significance(
+        self._get_statistical_significance(
             original_df, df, ref_dict=full_ref_dict, score_thresholds=None,
-            model_id=1, attr_cols=None, aplha=5e-2)
+            model_id=1, attr_cols=None, alpha=5e-2)
 
         # if specified, apply T/F mask to significance columns
         if mask_significance:
@@ -413,9 +406,9 @@ class Bias(object):
 
     @staticmethod
     def _get_measure_sample(original_df, attribute, measure):
-        '''
-        Helper function for get_statistical_significance() (via
-        calculate_significance() function). Convert dataframe to samples for
+        """
+        Helper function for _get_statistical_significance() (via
+        _calculate_significance() function). Convert dataframe to samples for
         given attribute group.
 
         :param original_df: a dataframe containing a required raw 'score' column
@@ -426,16 +419,16 @@ class Bias(object):
             (false positives, false negatives, score, label_value)
 
         :return: A dictionary of binary 'samples' for each attribute group
-        '''
+        """
         return original_df.groupby(attribute).apply(
             lambda f: f.loc[f[measure].notnull(), measure].values.tolist()).to_dict()
 
 
     @staticmethod
     def _check_equal_variance(sample_dict, ref_group, alpha=5e-2):
-        '''
-        Helper function for get_statistical_significance() (via
-        calculate_significance() function).
+        """
+        Helper function for _get_statistical_significance() (via
+        _calculate_significance() function).
 
         :param sample_dict: dictionary of binary samples for equal variance
             comparison.
@@ -446,7 +439,7 @@ class Bias(object):
 
         :return: Dictionary indicating whether each group has equal variance
         (in comparison with reference group)
-        '''
+        """
 
         # Immediately set ref_group status for equal variance (with itself): True
 
@@ -465,7 +458,7 @@ class Bias(object):
             # test to check equal variance between groups
             if normality_p < alpha or len(sample) < 8:
                 # if ref_group is not normal, can't use f-test or bartlett test
-                # for any samples, so check for equal varience against ref_group
+                # for any samples, so check for equal variance against ref_group
                 # using levene test for all groups and return dict
                 # (since includes all groups)
                 if attr_value == ref_group:
@@ -502,10 +495,10 @@ class Bias(object):
 
 
     @classmethod
-    def calculate_significance(cls, original_df, disparity_df, attribute,
+    def _calculate_significance(cls, original_df, disparity_df, attribute,
                                measure, ref_dict, alpha=5e-2):
-        '''
-        Helper function for get_statistical_significance. Pulls samples from
+        """
+        Helper function for _get_statistical_significance. Pulls samples from
         original df, checks for equal variance between population groups and
         reference group, runs t-test between groups and reference group, and
         adds p-values to disparity_df for a given measure (ex: false positives)
@@ -525,9 +518,9 @@ class Bias(object):
 
         :return: dataframe with same number of rows as the input (crosstab)
             but with additional disparity metrics columns, ref_group_values, and
-            statisitcal significance (p-values) of specific metrics.
+            statistical significance (p-values) of specific metrics.
 
-        '''
+        """
 
         binaries_lookup = {'label_value': 'label_value', 'binary_fpr': 'fpr',
                            'binary_tpr': 'tpr', 'binary_tnr': 'tnr',
@@ -572,10 +565,10 @@ class Bias(object):
 
 
     @classmethod
-    def get_statistical_significance(cls, original_df, disparity_df, ref_dict,
+    def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
                                      score_thresholds=None, model_id=1,
-                                     attr_cols=None, aplha=5e-2):
-        '''
+                                     attr_cols=None, alpha=5e-2):
+        """
 
         :param original_df: a dataframe containing a required raw 'score' column
             and possible raw 'label_value' column.
@@ -588,13 +581,13 @@ class Bias(object):
         :param model_id: (Future functionality) ID(s) of models for which to check
             statistical significance
         :param attr_cols: Columns indicating attribute values in original_df
-        :param aplha: Level at which to determine statistical significance.
+        :param alpha: Level at which to determine statistical significance.
             Default is 5e-2 (0.05).
 
         :return: dataframe with same number of rows as the input (crosstab)
             but with additional disparity metrics columns, ref_group_values, and
-            statisitcal significance (p-values) of specific metrics.
-        '''
+            statistical significance (p-values) of specific metrics.
+        """
         if 'label_value' not in original_df.columns:
             raise ValueError(
                 "Column 'label_value' not in dataframe. Label values are "
@@ -655,12 +648,6 @@ class Bias(object):
         binary_false_neg = lambda rank_col, label_col, thres: lambda x: (
             (x[rank_col] > thres) & (x[label_col] == 1)).astype(int)
 
-        # binary_true_pos = lambda rank_col, label_col, thres: lambda x: (
-        #     (x[rank_col] <= thres) & (x[label_col] == 1)).astype(int)
-        #
-        # binary_true_neg = lambda rank_col, label_col, thres: lambda x: (
-        #     (x[rank_col] > thres) & (x[label_col] == 0)).astype(int)
-
         binary_score = lambda rank_col, label_col, thres: lambda x: (
                 x[rank_col] <= thres).astype(int)
 
@@ -677,11 +664,6 @@ class Bias(object):
 
             for thres_unit, thres_values in score_thresholds.items():
                 for thres_val in thres_values:
-                    # flag = 0
-                    # k = (original_df[thres_unit] <= thres_val).sum()
-                    # score_threshold = \
-                    #     'binary 0/1' if count_ones != None else \
-                    #         str(thres_val) + '_' + thres_unit[-3:]
 
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
@@ -689,7 +671,7 @@ class Bias(object):
                             func).reset_index(level=0, drop=True)
 
             # add columns for error-based significance
-            # precision, tnr, fdr are based on false postives
+            # precision, tnr, fdr are based on false positives
             original_df.loc[:, 'binary_precision'] = original_df.loc[:, 'binary_fpr']
             original_df.loc[:, 'binary_tnr'] = original_df.loc[:, 'binary_fpr']
             original_df.loc[:, 'binary_fdr'] = original_df.loc[:, 'binary_fpr']
@@ -718,29 +700,26 @@ class Bias(object):
             measures += ['label_value']
 
             for measure in measures:
-                cls.calculate_significance(
+                cls._calculate_significance(
                     original_df, disparity_df, attribute, measure,
                     ref_dict=ref_dict,
-                    alpha=aplha)
+                    alpha=alpha)
         return disparity_df
 
     def list_disparities(self, df):
-        '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
-        '''
+        """
+        View list of all calculated disparities in df
+        """
         return list(df.columns[df.columns.str.contains('_disparity')])
 
     def list_significance(self, df):
-        '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
-        '''
+        """
+        View list of all calculated disparities in df
+        """
         return list(df.columns[df.columns.str.contains('_significance')])
 
     def list_absolute_metrics(self, df):
-        '''
-        View all calculated disparities in table
-        :return: list of absolute group metrics
-        '''
+        """
+        View list of all calculated absolute bias metrics in df
+        """
         return list(set(self.input_group_metrics) & set(df.columns))

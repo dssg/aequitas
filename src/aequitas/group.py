@@ -18,13 +18,13 @@ class Group(object):
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
-        self.group_functions = self.get_group_functions()
+        self.group_functions = self._get_group_functions()
 
     @staticmethod
-    def get_group_functions():
+    def _get_group_functions():
         """
-
-        :return:
+        Helper function to accumulate lambda functions used in bias metrics
+        calculations.
         """
 
         divide = lambda x, y: x / y if y != 0 else pd.np.nan
@@ -116,10 +116,13 @@ class Group(object):
         """
         Creates univariate groups and calculates group metrics.
 
-        :param df: a dataframe containing the following required columns [score,  label_value]
-        :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id:
-        :return:
+        :param df: a dataframe containing the following required columns [score,  label_value].
+        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param model_id: the model ID on which to subset the df.
+        :param attr_cols: optional, list of names of columns corresponding to
+            group attributes (i.e., gender, age category, race, etc.).
+
+        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
@@ -187,11 +190,11 @@ class Group(object):
                     flag = 0
 
                     # To discuss with Pedro: believe this might be the reason
-                    # for cutoff error - if nunmbers are cumulative, per
+                    # for cutoff error - if numbers are cumulative, per
                     # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
 
-                    # denote threshold as binarhy if numeric count_ones value
+                    # denote threshold as binary if numeric count_ones value
                     # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
@@ -220,10 +223,9 @@ class Group(object):
         return groups_df, attr_cols
 
     def list_absolute_metrics(self, df):
-        '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
-        '''
+        """
+        View list of all calculated absolute bias metrics in df
+        """
         return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
                                            'fdr', 'npv', 'precision', 'ppr',
                                            'pprev', 'prev'

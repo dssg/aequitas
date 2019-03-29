@@ -25,7 +25,7 @@ def get_attr_cols(df, non_attr_cols):
     """
     :param df: A data frame of model results
     :param non_attr_cols: Names of columns not associated with attributes
-    :return: List of columns associated with attributes
+    :return: List of columns associated with sample attributes
     """
     # index of the columns that are associated with attributes
     attr_cols = df.columns[~df.columns.isin(non_attr_cols)]

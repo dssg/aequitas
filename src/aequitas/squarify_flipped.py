@@ -182,9 +182,10 @@ def worst_ratio(sizes, x, y, dx, dy):
 
 
 def squarify(sizes, x, y, dx, dy):
-    '''
-    Calculate rectangle dimensions relative to a given width (dx) and height (dy)
-    starting at given x-axis and y-axis values.
+    """
+    Calculate rectangle dimensions for list of values relative to a given
+    width (dx) and height (dy), starting at given x-axis and y-axis values.
+    List 'sizes' must be normalized, unless dx * dy == sum(sizes).
 
     :param sizes: Ordered (desc) list of values normalized with respect to
         overall height (dy) and width values (dx)
@@ -192,11 +193,9 @@ def squarify(sizes, x, y, dx, dy):
     :param y: Remaining area start point on treemap y-axis
     :param dx: Remaining treemap width
     :param dy: Remaining treemap height
-    :return: List of dictionaries of rectangle dimensions
 
-    '''
-    # sizes should be pre-normalized wrt dx * dy (i.e., they should be same units)
-    # or dx * dy == sum(sizes)
+    :return: List of dictionaries of rectangle dimensions
+    """
     sizes = list(map(float, sizes))
 
     if len(sizes) == 0:
@@ -258,7 +257,7 @@ def padded_squarify(sizes, x, y, dx, dy):
     return rects
 
 def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
-                        labels=None, values=None, ax=None, **kwargs):
+                        labels=None, values=None, ax=None, acronyms = False, **kwargs):
     """
     Plotting with Matplotlib from predefined rectangles. Adapted from squarify
     source code.
@@ -330,14 +329,28 @@ def squarify_plot_rects(rects, norm_x=100, norm_y=100, color=None,
                 ax.text(x + dx / 2, y + dy / 2, label, va=va, ha='center',
                         fontsize=14, wrap=False)
 
+
             else:
                 # add labels that don't fit in boxes underneath plot
-                ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
-                        ha='center', fontsize=12, wrap=False)
+                if acronyms:
+                    # use acronym to to label very small boxes
+                    acronym = ''.join([word[0] for word in str(label).split(' ')])
 
-                underplot_label = str(label) if val is None else f"{label}, {val}"
-                under_plot.append(f"{alphabet[under_plot_num]}: {underplot_label}")
-                under_plot_num += 1
+                    # add labels that don't fit in boxes underneath plot
+                    ax.text(x + dx / 2, y + dy / 2, acronym, va=va,
+                            ha='center', fontsize=12, wrap=False)
+
+                    underplot_label = str(label) if val is None else f"{label}, {val}"
+                    under_plot.append(f"{acronym}: {underplot_label}")
+
+                else:
+                    # use alphabet character to to label very small boxes
+                    ax.text(x + dx / 2, y + dy / 2, alphabet[under_plot_num], va=va,
+                            ha='center', fontsize=12, wrap=False)
+
+                    underplot_label = str(label) if val is None else f"{label}, {val}"
+                    under_plot.append(f"{alphabet[under_plot_num]}: {underplot_label}")
+                    under_plot_num += 1
 
 
         if len(under_plot) > 0:
