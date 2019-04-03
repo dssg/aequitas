@@ -1,12 +1,12 @@
-###################################
-The Bias and Fairness Audit Toolkit
-###################################
+
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
     :scale: 50 %
 
-
+###################################
+The Bias and Fairness Audit Toolkit
+###################################
 --------
 Aequitas
 --------
