@@ -90,14 +90,14 @@ To contact the team, please email us at [aequitas at uchicago dot edu]
 ================================
 
 CLI
----
+~~~~~~
 With ``aequitas-report``, uncovering bias is as simple as running a single command on a CSV::
 
     aequitas-report --input compas_for_aequitas.csv
 
 
 Python API
-----------
+~~~~~~~~~~~~
 To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `general input requirements <#input-data>`_ and specific requirements for the `web app <#input-data-for-webapp>`_, `CLI <#input-data-for-cli>`_, and `Python API <#input-data-for-python-api>`_ in the section immediately below. 
 
 .. code-block:: python
