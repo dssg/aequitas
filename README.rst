@@ -1,6 +1,6 @@
-########################################################
+###################################
 The Bias and Fairness Audit Toolkit
-########################################################
+###################################
 
 
 .. figure:: src/aequitas_webapp/static/images/aequitas_header.png
@@ -85,9 +85,9 @@ To run such a container, supporting the Web server, on-the-fly::
 
 To contact the team, please email us at [aequitas at uchicago dot edu]
 
-
+***********************
 30 Seconds to Aequitas
-=============
+***********************
 
 CLI
 ---
