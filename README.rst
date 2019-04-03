@@ -87,7 +87,8 @@ To contact the team, please email us at [aequitas at uchicago dot edu]
 
 
 30 Seconds to Aequitas
-======================
+**********************
+
 
 CLI
 ---
