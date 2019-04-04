@@ -59,7 +59,5 @@ setup(
         'console_scripts': [
             'aequitas-report=aequitas_cli.aequitas_audit:main',
         ],
-    },
-    # test_suite='tests',
-    # tests_require=REQUIREMENTS_TEST,
+    }
 )
