@@ -30,4 +30,5 @@ db:
     input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
 
     # the output schema is optional, default=public
-    output_schema: results
+    output_schema: test_results
+    output_table: aequitas_group

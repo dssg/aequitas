@@ -3,12 +3,12 @@ import logging
 from sys import exit
 
 import pandas as pd
+
 from aequitas.bias import Bias
 from aequitas.fairness import Fairness
 from aequitas.group import Group
 from aequitas.plotting import Plot
 from aequitas.preprocessing import preprocess_input_df
-
 from .utils.configs_loader import Configs
 from .utils.io import get_csv_data
 from .utils.io import get_db_data
@@ -199,13 +199,18 @@ def main():
             output_schema = configs.db['output_schema']
         else:
             output_schema = 'public'
+        if 'output_table' in configs.db:
+            output_table = configs.db['output_table']
+        else:
+            output_table = 'aequitas_group'
+
         create_tables = 'append'
         if args.create_tables:
             create_tables = 'replace'
         input_query = configs.db['input_query']
         df = get_db_data(engine, input_query)
         group_value_df, report = run(df, configs=configs, preprocessed=False)
-        push_todb(engine, output_schema, create_tables, group_value_df)
+        push_todb(engine, output_schema, output_table, create_tables, group_value_df)
     else:
         df = get_csv_data(args.input_file)
         group_value_df, report = run(df, configs=configs, preprocessed=False)
