@@ -108,23 +108,31 @@ The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, cal
 The ``Plot()`` class can visualize a single group metric with ``plot_group_metric()``, or a list of bias metrics with ``plot_group_metric_all()``:
 ``` python
     p = Plot()
-    selected_metrics = p.plot_group_metric_all(xtab, metrics=['ppr','pprev','fnr','fpr'], ncols=4)
+    selected_metrics = p.plot_group_metric_all(xtab, 
+                metrics=['ppr','pprev','fnr','fpr'], 
+                ncols=4)
 ``` 
+![Image of Aequitas group metrics](docs/_static/selected_group_metrics.png)
 
-.. figure:: docs/_static/selected_group_metrics.png
-   :scale: 100%
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
 ``` python
     b = Bias()
-    bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, alpha=0.05, mask_significance=True)
+    bdf = b.get_disparity_predefined_groups(xtab, 
+                        original_df=df, 
+                        ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, 
+                        alpha=0.05, 
+                        mask_significance=True)
 ``` 
 [Learn more about reference group selection.](https://dssg.github.io/aequitas/config.html)
 
 
-The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given `fairness threshold <https://dssg.github.io/aequitas/config.html>`_ with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
+The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given [fairness threshold]( https://dssg.github.io/aequitas/config.html) with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
 ``` python
-    j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
+    j = aqp.plot_disparity_all(bdf, 
+                metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 
+                    'fpr_disparity', 'precision_disparity', 'fdr_disparity'], 
+                attributes=['race'], significance_alpha=0.05)
 ``` 
 
 ![Image of Aequitas treemaps](docs/_static/selected_treemaps.png)
@@ -181,7 +189,7 @@ score  label_value  race              sex  age income
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-![Image of Aequitas disparities race](docs/_static/webapp_input.pnh = 320x240)
+![Image of Aequitas disparities race](docs/_static/webapp_input.pnh =320x240)
 
 
 
