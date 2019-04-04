@@ -34,13 +34,19 @@ Installation
 
 Aequitas is compatible with: **Python 3.6+**
 
-Install this Python library from source::
+Install Aequitas using pip::
+
+    pip install aequitas
+
+
+Or install current Aequitas master from source::
 
     python setup.py install
 
 ...or named as an installation requirement, *e.g.* via ``pip``::
 
     python -m pip install git+https://github.com/dssg/aequitas.git
+
 
 You may then import the ``aequitas`` module from Python:
 
@@ -56,7 +62,6 @@ You may then import the ``aequitas`` module from Python:
 
     python -m serve
 
-(Note: The above command launches a Web server only intended for development.)
 
 Containerization
 ================
