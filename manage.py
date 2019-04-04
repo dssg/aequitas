@@ -181,6 +181,15 @@ class Release(Local):
             args.part,
         ]
 
+    @local
+    def build(self):
+        """build the python distribution"""
+        return (self.local.FG, self.local['python'][
+            'setup.py',
+            'sdist',
+            'bdist_wheel',
+        ])
+
     @localmethod('versions', metavar='version', nargs='*',
                  help="specific version(s) to upload (default: all)")
     def upload(self, args):
