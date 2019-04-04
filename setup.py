@@ -30,7 +30,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name='aequitas',
-    version='0.27.0',
+    version='0.28.0',
     # description="",
     long_description=README_PATH.read_text(),
     long_description_content_type='text/markdown',
