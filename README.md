@@ -189,7 +189,7 @@ score  label_value  race              sex  age income
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-![Image of Aequitas disparities race](docs/_static/webapp_input.png =320x240)
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/webapp_input.png" width="320">
 
 
 
@@ -216,14 +216,16 @@ Group columns can be categorical or continuous. If categorical, Aequitas will pr
 
 The CLI accepts CSV files and accommodates database calls defined in Configuration files.
 
-![Image of Aequitas cli input](docs/_static/CLI_input.png =320x240)
+
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/CLI_input.png" width="320">
+
 
 
 
 
 ##### ``score``
 
-By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds.
+By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. [See configurations](https://dssg.github.io/aequitas/config.html) for more on thresholds.
 
 
 ##### ``label_value``
@@ -250,7 +252,7 @@ Group columns can be categorical or continuous. If categorical, Aequitas will pr
 * ``rank_pct``
 
 
-`Back to 30 Seconds to Aequitas <#30-seconds-to-aequitas>`_
+[Back to 30 Seconds to Aequitas](#30-seconds-to-aequitas)
 
 
 #### Input data for Python API
