@@ -1,7 +1,7 @@
-# The Bias and Fairness Audit Toolkit
 
 ![Image of Aequitas logo](src/aequitas_webapp/static/images/aequitas_header.png)
 
+# The Bias and Fairness Audit Toolkit
 
 Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive tools.
 
@@ -189,7 +189,7 @@ score  label_value  race              sex  age income
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-![Image of Aequitas disparities race](docs/_static/webapp_input.pnh =320x240)
+![Image of Aequitas disparities race](docs/_static/webapp_input.png =320x240)
 
 
 
@@ -216,9 +216,9 @@ Group columns can be categorical or continuous. If categorical, Aequitas will pr
 
 The CLI accepts CSV files and accommodates database calls defined in Configuration files.
 
-.. figure:: docs/_static/CLI_input.png
-   :height: 240px
-   :width: 320px
+![Image of Aequitas cli input](docs/_static/CLI_input.png =320x240)
+
+
 
 
 ##### ``score``
@@ -263,17 +263,18 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
     df, _ = preprocess_input_df(*input_data*)
 ``` 
 
-.. figure:: docs/_static/python_input.png
-   :height: 240px
-   :width: 320px
+![Image of Aequitas python input](docs/_static/python_input.png =320x240)
+
+
 
 ##### ``score``
 
-By default, Aequitas assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Thresholds are set in a dictionary passed to `get_crosstabs()` of format {'rank_abs':[300] , 'rank_pct':[1.0, 5.0, 10.0]}. `See configurations <https://dssg.github.io/aequitas/config.html>`_ for more on thresholds.
+By default, Aequitas assumes the ``score`` column is a binary decision (0 or 1). If the ``score`` column contains a non-binary score (e.g. the output from a logistic regression applied to the data), the user sets a threshold to determine the binary decision. Thresholds are set in a dictionary passed to `get_crosstabs()` of format {'rank_abs':[300] , 'rank_pct':[1.0, 5.0, 10.0]}. [See configurations](https://dssg.github.io/aequitas/config.html) for more on thresholds.
 
 ##### ``label_value``
 
 This is the ground truth value of a binary decision. The data must be binary (0 or 1).
+
 
 ##### attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
 
@@ -281,9 +282,9 @@ Group columns can be categorical or continuous. If categorical, Aequitas will pr
 
 If you plan to bin or discretize continuous features manually, note that ``get_crosstabs()`` expects attribute columns to be of type 'string'. This excludes the ``pandas`` 'categorical' data type, which is the default output of certain ``pandas`` discretizing functions. You can recast 'categorical' columns to strings:
 
-.. code-block:: python
-
+```python 
    df['categorical_column_name'] = df['categorical_column_name'].astype(str)
+``` 
 
 ##### ``model_id``
 
@@ -320,7 +321,7 @@ Common development tasks, such as deploying the webapp, may then be handled via 
 
 If you use Aequitas in a scientific publication, we would appreciate citations to the following paper:
 
-Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequitas: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ( `PDF <https://arxiv.org/pdf/1811.05577.pdf>`_)
+Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequitas: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ([PDF](https://arxiv.org/pdf/1811.05577.pdf))
 
 ```bib
    @article{2018aequitas,
