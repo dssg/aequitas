@@ -31,7 +31,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 setup(
     name='aequitas',
     version='0.28.0',
-    # description="",
+    description="The bias and fairness audit toolkit.",
     long_description=README_PATH.read_text(),
     long_description_content_type='text/markdown',
     author="Center for Data Science and Public Policy",
