@@ -11,9 +11,11 @@ README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
-with open(README_PATH, encoding='utf-8') as f:
-    long_description = f.read()
+#with open(README_PATH, encoding='utf-8') as f:
+#    long_description = f.read()
 
+long_description = """
+Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive tools."""
 
 def stream_requirements(fd):
     """For a given requirements file descriptor, generate lines of
