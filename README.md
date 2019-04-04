@@ -263,8 +263,8 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
     df, _ = preprocess_input_df(*input_data*)
 ``` 
 
-![Image of Aequitas python input](docs/_static/python_input.png =320x240)
 
+<img src="https://github.com/dssg/aequitas/docs/_static/python_input.png" width="320">
 
 
 ##### ``score``
