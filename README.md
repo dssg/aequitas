@@ -91,7 +91,8 @@ With ``aequitas-report``, uncovering bias is as simple as running a single comma
 
 **Python API**
 
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See `general input requirements <#input-data>`_ and specific requirements for the `web app <#input-data-for-webapp>`_, `CLI <#input-data-for-cli>`_, and `Python API <#input-data-for-python-api>`_ in the section immediately below. 
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See [general input requirements](#input-data) and specific requirements for the [web app](#input-data-for-webapp), [CLI](#input-data-for-cli), and [Python API](#input-data-for-python-api) in the section immediately below. 
+
 ``` python
     from Aequitas.preprocessing import preprocess_input_df()
     
@@ -194,17 +195,17 @@ The webapp requires a single CSV with columns for a binary ``score``, a binary `
 
 
 
-##### `score``
+##### `score`
 
 Aequitas webapp assumes the ``score`` column is a binary decision (0 or 1).
 
 
-##### ```label_value``
+##### `label_value`
 
 This is the ground truth value of a binary decision. The data again must be binary 0 or 1.
 
 
-##### `attributes (e.g. ``race``, ``sex``, ``age``, ``income``)
+##### `attributes` (e.g. ``race``, ``sex``, ``age``, ``income``)
 
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.
 
@@ -223,12 +224,12 @@ The CLI accepts CSV files and accommodates database calls defined in Configurati
 
 
 
-##### ``score``
+##### `score`
 
 By default, Aequitas CLI assumes the ``score`` column is a binary decision (0 or 1). Alternatively, the ``score`` column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. [See configurations](https://dssg.github.io/aequitas/config.html) for more on thresholds.
 
 
-##### ``label_value``
+##### `label_value`
 
 As with the webapp, this is the ground truth value of a binary decision. The data must be binary 0 or 1.
 
@@ -237,7 +238,7 @@ As with the webapp, this is the ground truth value of a binary decision. The dat
 
 Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group value. If continuous, Aequitas will first bin the data into quartiles.
 
-##### ``model_id``
+##### `model_id`
 
 ``model_id`` is an identifier tied to the output of a specific model. With a ``model_id`` column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.
 
