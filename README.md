@@ -107,7 +107,9 @@ The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, cal
     g = Group()
     xtab, _ = g.get_crosstabs(df)
 ``` 
-The ``Plot()`` class can visualize a single group metric with ``plot_group_metric()``, or a list of bias metrics with ``plot_group_metric_all()``:
+
+The `Plot()` class can visualize a single group metric with `plot_group_metric()`, or a list of bias metrics with `plot_group_metric_all()`:
+
 ``` python
     p = Plot()
     selected_metrics = p.plot_group_metric_all(xtab, 
