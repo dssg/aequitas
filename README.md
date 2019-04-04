@@ -126,8 +126,9 @@ The ``Plot()`` class visualizes disparities as treemaps colored by disparity rel
 ``` python
     j = aqp.plot_disparity_all(bdf, metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 'fpr_disparity', 'precision_disparity', 'fdr_disparity'], attributes=['race'], significance_alpha=0.05)
 ``` 
-.. figure:: docs/_static/selected_treemaps.png
-   :scale: 100%
+
+![Image of Aequitas treemaps](docs/_static/selected_treemaps.png)
+
 
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
@@ -145,16 +146,16 @@ To visualize ``'all'`` group absolute bias metric parity determinations:
     wheat
 ``` 
 
-.. figure:: docs/_static/all_fairness_group.png
-   :scale: 100%
+![Image of Aequitas fairness_group](docs/_static/all_fairness_group.png)
+
 
 
 To visualize parity treemaps for multiple disparities, pass metrics of interest as a list:
 ``` python
     f_maps = aqp.plot_fairness_disparity_all(fdf, metrics=['pprev_disparity', 'ppr_disparity'])
 ``` 
-.. figure:: docs/_static/fairness_selected_disparities_race.png
-   :scale: 100%
+
+![Image of Aequitas disparities race](docs/_static/fairness_selected_disparities_race.png)
 
 
 
@@ -180,9 +181,9 @@ score  label_value  race              sex  age income
 
 The webapp requires a single CSV with columns for a binary ``score``, a binary ``label_value`` and an arbitrary number of attribute columns. Each row is associated with a single observation.
 
-.. figure:: docs/_static/webapp_input.png
-   :height: 240px
-   :width: 320px
+![Image of Aequitas disparities race](docs/_static/webapp_input.pnh = 320x240)
+
+
 
 
 ##### `score``
