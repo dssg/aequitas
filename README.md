@@ -85,7 +85,9 @@ To contact the team, please email us at [aequitas at uchicago dot edu]
 
 **CLI**
 
-With ``aequitas-report``, uncovering bias is as simple as running a single command on a CSV::
+Aequitas supports reading from and writing to CSV files or Postgres databases.  ([See configurations](https://dssg.github.io/aequitas/config.html))
+
+Example of running an audit from a CSV file with the ``aequitas-report`` via commandline:
 
     aequitas-report --input compas_for_aequitas.csv
 
