@@ -176,12 +176,11 @@ In general, input data is a single table with the following columns:
 - ``label_value`` (for error-based metrics only)
 - at least one attribute e.g. ``race``, ``sex`` and ``age_cat`` (attribute categories defined by user)
 
-=====  ===========  ================  ==== === ======
-score  label_value  race              sex  age income
-=====  ===========  ================  ==== === ======
-0      1            African-American  Male 25  18000
-1      1            Caucasian         Male 37  34000
-=====  ===========  ================  ==== === ======
+|  score 	| label_value  	| race  	|  sex 	|   age	|   income	|
+|---	|---	|---	|---	|---	|---	|
+| 0  	|  1 	|   African-American	| Female  	| 27  	|   18000	|
+| 1  	|  1 	|   Caucasian	|   	|   Male	|   32	| 45000
+
 
 [Back to 30 Seconds to Aequitas](#30-seconds-to-aequitas)
 
