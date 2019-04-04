@@ -264,7 +264,7 @@ Python input data can be handled identically to CLI by using ``preprocess_input_
 ``` 
 
 
-<img src="https://github.com/dssg/aequitas/docs/_static/python_input.png" width="320">
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/python_input.png" width="320">
 
 
 ##### ``score``
