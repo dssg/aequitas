@@ -23,7 +23,7 @@ def get_db_data(engine, input_query):
     """
     logging.info('querying db...')
     try:
-        df = pd.pg_copy_from(input_query, engine)
+        df = pd.DataFrame.pg_copy_from(input_query, engine)
     except SQLAlchemyError as e:
         logging.error('PG: could not get the resulting table. Please check your input_query. ' + e)
         exit(1)
