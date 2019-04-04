@@ -11,6 +11,9 @@ README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
+with open(README_PATH, encoding='utf-8') as f:
+    long_description = f.read()
+
 
 def stream_requirements(fd):
     """For a given requirements file descriptor, generate lines of
@@ -32,7 +35,7 @@ setup(
     name='aequitas',
     version='0.29.0',
     description="The bias and fairness audit toolkit.",
-    long_description=README_PATH.read_text(),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
