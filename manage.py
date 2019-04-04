@@ -181,7 +181,7 @@ class Release(Local):
             args.part,
         ]
 
-    @local
+    @localmethod
     def build(self):
         """build the python distribution"""
         return (self.local.FG, self.local['python'][
