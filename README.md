@@ -1,12 +1,13 @@
+<img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/aequitas_header.png">
 
-![Image of Aequitas logo](src/aequitas_webapp/static/images/aequitas_header.png)
 
 # The Bias and Fairness Audit Toolkit
 
 Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive tools.
 
 
-![Image of Aequitas interfaces](src/aequitas_webapp/static/images/use_aequitas.png)
+<img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/use_aequitas.png">
+
 
 [Visit the Aequitas project website](http://dsapp.uchicago.edu/aequitas/) 
 
@@ -113,7 +114,8 @@ The ``Plot()`` class can visualize a single group metric with ``plot_group_metri
                 metrics=['ppr','pprev','fnr','fpr'], 
                 ncols=4)
 ``` 
-![Image of Aequitas group metrics](docs/_static/selected_group_metrics.png)
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/selected_group_metrics.png">
+
 
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
@@ -136,7 +138,8 @@ The ``Plot()`` class visualizes disparities as treemaps colored by disparity rel
                 attributes=['race'], significance_alpha=0.05)
 ``` 
 
-![Image of Aequitas treemaps](docs/_static/selected_treemaps.png)
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/selected_treemaps.png">
+
 
 
 
@@ -155,7 +158,8 @@ To visualize ``'all'`` group absolute bias metric parity determinations:
     wheat
 ``` 
 
-![Image of Aequitas fairness_group](docs/_static/all_fairness_group.png)
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/all_fairness_group.png">
+
 
 
 
@@ -164,7 +168,8 @@ To visualize parity treemaps for multiple disparities, pass metrics of interest 
     f_maps = aqp.plot_fairness_disparity_all(fdf, metrics=['pprev_disparity', 'ppr_disparity'])
 ``` 
 
-![Image of Aequitas disparities race](docs/_static/fairness_selected_disparities_race.png)
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fairness_selected_disparities_race.png">
+
 
 
 
