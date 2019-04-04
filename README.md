@@ -85,7 +85,7 @@ To contact the team, please email us at [aequitas at uchicago dot edu]
 
 **CLI**
 
-Aequitas supports reading from and writing to CSV files or Postgres databases.  ([See configurations](https://dssg.github.io/aequitas/config.html))
+Aequitas supports reading from and writing to CSV files or Postgres databases.  ([See configurations](https://dssg.github.io/aequitas/config.html) and  [input data instructions](#input-data)))
 
 Example of running an audit from a CSV file with the ``aequitas-report`` via commandline:
 
