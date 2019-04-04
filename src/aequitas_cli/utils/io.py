@@ -1,9 +1,9 @@
+import pandas as pd
+import ohio.ext.pandas  # noqa
 import logging
 from datetime import datetime
 from os import path
 from sys import exit
-
-import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from xhtml2pdf import pisa
