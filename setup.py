@@ -7,7 +7,7 @@ ROOT_PATH = Path(__file__).parent
 
 LICENSE_PATH = ROOT_PATH / 'LICENSE'
 
-README_PATH = ROOT_PATH / 'README.rst'
+README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
