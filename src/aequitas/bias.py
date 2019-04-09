@@ -104,7 +104,7 @@ class Bias(object):
                             )
                         ].index[0]
                     else:
-                        logging.error(f"A minimum value for group_metric "
+                        raise Exception(f"A minimum value for group_metric "
                                       f"{group_metric} could not be calculated.")
                         continue
 
@@ -118,7 +118,7 @@ class Bias(object):
                                            '_ref_group_value']] = \
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
-                logging.error(
+                raise Exception(
                     'get_bias_min_metric:: one of the following columns is not '
                     'on the input dataframe : model_id, parameter, attribute_name '
                     'or any of the input_group_metrics '
@@ -216,7 +216,7 @@ class Bias(object):
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
-            logging.error('get_bias_major_group:: one of the following columns '
+            raise Exception('get_bias_major_group:: one of the following columns '
                           'is not on the input dataframe : model_id, parameter, '
                           'attribute_name, group_size')
 
@@ -334,7 +334,7 @@ class Bias(object):
         try:
             self._verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
-            logging.error('Bias.get_disparity_predefined_groups(): the number of '
+            raise Exception('Bias.get_disparity_predefined_groups(): the number of '
                           'predefined group values to use as reference is less '
                           'than the actual number of attributes in the input '
                           'dataframe.')
@@ -347,7 +347,7 @@ class Bias(object):
                 self._verify_ref_group_loc(group_slice)
                 df_ref_group = pd.concat([df_ref_group, group_slice])
         except (KeyError, ValueError):
-            logging.error('get_disparity_predefined_groups(): reference groups '
+            raise Exception('get_disparity_predefined_groups(): reference groups '
                           'and values provided do not exist as columns/values '
                           'in the input dataframe.(Note: check for syntax errors)')
 
@@ -621,7 +621,7 @@ class Bias(object):
                 (original_df.columns.isin(attr_cols))]
 
         if not non_string_cols.empty:
-            logging.error(
+            raise Exception(
                 'get_statistical_significance: statistical significance was '
                 'not calculated. There are non-string cols within attr_cols.')
 
