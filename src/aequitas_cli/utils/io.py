@@ -1,9 +1,9 @@
+import pandas as pd
+import ohio.ext.pandas  # noqa
 import logging
 from datetime import datetime
 from os import path
 from sys import exit
-
-import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from xhtml2pdf import pisa
@@ -23,7 +23,7 @@ def get_db_data(engine, input_query):
     """
     logging.info('querying db...')
     try:
-        df = pd.read_sql(input_query, engine)
+        df = pd.DataFrame.pg_copy_from(input_query, engine)
     except SQLAlchemyError as e:
         logging.error('PG: could not get the resulting table. Please check your input_query. ' + e)
         exit(1)
@@ -45,7 +45,7 @@ def get_csv_data(input_file):
     return df
 
 
-def push_todb(engine, output_schema, create_tables, output_df):
+def push_todb(engine, output_schema, output_table, create_tables, output_df):
     """
 
     :param engine:
@@ -54,9 +54,9 @@ def push_todb(engine, output_schema, create_tables, output_df):
     """
     logging.info('pushing to db aequitas table...')
     try:
-        output_df.set_index(['model_id', 'attribute_name']).to_sql(
+        output_df.set_index(['model_id', 'attribute_name']).pg_copy_to(
             schema=output_schema,
-            name='aequitas_group',
+            name=output_table,
             con=engine,
             if_exists=create_tables)
     except SQLAlchemyError as e:

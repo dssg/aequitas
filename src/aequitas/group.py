@@ -130,14 +130,11 @@ class Group(object):
         # check if all attr_cols exist in df
         check = [col in df.columns for col in attr_cols]
         if False in check:
-            # todo: create separate check method that raises exception...
-            logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-            # exit(1)
+            raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
-            logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-            # exit(1)
+            raise Exception('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
 
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
@@ -161,7 +158,6 @@ class Group(object):
             # find the priors_df
             col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
             counts = col_group.size()
-            print('COUNTS:::', counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
@@ -213,9 +209,7 @@ class Group(object):
                             flag = 1
                         else:
                             this_group_df = this_group_df.merge(metrics_df)
-                        # print(this_group_df.head(1))
                     dfs.append(this_group_df)
-        # precision@	25_abs
         groups_df = pd.concat(dfs, ignore_index=True)
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',

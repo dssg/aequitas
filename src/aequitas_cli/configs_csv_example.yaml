@@ -15,19 +15,3 @@ fairness_threshold: 0.8
 
 # available fairness_measeure "Impact Parity", "Statistical Parity", "FPR Parity", "FDR Parity", "FNR Parity", "FOR Parity"
 fairness_measures: ["FPR Parity", "FNR Parity"]
-
-# to connect to a database instead of using "--input <filename>", please uncomment the db key, credentials, and input_query
-#db:
-    #db_credentials:
-        #host: your_host
-        #database: your_db
-        #user: your_user
-        #password: your_pass
-        #port: 5432
-
-
-    # the input query should return a table with score, label_value columns and then each attribute you want to use for bias analysis
-    #input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
-
-    # the output schema is optional, default=public
-    #output_schema: results

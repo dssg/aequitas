@@ -181,8 +181,7 @@ class Fairness(object):
         group_attribute_df = self._fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df,
                                                                   fair_measures_requested)
         if group_attribute_df.empty:
-            logging.error('get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns')
-            exit(1)
+            raise Exception('get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns')
         parity_cols = [col for col in self.type_parity_depend if col in group_value_df.columns]
         group_attribute_df = self._fill_groupby_attribute_fairness(groupby_variable, key_columns, group_attribute_df, parity_cols)
         highlevel_cols = [col for col in self.high_level_fairness_depend if col in group_value_df.columns]
