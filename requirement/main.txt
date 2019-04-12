@@ -2,10 +2,10 @@ ohio>=0.2.0
 Flask==0.12.2
 Flask-Bootstrap==3.3.7.1
 markdown2==2.3.5
-matplotlib==2.2.3
-pandas==0.24.1
-pyyaml==5.1
-SQLAlchemy==1.1.1
+matplotlib>=3.0.3
+pandas>=0.24.1
+pyyaml>=5.1
+SQLAlchemy>=1.1.1
 tabulate==0.8.2
 xhtml2pdf==0.2.2
-seaborn==0.9.0
+seaborn>=0.9.0
