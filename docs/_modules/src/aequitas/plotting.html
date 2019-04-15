@@ -79,7 +79,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
@@ -344,7 +345,7 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_locate_ref_group_indices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">disparities_table</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span>
-                                 <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                                 <span class="n">ref_group_flag</span><span class="o">=</span><span class="s1">&#39;_ref_group_value&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds relative index (row) of reference group value for a given metric.</span>
 
@@ -356,10 +357,15 @@
 <span class="sd">            disparities_table.</span>
 <span class="sd">        :param ref_group_flag: string indicating column indicates reference group</span>
 <span class="sd">            flag value. Default is &#39;_ref_group_value&#39;.</span>
-<span class="sd">        :param model_id: model ID number. Default is 1.</span>
 
 <span class="sd">        :return: Integer indicating relative index of reference group value row.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">disparities_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">model_id</span> <span class="o">=</span> <span class="n">df_models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check disparities_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
         <span class="c1"># get absolute metric name from passed group metric (vs. a disparity name)</span>
         <span class="n">abs_metric</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_metric</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_disparity&#39;</span><span class="p">))</span>
 
@@ -372,8 +378,11 @@
                                          <span class="p">(</span><span class="n">disparities_table</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">model_id</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 
         <span class="c1"># there should only ever be one item in list, but JIC, select first</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;failed to find only one index for the reference group for attribute_name = </span><span class="si">{attribute_name}</span><span class="s2"> and </span>
+<span class="s2">                             attribute_value of reference = </span><span class="si">{ref_group_name}</span><span class="s2"> and model_id=</span><span class="si">{model_id}</span><span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
         <span class="n">relative_ind</span> <span class="o">=</span> <span class="n">disparities_table</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">relative_ind</span><span class="p">,</span> <span class="n">ref_group_name</span>
 
@@ -394,6 +403,11 @@
 
 <span class="sd">        :return: A Matplotlib axis</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">group_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check group_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">group_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Specified disparity metric &#39;</span><span class="si">{group_metric}</span><span class="s2">&#39; not &quot;</span>
                              <span class="n">f</span><span class="s2">&quot;in &#39;group_table&#39;.&quot;</span><span class="p">)</span>
@@ -521,7 +535,7 @@
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="Plot.plot_disparity"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_disparity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_disparity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disparity_table</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span>
-                       <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">label_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
@@ -539,7 +553,6 @@
 <span class="sd">            disparity_table.</span>
 <span class="sd">        :param attribute_name: which attribute to plot group_metric across.</span>
 <span class="sd">        :param color_mapping: matplotlib colormapping for treemap value boxes.</span>
-<span class="sd">        :param model_id: model ID number. Default is 1.</span>
 <span class="sd">        :param ax: a matplotlib Axis. If not passed, a new figure will be created.</span>
 <span class="sd">        :param fig: a matplotlib Figure. If not passed, a new figure will be created.</span>
 <span class="sd">        :param label_dict: optional, dictionary of replacement labels for data.</span>
@@ -558,6 +571,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Use matplotlib to truncate colormap, scale metric values</span>
         <span class="c1"># between the min and max, then assign colors to individual values</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">disparity_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check disparities_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
 
         <span class="n">table_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">disparity_table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">table_columns</span><span class="p">:</span>
@@ -760,6 +777,11 @@
 
 <span class="sd">        :return: A Matplotlib axis</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">fairness_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check fairness_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">group_metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fairness_table</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Specified disparity metric </span><span class="si">{group_metric}</span><span class="s2"> not &quot;</span>
                              <span class="n">f</span><span class="s2">&quot;in &#39;fairness_table&#39;.&quot;</span><span class="p">)</span>
@@ -889,7 +911,7 @@
 
 
 <div class="viewcode-block" id="Plot.plot_fairness_disparity"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.plotting.Plot.plot_fairness_disparity">[docs]</a>    <span class="k">def</span> <span class="nf">plot_fairness_disparity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fairness_table</span><span class="p">,</span> <span class="n">group_metric</span><span class="p">,</span>
-                                <span class="n">attribute_name</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">attribute_name</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">min_group_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">significance_alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -897,7 +919,6 @@
 
 <span class="sd">        :param group_metric: the metric to plot. Must be a column in the disparity_table.</span>
 <span class="sd">        :param attribute_name: which attribute to plot group_metric across.</span>
-<span class="sd">        :param model_id: model ID number. Default is 1.</span>
 <span class="sd">        :param ax: a matplotlib Axis. If not passed, a new figure will be created.</span>
 <span class="sd">        :param fig: a matplotlib Figure. If not passed, a new figure will be created.</span>
 <span class="sd">        :param title: whether to include a title in visualizations. Default is True.</span>
@@ -909,10 +930,15 @@
 <span class="sd">            asterisks on treemap).</span>
 <span class="sd">        :return: A Matplotlib axis</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">fairness_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check fairness_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_disparity</span><span class="p">(</span><span class="n">disparity_table</span><span class="o">=</span><span class="n">fairness_table</span><span class="p">,</span>
                                    <span class="n">group_metric</span><span class="o">=</span><span class="n">group_metric</span><span class="p">,</span>
                                    <span class="n">attribute_name</span><span class="o">=</span><span class="n">attribute_name</span><span class="p">,</span>
-                                   <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+                                   <span class="n">color_mapping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span> <span class="n">highlight_fairness</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                    <span class="n">min_group_size</span><span class="o">=</span><span class="n">min_group_size</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                                    <span class="n">significance_alpha</span><span class="o">=</span><span class="n">significance_alpha</span><span class="p">)</span></div>
@@ -951,6 +977,11 @@
 
 <span class="sd">        :return: Returns a figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">data_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check data_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">fillzeros</span><span class="p">:</span>
             <span class="n">data_table</span> <span class="o">=</span> <span class="n">data_table</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1076,6 +1107,10 @@
 
 <span class="sd">        :return: Returns a figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">data_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This method requires one and only one model_id in the disparities table. &#39;</span>
+                             <span class="s1">&#39;Tip: check disparities_table.model_id.unique() should be just one element list.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">fillzeros</span><span class="p">:</span>
             <span class="n">data_table</span> <span class="o">=</span> <span class="n">data_table</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1157,7 +1192,6 @@
         <span class="n">ax_col</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">ax_row</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_table</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
         <span class="k">for</span> <span class="n">group_metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>

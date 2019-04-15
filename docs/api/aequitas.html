@@ -81,7 +81,8 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
@@ -91,11 +92,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">Running the webapp locally</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Aequitas API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.group"><code class="docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.bias"><code class="docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.fairness"><code class="docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.plotting"><code class="docutils literal notranslate"><span class="pre">src.aequitas.plotting</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.preprocessing"><code class="docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.group"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.bias"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.fairness"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.plotting</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-src.aequitas.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
@@ -198,24 +199,20 @@
 <dt id="src.aequitas.group.Group.get_crosstabs">
 <code class="descname">get_crosstabs</code><span class="sig-paren">(</span><em>df</em>, <em>score_thresholds=None</em>, <em>model_id=1</em>, <em>attr_cols=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/group.html#Group.get_crosstabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.group.Group.get_crosstabs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates univariate groups and calculates group metrics.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – a dataframe containing the following required columns [score,  label_value].</li>
-<li><strong>score_thresholds</strong> – dictionary { ‘rank_abs’:[] , ‘rank_pct’:[], ‘score’:[] }</li>
-<li><strong>model_id</strong> – the model ID on which to subset the df.</li>
-<li><strong>attr_cols</strong> – optional, list of names of columns corresponding to
-group attributes (i.e., gender, age category, race, etc.).</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – a dataframe containing the following required columns [score,  label_value].</p></li>
+<li><p><strong>score_thresholds</strong> – dictionary { ‘rank_abs’:[] , ‘rank_pct’:[], ‘score’:[] }</p></li>
+<li><p><strong>model_id</strong> – the model ID on which to subset the df.</p></li>
+<li><p><strong>attr_cols</strong> – optional, list of names of columns corresponding to
+group attributes (i.e., gender, age category, race, etc.).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -231,46 +228,42 @@ group attributes (i.e., gender, age category, race, etc.).</li>
 <span id="src-aequitas-bias"></span><h2><a class="reference internal" href="#module-src.aequitas.bias" title="src.aequitas.bias"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a><a class="headerlink" href="#module-src.aequitas.bias" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="src.aequitas.bias.Bias">
-<em class="property">class </em><code class="descclassname">src.aequitas.bias.</code><code class="descname">Bias</code><span class="sig-paren">(</span><em>key_columns=('model_id'</em>, <em>'score_threshold'</em>, <em>'attribute_name')</em>, <em>sample_df=None</em>, <em>non_attr_cols=('score'</em>, <em>'model_id'</em>, <em>'as_of_date'</em>, <em>'entity_id'</em>, <em>'rank_abs'</em>, <em>'rank_pct'</em>, <em>'id'</em>, <em>'label_value')</em>, <em>significance_cols=('ppr'</em>, <em>'pprev'</em>, <em>'precision'</em>, <em>'fdr'</em>, <em>'for'</em>, <em>'fpr'</em>, <em>'fnr'</em>, <em>'tpr'</em>, <em>'tnr'</em>, <em>'npv')</em>, <em>input_group_metrics=('ppr'</em>, <em>'pprev'</em>, <em>'precision'</em>, <em>'fdr'</em>, <em>'for'</em>, <em>'fpr'</em>, <em>'fnr'</em>, <em>'tpr'</em>, <em>'tnr'</em>, <em>'npv')</em>, <em>fill_divbyzero=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/bias.html#Bias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.bias.Bias" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">src.aequitas.bias.</code><code class="descname">Bias</code><span class="sig-paren">(</span><em>key_columns=('model_id'</em>, <em>'score_threshold'</em>, <em>'attribute_name')</em>, <em>sample_df=None</em>, <em>non_attr_cols=('score'</em>, <em>'model_id'</em>, <em>'as_of_date'</em>, <em>'entity_id'</em>, <em>'rank_abs'</em>, <em>'rank_pct'</em>, <em>'id'</em>, <em>'label_value')</em>, <em>input_group_metrics=('ppr'</em>, <em>'pprev'</em>, <em>'precision'</em>, <em>'fdr'</em>, <em>'for'</em>, <em>'fpr'</em>, <em>'fnr'</em>, <em>'tpr'</em>, <em>'tnr'</em>, <em>'npv')</em>, <em>fill_divbyzero=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/bias.html#Bias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.bias.Bias" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="src.aequitas.bias.Bias.get_disparity_major_group">
 <code class="descname">get_disparity_major_group</code><span class="sig-paren">(</span><em>df</em>, <em>original_df</em>, <em>key_columns=None</em>, <em>input_group_metrics=None</em>, <em>fill_divbyzero=None</em>, <em>check_significance=None</em>, <em>alpha=0.05</em>, <em>mask_significance=True</em>, <em>label_score_ref='fpr'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/bias.html#Bias.get_disparity_major_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.bias.Bias.get_disparity_major_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates disparities between groups for the predefined list of group
 metrics using the majority group within each attribute as the reference
 group (denominator).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</li>
-<li><strong>original_df</strong> – a dataframe of sample features and model results.
-Includes a required ‘score ‘column and possible ‘label_value’ column.</li>
-<li><strong>key_columns</strong> – optional, key identifying columns for grouping
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</p></li>
+<li><p><strong>original_df</strong> – a dataframe of sample features and model results.
+Includes a required ‘score ‘column and possible ‘label_value’ column.</p></li>
+<li><p><strong>key_columns</strong> – optional, key identifying columns for grouping
 variables and bias metrics in intermediate joins. Defaults are
-‘model_id’, ‘score_threshold’, ‘attribute_name’.</li>
-<li><strong>input_group_metrics</strong> – optional, columns list corresponding to
-the group metrics for which we want to calculate disparity values</li>
-<li><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
-zero. Default is None.</li>
-<li><strong>check_significance</strong> – measures for which to determine statistical
-significance beyond label_value and score. Default is all metrics.</li>
-<li><strong>alpha</strong> – statistical significance level to use in significance
-determination. Default is 5e-2 (0.05).</li>
-<li><strong>mask_significance</strong> – whether to display a T/F mask over calculated
-p-values from statistical significance determination. Default is True.</li>
-<li><strong>label_score_ref</strong> – default reference group to use for score and
-label_value statistical significance calculations.</li>
+‘model_id’, ‘score_threshold’, ‘attribute_name’.</p></li>
+<li><p><strong>input_group_metrics</strong> – optional, columns list corresponding to
+the group metrics for which we want to calculate disparity values</p></li>
+<li><p><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
+zero. Default is None.</p></li>
+<li><p><strong>check_significance</strong> – measures for which to determine statistical
+significance beyond label_value and score. Default is all metrics.</p></li>
+<li><p><strong>alpha</strong> – statistical significance level to use in significance
+determination. Default is 5e-2 (0.05).</p></li>
+<li><p><strong>mask_significance</strong> – whether to display a T/F mask over calculated
+p-values from statistical significance determination. Default is True.</p></li>
+<li><p><strong>label_score_ref</strong> – default reference group to use for score and
+label_value statistical significance calculations.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dataframe with same number of rows as the input (crosstab)
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe with same number of rows as the input (crosstab)
 with additional disparity metrics columns and ref_group_values
 for each metric.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -279,39 +272,35 @@ for each metric.</p>
 <dd><p>Calculates disparities between groups for the predefined list of
 group metrics using the group with the minimum value for each absolute
 bias metric as the reference group (denominator).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</li>
-<li><strong>original_df</strong> – a dataframe of sample features and model results.
-Includes a required ‘score ‘column and possible ‘label_value’ column.</li>
-<li><strong>key_columns</strong> – optional, key identifying columns for grouping
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</p></li>
+<li><p><strong>original_df</strong> – a dataframe of sample features and model results.
+Includes a required ‘score ‘column and possible ‘label_value’ column.</p></li>
+<li><p><strong>key_columns</strong> – optional, key identifying columns for grouping
 variables and bias metrics in intermediate joins. Defaults are
-‘model_id’, ‘score_threshold’, ‘attribute_name’.</li>
-<li><strong>input_group_metrics</strong> – optional, columns list corresponding to
-the group metrics for which we want to calculate disparity values</li>
-<li><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
-zero. Default is None.</li>
-<li><strong>check_significance</strong> – measures for which to determine statistical
-significance beyond label_value and score. Default is all metrics.</li>
-<li><strong>alpha</strong> – statistical significance level to use in significance
-determination. Default is 5e-2 (0.05).</li>
-<li><strong>mask_significance</strong> – whether to display a T/F mask over calculated
-p-values from statistical significance determination. Default is True.</li>
-<li><strong>label_score_ref</strong> – default reference group to use for score and
-label_value statistical significance calculations.</li>
+‘model_id’, ‘score_threshold’, ‘attribute_name’.</p></li>
+<li><p><strong>input_group_metrics</strong> – optional, columns list corresponding to
+the group metrics for which we want to calculate disparity values</p></li>
+<li><p><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
+zero. Default is None.</p></li>
+<li><p><strong>check_significance</strong> – measures for which to determine statistical
+significance beyond label_value and score. Default is all metrics.</p></li>
+<li><p><strong>alpha</strong> – statistical significance level to use in significance
+determination. Default is 5e-2 (0.05).</p></li>
+<li><p><strong>mask_significance</strong> – whether to display a T/F mask over calculated
+p-values from statistical significance determination. Default is True.</p></li>
+<li><p><strong>label_score_ref</strong> – default reference group to use for score and
+label_value statistical significance calculations.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dataframe with same number of rows as the input (crosstab)
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe with same number of rows as the input (crosstab)
 with additional disparity metrics columns and ref_group_values
 for each metric.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -320,38 +309,34 @@ for each metric.</p>
 <dd><p>Calculates disparities between groups for the predefined list of group
 metrics using a predefined reference group (denominator) value for each
 attribute.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</li>
-<li><strong>original_df</strong> – dataframe of sample features and model results.
-Includes a required ‘score ‘column and possible ‘label_value’ column.</li>
-<li><strong>ref_groups_dict</strong> – dictionary of format: {‘attribute_name’: ‘attribute_value’, …}</li>
-<li><strong>key_columns</strong> – optional, key identifying columns for grouping
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – output dataframe of Group class get_crosstabs() method.</p></li>
+<li><p><strong>original_df</strong> – dataframe of sample features and model results.
+Includes a required ‘score ‘column and possible ‘label_value’ column.</p></li>
+<li><p><strong>ref_groups_dict</strong> – dictionary of format: {‘attribute_name’: ‘attribute_value’, …}</p></li>
+<li><p><strong>key_columns</strong> – optional, key identifying columns for grouping
 variables and bias metrics in intermediate joins. Defaults are
-‘model_id’, ‘score_threshold’, ‘attribute_name’.</li>
-<li><strong>input_group_metrics</strong> – optional, columns list corresponding to
-the group metrics for which we want to calculate disparity values</li>
-<li><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
-zero. Default is None.</li>
-<li><strong>check_significance</strong> – measures for which to determine statistical
-significance beyond label_value and score. Default is all metrics.</li>
-<li><strong>alpha</strong> – statistical significance level to use in significance
-determination. Default is 5e-2 (0.05).</li>
-<li><strong>mask_significance</strong> – whether to display a T/F mask over calculated
-p-values from statistical significance determination. Default is True.</li>
+‘model_id’, ‘score_threshold’, ‘attribute_name’.</p></li>
+<li><p><strong>input_group_metrics</strong> – optional, columns list corresponding to
+the group metrics for which we want to calculate disparity values</p></li>
+<li><p><strong>fill_divbyzero</strong> – optional, fill value to use when divided by
+zero. Default is None.</p></li>
+<li><p><strong>check_significance</strong> – measures for which to determine statistical
+significance beyond label_value and score. Default is all metrics.</p></li>
+<li><p><strong>alpha</strong> – statistical significance level to use in significance
+determination. Default is 5e-2 (0.05).</p></li>
+<li><p><strong>mask_significance</strong> – whether to display a T/F mask over calculated
+p-values from statistical significance determination. Default is True.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dataframe with same number of rows as the input (crosstab)
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe with same number of rows as the input (crosstab)
 with additional disparity metrics columns and ref_group_values
 for each metric.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -393,16 +378,14 @@ for each metric.</p>
 fair_measures_requested is ‘False’ across all attribute_values defined
 by a group attribute_name. If ‘False’ is present, determination for the
 attribute is False for given fairness measure.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group_value_df</strong> – output dataframe of get_group_value_fairness() method</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dataframe of fairness measures at the attribute level (no attribute_values)</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>group_value_df</strong> – output dataframe of get_group_value_fairness() method</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe of fairness measures at the attribute level (no attribute_values)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -410,24 +393,20 @@ attribute is False for given fairness measure.</p>
 <code class="descname">get_group_value_fairness</code><span class="sig-paren">(</span><em>bias_df</em>, <em>tau=None</em>, <em>fair_measures_requested=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairness.html#Fairness.get_group_value_fairness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.fairness.Fairness.get_group_value_fairness" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the fairness measures defined in fair_measures_requested
 dictionary and adds them as columns to the input bias_df.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>bias_df</strong> – the output dataframe from bias/ disparity calculation methods.</li>
-<li><strong>tau</strong> – optional, the threshold for fair/ unfair evaluation.</li>
-<li><strong>fair_measures_requested</strong> – optional, a dictionary containing fairness
-measures as keys and the corresponding input bias disparity as values.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bias_df</strong> – the output dataframe from bias/ disparity calculation methods.</p></li>
+<li><p><strong>tau</strong> – optional, the threshold for fair/ unfair evaluation.</p></li>
+<li><p><strong>fair_measures_requested</strong> – optional, a dictionary containing fairness
+measures as keys and the corresponding input bias disparity as values.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Bias_df dataframe with additional columns for each
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bias_df dataframe with additional columns for each
 of the fairness measures defined in the fair_measures dictionary</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -436,16 +415,14 @@ of the fairness measures defined in the fair_measures dictionary</p>
 <dd><p>Calculates overall fairness regardless of the group_attributes.
 Searches for ‘False’ parity determinations across group_attributes and
 outputs ‘True’ determination if all group_attributes are fair.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group_attribute_df</strong> – the output df of the get_group_attributes_fairness</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary of overall, unsupervised, and supervised fairness determinations</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>group_attribute_df</strong> – the output df of the get_group_attributes_fairness</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of overall, unsupervised, and supervised fairness determinations</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -467,168 +444,150 @@ relative disparities calculated by Aequitas Group(), Bias(), and Fairness()
 class instances.</p>
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_disparity">
-<code class="descname">plot_disparity</code><span class="sig-paren">(</span><em>disparity_table</em>, <em>group_metric</em>, <em>attribute_name</em>, <em>color_mapping=None</em>, <em>model_id=1</em>, <em>ax=None</em>, <em>fig=None</em>, <em>label_dict=None</em>, <em>title=True</em>, <em>highlight_fairness=False</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_disparity" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_disparity</code><span class="sig-paren">(</span><em>disparity_table</em>, <em>group_metric</em>, <em>attribute_name</em>, <em>color_mapping=None</em>, <em>ax=None</em>, <em>fig=None</em>, <em>label_dict=None</em>, <em>title=True</em>, <em>highlight_fairness=False</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_disparity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create treemap based on a single bias disparity metric across attribute
 groups.</p>
 <p>Adapted from <a class="reference external" href="https://plot.ly/python/treemaps/">https://plot.ly/python/treemaps/</a>,
 <a class="reference external" href="https://gist.github.com/gVallverdu/0b446d0061a785c808dbe79262a37eea">https://gist.github.com/gVallverdu/0b446d0061a785c808dbe79262a37eea</a>,
 and <a class="reference external" href="https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib">https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>disparity_table</strong> – a disparity table. Output of bias.get_disparity or
-fairness.get_fairness function.</li>
-<li><strong>group_metric</strong> – the metric to plot. Must be a column in the
-disparity_table.</li>
-<li><strong>attribute_name</strong> – which attribute to plot group_metric across.</li>
-<li><strong>color_mapping</strong> – matplotlib colormapping for treemap value boxes.</li>
-<li><strong>model_id</strong> – model ID number. Default is 1.</li>
-<li><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</li>
-<li><strong>fig</strong> – a matplotlib Figure. If not passed, a new figure will be created.</li>
-<li><strong>label_dict</strong> – optional, dictionary of replacement labels for data.
-Default is None.</li>
-<li><strong>title</strong> – whether to include a title in visualizations. Default is True.</li>
-<li><strong>highlight_fairness</strong> – whether to highlight treemaps by disparity
-magnitude, or by related fairness determination.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>disparity_table</strong> – a disparity table. Output of bias.get_disparity or
+fairness.get_fairness function.</p></li>
+<li><p><strong>group_metric</strong> – the metric to plot. Must be a column in the
+disparity_table.</p></li>
+<li><p><strong>attribute_name</strong> – which attribute to plot group_metric across.</p></li>
+<li><p><strong>color_mapping</strong> – matplotlib colormapping for treemap value boxes.</p></li>
+<li><p><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</p></li>
+<li><p><strong>fig</strong> – a matplotlib Figure. If not passed, a new figure will be created.</p></li>
+<li><p><strong>label_dict</strong> – optional, dictionary of replacement labels for data.
+Default is None.</p></li>
+<li><p><strong>title</strong> – whether to include a title in visualizations. Default is True.</p></li>
+<li><p><strong>highlight_fairness</strong> – whether to highlight treemaps by disparity
+magnitude, or by related fairness determination.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in bias metric
-visualization</li>
-<li><strong>significance_alpha</strong> – statistical significance level. Used to
+visualization</p></li>
+<li><p><strong>significance_alpha</strong> – statistical significance level. Used to
 determine visual representation of significance (number of
-asterisks on treemap).</li>
+asterisks on treemap).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib axis</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib axis</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_disparity_all">
 <code class="descname">plot_disparity_all</code><span class="sig-paren">(</span><em>data_table</em>, <em>attributes=None</em>, <em>metrics=None</em>, <em>fillzeros=True</em>, <em>title=True</em>, <em>label_dict=None</em>, <em>ncols=3</em>, <em>show_figure=True</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_disparity_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_disparity_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot multiple metrics at once from a fairness object table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data_table</strong> – output of group.get_crosstabs, bias.get_disparity, or
-fairness.get_fairness functions.</li>
-<li><strong>attributes</strong> – which attribute(s) to plot metrics for. If this
-value is null, will plot metrics against all attributes.</li>
-<li><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_table</strong> – output of group.get_crosstabs, bias.get_disparity, or
+fairness.get_fairness functions.</p></li>
+<li><p><strong>attributes</strong> – which attribute(s) to plot metrics for. If this
+value is null, will plot metrics against all attributes.</p></li>
+<li><p><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
 If this value is null, will plot:</p>
 <blockquote>
 <div><ul>
-<li>Predicted Prevalence Disparity (pprev_disparity),</li>
-<li>Predicted Positive Rate Disparity (ppr_disparity),</li>
-<li>False Discovery Rate Disparity (fdr_disparity),</li>
-<li>False Omission Rate Disparity (for_disparity),</li>
-<li>False Positive Rate Disparity (fpr_disparity),</li>
-<li>False Negative Rate Disparity (fnr_disparity)</li>
+<li><p>Predicted Prevalence Disparity (pprev_disparity),</p></li>
+<li><p>Predicted Positive Rate Disparity (ppr_disparity),</p></li>
+<li><p>False Discovery Rate Disparity (fdr_disparity),</p></li>
+<li><p>False Omission Rate Disparity (for_disparity),</p></li>
+<li><p>False Positive Rate Disparity (fpr_disparity),</p></li>
+<li><p>False Negative Rate Disparity (fnr_disparity)</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</li>
-<li><strong>title</strong> – whether to display a title on each plot. Default is True.</li>
-<li><strong>label_dict</strong> – optional dictionary of label replacements. Default is
-None.</li>
-<li><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+</p></li>
+<li><p><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</p></li>
+<li><p><strong>title</strong> – whether to display a title on each plot. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional dictionary of label replacements. Default is
+None.</p></li>
+<li><p><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in metric
-visualization.</li>
-<li><strong>significance_alpha</strong> – statistical significance level. Used to
+visualization.</p></li>
+<li><p><strong>significance_alpha</strong> – statistical significance level. Used to
 determine visual representation of significance (number of
-asterisks on treemap).</li>
+asterisks on treemap).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib figure</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_fairness_disparity">
-<code class="descname">plot_fairness_disparity</code><span class="sig-paren">(</span><em>fairness_table</em>, <em>group_metric</em>, <em>attribute_name</em>, <em>model_id=1</em>, <em>ax=None</em>, <em>fig=None</em>, <em>title=True</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_fairness_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_fairness_disparity" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_fairness_disparity</code><span class="sig-paren">(</span><em>fairness_table</em>, <em>group_metric</em>, <em>attribute_name</em>, <em>ax=None</em>, <em>fig=None</em>, <em>title=True</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_fairness_disparity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_fairness_disparity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot disparity metrics colored based on calculated disparity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>group_metric</strong> – the metric to plot. Must be a column in the disparity_table.</li>
-<li><strong>attribute_name</strong> – which attribute to plot group_metric across.</li>
-<li><strong>model_id</strong> – model ID number. Default is 1.</li>
-<li><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</li>
-<li><strong>fig</strong> – a matplotlib Figure. If not passed, a new figure will be created.</li>
-<li><strong>title</strong> – whether to include a title in visualizations. Default is True.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_metric</strong> – the metric to plot. Must be a column in the disparity_table.</p></li>
+<li><p><strong>attribute_name</strong> – which attribute to plot group_metric across.</p></li>
+<li><p><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</p></li>
+<li><p><strong>fig</strong> – a matplotlib Figure. If not passed, a new figure will be created.</p></li>
+<li><p><strong>title</strong> – whether to include a title in visualizations. Default is True.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in bias metric
-visualization</li>
-<li><strong>significance_alpha</strong> – statistical significance level. Used to
+visualization</p></li>
+<li><p><strong>significance_alpha</strong> – statistical significance level. Used to
 determine visual representation of significance (number of
-asterisks on treemap).</li>
+asterisks on treemap).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib axis</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib axis</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_fairness_disparity_all">
 <code class="descname">plot_fairness_disparity_all</code><span class="sig-paren">(</span><em>fairness_table</em>, <em>attributes=None</em>, <em>metrics=None</em>, <em>fillzeros=True</em>, <em>title=True</em>, <em>label_dict=None</em>, <em>show_figure=True</em>, <em>min_group_size=None</em>, <em>significance_alpha=0.05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_fairness_disparity_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_fairness_disparity_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot multiple metrics at once from a fairness object table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fairness_table</strong> – output of fairness.get_fairness functions.</li>
-<li><strong>attributes</strong> – which attribute(s) to plot metrics for. If this value is null, will plot metrics against all attributes.</li>
-<li><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fairness_table</strong> – output of fairness.get_fairness functions.</p></li>
+<li><p><strong>attributes</strong> – which attribute(s) to plot metrics for. If this value is null, will plot metrics against all attributes.</p></li>
+<li><p><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
 If this value is null, will plot:</p>
 <blockquote>
 <div><ul>
-<li>Predicted Prevalence Disparity (pprev_disparity),</li>
-<li>Predicted Positive Rate Disparity (ppr_disparity),</li>
-<li>False Discovery Rate Disparity (fdr_disparity),</li>
-<li>False Omission Rate Disparity (for_disparity),</li>
-<li>False Positive Rate Disparity (fpr_disparity),</li>
-<li>False Negative Rate Disparity (fnr_disparity)</li>
+<li><p>Predicted Prevalence Disparity (pprev_disparity),</p></li>
+<li><p>Predicted Positive Rate Disparity (ppr_disparity),</p></li>
+<li><p>False Discovery Rate Disparity (fdr_disparity),</p></li>
+<li><p>False Omission Rate Disparity (for_disparity),</p></li>
+<li><p>False Positive Rate Disparity (fpr_disparity),</p></li>
+<li><p>False Negative Rate Disparity (fnr_disparity)</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</li>
-<li><strong>title</strong> – whether to display a title on each plot. Default is True.</li>
-<li><strong>label_dict</strong> – optional dictionary of label replacements. Default is
-None.</li>
-<li><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+</p></li>
+<li><p><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</p></li>
+<li><p><strong>title</strong> – whether to display a title on each plot. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional dictionary of label replacements. Default is
+None.</p></li>
+<li><p><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in fairness
-visualization</li>
-<li><strong>significance_alpha</strong> – statistical significance level. Used to
+visualization</p></li>
+<li><p><strong>significance_alpha</strong> – statistical significance level. Used to
 determine visual representation of significance (number of
-asterisks on treemap)</li>
+asterisks on treemap)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib figure</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -636,144 +595,128 @@ asterisks on treemap)</li>
 <code class="descname">plot_fairness_group</code><span class="sig-paren">(</span><em>fairness_table</em>, <em>group_metric</em>, <em>ax=None</em>, <em>ax_lim=None</em>, <em>title=False</em>, <em>label_dict=None</em>, <em>min_group_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_fairness_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_fairness_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function plots absolute group metrics as indicated by the config file,
 colored based on calculated parity.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fairness_table</strong> – a fairness table. Output of fairness.get_fairness
-function.</li>
-<li><strong>group_metric</strong> – the fairness metric to plot. Must be a column in the fairness_table.</li>
-<li><strong>ax</strong> – a matplotlib Axis. If not passed a new figure will be created.</li>
-<li><strong>ax_lim</strong> – maximum value on x-axis, used to match axes across subplots
-when plotting multiple metrics. Default is None.</li>
-<li><strong>title</strong> – whether to include a title in visualizations. Default is True.</li>
-<li><strong>label_dict</strong> – optional dictionary of replacement values for data.
-Default is None.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fairness_table</strong> – a fairness table. Output of fairness.get_fairness
+function.</p></li>
+<li><p><strong>group_metric</strong> – the fairness metric to plot. Must be a column in the fairness_table.</p></li>
+<li><p><strong>ax</strong> – a matplotlib Axis. If not passed a new figure will be created.</p></li>
+<li><p><strong>ax_lim</strong> – maximum value on x-axis, used to match axes across subplots
+when plotting multiple metrics. Default is None.</p></li>
+<li><p><strong>title</strong> – whether to include a title in visualizations. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional dictionary of replacement values for data.
+Default is None.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in fairness
-visualization</li>
+visualization</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib axis</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib axis</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_fairness_group_all">
 <code class="descname">plot_fairness_group_all</code><span class="sig-paren">(</span><em>fairness_table</em>, <em>metrics=None</em>, <em>fillzeros=True</em>, <em>ncols=3</em>, <em>title=True</em>, <em>label_dict=None</em>, <em>show_figure=True</em>, <em>min_group_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_fairness_group_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_fairness_group_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot multiple metrics at once from a fairness object table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>fairness_table</strong> – output of fairness.get_fairness functions.</li>
-<li><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fairness_table</strong> – output of fairness.get_fairness functions.</p></li>
+<li><p><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
 If this value is null, will plot:</p>
 <blockquote>
 <div><ul>
-<li>Predicted Prevalence (pprev),</li>
-<li>Predicted Positive Rate (ppr),</li>
-<li>False Discovery Rate (fdr),</li>
-<li>False Omission Rate (for),</li>
-<li>False Positive Rate (fpr),</li>
-<li>False Negative Rate (fnr)</li>
+<li><p>Predicted Prevalence (pprev),</p></li>
+<li><p>Predicted Positive Rate (ppr),</p></li>
+<li><p>False Discovery Rate (fdr),</p></li>
+<li><p>False Omission Rate (for),</p></li>
+<li><p>False Positive Rate (fpr),</p></li>
+<li><p>False Negative Rate (fnr)</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</li>
-<li><strong>ncols</strong> – number of subplots per row in figure. Default is 3.</li>
-<li><strong>title</strong> – whether to display a title on each plot. Default is True.</li>
-<li><strong>label_dict</strong> – optional dictionary of label replacements. Default is
-None.</li>
-<li><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data).
+</p></li>
+<li><p><strong>fillzeros</strong> – whether to fill null values with zeros. Default is True.</p></li>
+<li><p><strong>ncols</strong> – number of subplots per row in figure. Default is 3.</p></li>
+<li><p><strong>title</strong> – whether to display a title on each plot. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional dictionary of label replacements. Default is
+None.</p></li>
+<li><p><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data).
 a population group must meet in order to be included in fairness
-visualization</li>
+visualization</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib figure</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_group_metric">
 <code class="descname">plot_group_metric</code><span class="sig-paren">(</span><em>group_table</em>, <em>group_metric</em>, <em>ax=None</em>, <em>ax_lim=None</em>, <em>title=True</em>, <em>label_dict=None</em>, <em>min_group_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_group_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_group_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a single group metric across all attribute groups.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>group_table</strong> – group table. Output of of group.get_crosstabs() or
-bias.get_disparity functions.</li>
-<li><strong>group_metric</strong> – the metric to plot. Must be a column in the group_table.</li>
-<li><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</li>
-<li><strong>title</strong> – whether to include a title in visualizations. Default is True.</li>
-<li><strong>label_dict</strong> – optional, dictionary of replacement labels for data.
-Default is None.</li>
-<li><strong>min_group_size</strong> – minimum size for groups to include in visualization
-(as a proportion of total sample)</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_table</strong> – group table. Output of of group.get_crosstabs() or
+bias.get_disparity functions.</p></li>
+<li><p><strong>group_metric</strong> – the metric to plot. Must be a column in the group_table.</p></li>
+<li><p><strong>ax</strong> – a matplotlib Axis. If not passed, a new figure will be created.</p></li>
+<li><p><strong>title</strong> – whether to include a title in visualizations. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional, dictionary of replacement labels for data.
+Default is None.</p></li>
+<li><p><strong>min_group_size</strong> – minimum size for groups to include in visualization
+(as a proportion of total sample)</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib axis</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib axis</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="src.aequitas.plotting.Plot.plot_group_metric_all">
 <code class="descname">plot_group_metric_all</code><span class="sig-paren">(</span><em>data_table</em>, <em>metrics=None</em>, <em>fillzeros=True</em>, <em>ncols=3</em>, <em>title=True</em>, <em>label_dict=None</em>, <em>show_figure=True</em>, <em>min_group_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#Plot.plot_group_metric_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.Plot.plot_group_metric_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot multiple metrics at once from a fairness object table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data_table</strong> – output of group.get_crosstabs, bias.get_disparity, or
-fairness.get_fairness functions.</li>
-<li><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_table</strong> – output of group.get_crosstabs, bias.get_disparity, or
+fairness.get_fairness functions.</p></li>
+<li><p><strong>metrics</strong> – <p>which metric(s) to plot, or ‘all.’
 If this value is null, will plot:</p>
 <blockquote>
 <div><ul>
-<li>Predicted Prevalence (pprev),</li>
-<li>Predicted Positive Rate (ppr),</li>
-<li>False Discovery Rate (fdr),</li>
-<li>False Omission Rate (for),</li>
-<li>False Positive Rate (fpr),</li>
-<li>False Negative Rate (fnr)</li>
+<li><p>Predicted Prevalence (pprev),</p></li>
+<li><p>Predicted Positive Rate (ppr),</p></li>
+<li><p>False Discovery Rate (fdr),</p></li>
+<li><p>False Omission Rate (for),</p></li>
+<li><p>False Positive Rate (fpr),</p></li>
+<li><p>False Negative Rate (fnr)</p></li>
 </ul>
 </div></blockquote>
-</li>
-<li><strong>fillzeros</strong> – whether to fill null values with zeros. Default is
-True.</li>
-<li><strong>ncols</strong> – number of subplots per row in figure. Default is 3.</li>
-<li><strong>title</strong> – whether to display a title on each plot. Default is True.</li>
-<li><strong>label_dict</strong> – optional dictionary of label replacements. Default is None.</li>
-<li><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</li>
-<li><strong>min_group_size</strong> – minimum proportion of total group size (all data)
+</p></li>
+<li><p><strong>fillzeros</strong> – whether to fill null values with zeros. Default is
+True.</p></li>
+<li><p><strong>ncols</strong> – number of subplots per row in figure. Default is 3.</p></li>
+<li><p><strong>title</strong> – whether to display a title on each plot. Default is True.</p></li>
+<li><p><strong>label_dict</strong> – optional dictionary of label replacements. Default is None.</p></li>
+<li><p><strong>show_figure</strong> – whether to show figure (plt.show()). Default is True.</p></li>
+<li><p><strong>min_group_size</strong> – minimum proportion of total group size (all data)
 a population group must meet in order to be included in group metric
-visualization.</li>
+visualization.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Matplotlib figure</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Matplotlib figure</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -782,40 +725,35 @@ visualization.</li>
 <dt id="src.aequitas.plotting.assemble_ref_groups">
 <code class="descclassname">src.aequitas.plotting.</code><code class="descname">assemble_ref_groups</code><span class="sig-paren">(</span><em>disparities_table</em>, <em>ref_group_flag='_ref_group_value'</em>, <em>specific_measures=None</em>, <em>label_score_ref=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/plotting.html#assemble_ref_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.plotting.assemble_ref_groups" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
-<div>Creates a dictionary of reference groups for each metric in a data_table.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>disparities_table</strong> – <dl class="docutils">
-<dt>a disparity table. Output of bias.get_disparity or</dt>
-<dd>fairness.get_fairness functions</dd>
+<div><p>Creates a dictionary of reference groups for each metric in a data_table.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>disparities_table</strong> – <dl class="simple">
+<dt>a disparity table. Output of bias.get_disparity or</dt><dd><p>fairness.get_fairness functions</p>
+</dd>
 </dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">param ref_group_flag:</th></tr>
-<tr class="field-odd field"><td>&#160;</td><td class="field-body">string indicating column indicates reference group
-flag value. Default is ‘_ref_group_value’.</td>
-</tr>
-<tr class="field-even field"><th class="field-name" colspan="2">param specific_measures:</th></tr>
-<tr class="field-even field"><td>&#160;</td><td class="field-body">Limits reference dictionary to only specified
-metrics in a data table. Default is None.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">param label_score_ref:</th></tr>
-<tr class="field-odd field"><td>&#160;</td><td class="field-body">Defines a metric, ex: ‘fpr’ (false positive rate)
+<dl class="field-list simple">
+<dt class="field-odd">param ref_group_flag</dt>
+<dd class="field-odd"><p>string indicating column indicates reference group
+flag value. Default is ‘_ref_group_value’.</p>
+</dd>
+<dt class="field-even">param specific_measures</dt>
+<dd class="field-even"><p>Limits reference dictionary to only specified
+metrics in a data table. Default is None.</p>
+</dd>
+<dt class="field-odd">param label_score_ref</dt>
+<dd class="field-odd"><p>Defines a metric, ex: ‘fpr’ (false positive rate)
 from which to mimic reference group for label_value and score. Used for
-statistical significance calculations in Bias() class. Default is None.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">return:</th><td class="field-body">A dictionary</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
+statistical significance calculations in Bias() class. Default is None.</p>
+</dd>
+<dt class="field-even">return</dt>
+<dd class="field-even"><p>A dictionary</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -824,82 +762,66 @@ statistical significance calculations in Bias() class. Default is None.</td>
 <dl class="function">
 <dt id="src.aequitas.preprocessing.check_required_cols">
 <code class="descclassname">src.aequitas.preprocessing.</code><code class="descname">check_required_cols</code><span class="sig-paren">(</span><em>df</em>, <em>required_cols</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/preprocessing.html#check_required_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.preprocessing.check_required_cols" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – A data frame of model results</li>
-<li><strong>required_cols</strong> – Column names required for selected fairness measures</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – A data frame of model results</p></li>
+<li><p><strong>required_cols</strong> – Column names required for selected fairness measures</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None, or ValueError</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None, or ValueError</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.aequitas.preprocessing.discretize">
 <code class="descclassname">src.aequitas.preprocessing.</code><code class="descname">discretize</code><span class="sig-paren">(</span><em>df</em>, <em>target_cols</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/preprocessing.html#discretize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.preprocessing.discretize" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – A data frame of model results</li>
-<li><strong>target_cols</strong> – Names of columns to discretize</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – A data frame of model results</p></li>
+<li><p><strong>target_cols</strong> – Names of columns to discretize</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A data frame</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A data frame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.aequitas.preprocessing.get_attr_cols">
 <code class="descclassname">src.aequitas.preprocessing.</code><code class="descname">get_attr_cols</code><span class="sig-paren">(</span><em>df</em>, <em>non_attr_cols</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/preprocessing.html#get_attr_cols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.preprocessing.get_attr_cols" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – A data frame of model results</li>
-<li><strong>non_attr_cols</strong> – Names of columns not associated with attributes</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – A data frame of model results</p></li>
+<li><p><strong>non_attr_cols</strong> – Names of columns not associated with attributes</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of columns associated with sample attributes</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of columns associated with sample attributes</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="src.aequitas.preprocessing.preprocess_input_df">
 <code class="descclassname">src.aequitas.preprocessing.</code><code class="descname">preprocess_input_df</code><span class="sig-paren">(</span><em>df</em>, <em>required_cols=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/preprocessing.html#preprocess_input_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.aequitas.preprocessing.preprocess_input_df" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – A data frame of model results</li>
-<li><strong>required_cols</strong> – Names of columns required for bias calculations.
-Default is None.</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – A data frame of model results</p></li>
+<li><p><strong>required_cols</strong> – Names of columns required for bias calculations.
+Default is None.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A data frame, list of columns associated with sample attributes</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A data frame, list of columns associated with sample attributes</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

@@ -79,7 +79,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
@@ -227,16 +228,14 @@
         <span class="n">check_required_cols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">required_cols</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;preprocessing.preprocess_input_df: input dataframe does not have all the required columns.&#39;</span><span class="p">)</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="n">required_cols</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;as_of_date&#39;</span><span class="p">,</span> <span class="s1">&#39;entity_id&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_abs&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_pct&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">]</span>
     <span class="n">non_string_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">object</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_attr_cols</span><span class="p">))]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">discretize</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">non_string_cols</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">attr_cols_input</span> <span class="o">=</span> <span class="n">get_attr_cols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">non_attr_cols</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required &#39;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required &#39;</span>
                       <span class="s1">&#39;columns. Please add attribute columns to the input df.&#39;</span><span class="p">)</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">attr_cols_input</span></div>
 </pre></div>
 

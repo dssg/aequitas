@@ -81,7 +81,8 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
@@ -197,9 +198,9 @@
 <p><code class="docutils literal notranslate"><span class="pre">--ref-group-method</span> <span class="pre">&lt;type&gt;</span></code></p>
 <p>Fairness is always determined in relation to a reference group. By default, aequitas uses the majority group level for a given group as the reference group.</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">&quot;majority&quot;</span></code> Define fairness in relation to the majority in a group.</li>
-<li><code class="docutils literal notranslate"><span class="pre">&quot;min_metric&quot;</span></code> Define fairness in relation to the subgroup with the lowest value on a given metric.</li>
-<li><code class="docutils literal notranslate"><span class="pre">&quot;predefined&quot;</span></code> Define fairness in relation to groups of your choice.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;majority&quot;</span></code> Define fairness in relation to the majority in a group.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;min_metric&quot;</span></code> Define fairness in relation to the subgroup with the lowest value on a given metric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;predefined&quot;</span></code> Define fairness in relation to groups of your choice.</p></li>
 </ul>
 <p>The predefined reference groups are set in the configuration file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_groups_method</span><span class="p">:</span> <span class="s2">&quot;predefind&quot;</span>
@@ -225,12 +226,12 @@
 <h2>Choosing Metrics<a class="headerlink" href="#Choosing-Metrics" title="Permalink to this headline">¶</a></h2>
 <p>Choose from:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">'Statistical</span> <span class="pre">Parity'</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">'Impact</span> <span class="pre">Parity'</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">'FOR</span> <span class="pre">Parity'</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">'FDR</span> <span class="pre">Parity'</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">'FPR</span> <span class="pre">Parity'</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">'FNR</span> <span class="pre">Parity'</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'Statistical</span> <span class="pre">Parity'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'Impact</span> <span class="pre">Parity'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'FOR</span> <span class="pre">Parity'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'FDR</span> <span class="pre">Parity'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'FPR</span> <span class="pre">Parity'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'FNR</span> <span class="pre">Parity'</span></code></p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fairness_measures</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;FPR Parity&quot;</span><span class="p">,</span> <span class="s2">&quot;FNR Parity&quot;</span><span class="p">]</span>
 </pre></div>
@@ -261,7 +262,7 @@
 </div>
 <div class="section" id="Databases">
 <h2>Databases<a class="headerlink" href="#Databases" title="Permalink to this headline">¶</a></h2>
-<p>To connect to a database instead of using “–input ”, use the db key, credentials, and input_query. These are set in config.yaml.</p>
+<p>To connect to a database instead of using “–input “, use the db key, credentials, and input_query. These are set in config.yaml.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">:</span>
     <span class="n">db_credentials</span><span class="p">:</span>
         <span class="n">host</span><span class="p">:</span> <span class="n">your_host</span>
