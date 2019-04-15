@@ -189,7 +189,7 @@ class Plot(object):
 
     @classmethod
     def _locate_ref_group_indices(cls, disparities_table, attribute_name, group_metric,
-                                 ref_group_flag='_ref_group_value', model_id=1):
+                                 ref_group_flag='_ref_group_value'):
         """
         Finds relative index (row) of reference group value for a given metric.
 
@@ -201,10 +201,15 @@ class Plot(object):
             disparities_table.
         :param ref_group_flag: string indicating column indicates reference group
             flag value. Default is '_ref_group_value'.
-        :param model_id: model ID number. Default is 1.
 
         :return: Integer indicating relative index of reference group value row.
         """
+        df_models = disparities_table.model_id.unique()
+        if len(df_models) == 1:
+            model_id = df_models[0]
+        else:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check disparities_table.model_id.unique() should be just one element list.')
         # get absolute metric name from passed group metric (vs. a disparity name)
         abs_metric = "".join(group_metric.split('_disparity'))
 
@@ -217,8 +222,11 @@ class Plot(object):
                                          (disparities_table['model_id'] == model_id)].index)
 
         # there should only ever be one item in list, but JIC, select first
-        idx = ind[0]
-
+        if len(ind) == 1:
+            idx = ind[0]
+        else:
+            raise ValueError("""failed to find only one index for the reference group for attribute_name = {attribute_name} and 
+                             attribute_value of reference = {ref_group_name} and model_id={model_id}""".format())
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
@@ -239,6 +247,11 @@ class Plot(object):
 
         :return: A Matplotlib axis
         """
+        df_models = group_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check group_table.model_id.unique() should be just one element list.')
+
         if group_metric not in group_table.columns:
             raise ValueError(f"Specified disparity metric '{group_metric}' not "
                              f"in 'group_table'.")
@@ -366,7 +379,7 @@ class Plot(object):
         return ax
 
     def plot_disparity(self, disparity_table, group_metric, attribute_name,
-                       color_mapping=None, model_id=1, ax=None, fig=None,
+                       color_mapping=None, ax=None, fig=None,
                        label_dict=None, title=True,
                        highlight_fairness=False, min_group_size=None,
                        significance_alpha=0.05):
@@ -384,7 +397,6 @@ class Plot(object):
             disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
         :param color_mapping: matplotlib colormapping for treemap value boxes.
-        :param model_id: model ID number. Default is 1.
         :param ax: a matplotlib Axis. If not passed, a new figure will be created.
         :param fig: a matplotlib Figure. If not passed, a new figure will be created.
         :param label_dict: optional, dictionary of replacement labels for data.
@@ -403,6 +415,10 @@ class Plot(object):
         """
         # Use matplotlib to truncate colormap, scale metric values
         # between the min and max, then assign colors to individual values
+        df_models = disparity_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check disparities_table.model_id.unique() should be just one element list.')
 
         table_columns = set(disparity_table.columns)
         if group_metric not in table_columns:
@@ -605,6 +621,11 @@ class Plot(object):
 
         :return: A Matplotlib axis
         '''
+        df_models = fairness_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check fairness_table.model_id.unique() should be just one element list.')
+
         if group_metric not in fairness_table.columns:
             raise ValueError(f"Specified disparity metric {group_metric} not "
                              f"in 'fairness_table'.")
@@ -734,7 +755,7 @@ class Plot(object):
 
 
     def plot_fairness_disparity(self, fairness_table, group_metric,
-                                attribute_name, model_id=1, ax=None, fig=None,
+                                attribute_name, ax=None, fig=None,
                                 title=True, min_group_size=None,
                                 significance_alpha=0.05):
         """
@@ -742,7 +763,6 @@ class Plot(object):
 
         :param group_metric: the metric to plot. Must be a column in the disparity_table.
         :param attribute_name: which attribute to plot group_metric across.
-        :param model_id: model ID number. Default is 1.
         :param ax: a matplotlib Axis. If not passed, a new figure will be created.
         :param fig: a matplotlib Figure. If not passed, a new figure will be created.
         :param title: whether to include a title in visualizations. Default is True.
@@ -754,10 +774,15 @@ class Plot(object):
             asterisks on treemap).
         :return: A Matplotlib axis
         """
+        df_models = fairness_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check fairness_table.model_id.unique() should be just one element list.')
+
         return self.plot_disparity(disparity_table=fairness_table,
                                    group_metric=group_metric,
                                    attribute_name=attribute_name,
-                                   color_mapping=None, model_id=model_id,
+                                   color_mapping=None,
                                    ax=ax, fig=fig, highlight_fairness=True,
                                    min_group_size=min_group_size, title=title,
                                    significance_alpha=significance_alpha)
@@ -796,6 +821,11 @@ class Plot(object):
 
         :return: Returns a figure
         """
+        df_models = data_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check data_table.model_id.unique() should be just one element list.')
+
         if fillzeros:
             data_table = data_table.fillna(0)
 
@@ -921,6 +951,10 @@ class Plot(object):
 
         :return: Returns a figure
         """
+        df_models = data_table.model_id.unique()
+        if len(df_models) != 1:
+            raise ValueError('This method requires one and only one model_id in the disparities table. '
+                             'Tip: check disparities_table.model_id.unique() should be just one element list.')
 
         if fillzeros:
             data_table = data_table.fillna(0)
@@ -1002,7 +1036,6 @@ class Plot(object):
         ax_col = 0
         ax_row = 0
 
-        models = list(data_table.model_id.unique())
 
         for group_metric in metrics:
             for attr in attributes:
