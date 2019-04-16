@@ -96,11 +96,11 @@ Example of running an audit from a CSV file with the ``aequitas-report`` via com
 
 To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See [general input requirements](#input-data) and specific requirements for the [web app](#input-data-for-webapp), [CLI](#input-data-for-cli), and [Python API](#input-data-for-python-api) in the section immediately below.
 
-If you plan to bin or discretize continuous features manually, note that get_crosstabs() expects attribute columns to be of type 'string,' so don't forget to recast any 'categorical' type columns!
+If you plan to bin or discretize continuous features manually, note that `get_crosstabs()` expects attribute columns to be of type 'string,' so don't forget to recast any 'categorical' type columns!
 ``` python
     from Aequitas.preprocessing import preprocess_input_df
     
-    # double-check that categorical columns are of type string
+    # double-check that categorical columns are of type 'string'
     df['categorical_column_name'] = df['categorical_column_name'].astype(str)
     
     df, _ = preprocess_input_df(*input_data*)
