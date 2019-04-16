@@ -18,7 +18,7 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
 
 ## Documentation
 
-You can find the toolkit documentation [here](https://dssg.github.io/aequitas/)
+You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
 For usage examples of the python library, see our [demo notebook](https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb) using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
@@ -94,18 +94,22 @@ Example of running an audit from a CSV file with the ``aequitas-report`` via com
 
 **Python API**
 
-To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See [general input requirements](#input-data) and specific requirements for the [web app](#input-data-for-webapp), [CLI](#input-data-for-cli), and [Python API](#input-data-for-python-api) in the section immediately below. 
+To get started, preprocess your input data. Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. See [general input requirements](#input-data) and specific requirements for the [web app](#input-data-for-webapp), [CLI](#input-data-for-cli), and [Python API](#input-data-for-python-api) in the section immediately below.
 
+If you plan to bin or discretize continuous features manually, note that get_crosstabs() expects attribute columns to be of type 'string,' so don't forget to recast any 'categorical' type columns!
 ``` python
-    from Aequitas.preprocessing import preprocess_input_df()
+    from Aequitas.preprocessing import preprocess_input_df
     
+    # double-check that categorical columns are of type string
     df['categorical_column_name'] = df['categorical_column_name'].astype(str)
+    
     df, _ = preprocess_input_df(*input_data*)
 ``` 
 The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, calculating absolute group metrics from score and label value truth status (true/ false positives and true/ false negatives)
 
 ``` python
     from aequitas.group import Group
+    
     g = Group()
     xtab, _ = g.get_crosstabs(df)
 ``` 
@@ -113,8 +117,10 @@ The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, cal
 The `Plot()` class can visualize a single group metric with `plot_group_metric()`, or a list of bias metrics with `plot_group_metric_all()`:
 
 ``` python
-    p = Plot()
-    selected_metrics = p.plot_group_metric_all(xtab, 
+    from aequitas.plotting import Plot
+    
+    aqp = Plot()
+    selected_metrics = aqp.plot_group_metric_all(xtab, 
                 metrics=['ppr','pprev','fnr','fpr'], 
                 ncols=4)
 ``` 
@@ -124,6 +130,8 @@ The `Plot()` class can visualize a single group metric with `plot_group_metric()
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
 ``` python
+    from aequitas.bias import Bias
+    
     b = Bias()
     bdf = b.get_disparity_predefined_groups(xtab, 
                         original_df=df, 
@@ -149,6 +157,8 @@ The ``Plot()`` class visualizes disparities as treemaps colored by disparity rel
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
 ``` python
+    from aequitas.fairness import Fairness
+    
     f = Fairness()
     fdf = f.get_group_value_fairness(bdf)
 ``` 
@@ -159,7 +169,6 @@ To visualize fairness, use ``Plot()`` class fairness methods.
 To visualize ``'all'`` group absolute bias metric parity determinations:
 ``` python
     fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
-    wheat
 ``` 
 
 <img src="https://github.com/dssg/aequitas/blob/master/docs/_static/all_fairness_group.png">
