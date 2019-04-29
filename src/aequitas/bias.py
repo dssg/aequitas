@@ -83,8 +83,8 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
-        if not check_significance:
-            check_significance = self.significance_cols
+        # if not check_significance:
+        #     check_significance = self.significance_cols
 
         for group_metric in input_group_metrics:
 
@@ -131,41 +131,38 @@ class Bias(object):
                 df[group_metric] / df[group_metric + '_disparity']
             # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
+        if check_significance:
+            # add statistical_significance
+            check_significance = df_cols.intersection(check_significance).tolist()
+            ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                                  specific_measures=check_significance,
+                                                  label_score_ref=label_score_ref)
 
-        # add statistical_significance
-        check_significance = df_cols.intersection(check_significance).tolist()
+            attr_cols = df['attribute_name'].unique()
+            # run significance method on bias-augmented crosstab based on false
+            # positives, false negatives, scores, and label values in original df
+            self._get_statistical_significance(
+                original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
+                model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
-        ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                              specific_measures=check_significance,
-                                              label_score_ref=label_score_ref)
+            # if specified, apply T/F mask to significance columns
+            if mask_significance:
+                significance_cols = df.columns[df.columns.str.contains('_significance')]
+                truemask = df.loc[:, significance_cols] < alpha
+                falsemask = df.loc[:, significance_cols] >= alpha
 
-        attr_cols = df['attribute_name'].unique()
+                df.loc[:, significance_cols] = pd.np.select(
+                    [truemask, falsemask], [True, False], default=None)
 
-        # run significance method on bias-augmented crosstab based on false
-        # positives, false negatives, scores, and label values in original df
-        self._get_statistical_significance(
-            original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
-            model_id=1, attr_cols=attr_cols, alpha=5e-2)
+            # check what new disparity columns are and order as disparity,
+            # ref_group, significance for each
+            new_cols = sorted(
+                list(set(df.columns) - set(df_cols) - {'label_value_significance',
+                                                       'score_significance'})
+            )
 
-        # if specified, apply T/F mask to significance columns
-        if mask_significance:
-            significance_cols = df.columns[df.columns.str.contains('_significance')]
-            truemask = df.loc[:, significance_cols] < alpha
-            falsemask = df.loc[:, significance_cols] >= alpha
-
-            df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default=None)
-
-        # check what new disparity columns are and order as disparity,
-        # ref_group, significance for each
-        new_cols = sorted(
-            list(set(df.columns) - set(df_cols) - {'label_value_significance',
-                                                   'score_significance'})
-        )
-
-        return df[df_cols.tolist() + ['label_value_significance',
-                                      'score_significance'] + new_cols]
-
+            return df[df_cols.tolist() + ['label_value_significance','score_significance'] + new_cols]
+        return df
 
     def get_disparity_major_group(self, df, original_df, key_columns=None,
                                   input_group_metrics=None,
@@ -209,8 +206,8 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
-        if not check_significance:
-            check_significance = self.significance_cols
+        # if not check_significance:
+        #     check_significance = self.significance_cols
 
 
         try:
@@ -241,42 +238,43 @@ class Bias(object):
 
         # default is to use the same ref groups as df, need to add functionality to
         # compile ref_groups_dict based on a passed ref group for a given measure
-        check_significance = df_cols.intersection(check_significance).tolist()
+        if check_significance:
+            check_significance = df_cols.intersection(check_significance).tolist()
 
-        ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                       specific_measures=check_significance,
-                                              label_score_ref=label_score_ref)
+            ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                           specific_measures=check_significance,
+                                                  label_score_ref=label_score_ref)
 
 
-        attr_cols = df['attribute_name'].unique()
-        for attribute in attr_cols:
-            largest_group = df_major_group.loc[df_major_group['attribute_name'] == attribute,
-                                               'attribute_value'].values.tolist()[0]
-            ref_groups_dict[attribute]['label_value'] = largest_group
-            ref_groups_dict[attribute]['score'] = largest_group
+            attr_cols = df['attribute_name'].unique()
+            for attribute in attr_cols:
+                largest_group = df_major_group.loc[df_major_group['attribute_name'] == attribute,
+                                                   'attribute_value'].values.tolist()[0]
+                ref_groups_dict[attribute]['label_value'] = largest_group
+                ref_groups_dict[attribute]['score'] = largest_group
 
-        # run significance method on bias-augmented crosstab based on false
-        # positives, false negatives, scores, and label values in original df
-        self._get_statistical_significance(
-            original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
-            model_id=1, attr_cols=attr_cols, alpha=5e-2)
+            # run significance method on bias-augmented crosstab based on false
+            # positives, false negatives, scores, and label values in original df
+            self._get_statistical_significance(
+                original_df, df, ref_dict=ref_groups_dict, score_thresholds=None,
+                model_id=1, attr_cols=attr_cols, alpha=5e-2)
 
-        # if specified, apply T/F mask to significance columns
-        if mask_significance:
-            significance_cols = df.columns[df.columns.str.contains('_significance')]
-            truemask = df.loc[:, significance_cols] < alpha
-            falsemask = df.loc[:, significance_cols] >= alpha
+            # if specified, apply T/F mask to significance columns
+            if mask_significance:
+                significance_cols = df.columns[df.columns.str.contains('_significance')]
+                truemask = df.loc[:, significance_cols] < alpha
+                falsemask = df.loc[:, significance_cols] >= alpha
 
-            df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default=None)
+                df.loc[:, significance_cols] = pd.np.select(
+                    [truemask, falsemask], [True, False], default=None)
 
-        # check what new disparity columns are and order as disparity,
-        # ref_group, significance for each
-        new_cols = sorted(
-            list(set(df.columns) - set(df_cols) - {'label_value_significance', 'score_significance'})
-        )
-        return df[df_cols.tolist() + ['label_value_significance', 'score_significance'] + new_cols]
-
+            # check what new disparity columns are and order as disparity,
+            # ref_group, significance for each
+            new_cols = sorted(
+                list(set(df.columns) - set(df_cols) - {'label_value_significance', 'score_significance'})
+            )
+            return df[df_cols.tolist() + ['label_value_significance', 'score_significance'] + new_cols]
+        return df
 
 
     def _verify_ref_groups_dict_len(self, df, ref_groups_dict):
@@ -329,8 +327,8 @@ class Bias(object):
             input_group_metrics = self.input_group_metrics
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
-        if not check_significance:
-            check_significance = self.significance_cols
+        # if not check_significance:
+        #     check_significance = self.significance_cols
         try:
             self._verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
@@ -368,41 +366,42 @@ class Bias(object):
 
         # We are capping the disparity values to 10.0 when divided by zero...
         df = df.replace(pd.np.inf, fill_divbyzero)
+        if check_significance:
+            # for predefined groups, use the largest of the predefined groups as
+            # ref group for score and label value
+            check_significance = df_cols.intersection(check_significance).tolist()
 
-        # for predefined groups, use the largest of the predefined groups as
-        # ref group for score and label value
-        check_significance = df_cols.intersection(check_significance).tolist()
+            # compile dictionary of reference groups based on bias-augmented crosstab
+            full_ref_dict = {}
+            for key, val in ref_groups_dict.items():
+                full_ref_dict[key] = {'label_value': val,
+                                      'score': val}
+                for measure in check_significance:
+                    full_ref_dict[key][measure] = val
 
-        # compile dictionary of reference groups based on bias-augmented crosstab
-        full_ref_dict = {}
-        for key, val in ref_groups_dict.items():
-            full_ref_dict[key] = {'label_value': val,
-                                  'score': val}
-            for measure in check_significance:
-                full_ref_dict[key][measure] = val
+            # run significance method on bias-augmented crosstab based on false
+            # positives, false negatives, scores, and label values in original df
+            self._get_statistical_significance(
+                original_df, df, ref_dict=full_ref_dict, score_thresholds=None,
+                model_id=1, attr_cols=None, alpha=5e-2)
 
-        # run significance method on bias-augmented crosstab based on false
-        # positives, false negatives, scores, and label values in original df
-        self._get_statistical_significance(
-            original_df, df, ref_dict=full_ref_dict, score_thresholds=None,
-            model_id=1, attr_cols=None, alpha=5e-2)
+            # if specified, apply T/F mask to significance columns
+            if mask_significance:
+                significance_cols = df.columns[df.columns.str.contains('_significance')]
+                truemask = df.loc[:, significance_cols] < alpha
+                falsemask = df.loc[:, significance_cols] >= alpha
 
-        # if specified, apply T/F mask to significance columns
-        if mask_significance:
-            significance_cols = df.columns[df.columns.str.contains('_significance')]
-            truemask = df.loc[:, significance_cols] < alpha
-            falsemask = df.loc[:, significance_cols] >= alpha
+                df.loc[:, significance_cols] = pd.np.select(
+                    [truemask, falsemask], [True, False], default=None)
 
-            df.loc[:, significance_cols] = pd.np.select(
-                [truemask, falsemask], [True, False], default=None)
+            # check what new disparity columns are and order as disparity,
+            # ref_group, significance for each
+            new_cols = sorted(
+                list(set(df.columns) - set(df_cols) - {'label_value_significance', 'score_significance'})
+            )
 
-        # check what new disparity columns are and order as disparity,
-        # ref_group, significance for each
-        new_cols = sorted(
-            list(set(df.columns) - set(df_cols) - {'label_value_significance', 'score_significance'})
-        )
-
-        return df[df_cols.tolist() + ['label_value_significance', 'score_significance'] + new_cols]
+            return df[df_cols.tolist() + ['label_value_significance', 'score_significance'] + new_cols]
+        return df
 
     @staticmethod
     def _get_measure_sample(original_df, attribute, measure):

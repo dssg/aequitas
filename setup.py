@@ -46,7 +46,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    license=LICENSE_PATH.read_text(),
+    license='https://github.com/dssg/aequitas/blob/master/LICENSE',
     zip_safe=False,
     keywords='fairness bias aequitas',
     classifiers=[
