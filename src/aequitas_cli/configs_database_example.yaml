@@ -1,7 +1,7 @@
 # Thresholds for positive class (absolutes top k and top k %)
 score_thresholds:
     rank_abs: [200]
-    rank_pct: [1, 2, 5, 10]
+    rank_pct: [0.01, 0.02, 0.05, 0.10] #needs to be a float between 0 and 1
 
 #available options: "predefined", "majority" and "min_metric"
 ref_groups_method: "majority"
