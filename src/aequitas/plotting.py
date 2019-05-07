@@ -1225,3 +1225,87 @@ class Plot(object):
             metrics=metrics, fillzeros=fillzeros, label_dict=label_dict,
             title=title, highlight_fairness=True, show_figure=show_figure,
             min_group_size=min_group_size, significance_alpha=significance_alpha)
+
+
+    def multimodel_comparison(self, disparities_table, x_metric, y_metric,
+                              x_agg_method='mean', y_agg_method='mean',
+                            x_jitter=None, y_jitter=None, selected_models=None,
+                              ax=None, scatter_kws={'legend': 'full'}):
+                              # fit_reg=True, scatter=True, line_kws=None):
+        # requirement: at least two model_id values
+        if selected_models:
+            disparities_table = disparities_table.loc[disparities_table['model_id'].isin(selected_models)]
+
+        df_models = disparities_table.model_id.unique()
+
+        if len(df_models) == 1:
+            raise ValueError("This method requires at least two distinct 'model_id' values "
+                             "in the disparities table. Tip: check that "
+                             "disparities_table.model_id.unique() returns more than one element.")
+
+        # must be valid metric
+        if x_metric not in disparities_table.columns:
+            raise ValueError(
+                f"Absolute metric '{x_metric}' is not included in disparities_table.")
+
+        if y_metric not in disparities_table.columns:
+            raise ValueError(
+                f"Disparity metric '{y_metric}' is not included in disparities_table.")
+
+        # must be valid aggregation method
+        if (x_agg_method not in ('mean', 'median', 'max', 'min')) or (y_agg_method not in ('mean', 'median', 'max', 'min')):
+            raise ValueError(
+                "Aggregation methods 'x_agg_method' and 'y_agg_method' must "
+                "take one of the following values: 'mean', 'median', 'max', 'min'.")
+
+        collected_df = disparities_table.groupby('model_id', as_index=False).agg({x_metric: x_agg_method, y_metric:y_agg_method})
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(8, 5))
+
+        with sns.axes_style("whitegrid"):
+            ax = sns.scatterplot(x=x_metric, y=y_metric, data=collected_df, hue='model_id',
+                                 x_jitter=x_jitter, y_jitter=y_jitter, **scatter_kws)
+                            # scatter=scatter, fit_reg=fit_reg, line_kws=line_kws)
+
+        ax.xaxis.grid(color='lightgray', which='major')
+        ax.yaxis.grid(color='lightgray', which='major')
+        labels = [item.get_text().replace('_', ' ').upper() for item in ax.get_xticklabels()]
+        if '' not in labels:
+            ax.set_xticklabels(labels, rotation=30, ha='center')
+        else:
+            plt.xticks(rotation=30, horizontalalignment='center')
+
+        x_clean = x_metric.replace('_', ' ').upper()
+        y_clean = y_metric.replace('_', ' ').upper()
+        ax.set_xlabel(x_clean, fontsize=12)
+        ax.set_ylabel(y_clean, fontsize=12)
+
+        # orig_handles, orig_labels = ax.legend()
+        #
+        # print(orig_handles)
+        # print(orig_labels)
+        # ax.legend(title='Model ID')
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles=handles[1:], labels=[f"Model {model}" for model in labels[1:]], title="Model ID")
+
+
+        # ax.legend(handles= orig_handles, labels=[f"Model {model}" for model in orig_labels], title='Model ID')
+
+        # model_labels = [f"Model {model}" for model in df_models]
+        # for text, label in zip(ax.legend().texts, model_labels):
+        # for text, label in zip(ax._legend.texts, model_labels):
+        #     text.set_text(label)
+
+        plot_title = f"MODEL COMPARISON: {y_clean} BY {x_clean}"
+        ax.set_title(plot_title, fontsize=20)
+
+        return ax
+
+
+
+
+
+
+
+

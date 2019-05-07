@@ -156,11 +156,18 @@ class Group(object):
         # for each group variable do
         for col in attr_cols:
             # find the priors_df
-            col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+            col_group = df.fillna({col: 'pd.np.nan'}).groupby(['model_id', col])
             counts = col_group.size()
+
+            print("::COUNTS::")
+            print('think this is the df ', col_group)
+            print(counts)
+            print()
+
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
-                'model_id': [model_id] * len(counts),
+                # 'model_id': [model_id] * len(counts),
+                'model_id': col_group[model_id].to_list(),
                 'attribute_name': [col] * len(counts),
                 'attribute_value': counts.index.values,
                 'group_label_pos': col_group.apply(self.label_pos_count(
@@ -196,6 +203,9 @@ class Group(object):
                     for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
+                        print(feat_bias)
+                        print(model_id)
+
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
                             'score_threshold': [score_threshold] * len(feat_bias),
