@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -77,7 +79,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
@@ -157,11 +160,9 @@
 
 <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="c1"># Authors: Pedro Saleiro &lt;saleiro@uchicago.edu&gt;</span>
-<span class="c1">#          Rayid Ghani</span>
-<span class="c1">#          Benedict Kuester</span>
-<span class="c1">#</span>
-<span class="c1"># License: Copyright \xa9 2018. The University of Chicago. All Rights Reserved</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Rayid Ghani, Pedro Saleiro &lt;saleiro@uchicago.edu&gt;, Benedict Kuester, Loren Hinkson&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright </span><span class="se">\xa9</span><span class="s2"> 2018. The University of Chicago. All Rights Reserved.&quot;</span>
+
 
 <div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -173,12 +174,13 @@
             <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_pos_count</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">label_col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> \
             <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_group_functions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_group_functions</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Group.get_group_functions"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_group_functions">[docs]</a>    <span class="k">def</span> <span class="nf">get_group_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_group_functions</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :return:</span>
+<span class="sd">        Helper function to accumulate lambda functions used in bias metrics</span>
+<span class="sd">        calculations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -264,16 +266,19 @@
                            <span class="s1">&#39;tn&#39;</span><span class="p">:</span> <span class="n">true_neg_count</span><span class="p">,</span>
                            <span class="s1">&#39;tp&#39;</span><span class="p">:</span> <span class="n">true_pos_count</span><span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">group_functions</span></div>
+        <span class="k">return</span> <span class="n">group_functions</span>
 
 <div class="viewcode-block" id="Group.get_crosstabs"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_crosstabs">[docs]</a>    <span class="k">def</span> <span class="nf">get_crosstabs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">attr_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates univariate groups and calculates group metrics.</span>
 
-<span class="sd">        :param df: a dataframe containing the following required columns [score,  label_value]</span>
-<span class="sd">        :param score_thresholds: a dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
-<span class="sd">        :param model_id:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param df: a dataframe containing the following required columns [score,  label_value].</span>
+<span class="sd">        :param score_thresholds: dictionary { &#39;rank_abs&#39;:[] , &#39;rank_pct&#39;:[], &#39;score&#39;:[] }</span>
+<span class="sd">        :param model_id: the model ID on which to subset the df.</span>
+<span class="sd">        :param attr_cols: optional, list of names of columns corresponding to</span>
+<span class="sd">            group attributes (i.e., gender, age category, race, etc.).</span>
+
+<span class="sd">        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_cols</span><span class="p">:</span>
             <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;entity_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_abs&#39;</span><span class="p">,</span> <span class="s1">&#39;rank_pct&#39;</span><span class="p">]</span>
@@ -281,23 +286,20 @@
         <span class="c1"># check if all attr_cols exist in df</span>
         <span class="n">check</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">]</span>
         <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">check</span><span class="p">:</span>
-            <span class="c1"># todo: create separate check method that raises exception...</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: not all attribute columns provided exist in input dataframe!&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: not all attribute columns provided exist in input dataframe!&#39;</span><span class="p">)</span>
         <span class="c1"># check if all columns are strings:</span>
         <span class="n">non_string_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">object</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">attr_cols</span><span class="p">))]</span>
         <span class="k">if</span> <span class="n">non_string_cols</span><span class="o">.</span><span class="n">empty</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!&#39;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!&#39;</span><span class="p">)</span>
+
         <span class="c1"># if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column</span>
         <span class="n">count_ones</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># it also serves as flag to set parameter to &#39;binary&#39;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">score_thresholds</span><span class="p">:</span>
             <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-            <span class="n">count_ones</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="mf">1.0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">count_ones</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;get_crosstabs: No threshold provided and there is no 1s in the score column.&#39;</span><span class="p">)</span>
-                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">count_ones</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">score_thresholds</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">count_ones</span><span class="p">]}</span>
+
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;model_id, score_thresholds&#39;</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">score_thresholds</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;rank_abs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -312,7 +314,6 @@
             <span class="c1"># find the priors_df</span>
             <span class="n">col_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="n">col</span><span class="p">:</span> <span class="s1">&#39;pd.np.nan&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
             <span class="n">counts</span> <span class="o">=</span> <span class="n">col_group</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;COUNTS:::&#39;</span><span class="p">,</span> <span class="n">counts</span><span class="p">)</span>
             <span class="c1"># distinct entities within group value</span>
             <span class="n">this_prior_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
                 <span class="s1">&#39;model_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span>
@@ -326,13 +327,27 @@
                 <span class="s1">&#39;total_entities&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
             <span class="p">})</span>
             <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;prev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;group_label_pos&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">this_prior_df</span><span class="p">[</span><span class="s1">&#39;group_size&#39;</span><span class="p">]</span>
-            <span class="c1"># for each model_id and as_of_date the priors_df has length attribute_names * attribute_values</span>
+            <span class="c1"># for each model_id and as_of_date the priors_df has length</span>
+            <span class="c1"># attribute_names * attribute_values</span>
             <span class="n">prior_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_prior_df</span><span class="p">)</span>
-            <span class="c1"># we calculate the bias for two different types of score_thresholds (percentage ranks and absolute ranks)</span>
+
+            <span class="c1"># we calculate the bias for two different types of score_thresholds</span>
+            <span class="c1"># units (percentage ranks and absolute ranks)</span>
+            <span class="c1"># YAML ex: thresholds:</span>
+            <span class="c1">#              rank_abs: [300]</span>
+            <span class="c1">#              rank_pct: [1.0, 5.0, 10.0]</span>
             <span class="k">for</span> <span class="n">thres_unit</span><span class="p">,</span> <span class="n">thres_values</span> <span class="ow">in</span> <span class="n">score_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
                 <span class="k">for</span> <span class="n">thres_val</span> <span class="ow">in</span> <span class="n">thres_values</span><span class="p">:</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+
+                    <span class="c1"># To discuss with Pedro: believe this might be the reason</span>
+                    <span class="c1"># for cutoff error - if numbers are cumulative, per</span>
+                    <span class="c1"># line 149 and line 150, why taking sum for k vs. max?</span>
                     <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">thres_unit</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thres_val</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+                    <span class="c1"># denote threshold as binary if numeric count_ones value</span>
+                    <span class="c1"># donate as [rank value]_abs or [rank_value]_pct otherwise</span>
                     <span class="n">score_threshold</span> <span class="o">=</span> <span class="s1">&#39;binary 0/1&#39;</span> <span class="k">if</span> <span class="n">count_ones</span> <span class="o">!=</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">thres_val</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">thres_unit</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
                     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_functions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                         <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">thres_unit</span><span class="p">,</span> <span class="s1">&#39;label_value&#39;</span><span class="p">,</span> <span class="n">thres_val</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
@@ -350,14 +365,21 @@
                             <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">this_group_df</span> <span class="o">=</span> <span class="n">this_group_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">metrics_df</span><span class="p">)</span>
-                        <span class="c1"># print(this_group_df.head(1))</span>
                     <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_group_df</span><span class="p">)</span>
-        <span class="c1"># precision@	25_abs</span>
         <span class="n">groups_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">priors_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">prior_dfs</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">groups_df</span> <span class="o">=</span> <span class="n">groups_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">priors_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">,</span>
                                                    <span class="s1">&#39;attribute_value&#39;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">groups_df</span><span class="p">,</span> <span class="n">attr_cols</span></div></div>
+        <span class="k">return</span> <span class="n">groups_df</span><span class="p">,</span> <span class="n">attr_cols</span></div>
+
+<div class="viewcode-block" id="Group.list_absolute_metrics"><a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.list_absolute_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">list_absolute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View list of all calculated absolute bias metrics in df</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">intersection</span><span class="p">([</span><span class="s1">&#39;fpr&#39;</span><span class="p">,</span> <span class="s1">&#39;fnr&#39;</span><span class="p">,</span> <span class="s1">&#39;tpr&#39;</span><span class="p">,</span> <span class="s1">&#39;tnr&#39;</span><span class="p">,</span> <span class="s1">&#39;for&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;fdr&#39;</span><span class="p">,</span> <span class="s1">&#39;npv&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">,</span> <span class="s1">&#39;ppr&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;pprev&#39;</span><span class="p">,</span> <span class="s1">&#39;prev&#39;</span>
+                                        <span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>
@@ -370,7 +392,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -387,32 +409,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

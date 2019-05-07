@@ -18,13 +18,13 @@ class Group(object):
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
-        self.group_functions = self.get_group_functions()
+        self.group_functions = self._get_group_functions()
 
     @staticmethod
-    def get_group_functions():
+    def _get_group_functions():
         """
-
-        :return:
+        Helper function to accumulate lambda functions used in bias metrics
+        calculations.
         """
 
         divide = lambda x, y: x / y if y != 0 else pd.np.nan
@@ -116,25 +116,25 @@ class Group(object):
         """
         Creates univariate groups and calculates group metrics.
 
-        :param df: a dataframe containing the following required columns [score,  label_value]
-        :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id:
-        :return:
+        :param df: a dataframe containing the following required columns [score,  label_value].
+        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param model_id: the model ID on which to subset the df.
+        :param attr_cols: optional, list of names of columns corresponding to
+            group attributes (i.e., gender, age category, race, etc.).
+
+        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
-        # double-check if all attr_cols exist in df
+        # check if all attr_cols exist in df
         check = [col in df.columns for col in attr_cols]
         if False in check:
-            # todo: create separate check method that raises exception...
-            logging.error('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-            exit(1)
+            raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
-            logging.error('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-            exit(1)
+            raise Exception('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
 
         # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
         count_ones = None  # it also serves as flag to set parameter to 'binary'
@@ -158,7 +158,6 @@ class Group(object):
             # find the priors_df
             col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
             counts = col_group.size()
-            print('COUNTS:::', counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
@@ -187,11 +186,11 @@ class Group(object):
                     flag = 0
 
                     # To discuss with Pedro: believe this might be the reason
-                    # for cutoff error - if nunmbers are cumulative, per
+                    # for cutoff error - if numbers are cumulative, per
                     # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
 
-                    # denote threshold as binarhy if numeric count_ones value
+                    # denote threshold as binary if numeric count_ones value
                     # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
                     for name, func in self.group_functions.items():
@@ -210,9 +209,7 @@ class Group(object):
                             flag = 1
                         else:
                             this_group_df = this_group_df.merge(metrics_df)
-                        # print(this_group_df.head(1))
                     dfs.append(this_group_df)
-        # precision@	25_abs
         groups_df = pd.concat(dfs, ignore_index=True)
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
@@ -220,10 +217,9 @@ class Group(object):
         return groups_df, attr_cols
 
     def list_absolute_metrics(self, df):
-        '''
-        View all calculated disparities in table
-        :return: list of disparity metrics
-        '''
+        """
+        View list of all calculated absolute bias metrics in df
+        """
         return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
                                            'fdr', 'npv', 'precision', 'ppr',
                                            'pprev', 'prev'

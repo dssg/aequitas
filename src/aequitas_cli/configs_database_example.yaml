@@ -1,7 +1,7 @@
 # Thresholds for positive class (absolutes top k and top k %)
 score_thresholds:
     rank_abs: [200]
-    rank_pct: [1.0, 2.0, 5.0, 10.0 ]
+    rank_pct: [0.01, 0.02, 0.05, 0.10] #needs to be a float between 0 and 1
 
 #available options: "predefined", "majority" and "min_metric"
 ref_groups_method: "majority"
@@ -30,4 +30,5 @@ db:
     input_query: "select id, score, label_value, attribute_1, attribute_2 from results.predictions left join ..."
 
     # the output schema is optional, default=public
-    output_schema: results
+    output_schema: test_results
+    output_table: aequitas_group

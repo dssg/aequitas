@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -77,7 +79,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
@@ -170,6 +173,11 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="api">
 <h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
@@ -177,10 +185,11 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="aequitas.html">Aequitas API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.group"><code class="docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.bias"><code class="docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.fairness"><code class="docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.preprocessing"><code class="docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.group"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.bias"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.fairness"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.plotting</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -198,7 +207,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -215,32 +224,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -17,33 +17,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started with aequitas-report" href="30_seconds_aequitas.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+    <link rel="next" title="Welcome to Aequitas" href="30_seconds_aequitas.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -78,7 +80,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
@@ -171,6 +174,11 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="the-bias-and-fairness-audit-toolkit-for-machine-learning">
 <h1>The Bias and Fairness Audit Toolkit for Machine Learning<a class="headerlink" href="#the-bias-and-fairness-audit-toolkit-for-machine-learning" title="Permalink to this headline">¶</a></h1>
@@ -184,18 +192,15 @@
 <div class="section" id="sample-jupyter-notebook">
 <h2>Sample Jupyter Notebook<a class="headerlink" href="#sample-jupyter-notebook" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><a class="reference external" href="https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb">Explore bias analysis of the COMPAS data</a> using the Aequitas library.</div></blockquote>
+<div><p><a class="reference external" href="https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb">Explore bias analysis of the COMPAS data</a> using the Aequitas library.</p>
+</div></blockquote>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_aequitas.html#Input-machine-learning-predictions">Input machine learning predictions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_aequitas.html#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">Get out measures of bias that you can tailor to your problem</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="30_seconds_aequitas.html#The-Bias-Report-output">The Bias Report output</a></li>
-<li class="toctree-l3"><a class="reference internal" href="30_seconds_aequitas.html#Commandline-output">Commandline output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Welcome to Aequitas</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="30_seconds_aequitas.html#Getting-started">Getting started</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="input_data.html#Input-data-for-Webapp">Input data for Webapp</a><ul>
@@ -264,22 +269,77 @@
 <li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Load-data">Load data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Customize-report">Customize report</a></li>
-<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Get-‘The-Bias-Report’">Get ‘The Bias Report’</a></li>
+<li class="toctree-l2"><a class="reference internal" href="30_seconds_webapp.html#Get-'The-Bias-Report'">Get ‘The Bias Report’</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/aequitas.html">Aequitas API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.group"><code class="docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.bias"><code class="docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.fairness"><code class="docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.preprocessing"><code class="docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.group"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.group</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.bias"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.bias</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.fairness"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.fairness</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.plotting</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/aequitas.html#module-src.aequitas.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.aequitas.preprocessing</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html">COMPAS Analysis using Aequitas</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Exploratory-Analysis">Exploratory Analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Putting-Aequitas-to-the-task">Putting Aequitas to the task</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Background">Background</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#Pre-Aequitas:-Exploring-the-COMPAS-Dataset">Pre-Aequitas: Exploring the COMPAS Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#Putting-Aequitas-to-the-task">Putting Aequitas to the task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Data-Formatting">Data Formatting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#What-biases-exist-in-my-model?">What biases exist in my model?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Aequitas-Group()-Class"><em>Aequitas Group() Class</em></a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#What-is-the-distribution-of-groups,-predicted-scores,-and-labels-across-my-dataset?">What is the distribution of groups, predicted scores, and labels across my dataset?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#What-are-bias-metrics-across-groups?">What are bias metrics across groups?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#How-do-I-interpret-biases-in-my-model?">How do I interpret biases in my model?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#How-do-I-visualize-bias-in-my-model?">How do I visualize bias in my model?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-a-single-absolute-group-metric-across-all-population-groups">Visualizing a single absolute group metric across all population groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#View-group-metrics-for-only-groups-over-a-certain-size-threshold">View group metrics for only groups over a certain size threshold</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-multiple-user-specified-absolute-group-metrics-across-all-population-groups">Visualizing multiple user-specified absolute group metrics across all population groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-default-absolute-group-metrics-across-all-population-groups">Visualizing default absolute group metrics across all population groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#What-levels-of-disparity-exist-between-population-groups?">What levels of disparity exist between population groups?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Aequitas-Bias()-Class"><em>Aequitas Bias() Class</em></a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#How-do-I-interpret-calculated-disparity-ratios?">How do I interpret calculated disparity ratios?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#How-does-the-selected-reference-group-affect-disparity-calculations?">How does the selected reference group affect disparity calculations?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#How-do-I-visualize-disparities-in-my-model?">How do I visualize disparities in my model?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-disparities-between-groups-in-a-single-user-specified-attribute-for-a-single-user-specified-disparity-metric">Visualizing disparities between groups in a single user-specified attribute for a single user-specified disparity metric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-disparities-between-all-groups-for-a-single-user-specified-disparity-metric">Visualizing disparities between all groups for a single user-specified disparity metric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-disparities-between-groups-in-a-single-user-specified-attribute-for-default-metrics">Visualizing disparities between groups in a single user-specified attribute for default metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-disparities-between-groups-in-a-single-user-specified-attribute-for-all-calculated-disparity-metrics">Visualizing disparities between groups in a single user-specified attribute for all calculated disparity metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-disparity-between-all-groups-for-multiple-user-specified-disparity-metrics">Visualizing disparity between all groups for multiple user-specified disparity metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#How-do-I-assess-model-fairness?">How do I assess model fairness?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Aequitas-Fairness()-Class"><em>Aequitas Fairness() Class</em></a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Group-Level-Fairness">Group Level Fairness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#How-do-I-interpret-parities?">How do I interpret parities?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Attribute-Level-Fairness">Attribute Level Fairness</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Overall-Fairness">Overall Fairness</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#How-do-I-visualize-bias-metric-parity?">How do I visualize bias metric parity?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-parity-of-a-single-absolute-group-metric-across-all-population-groups">Visualizing parity of a single absolute group metric across all population groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-all-absolute-group-metrics-across-all-population-groups">Visualizing all absolute group metrics across all population groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#How-do-I-visualize-parity-between-groups-in-my-model?">How do I visualize parity between groups in my model?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-parity-between-groups-in-a-single-user-specified-attribute-for-all-calculated-disparity-metrics">Visualizing parity between groups in a single user-specified attribute for all calculated disparity metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Researcher-Check:-Could-the-unfairness-I-am-seeing-be-related-to-small-group-sizes-in-my-sample?">Researcher Check: Could the unfairness I am seeing be related to small group sizes in my sample?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-parity-between-groups-in-a-single-user-specified-attribute-for-all-calculated-disparity-metrics">Visualizing parity between groups in a single user-specified attribute for all calculated disparity metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-parity-between-all-groups-for-multiple-user-specified-disparity-metrics">Visualizing parity between all groups for multiple user-specified disparity metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/compas_demo.html#Visualizing-parity-between-groups-in-multiple-user-specified-attributes">Visualizing parity between groups in multiple user-specified attributes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples/compas_demo.html#The-Aequitas-Effect">The Aequitas Effect</a></li>
 </ul>
 </li>
 </ul>
@@ -295,7 +355,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="30_seconds_aequitas.html" class="btn btn-neutral float-right" title="Getting started with aequitas-report" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="30_seconds_aequitas.html" class="btn btn-neutral float-right" title="Welcome to Aequitas" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -305,7 +365,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -322,32 +382,16 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

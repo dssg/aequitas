@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Understanding Output" href="output_data.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -79,7 +81,8 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Getting started with <em>aequitas-report</em></a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Understanding Input Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Input-data-for-Webapp">Input data for Webapp</a><ul>
@@ -196,124 +199,106 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="Understanding-Input-Data">
 <h1>Understanding Input Data<a class="headerlink" href="#Understanding-Input-Data" title="Permalink to this headline">¶</a></h1>
-<p>Input data has slightly different requirements depending on whether you
-are using Aequitas via the webapp, CLI or Python package. In general,
-input data is a single table with the following columns:</p>
+<p>Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. In general, input data is a single table with the following columns:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
-<li>at least one attribute. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code>.
-(Attribute categories are defined by users.)</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label_value</span></code></p></li>
+<li><p>at least one attribute. e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age</span></code>. (Attribute categories are defined by users.)</p></li>
 </ul>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="12%" />
-<col width="23%" />
-<col width="32%" />
-<col width="11%" />
-<col width="9%" />
-<col width="14%" />
+<col style="width: 13%" />
+<col style="width: 23%" />
+<col style="width: 29%" />
+<col style="width: 11%" />
+<col style="width: 10%" />
+<col style="width: 14%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">score</th>
-<th class="head">label_value</th>
-<th class="head">race</th>
-<th class="head">sex</th>
-<th class="head">age</th>
-<th class="head">income</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age</p></th>
+<th class="head"><p>income</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>0</td>
-<td>1</td>
-<td>African-American</td>
-<td>Male</td>
-<td>25</td>
-<td>180000</td>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>African-American</p></td>
+<td><p>Male</p></td>
+<td><p>25</p></td>
+<td><p>180000</p></td>
 </tr>
-<tr class="row-odd"><td>1</td>
-<td>1</td>
-<td>Caucasian</td>
-<td>Male</td>
-<td>37</td>
-<td>34000</td>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>Caucasian</p></td>
+<td><p>Male</p></td>
+<td><p>37</p></td>
+<td><p>34000</p></td>
 </tr>
 </tbody>
 </table>
 <div class="section" id="Input-data-for-Webapp">
 <h2>Input data for Webapp<a class="headerlink" href="#Input-data-for-Webapp" title="Permalink to this headline">¶</a></h2>
-<p>The webapp requires a single CSV with columns for a binary <code class="docutils literal notranslate"><span class="pre">score</span></code>, a
-binary <code class="docutils literal notranslate"><span class="pre">label_value</span></code> and an arbitrary number of attribute columns.
-Each row is associated with a single observation.</p>
+<p>The webapp requires a single CSV with columns for a binary <code class="docutils literal notranslate"><span class="pre">score</span></code>, a binary <code class="docutils literal notranslate"><span class="pre">label_value</span></code> and an arbitrary number of attribute columns. Each row is associated with a single observation.</p>
 <p><img alt="image0" src="_images/webapp_input.jpg" /></p>
 <div class="section" id="score">
 <h3><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h3>
-<p>Aequitas webapp assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary decision (0 or
-1).</p>
+<p>Aequitas webapp assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary decision (0 or 1).</p>
 </div>
 <div class="section" id="label_value">
 <h3><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h3>
-<p>This is the ground truth value of a binary decision. The data again must
-be binary 0 or 1.</p>
+<p>This is the ground truth value of a binary decision. The data again must be binary 0 or 1.</p>
 </div>
 <div class="section" id="attributes-e.g.-race,-sex,-age,income">
 <h3>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h3>
-<p>Group columns can be categorical or continuous. If categorical, Aequitas
-will produce crosstabs with bias metrics for each group_level. If
-continuous, Aequitas will first bin the data into quartiles and then
-create crosstabs with the newly defined categories.</p>
+<p>Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles and then create crosstabs with the newly defined categories.</p>
 </div>
 </div>
 <div class="section" id="Input-data-for-CLI">
 <h2>Input data for CLI<a class="headerlink" href="#Input-data-for-CLI" title="Permalink to this headline">¶</a></h2>
-<p>The CLI accepts csv files and also accomodates database calls defined in
-Configuration files.</p>
+<p>The CLI accepts csv files and also accomodates database calls defined in Configuration files.</p>
 <p><img alt="image1" src="_images/CLI_input.jpg" /></p>
 <div class="section" id="score">
-<span id="score-1"></span><h3><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h3>
-<p>By default, Aequitas CLI assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary
-decision (0 or 1). Alternatively, the <code class="docutils literal notranslate"><span class="pre">score</span></code> column can contain the
-score (e.g.&nbsp;the output from a logistic regression applied to the data).
-In this case, the user sets a threshold to determine the binary
-decision. See <a class="reference external" href="./config.html">configurations</a> for more on thresholds.</p>
+<h3><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h3>
+<p>By default, Aequitas CLI assumes the <code class="docutils literal notranslate"><span class="pre">score</span></code> column is a binary decision (0 or 1). Alternatively, the <code class="docutils literal notranslate"><span class="pre">score</span></code> column can contain the score (e.g. the output from a logistic regression applied to the data). In this case, the user sets a threshold to determine the binary decision. See <a class="reference external" href="./config.html">configurations</a> for more on thresholds.</p>
 </div>
 <div class="section" id="label_value">
-<span id="label-value-1"></span><h3><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h3>
-<p>As with the webapp, this is the ground truth value of a binary decision.
-The data must be binary 0 or 1.</p>
+<h3><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h3>
+<p>As with the webapp, this is the ground truth value of a binary decision. The data must be binary 0 or 1.</p>
 </div>
 <div class="section" id="attributes-e.g.-race,-sex,-age,income">
-<span id="attributes-e-g-race-sex-ageincome-1"></span><h3>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h3>
-<p>Group columns can be categorical or continuous. If categorical, Aequitas
-will produce crosstabs with bias metrics for each group_level. If
-continuous, Aequitas will first bin the data into quartiles.</p>
+<h3>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h3>
+<p>Group columns can be categorical or continuous. If categorical, Aequitas will produce crosstabs with bias metrics for each group_level. If continuous, Aequitas will first bin the data into quartiles.</p>
 </div>
 <div class="section" id="model_id">
 <h3><code class="docutils literal notranslate"><span class="pre">model_id</span></code><a class="headerlink" href="#model_id" title="Permalink to this headline">¶</a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">model_id</span></code> is an identifier tied to the output of a specific model.
-With a <code class="docutils literal notranslate"><span class="pre">model_id</span></code> column you can test the bias of multiple models at
-once. This feature is available using the CLI or the Python package.</p>
+<p><code class="docutils literal notranslate"><span class="pre">model_id</span></code> is an identifier tied to the output of a specific model. With a <code class="docutils literal notranslate"><span class="pre">model_id</span></code> column you can test the bias of multiple models at once. This feature is available using the CLI or the Python package.</p>
 </div>
 <div class="section" id="Reserved-column-names:">
 <h3>Reserved column names:<a class="headerlink" href="#Reserved-column-names:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">model_id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">entity_id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">rank_abs</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">rank_pct</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">entity_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank_abs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank_pct</span></code></p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="Input-data-for-Python-package">
 <h2>Input data for Python package<a class="headerlink" href="#Input-data-for-Python-package" title="Permalink to this headline">¶</a></h2>
-<p>Python input data can be handled identically to CLI by using
-<code class="docutils literal notranslate"><span class="pre">preprocess_input_df()</span></code>. Otherwise, you must discretize continuous
-attribute columns prior to passing the data to
-<code class="docutils literal notranslate"><span class="pre">Group().get_crosstabs()</span></code>.</p>
+<p>Python input data can be handled identically to CLI by using <code class="docutils literal notranslate"><span class="pre">preprocess_input_df()</span></code>. Otherwise, you must discretize continuous attribute columns prior to passing the data to <code class="docutils literal notranslate"><span class="pre">Group().get_crosstabs()</span></code>.</p>
 <div class="highlight-{python} notranslate"><div class="highlight"><pre><span></span>from Aequitas.preprocessing import preprocess_input_df()
 
 # *input_data* matches CLI input data norms.
@@ -322,37 +307,32 @@ df, _ = preprocess_input_df(*input_data*)
 </div>
 <p><img alt="image2" src="_images/python_input.jpg" /></p>
 <div class="section" id="score">
-<span id="score-2"></span><h3><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h3>
-<p>See CLI. Threshholds are set in a dictionary passed to
-<code class="docutils literal notranslate"><span class="pre">get_crosstabs()</span></code>.</p>
+<h3><code class="docutils literal notranslate"><span class="pre">score</span></code><a class="headerlink" href="#score" title="Permalink to this headline">¶</a></h3>
+<p>See CLI. Threshholds are set in a dictionary passed to <code class="docutils literal notranslate"><span class="pre">get_crosstabs()</span></code>.</p>
 </div>
 <div class="section" id="label_value">
-<span id="label-value-2"></span><h3><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">label_value</span></code><a class="headerlink" href="#label_value" title="Permalink to this headline">¶</a></h3>
 <p>See CLI.</p>
 </div>
 <div class="section" id="attributes-e.g.-race,-sex,-age,income">
-<span id="attributes-e-g-race-sex-ageincome-2"></span><h3>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h3>
-<p>See CLI. If you plan to bin or discritize continuous features manually,
-note that <code class="docutils literal notranslate"><span class="pre">get_crosstabs()</span></code> expects attribute columns to be type
-string. This excludes pandas ‘categorical’ data type, which is the
-default output of certain pandas discritizing functions. You can recast
-‘categorical’ columns to strings as follows:</p>
+<h3>attributes e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>,<code class="docutils literal notranslate"><span class="pre">income</span></code><a class="headerlink" href="#attributes-e.g.-race,-sex,-age,income" title="Permalink to this headline">¶</a></h3>
+<p>See CLI. If you plan to bin or discritize continuous features manually, note that <code class="docutils literal notranslate"><span class="pre">get_crosstabs()</span></code> expects attribute columns to be type string. This excludes pandas ‘categorical’ data type, which is the default output of certain pandas discritizing functions. You can recast ‘categorical’ columns to strings as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;categorical_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;categorical_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="model_id">
-<span id="model-id-1"></span><h3><code class="docutils literal notranslate"><span class="pre">model_id</span></code><a class="headerlink" href="#model_id" title="Permalink to this headline">¶</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">model_id</span></code><a class="headerlink" href="#model_id" title="Permalink to this headline">¶</a></h3>
 <p>See CLI.</p>
 </div>
 <div class="section" id="Reserved-column-names:">
-<span id="reserved-column-names-1"></span><h3>Reserved column names:<a class="headerlink" href="#Reserved-column-names:" title="Permalink to this headline">¶</a></h3>
+<h3>Reserved column names:<a class="headerlink" href="#Reserved-column-names:" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">model_id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">entity_id</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">rank_abs</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">rank_pct</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">entity_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank_abs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rank_pct</span></code></p></li>
 </ul>
 </div>
 </div>
@@ -369,7 +349,7 @@ default output of certain pandas discritizing functions. You can recast
         <a href="output_data.html" class="btn btn-neutral float-right" title="Understanding Output" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -378,7 +358,7 @@ default output of certain pandas discritizing functions. You can recast
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -395,32 +375,16 @@ default output of certain pandas discritizing functions. You can recast
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

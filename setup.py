@@ -7,10 +7,15 @@ ROOT_PATH = Path(__file__).parent
 
 LICENSE_PATH = ROOT_PATH / 'LICENSE'
 
-README_PATH = ROOT_PATH / 'README.rst'
+README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
+#with open(README_PATH, encoding='utf-8') as f:
+#    long_description = f.read()
+
+long_description = """
+Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive tools."""
 
 def stream_requirements(fd):
     """For a given requirements file descriptor, generate lines of
@@ -30,19 +35,20 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name='aequitas',
-    version='0.23.0',
-    # description="",
-    long_description=README_PATH.read_text(),
+    version='0.38.0',
+    description="The bias and fairness audit toolkit.",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
-    url='https://github.com/dssg/aequitas-public',
+    url='https://github.com/dssg/aequitas',
     packages=find_packages('src', exclude=['tests', 'tests.*']),
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    license=LICENSE_PATH.read_text(),
+    license='https://github.com/dssg/aequitas/blob/master/LICENSE',
     zip_safe=False,
-    keywords='bias aequitas',
+    keywords='fairness bias aequitas',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -55,7 +61,5 @@ setup(
         'console_scripts': [
             'aequitas-report=aequitas_cli.aequitas_audit:main',
         ],
-    },
-    # test_suite='tests',
-    # tests_require=REQUIREMENTS_TEST,
+    }
 )

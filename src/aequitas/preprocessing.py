@@ -25,7 +25,7 @@ def get_attr_cols(df, non_attr_cols):
     """
     :param df: A data frame of model results
     :param non_attr_cols: Names of columns not associated with attributes
-    :return: List of columns associated with attributes
+    :return: List of columns associated with sample attributes
     """
     # index of the columns that are associated with attributes
     attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
@@ -62,7 +62,7 @@ def preprocess_input_df(df, required_cols=None):
     """
 
     :param df: A data frame of model results
-    :param non_attr_cols: Names of columns not associated with attributes.
+    :param required_cols: Names of columns required for bias calculations.
         Default is None.
     :return: A data frame, list of columns associated with sample attributes
     """
@@ -72,14 +72,12 @@ def preprocess_input_df(df, required_cols=None):
         check_required_cols(df, required_cols)
     except ValueError:
         logging.error('preprocessing.preprocess_input_df: input dataframe does not have all the required columns.')
-        exit(1)
     non_attr_cols = required_cols + ['model_id', 'as_of_date', 'entity_id', 'rank_abs', 'rank_pct', 'id', 'label_value']
     non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (~df.columns.isin(non_attr_cols))]
     df = discretize(df, non_string_cols)
     try:
         attr_cols_input = get_attr_cols(df, non_attr_cols)
     except ValueError:
-        logging.info('preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required '
+        logging.error('preprocessing.preprocess_input_df: input dataframe does not have any other columns besides required '
                       'columns. Please add attribute columns to the input df.')
-        exit(1)
     return df, attr_cols_input

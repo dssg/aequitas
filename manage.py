@@ -1,7 +1,9 @@
 from pathlib import Path
+from argparse import REMAINDER
 
 from argcmdr import CacheDict, Local, LocalRoot, localmethod
 from plumbum import local
+
 
 
 ROOT_PATH = Path(__file__).parent
@@ -151,3 +153,50 @@ class Web(Local):
                         args.name,
                     ]
                 )
+
+
+
+@Aequitas.register
+class Release(Local):
+    """manage the aequitas releases and upload to pypi"""
+
+    package_name = 'aequitas'
+
+    bump_default_message = "Bump version: {current_version} → {new_version}"
+
+    @localmethod('part', choices=('major', 'minor', 'patch'),
+                 help="part of the version to be bumped")
+    @localmethod('-m', '--message',
+                 help=f"Tag message (in addition to default: "
+                      f"'{bump_default_message}')")
+    def bump(self, args):
+        """increment package version"""
+        if args.message:
+            message = f"{self.bump_default_message}\n\n{args.message}"
+        else:
+            message = self.bump_default_message
+
+        return self.local['bumpversion'][
+            '--message', message,
+            args.part,
+        ]
+
+    @localmethod
+    def build(self):
+        """build the python distribution"""
+        return (self.local.FG, self.local['python'][
+            'setup.py',
+            'sdist',
+            'bdist_wheel',
+        ])
+
+    @localmethod('versions', metavar='version', nargs='*',
+                 help="specific version(s) to upload (default: all)")
+    def upload(self, args):
+        """upload distribution(s) to pypi"""
+        if args.versions:
+            targets = [f'dist/{self.package_name}-{version}*'
+                       for version in args.versions]
+        else:
+            targets = [f'dist/{self.package_name}-*']
+        return (self.local.FG, self.local['twine']['upload'][targets])

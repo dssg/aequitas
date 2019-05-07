@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started with aequitas-report &mdash; aequitas  documentation</title>
+  <title>Welcome to Aequitas &mdash; aequitas  documentation</title>
   
 
   
@@ -17,34 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="The Bias and Fairness Audit Toolkit for Machine Learning" href="index.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -79,15 +81,11 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started with <em>aequitas-report</em></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#Input-machine-learning-predictions">Input machine learning predictions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">Get out measures of bias that you can tailor to your problem</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#The-Bias-Report-output">The Bias Report output</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Commandline-output">Commandline output</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to Aequitas</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Getting-started">Getting started</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
@@ -143,7 +141,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Getting started with <em>aequitas-report</em></li>
+      <li>Welcome to Aequitas</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -180,97 +178,103 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
-<div class="section" id="Getting-started-with-aequitas-report">
-<h1>Getting started with <em>aequitas-report</em><a class="headerlink" href="#Getting-started-with-aequitas-report" title="Permalink to this headline">¶</a></h1>
-<p>With aequitas-report uncovering bias is as simple as running a single
-command on a csv.</p>
-<div class="section" id="Input-machine-learning-predictions">
-<h2>Input machine learning predictions<a class="headerlink" href="#Input-machine-learning-predictions" title="Permalink to this headline">¶</a></h2>
-<p>After <a class="reference external" href="./installation.html">installing on your computer</a></p>
-<p>Run <code class="docutils literal notranslate"><span class="pre">aequitas-report</span></code> on <a class="reference external" href="https://github.com/dssg/aequitas/tree/master/examples">COMPAS
-data</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aequitas</span><span class="o">-</span><span class="n">report</span> <span class="o">--</span><span class="nb">input</span> <span class="n">compas_for_aequitas</span><span class="o">.</span><span class="n">csv</span>
-</pre></div>
+<div class="section" id="Welcome-to-Aequitas">
+<h1>Welcome to Aequitas<a class="headerlink" href="#Welcome-to-Aequitas" title="Permalink to this headline">¶</a></h1>
+<p>The Aequitas toolkit is a flexible bias-audit utility for algorithmic decision-making models, accessible via Python API, command line interface (CLI), and through our <a class="reference external" href="http://aequitas.dssg.io/">web application</a>.</p>
+<p>Use Aequitas to evaluate model performance across several bias and fairness metrics, and utilize the <a class="reference external" href="https://dsapp.uchicago.edu/wp-content/uploads/2018/05/metrictree-1200x750.png">most relevant metrics</a> to your process in model selection.</p>
+<p>Aequitas will help you:</p>
+<ul class="simple">
+<li><p>Understand where biases exist in your model(s)</p></li>
+<li><p>Compare the level of bias between groups in your sample population (bias disparity)</p></li>
+<li><p>Visualize absolute bias metrics and their related disparities for rapid comprehension and decision-making</p></li>
+</ul>
+<p>Our goal is to support informed and equitable action for both machine learnining practitioners and the decision-makers who rely on them.</p>
+<p>Aequitas is compatible with: <strong>Python 3.6+</strong></p>
+<div class="section" id="Getting-started">
+<h2>Getting started<a class="headerlink" href="#Getting-started" title="Permalink to this headline">¶</a></h2>
+<p>You can audit your risk assessment system for two types of biases:</p>
+<ul class="simple">
+<li><p>Biased actions or interventions that are not allocated in a way that’s representative of the population.</p></li>
+<li><p>Biased outcomes through actions or interventions that are a result of your system being wrong about certain groups of people.</p></li>
+</ul>
+<p>For both audits, you need the following data:</p>
+<ul class="simple">
+<li><p>Data about the specific attributes (race, gender, age, income, etc.) you want to audit for the the overall population considered for interventions</p></li>
+<li><p>The set of individuals in the above population that your risk assessment system recommended/ selected for intervention or action. <em>It’s important t this set come from the assessments made after the system has been built, and not from the data the machine learning system was “trained” on if you’re using the audit as a factor in model selection.</em></p></li>
+</ul>
+<p>If you want to audit for biases due to model or system errors, you also need to include actual outcomes (label values) for all individuals in the overall population.</p>
+<p>Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. In general, input data is a single table with the following columns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">score</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label_value</span></code> (for error-based metrics only)</p></li>
+<li><p>at least one attribute e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code> (attribute categories defined by user)</p></li>
+</ul>
 </div>
-<table border="1" class="docutils">
+</div>
+<div class="section" id="Bias-measures-tailored-to-your-problem">
+<h1>Bias measures tailored to your problem<a class="headerlink" href="#Bias-measures-tailored-to-your-problem" title="Permalink to this headline">¶</a></h1>
+<p>After <a class="reference external" href="./installation.html">installing on your computer</a></p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">aequitas-report</span></code> on <a class="reference external" href="https://github.com/dssg/aequitas/tree/master/examples">COMPAS data</a>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">compas_for_aequitas.csv</span></code> excerpt:</p>
+<table class="docutils align-center">
 <colgroup>
-<col width="12%" />
-<col width="22%" />
-<col width="30%" />
-<col width="13%" />
-<col width="23%" />
+<col style="width: 13%" />
+<col style="width: 23%" />
+<col style="width: 28%" />
+<col style="width: 14%" />
+<col style="width: 23%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">score</th>
-<th class="head">label_value</th>
-<th class="head">race</th>
-<th class="head">sex</th>
-<th class="head">age_cat</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age_cat</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>0</td>
-<td>1</td>
-<td>African-American</td>
-<td>Male</td>
-<td>25 - 45</td>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>African-American</p></td>
+<td><p>Male</p></td>
+<td><p>25 - 45</p></td>
 </tr>
-<tr class="row-odd"><td>1</td>
-<td>1</td>
-<td>Native American</td>
-<td>Female</td>
-<td>Less than 25</td>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>Native American</p></td>
+<td><p>Female</p></td>
+<td><p>Less than 25</p></td>
 </tr>
 </tbody>
 </table>
-<p>The input data at least has:</p>
-<ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">score</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">label_value</span></code></li>
-<li>at least one attribute e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code>.</li>
-</ul>
-<p><a class="reference external" href="./input_data.html">Getting started with input data</a></p>
-<p>Additionally, disparity is always defined in relation to a reference
-group. By default, Aequitas uses majority as the reference. <a class="reference external" href="./config.html">Defining a
-reference group</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aequitas</span><span class="o">-</span><span class="n">report</span> <span class="o">--</span><span class="nb">input</span> <span class="n">compas_for_aequitas</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
 </div>
-<div class="section" id="Get-out-measures-of-bias-that-you-can-tailor-to-your-problem">
-<h2>Get out measures of bias that you can tailor to your problem<a class="headerlink" href="#Get-out-measures-of-bias-that-you-can-tailor-to-your-problem" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="The-Bias-Report-output">
-<h3>The Bias Report output<a class="headerlink" href="#The-Bias-Report-output" title="Permalink to this headline">¶</a></h3>
-<p>The Bias Report produces a pdf that returns descriptive interpretation
-of the results along with three sets of tables.</p>
+<p><strong>Note:</strong> Disparites are always defined in relation to a reference group. By default, Aequitas uses the majority group within each attribute as the reference group. <a class="reference external" href="./config.html">Defining a reference group</a></p>
+<p>The Bias Report produces a pdf that returns descriptive interpretation of the results along with three sets of tables.</p>
 <ul class="simple">
-<li>Fairness Measures Results</li>
-<li>Bias Metrics Results</li>
-<li>Group Metrics Results</li>
+<li><p>Fairness Measures Results</p></li>
+<li><p>Bias Metrics Results</p></li>
+<li><p>Group Metrics Results</p></li>
 </ul>
-<p>Additionally, a csv is produced that contains the relevant data. More
-information about output <a class="reference external" href="./output_data.html">here</a>.</p>
-</div>
-<div class="section" id="Commandline-output">
-<h3>Commandline output<a class="headerlink" href="#Commandline-output" title="Permalink to this headline">¶</a></h3>
-<p>In the command line you will see The Bias Report, which returns counts
-for each attribute by group and then computes various fairness metrics.
-This is the same information that is captured in the csv output.</p>
+<p>Additionally, a csv is produced that contains the relevant data. More information about output <a class="reference external" href="./output_data.html">here</a>.</p>
+<p>In the command line you will see The Bias Report, which returns counts for each attribute by group and then computes various fairness metrics. This is the same information that is captured in the csv output.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    ___                    _ __
                    /   | ___  ____ ___  __(_) /_____ ______
                   / /| |/ _ \/ __ `/ / / / / __/ __ `/ ___/
                  / ___ /  __/ /_/ / /_/ / / /_/ /_/ (__  )
                 /_/  |_\___/\__, /\__,_/_/\__/\__,_/____/
                               /_/
-
-
-
 ____________________________________________________________________________
 
                       Bias and Fairness Audit Tool
 ____________________________________________________________________________
-
-
-
-
 
 Welcome to Aequitas-Audit
 Fairness measures requested: Statistical Parity,Impact Parity,FDR Parity,FPR Parity,FNR Parity,FOR Parity
@@ -304,8 +308,6 @@ Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;
 </pre></div>
 </div>
 </div>
-</div>
-</div>
 
 
            </div>
@@ -318,7 +320,7 @@ Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;
         <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="The Bias and Fairness Audit Toolkit for Machine Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="The Bias and Fairness Audit Toolkit for Machine Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -327,7 +329,7 @@ Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Center for Data Science and Public Policy.
+        &copy; Copyright 2018, Center for Data Science and Public Policy
 
     </p>
   </div>
@@ -344,32 +346,16 @@ Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
