@@ -23,17 +23,17 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
                          specific_measures=None, label_score_ref=None):
     """
-    Creates a dictionary of reference groups for each metric in a data_table
+    Creates a dictionary of reference groups for each metric in a data_table.
 
-   :param disparities_table: A disparity table. Output of bias.get_disparity or
+   :param disparities_table: a disparity table. Output of bias.get_disparity or
         fairness.get_fairness functions
     :param ref_group_flag: string indicating column indicates reference group
         flag value. Default is '_ref_group_value'.
     :param specific_measures: Limits reference dictionary to only specified
         metrics in a data table. Default is None.
-    :param label_score_ref: Defines a metric (ex: 'fpr' (false positive rate)
-        to mimic reference group when calculating label value and score
-        statistical significance. Default is None.
+    :param label_score_ref: Defines a metric, ex: 'fpr' (false positive rate)
+        from which to mimic reference group for label_value and score. Used for
+        statistical significance calculations in Bias() class. Default is None.
 
     :return: A dictionary
     """
@@ -82,7 +82,7 @@ class Plot(object):
                            'fdr_disparity', 'for_disparity',
                            'fpr_disparity', 'fnr_disparity')
 
-    # Define mapping for condiitonal coloring based on fairness
+    # Define mapping for conditional coloring based on fairness
     # determinations
     _metric_parity_mapping = {
         'ppr_disparity': 'Statistical Parity',
@@ -108,16 +108,16 @@ class Plot(object):
     }
 
     _significance_disparity_mapping = {
-        'ppr_disparity': 'score_significance',
-        'pprev_disparity': 'score_significance',
-        'precision_disparity': 'fp_significance',
-        'fdr_disparity': 'fp_significance',
-        'for_disparity': 'fn_significance',
-        'fpr_disparity': 'fp_significance',
-        'fnr_disparity': 'fn_significance',
-        'tpr_disparity': 'fn_significance',
-        'tnr_disparity': 'fp_significance',
-        'npv_disparity': 'fn_significance'
+        'ppr_disparity': 'ppr_significance',
+        'pprev_disparity': 'pprev_significance',
+        'precision_disparity': 'precision_significance',
+        'fdr_disparity': 'fdr_significance',
+        'for_disparity': 'fnr_significance',
+        'fpr_disparity': 'fpr_significance',
+        'fnr_disparity': 'fnr_significance',
+        'tpr_disparity': 'tpr_significance',
+        'tnr_disparity': 'tnr_significance',
+        'npv_disparity': 'npv_significance'
     }
 
     def __init__(self, key_metrics=default_absolute_metrics,
@@ -131,6 +131,9 @@ class Plot(object):
 
     @staticmethod
     def _nearest_quartile(x):
+        '''
+        Return nearest quartile for given value x.
+        '''
         rounded = round(x * 4) / 4
         if rounded > x:
             return rounded
@@ -165,7 +168,16 @@ class Plot(object):
     def _truncate_colormap(orig_cmap, min_value=0.0, max_value=1.0, num_colors=100):
         '''
         Use only part of a colormap (min_value to max_value) across a given number
-        of partiions.
+        of partitions.
+
+        :param orig_cmap: an existing Matplotlib colormap.
+        :param min_value: desired minimum value (0.0 to 1.0) for truncated
+            colormap. Default is 0.0.
+        :param max_value: desired maximum value (0.0 to 1.0) for truncated
+            colormap. Default is 1.0.
+        :param num_colors: number of colors to spread colormap gradient across
+            before truncating. Default is 100.
+        :return: Truncated color map
 
         Attribution: Adapted from: https://stackoverflow.com/questions/
         18926031/how-to-extract-a-subset-of-a-colormap-as-a-new-colormap-in-matplotlib
