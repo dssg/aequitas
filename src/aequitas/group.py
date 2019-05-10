@@ -11,9 +11,12 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 class Group(object):
     """
     """
-    def __init__(self):
+    all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
+                         'fnr', 'tpr', 'tnr', 'npv', 'prev')
+    def __init__(self, input_group_metrics=all_group_metrics):
         """
         """
+        self.absolute_metrics = input_group_metrics
         self.label_neg_count = lambda label_col: lambda x: \
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
@@ -220,7 +223,4 @@ class Group(object):
         """
         View list of all calculated absolute bias metrics in df
         """
-        return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
-                                           'fdr', 'npv', 'precision', 'ppr',
-                                           'pprev', 'prev'
-                                        ]).tolist()
+        return df.columns.intersection(self.absolute_metrics).tolist()
