@@ -112,13 +112,12 @@ class Group(object):
 
         return group_functions
 
-    def get_crosstabs(self, df, score_thresholds=None, model_id=1, attr_cols=None):
+    def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
         Creates univariate groups and calculates group metrics.
 
         :param df: a dataframe containing the following required columns [score,  label_value].
         :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id: the model ID on which to subset the df.
         :param attr_cols: optional, list of names of columns corresponding to
             group attributes (i.e., gender, age category, race, etc.).
 
@@ -127,10 +126,14 @@ class Group(object):
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
+
+        df_cols = set(df.columns)
+
         # check if all attr_cols exist in df
-        check = [col in df.columns for col in attr_cols]
-        if False in check:
+        # check = [col in df.columns for col in attr_cols]
+        if len(set(attr_cols) - df_cols) > 0:
             raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
+
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
@@ -144,7 +147,15 @@ class Group(object):
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
-        print('model_id, score_thresholds', model_id, score_thresholds)
+        if 'model_id' in df_cols:
+            models = df['model_id'].unique()
+            model_id_col = True
+        else:
+            model_id = 0
+            model_id_col = False
+
+        # print('model_id, score_thresholds', model_id, score_thresholds)
+        print('model_id, score_thresholds', score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
         df['rank_pct'] = df['rank_abs'] / len(df)
@@ -156,18 +167,22 @@ class Group(object):
         # for each group variable do
         for col in attr_cols:
             # find the priors_df
-            col_group = df.fillna({col: 'pd.np.nan'}).groupby(['model_id', col])
-            counts = col_group.size()
+            if 'model_id' in df_cols:
+                col_group = df.fillna({col: 'pd.np.nan'}).groupby(['model_id', col])
+                model_id_col = True
+            else:
+                col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+                model_id_col = False
 
-            print("::COUNTS::")
-            print('think this is the df ', col_group)
-            print(counts)
-            print()
+            counts = col_group.size()
+            print('COUNTS:::', counts)
+
+            add_model_id = lambda x: counts.reset_index()['model_id'].to_list() if x is True else [0] * len(counts)
 
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 # 'model_id': [model_id] * len(counts),
-                'model_id': col_group[model_id].to_list(),
+                'model_id': add_model_id(model_id_col),
                 'attribute_name': [col] * len(counts),
                 'attribute_value': counts.index.values,
                 'group_label_pos': col_group.apply(self.label_pos_count(
@@ -191,10 +206,6 @@ class Group(object):
 
                 for thres_val in thres_values:
                     flag = 0
-
-                    # To discuss with Pedro: believe this might be the reason
-                    # for cutoff error - if numbers are cumulative, per
-                    # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
 
                     # denote threshold as binary if numeric count_ones value
@@ -203,8 +214,8 @@ class Group(object):
                     for name, func in self.group_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
-                        print(feat_bias)
-                        print(model_id)
+
+                        add_model_id = lambda x: list(col_group['model_id']) if x is True else [0] * len(feat_bias)
 
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
@@ -225,6 +236,7 @@ class Group(object):
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
         return groups_df, attr_cols
+
 
     def list_absolute_metrics(self, df):
         """

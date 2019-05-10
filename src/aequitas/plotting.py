@@ -37,8 +37,7 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
     """
     ref_groups = {}
     ref_group_cols = \
-        list(disparities_table.columns[disparities_table.columns.str.contains(
-            ref_group_flag)])
+        list(disparities_table.columns[disparities_table.columns.str.contains(ref_group_flag)])
 
     if specific_measures:
         ref_group_cols = \
@@ -46,9 +45,11 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
              measure + ref_group_flag in ref_group_cols]
 
     attributes = list(disparities_table.attribute_name.unique())
+
     for attribute in attributes:
         attr_table = \
             disparities_table.loc[disparities_table['attribute_name'] == attribute]
+
         attr_refs = {}
         for col in ref_group_cols:
             metric_key = "".join(col.split(ref_group_flag))
