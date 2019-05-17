@@ -124,9 +124,9 @@ Suppose you are interested in False Positive Rate across groups. We can visualiz
 ``` 
 <img src="./docs/_static/fpr_metric.png">
 
-There are some very small groups in this data set, for example 18 and 32 samples in the Native American and Asian population groups.
+There are some very small groups in this data set, for example 18 and 32 samples in the Native American and Asian population groups, respectively.
 
-Aequitas includes an option to filter for a minimum group size: 
+Aequitas includes an option to filter out groups under a minimum group size threshold, as very small group size may be a contributing factor in model error rates: 
 ``` python
     from aequitas.plotting import Plot
     
