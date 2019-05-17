@@ -122,7 +122,7 @@ Suppose you are interested in False Positive Rate across groups. We can visualiz
     aqp = Plot()
     fpr_plot = aqp.plot_group_metric(xtab, 'fpr')
 ``` 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_metric.png">
+<img src="./docs/_static/fpr_metric.png">
 
 There are some very small groups in this data set, for example 18 and 32 samples in the Native American and Asian population groups.
 
@@ -133,7 +133,7 @@ Aequitas includes an option to filter for a minimum group size:
     aqp = Plot()
     fpr_plot = aqp.plot_group_metric(xtab, 'fpr', min_group_size=0.05)
 ``` 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_min_group.png">
+<img src="./docs/_static/fpr_min_group.png">
 
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
@@ -156,7 +156,7 @@ Let's look at False Positive Rate Disparity.
     fpr_disparity = aqp.plot_disparity(bdf, group_metric='fpr_disparity', 
                                        attribute_name='race')
 ``` 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_disparity.png">
+<img src="./docs/_static/fpr_disparity.png">
 
 
 
@@ -174,7 +174,7 @@ To visualize group False Positive Rate parity determinations, use ``Plot()`` cla
     fpr_fairness = aqp.plot_fairness_group(fdf, group_metric='fpr', title=True)
 ``` 
 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_fairness.png">
+<img src="./docs/_static/fpr_fairness.png">
 
 
 To visualize False Positive Rate Disparity fairness determinations, use ``Plot()`` class disparity_fairness methods:
@@ -182,7 +182,7 @@ To visualize False Positive Rate Disparity fairness determinations, use ``Plot()
     fpr_disparity_fairness = aqp.plot_fairness_disparity(fdf, group_metric='fpr', attribute_name='race')
 ``` 
 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_disparity_fairness.png">
+<img src="./docs/_static/fpr_disparity_fairness.png">
 
 
 
