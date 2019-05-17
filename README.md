@@ -156,7 +156,7 @@ Let's look at False Positive Rate Disparity.
     fpr_disparity = aqp.plot_disparity(bdf, group_metric='fpr_disparity', 
                                        attribute_name='race')
 ``` 
-<img src="./docs/_static/fpr_disparity.png">
+<img style="width: 50%; height: 50%" src="./docs/_static/fpr_disparity.png">
 
 
 
@@ -182,7 +182,7 @@ To visualize False Positive Rate Disparity fairness determinations, use ``Plot()
     fpr_disparity_fairness = aqp.plot_fairness_disparity(fdf, group_metric='fpr', attribute_name='race')
 ``` 
 
-<img src="./docs/_static/fpr_disparity_fairness.png">
+<img style="width: 50%; height: 50%" src="./docs/_static/fpr_disparity_fairness.png">
 
 
 
