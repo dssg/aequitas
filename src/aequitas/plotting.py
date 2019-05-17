@@ -238,8 +238,11 @@ class Plot(object):
         if len(ind) == 1:
             idx = ind[0]
         else:
-            raise ValueError("""failed to find only one index for the reference group for attribute_name = {attribute_name} and 
-                             attribute_value of reference = {ref_group_name} and model_id={model_id}""".format())
+            raise ValueError(f"failed to find only one index for the reference "
+                             f"group for attribute_name = {attribute_name} and "
+                             f"attribute_value of reference = {ref_group_name} "
+                             f"and model_id={model_id}".format())
+
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
@@ -618,7 +621,6 @@ class Plot(object):
 
         #     Remove axes and display the plot
         ax.axis('off')
-
 
 
     def plot_fairness_group(self, fairness_table, group_metric, ax=None,

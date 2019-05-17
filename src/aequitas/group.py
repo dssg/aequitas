@@ -187,10 +187,6 @@ class Group(object):
 
                 for thres_val in thres_values:
                     flag = 0
-
-                    # To discuss with Pedro: believe this might be the reason
-                    # for cutoff error - if numbers are cumulative, per
-                    # line 149 and line 150, why taking sum for k vs. max?
                     k = (df[thres_unit] <= thres_val).sum()
 
                     # denote threshold as binary if numeric count_ones value
