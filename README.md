@@ -114,18 +114,26 @@ The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, cal
     xtab, _ = g.get_crosstabs(df)
 ``` 
 
-The `Plot()` class can visualize a single group metric with `plot_group_metric()`, or a list of bias metrics with `plot_group_metric_all()`:
-
+The `Plot()` class can visualize a single group metric with `plot_group_metric()`, or a list of bias metrics with `plot_group_metric_all()`.
+Suppose you are interested in False Positive Rate across groups. We can visualize this metric in Aequitas: 
 ``` python
     from aequitas.plotting import Plot
     
     aqp = Plot()
-    selected_metrics = aqp.plot_group_metric_all(xtab, 
-                metrics=['ppr','pprev','fnr','fpr'], 
-                ncols=4)
+    fpr_plot = aqp.plot_group_metric(xtab, 'fpr')
 ``` 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/selected_group_metrics.png">
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_metric.png">
 
+There are some very small groups in this data set, for example 18 and 32 samples in the Native American and Asian population groups.
+
+Aequitas includes an option to filter for a minimum group size: 
+``` python
+    from aequitas.plotting import Plot
+    
+    aqp = Plot()
+    fpr_plot = aqp.plot_group_metric(xtab, 'fpr', min_group_size=0.05)
+``` 
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_min_group.png">
 
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
@@ -137,21 +145,18 @@ The crosstab dataframe is augmented by every succeeding class with additional la
                         original_df=df, 
                         ref_groups_dict={'race':'Caucasian', 'sex':'Male', 'age_cat':'25 - 45'}, 
                         alpha=0.05, 
-                        mask_significance=True)
+                        check_significance=False)
 ``` 
 [Learn more about reference group selection.](https://dssg.github.io/aequitas/config.html)
 
 
-The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given [fairness threshold]( https://dssg.github.io/aequitas/config.html) with ``plot_disparity()`` or multiple with ``plot_disparity_all()``:
+The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given [fairness threshold]( https://dssg.github.io/aequitas/config.html) with ``plot_disparity()`` or multiple with ``plot_disparity_all()``.
+Let's look at False Positive Rate Disparity. 
 ``` python
-    j = aqp.plot_disparity_all(bdf, 
-                metrics=['ppr_disparity', 'pprev_disparity', 'fnr_disparity', 
-                    'fpr_disparity', 'precision_disparity', 'fdr_disparity'], 
-                attributes=['race'], significance_alpha=0.05)
+    fpr_disparity = aqp.plot_disparity(bdf, group_metric='fpr_disparity', 
+                                       attribute_name='race')
 ``` 
-
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/selected_treemaps.png">
-
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_disparity.png">
 
 
 
@@ -164,25 +169,20 @@ Now you're ready to obtain metric parities with the ``Fairness()`` class:
 ``` 
 You now have parity determinations for your models that can be leveraged in model selection!
 
-To visualize fairness, use ``Plot()`` class fairness methods.
-
-To visualize ``'all'`` group absolute bias metric parity determinations:
+To visualize group False Positive Rate parity determinations, use ``Plot()`` class fairness methods:
 ``` python
-    fg = aqp.plot_fairness_group_all(fdf, ncols=5, metrics = "all")
+    fpr_fairness = aqp.plot_fairness_group(fdf, group_metric='fpr', title=True)
 ``` 
 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/all_fairness_group.png">
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_fairness.png">
 
 
-
-
-To visualize parity treemaps for multiple disparities, pass metrics of interest as a list:
+To visualize False Positive Rate Disparity fairness determinations, use ``Plot()`` class disparity_fairness methods:
 ``` python
-    f_maps = aqp.plot_fairness_disparity_all(fdf, metrics=['pprev_disparity', 'ppr_disparity'])
+    fpr_disparity_fairness = aqp.plot_fairness_disparity(fdf, group_metric='fpr', attribute_name='race')
 ``` 
 
-<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fairness_selected_disparities_race.png">
-
+<img src="https://github.com/dssg/aequitas/blob/master/docs/_static/fpr_disparity_fairness.png">
 
 
 
