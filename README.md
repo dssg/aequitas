@@ -177,7 +177,7 @@ To visualize group False Positive Rate parity determinations, use ``Plot()`` cla
 <img src="./docs/_static/fpr_fairness.png">
 
 
-To visualize False Positive Rate Disparity fairness determinations, use ``Plot()`` class disparity_fairness methods:
+To quickly review False Positive Rate Disparity fairness determinations, use ``Plot()`` class disparity_fairness methods:
 ``` python
     fpr_disparity_fairness = aqp.plot_fairness_disparity(fdf, group_metric='fpr', attribute_name='race')
 ``` 
