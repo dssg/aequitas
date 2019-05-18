@@ -167,9 +167,11 @@ Now you're ready to obtain metric parities with the ``Fairness()`` class:
     f = Fairness()
     fdf = f.get_group_value_fairness(bdf)
 ``` 
-You now have parity determinations for your models that can be leveraged in model selection!
+You now have parity determinations for your models that can be leveraged in model selection! Aequitas uses a default $\tau$ (disparity intolerance) of 80%. If a specific bias metric for a group is within this percentage of the reference group, the fairness determination is 'True.'
 
-To visualize group False Positive Rate parity determinations, use ``Plot()`` class fairness methods:
+To determine whether group False Positive Rates fall within the "fair" range, use ``Plot()`` class fairness methods.
+
+:
 ``` python
     fpr_fairness = aqp.plot_fairness_group(fdf, group_metric='fpr', title=True)
 ``` 
@@ -334,6 +336,23 @@ Provision your development environment via the shell script ``develop``:
 Common development tasks, such as deploying the webapp, may then be handled via ``manage``:
 
     manage --help
+
+#### Aequitas Metrics
+| Metric | Formula |  | Description |
+| ------------------------------------ | ------------------------------------ |  | ------------------------------------ |
+| **Predicted Positive** | $PP_g$ |  | The number of entities within a group where the decision is positive, i.e.,  $\widehat{Y}=1$.  |
+| **Total Predictive Positive** | K = $\sum_{A=a_1}^{A=a_n}$ $PP_{g(a_i)}$ |  | The total number of entities predicted positive across groups defined by $A$.                                 |
+| **Predicted Negative** | $PN_g$ |  | The number of entities within a group which decision is negative, i.e.,  $\widehat{Y}=0$.    |
+| **Predicted Prevalence** | $PPrev_g$ = $PP_g$\ \textbf{/}\ $|g| = \text{Pr(}\widehat{Y}\text{=1|A=}a_i)$  |  | The fraction of entities within a group which were predicted as positive. |
+| **Predicted Positive Rate** | $PPR_g$ = $PP_g$\ \textbf{/}\ $K = \text{Pr(a=}a_i|\widehat{Y}\text{=1)} $  |  | The fraction of the entities predicted as positive that belong to a certain group. |
+| **False Positive** | $FP_g$  |  | The number of entities of the group with $\widehat{Y}=1 \land Y=0$. |
+| **False Negative**       | $FN_g$ |  | The number of entities of the group with $\widehat{Y}=0 \land Y=1$.  |
+| **True Positive** | $TP_g$  |  | The number of entities of the group with  $\widehat{Y}=1 \land Y=1$. |
+| **True Negative** | $TN_g$  |  | The number of entities of the group with  $\widehat{Y}=0 \land Y=0$. |
+| **False Discovery Rate** | $FDR_g$ = $FP_g$\ \textbf{/}\ $PP_g = \text{Pr(Y=0|}\widehat{Y}\text{=1,A=}a_i)$  |  | The fraction of false positives of a group within the predicted positive of the group. |
+| **False Omission Rate** | $FOR_g$ = $FN_g$\ \textbf{/}\ $PN_g = \text{Pr(Y=1|}\widehat{Y}\text{=0,A=}a_i)$ |  | The fraction of false negatives of a group within the predicted negative of the group. |
+| **False Positive Rate** | $FPR_g$ = $FP_g$\ \textbf{/}\ $LN_g  = \text{Pr(}\widehat{Y}\text{=1|Y=0,A=}a_i)$ |  | The fraction of false positives of a group within the labeled negative of the group. |
+| **False Negative Rate** | $FNR_g$ = $FN_g$\ \textbf{/}\ $LP_g = \text{Pr(}\widehat{Y}\text{=0|Y=1,A=}a_i)$  |  | The fraction of false negatives of a group within the labeled positives of the group. |
 
 
 ## Citing Aequitas
