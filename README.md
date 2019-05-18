@@ -150,7 +150,8 @@ The crosstab dataframe is augmented by every succeeding class with additional la
 [Learn more about reference group selection.](https://dssg.github.io/aequitas/config.html)
 
 
-The ``Plot()`` class visualizes disparities as treemaps colored by disparity relationship to a given [fairness threshold]( https://dssg.github.io/aequitas/config.html) with ``plot_disparity()`` or multiple with ``plot_disparity_all()``.
+The ``Plot()`` class visualizes disparities as treemaps colored based on disparity relationship between a given group and the reference group with ``plot_disparity()`` or multiple with ``plot_disparity_all()``. Saturation is determined by a given [fairness threshold](https://dssg.github.io/aequitas/config.html).
+
 Let's look at False Positive Rate Disparity. 
 ``` python
     fpr_disparity = aqp.plot_disparity(bdf, group_metric='fpr_disparity', 
@@ -167,11 +168,9 @@ Now you're ready to obtain metric parities with the ``Fairness()`` class:
     f = Fairness()
     fdf = f.get_group_value_fairness(bdf)
 ``` 
-You now have parity determinations for your models that can be leveraged in model selection! Aequitas uses a default $\tau$ (disparity intolerance) of 80%. If a specific bias metric for a group is within this percentage of the reference group, the fairness determination is 'True.'
+You now have parity determinations for your models that can be leveraged in model selection!  If a specific bias metric for a group falls within a given percentage (based on the fairness threshold) of the reference group, the fairness determination is 'True.'
 
-To determine whether group False Positive Rates fall within the "fair" range, use ``Plot()`` class fairness methods.
-
-:
+To determine whether group False Positive Rates fall within the "fair" range, use ``Plot()`` class fairness methods:
 ``` python
     fpr_fairness = aqp.plot_fairness_group(fdf, group_metric='fpr', title=True)
 ``` 
@@ -179,7 +178,7 @@ To determine whether group False Positive Rates fall within the "fair" range, us
 <img src="./docs/_static/fpr_fairness.png">
 
 
-To quickly review False Positive Rate Disparity fairness determinations, use ``Plot()`` class disparity_fairness methods:
+To quickly review False Positive Rate Disparity fairness determinations, we can use ``Plot()`` class ``fairness_disparity()`` methods:
 ``` python
     fpr_disparity_fairness = aqp.plot_fairness_disparity(fdf, group_metric='fpr', attribute_name='race')
 ``` 
@@ -342,15 +341,15 @@ Below are descriptions of the 10 absolute bias metrics calculated by Aequitas.
 
 | Metric                        | Formula                                                                           | Description                                                                                                   | 
 |-------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------| 
-| **Predicted Positive**        | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20PP_g">                                                                           | The number of entities within a group where the decision is positive, i.e.,  <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Cwidehat%7BY%7D%3D1">.                | 
-| **Total Predictive Positive** | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20K%20%3D%20%5Csum_%7BA%3Da_1%7D%5E%7BA%3Da_n%7D%20SPP_%7Bg%28a_i%29%7D">                                      | The total number of entities predicted positive across groups defined by <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20A">.                               | 
-| **Predicted Negative**        | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20PN_g">                                                                             | The number of entities within a group which decision is negative, i.e.,  <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0">.                     | 
+| **Predicted Positive**        | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20PP_g">                                                                           | The number of entities within a group where the decision is positive, i.e.,  <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Cwidehat%7BY%7D%3D1.">                | 
+| **Total Predictive Positive** | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20K%20%3D%20%5Csum_%7BA%3Da_1%7D%5E%7BA%3Da_n%7D%20SPP_%7Bg%28a_i%29%7D">                                      | The total number of entities predicted positive across groups defined by <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20A.">                               | 
+| **Predicted Negative**        | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20PN_g">                                                                             | The number of entities within a group which decision is negative, i.e.,  <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0.">                     | 
 | **Predicted Prevalence**      | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%24%24PPrev_g%24%24%20%3D%20%24%24PP_g%24%24%5C%20%5Ctextbf%7B/%7D%5C%20%24%24%7Cg%7C%20%3D%20%5Ctext%7BPr%28%7D%5Cwidehat%7BY%7D%3D1%20%7C%20A%3Da_i%29">     | The fraction of entities within a group which were predicted as positive.                                     | 
 | **Predicted Positive Rate**   | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20PPR_g%20%3D%20PP_g%5C%20%5Ctextbf%7B/%7D%5C%20%24K%20%3D%20%5Ctext%7BPr%28a%3D%7Da_i%20%7C%20%5Cwidehat%7BY%7D%5Ctext%7B%3D1%29%7D">         | The fraction of the entities predicted as positive that belong to a certain group.                            | 
-| **False Positive**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0">.                                           | 
-| **False Negative**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1">.                                           | 
-| **True Positive**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1">.                                          | 
-| **True Negative**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0">.                                          | 
+| **False Positive**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0.">                                           | 
+| **False Negative**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1.">                                           | 
+| **True Positive**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1.">                                          | 
+| **True Negative**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0.">                                          | 
 | **False Discovery Rate**      | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FDR_g%20%3D%20FP_g%5C%20%5Ctextbf%7B/%7D%5C%20%24PP_g%20%3D%20%5Ctext%7BPr%28Y%3D0%7D%20%7C%20%5Cwidehat%7BY%7D%5Ctext%7B%3D1%2C%20A%3D%7Da_i%29">  | The fraction of false positives of a group within the predicted positive of the group.                        | 
 | **False Omission Rate**       | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FOR_g%20%3D%20FN_g%20%5C%20%5Ctextbf%7B/%7D%5C%20PN_g%20%3D%20%5Ctext%7BPr%28Y%3D1%7D%20%7C%20%5Cwidehat%7BY%7D%5Ctext%7B%3D0%2C%20A%3D%7Da_i%29%24">  | The fraction of false negatives of a group within the predicted negative of the group.                        | 
 | **False Positive Rate**       | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FPR_g%20%3D%20FP_g%5C%20%5Ctextbf%7B/%7D%5C%20LN_g%20%3D%20%5Ctext%7BPr%28%7D%5Cwidehat%7BY%7D%3D%201%20%7CY%3D0%2C%20A%3Da_i%29"> | The fraction of false positives of a group within the labeled negative of the group.                          | 
