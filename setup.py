@@ -35,7 +35,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name='aequitas',
-    version='0.36.0',
+    version='0.38.0',
     description="The bias and fairness audit toolkit.",
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -46,7 +46,7 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    license=LICENSE_PATH.read_text(),
+    license='https://github.com/dssg/aequitas/blob/master/LICENSE',
     zip_safe=False,
     keywords='fairness bias aequitas',
     classifiers=[
