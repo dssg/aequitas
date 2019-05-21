@@ -161,6 +161,7 @@ class Group(object):
             # find the priors_df
             col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
             counts = col_group.size()
+            print("COUNTS:::", counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
