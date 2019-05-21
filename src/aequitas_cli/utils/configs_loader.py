@@ -21,7 +21,7 @@ class Configs(object):
                  fairness_measures=original_fairness_measures,
                  plot_bias_disparities=(), plot_bias_metrics=(),
                  check_significance=False, selected_significance=False,
-                 mask_significance=True):
+                 mask_significance=True, alpha = 5e-2):
 
         self.ref_groups_method = ref_groups_method
         self.fairness_threshold = fairness_threshold
@@ -36,7 +36,8 @@ class Configs(object):
         self.plot_bias_disparities = plot_bias_disparities
         self.check_significance = check_significance
         self.selected_significance = selected_significance
-        self.mask_significance=mask_significance
+        self.mask_significance = mask_significance
+        self.alpha = alpha
 
     @staticmethod
     def load_configs(configs_path):
