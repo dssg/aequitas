@@ -37,12 +37,14 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
     """
     ref_groups = {}
     ref_group_cols = \
-        list(disparities_table.columns[disparities_table.columns.str.contains(ref_group_flag)])
+        set(disparities_table.columns[disparities_table.columns.str.contains(
+            ref_group_flag)])
 
+    # Note: specific measures is a set
     if specific_measures:
-        ref_group_cols = \
-            [measure + ref_group_flag for measure in specific_measures if
-             measure + ref_group_flag in ref_group_cols]
+        specific_measures.intersection({label_score_ref})
+        ref_group_cols = {measure + ref_group_flag for measure in specific_measures if
+             measure + ref_group_flag in ref_group_cols}
 
     attributes = list(disparities_table.attribute_name.unique())
 
@@ -52,17 +54,28 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
 
         attr_refs = {}
         for col in ref_group_cols:
+            if col in ('label' + ref_group_flag, 'score' + ref_group_flag):
+                continue
+
             metric_key = "".join(col.split(ref_group_flag))
             attr_refs[metric_key] = \
                 attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
         if label_score_ref:
-            if label_score_ref + ref_group_flag in ref_group_cols:
-                attr_refs['label_value'] = attr_refs[label_score_ref]
-                attr_refs['score'] = attr_refs[label_score_ref]
-            else:
-                raise ValueError("The specified reference measure for label"
-                                 " value and score is not included in the "
-                                 "data frame.")
+            tried = 0
+
+            if label_score_ref + ref_group_flag not in disparities_table.columns:
+                while (label_score_ref + ref_group_flag not in disparities_table.columns) and (tried <= len(specific_measures)):
+                    label_score_ref = next(iter(specific_measures))
+                    tried += 1
+
+                logging.warning("The specified reference measure for label "
+                                  "value and score is not included in the "
+                                  f"data frame. Using '{label_score_ref}' "
+                                  "reference group as label value and score "
+                                  "reference instead.")
+
+            attr_refs['label_value'] = attr_refs[label_score_ref]
+            attr_refs['score'] = attr_refs[label_score_ref]
 
         ref_groups[attribute] = attr_refs
 
@@ -226,8 +239,11 @@ class Plot(object):
         if len(ind) == 1:
             idx = ind[0]
         else:
-            raise ValueError("""failed to find only one index for the reference group for attribute_name = {attribute_name} and 
-                             attribute_value of reference = {ref_group_name} and model_id={model_id}""".format())
+            raise ValueError(f"failed to find only one index for the reference "
+                             f"group for attribute_name = {attribute_name} and "
+                             f"attribute_value of reference = {ref_group_name} "
+                             f"and model_id={model_id}".format())
+
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
 
@@ -531,42 +547,50 @@ class Plot(object):
             labels = sorted_df['attribute_value'].values
 
         # if df includes significance columns, add stars to indicate significance
-        if sorted_df.columns[
-            sorted_df.columns.str.contains('_significance')].value_counts().sum() > 0:
-        # unmasked significance
-        # find indices where related significance have smaller value than significance_alpha
-            if np.issubdtype(
-                    sorted_df[
-                        self._significance_disparity_mapping[related_disparity]].dtype,
-                    np.number):
-                to_star = sorted_df.loc[
-                    sorted_df[
-                        self._significance_disparity_mapping[related_disparity]] < significance_alpha].index.tolist()
+        if self._significance_disparity_mapping[related_disparity] in sorted_df.columns:
+
+            # truncated_signif_mapping = {k: v for k,v in self._significance_disparity_mapping.items() if v in sorted_df.columns}
+
+            if sorted_df.columns[
+                sorted_df.columns.str.contains('_significance')].value_counts().sum() > 0:
+
+            # unmasked significance
+            # find indices where related significance have smaller value than significance_alpha
+                if np.issubdtype(
+                        sorted_df[
+                            self._significance_disparity_mapping[related_disparity]].dtype,
+                            # truncated_signif_mapping[related_disparity]].dtype,
+                        np.number):
+                    to_star = sorted_df.loc[
+                        sorted_df[
+                            self._significance_disparity_mapping[related_disparity]] < significance_alpha].index.tolist()
+                            # truncated_signif_mapping[related_disparity]] < significance_alpha].index.tolist()
 
 
-            # masked significance
-            # find indices where attr values have True value for each of those two columns,
-            else:
-                to_star = sorted_df.loc[
-                    sorted_df[
-                        self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
-
-
-            # add stars to label value where significant
-            for idx in to_star:
-                # convert idx location to relative index in sorted df and label_values list
-                idx_adj = sorted_df.index.get_loc(idx)
-
-                # star significant disparities in visualizations based on significance level
-                if 0.10 >= significance_alpha > 0.05:
-                    significance_stars = '*'
-                elif 0.05 >= significance_alpha > 0.01:
-                    significance_stars = '**'
-                elif significance_alpha <= 0.01:
-                    significance_stars = '***'
+                # masked significance
+                # find indices where attr values have True value for each of those two columns,
                 else:
-                    significance_stars = ''
-                label_values[idx_adj] = label_values[idx_adj] + significance_stars
+                    to_star = sorted_df.loc[
+                        sorted_df[
+                            self._significance_disparity_mapping[related_disparity]] > 0].index.tolist()
+                            # truncated_signif_mapping[related_disparity]] > 0].index.tolist()
+
+
+                # add stars to label value where significant
+                for idx in to_star:
+                    # convert idx location to relative index in sorted df and label_values list
+                    idx_adj = sorted_df.index.get_loc(idx)
+
+                    # star significant disparities in visualizations based on significance level
+                    if 0.10 >= significance_alpha > 0.05:
+                        significance_stars = '*'
+                    elif 0.05 >= significance_alpha > 0.01:
+                        significance_stars = '**'
+                    elif significance_alpha <= 0.01:
+                        significance_stars = '***'
+                    else:
+                        significance_stars = ''
+                    label_values[idx_adj] = label_values[idx_adj] + significance_stars
 
 
         normed = sf.normalize_sizes(scaled_values, width, height)

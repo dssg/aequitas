@@ -113,6 +113,7 @@ The Aequitas ``Group()`` class creates a crosstab of your preprocessed data, cal
 The `Plot()` class can visualize a single group metric with `plot_group_metric()`, or a list of bias metrics with `plot_group_metric_all()`:
 
 ``` python
+    from aequitas.plotting import Plot
     p = Plot()
     selected_metrics = p.plot_group_metric_all(xtab, 
                 metrics=['ppr','pprev','fnr','fpr'], 
@@ -124,6 +125,7 @@ The `Plot()` class can visualize a single group metric with `plot_group_metric()
 
 The crosstab dataframe is augmented by every succeeding class with additional layers of information about biases, starting with bias disparities in the ``Bias()`` class. There are three ``get_disparity`` functions, one for each of the three ways to select a reference group. ``get_disparity_min_metric()`` and ``get_disparity_major_group()`` methods calculate a reference group automatically based on your data, while the user specifies reference groups for ``get_disparity_predefined_groups()``.
 ``` python
+    from aequitas.bias import Bias
     b = Bias()
     bdf = b.get_disparity_predefined_groups(xtab, 
                         original_df=df, 
@@ -149,6 +151,7 @@ The ``Plot()`` class visualizes disparities as treemaps colored by disparity rel
 
 Now you're ready to obtain metric parities with the ``Fairness()`` class:
 ``` python
+    from aequitas.fairness import Fairness
     f = Fairness()
     fdf = f.get_group_value_fairness(bdf)
 ``` 

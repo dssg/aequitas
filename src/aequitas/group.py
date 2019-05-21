@@ -11,9 +11,12 @@ __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Rese
 class Group(object):
     """
     """
-    def __init__(self):
+    all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
+                         'fnr', 'tpr', 'tnr', 'npv', 'prev')
+    def __init__(self, input_group_metrics=all_group_metrics):
         """
         """
+        self.absolute_metrics = input_group_metrics
         self.label_neg_count = lambda label_col: lambda x: \
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
@@ -128,9 +131,9 @@ class Group(object):
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
 
         df_cols = set(df.columns)
-
         # check if all attr_cols exist in df
         # check = [col in df.columns for col in attr_cols]
+
         if len(set(attr_cols) - df_cols) > 0:
             raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
 
@@ -178,7 +181,6 @@ class Group(object):
             print('COUNTS:::', counts)
 
             add_model_id = lambda x: counts.reset_index()['model_id'].to_list() if x is True else [0] * len(counts)
-
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 # 'model_id': [model_id] * len(counts),
@@ -215,7 +217,7 @@ class Group(object):
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
 
-                        add_model_id = lambda x: list(col_group['model_id']) if x is True else [0] * len(feat_bias)
+                        feat_model_id = lambda x: list(col_group['model_id']) if x is True else [0] * len(feat_bias)
 
                         metrics_df = pd.DataFrame({
                             'model_id': [model_id] * len(feat_bias),
@@ -242,7 +244,4 @@ class Group(object):
         """
         View list of all calculated absolute bias metrics in df
         """
-        return df.columns.intersection(['fpr', 'fnr', 'tpr', 'tnr', 'for',
-                                           'fdr', 'npv', 'precision', 'ppr',
-                                           'pprev', 'prev'
-                                        ]).tolist()
+        return df.columns.intersection(self.absolute_metrics).tolist()
