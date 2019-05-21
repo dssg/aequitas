@@ -707,8 +707,8 @@ class Bias(object):
 
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
-                        original_df.loc[:, name] = col_group.apply(func).reset_index(level=0, drop=True)
-
+                        original_df[name] = col_group.apply(
+                            func).reset_index(level=0, drop=True)
 
             # add columns for error-based significance
             # precision, tnr, fdr are based on false positives
