@@ -109,7 +109,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
-    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute, :]
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
@@ -119,8 +119,8 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     for col in aux_df.columns:
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
-            idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
-            aux_df.loc[idx, col] = 'Ref'
+            # idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
+            aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group], col] = 'Ref'
 
     map = {}
     aux_df = aux_df[def_cols + fairness_measures]
