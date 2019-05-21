@@ -45,7 +45,7 @@ class Bias(object):
                                  input_group_metrics=None, fill_divbyzero=None,
                                  check_significance=False,  alpha = 5e-2,
                                  mask_significance = True, label_score_ref='fpr',
-                                 selected_significance=None):
+                                 selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of
         group metrics using the group with the minimum value for each absolute
@@ -137,8 +137,8 @@ class Bias(object):
             return df
 
         else:
-            if selected_significance is None:
-                selected_significance = set( self.input_group_metrics + ['label_value', 'score'] )
+            if not selected_significance:
+                selected_significance = self.input_group_metrics + ['label_value', 'score']
 
             # add statistical_significance
             selected_significance = set( original_cols.intersection(selected_significance) )
@@ -179,7 +179,7 @@ class Bias(object):
                                   input_group_metrics=None,
                                   fill_divbyzero=None, check_significance=False,
                                   alpha = 5e-2, mask_significance=True,
-                                  selected_significance=None):
+                                  selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of group
         metrics using the majority group within each attribute as the reference
@@ -254,8 +254,8 @@ class Bias(object):
             return df
 
         else:
-            if selected_significance is None:
-                selected_significance = set( self.input_group_metrics + ['label_value', 'score'] )
+            if not selected_significance:
+                    selected_significance = self.input_group_metrics + ['label_value', 'score']
 
             selected_significance = set( original_cols.intersection(selected_significance) )
 
@@ -317,7 +317,7 @@ class Bias(object):
                                         fill_divbyzero=None,
                                         check_significance=False, alpha=5e-2,
                                         mask_significance=True,
-                                        selected_significance=None):
+                                        selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of group
         metrics using a predefined reference group (denominator) value for each
@@ -398,8 +398,8 @@ class Bias(object):
             return df
 
         else:
-            if selected_significance is None:
-                selected_significance = set( self.input_group_metrics + ['label_value', 'score'] )
+            if not selected_significance:
+                selected_significance = self.input_group_metrics + ['label_value', 'score']
 
             selected_significance = set( original_cols.intersection(selected_significance) )
 
@@ -605,7 +605,7 @@ class Bias(object):
     @classmethod
     def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
                                      score_thresholds=None,
-                                     attr_cols=None, alpha=5e-2, selected_significance=None):
+                                     attr_cols=None, alpha=5e-2, selected_significance=False):
         """
 
         :param original_df: a dataframe containing a required raw 'score' column
