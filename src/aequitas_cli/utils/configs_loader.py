@@ -20,7 +20,7 @@ class Configs(object):
                  ref_groups=None, db=None,
                  fairness_measures=original_fairness_measures,
                  plot_bias_disparities=(), plot_bias_metrics=(),
-                 check_significance=False, selected_significance=None,
+                 check_significance=False, selected_significance=False,
                  mask_significance=True):
 
         self.ref_groups_method = ref_groups_method
