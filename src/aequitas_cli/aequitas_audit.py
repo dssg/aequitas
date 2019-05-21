@@ -113,13 +113,13 @@ def audit(df, configs, model_id=1, preprocessed=False):
     if ref_groups_method == 'predefined' and configs.ref_groups:
         bias_df = b.get_disparity_predefined_groups(groups_model, df, configs.ref_groups,
                                                     check_significance=configs.check_significance,
-                                                    alpha=configs.alpha, label_score_ref='fpr',
+                                                    alpha=configs.alpha,
                                                     selected_significance=configs.selected_significance,
                                                     mask_significance=configs.mask_significance)
     elif ref_groups_method == 'majority':
         bias_df = b.get_disparity_major_group(groups_model, df,
                                               check_significance=configs.check_significance,
-                                              alpha=configs.alpha, label_score_ref='fpr',
+                                              alpha=configs.alpha,
                                               selected_significance=configs.selected_significance,
                                               mask_significance=configs.mask_significance)
     else:
