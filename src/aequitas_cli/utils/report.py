@@ -1,6 +1,6 @@
 import datetime
 import logging
-
+import warnings
 import pandas as pd
 from markdown2 import markdown
 from tabulate import tabulate
@@ -122,8 +122,20 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
             # idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
+
+            indicate_ref = lambda x, y: x if x != y else 'Ref'
+
             # set value in rows of new df for reference group equal to Ref
-            aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group], col] = 'Ref'
+            # with warnings.catch_warnings(record=True):
+            #     warnings.filterwarnings("ignore", category=SettingWithCopyWarning, lineno=131)
+            #     aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group], col] = 'Ref'
+
+            aux_df.loc[:, col] = aux_df[['attribute_value', ref_group]].apply(lambda x: indicate_ref(*x), axis=1)
+
+
+
+
+
 
     map = {}
     aux_df = aux_df[def_cols + fairness_measures]
