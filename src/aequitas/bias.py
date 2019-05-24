@@ -489,13 +489,13 @@ class Bias(object):
             # large enough that it is always greater than alpha
             normality_p = pd.np.inf
 
-            # skew test requires at least 8 samples
-            if len(sample) >= 8:
+            # skew test requires at least 20 samples
+            if len(sample) > 20:
                 _, normality_p = stats.normaltest(sample, axis=None, nan_policy='omit')
 
             # if tested normality is False or less than 8 samples, use levene
             # test to check equal variance between groups
-            if normality_p < alpha or len(sample) < 8:
+            if normality_p < alpha or len(sample) <= 20:
                 # if ref_group is not normal, can't use f-test or bartlett test
                 # for any samples, so check for equal variance against ref_group
                 # using levene test for all groups and return dict
@@ -585,6 +585,7 @@ class Bias(object):
         # run SciPy statistical significance test between each group and
         # reference group
         for attr_val, eq_var in sample_dict.items():
+
             _, difference_significance_p = stats.ttest_ind(
                 sample_dict[ref_group],
                 sample_dict[attr_val],
