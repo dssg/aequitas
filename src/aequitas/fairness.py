@@ -66,6 +66,7 @@ class Fairness(object):
                                          }
         else:
             self.fair_measures_depend = fair_measures_depend
+
         # the self.fair_measures represents the list of fairness_measures to be calculated by default
         self.fair_measures_supported = self.fair_measures_depend.keys()
 
@@ -93,6 +94,7 @@ class Fairness(object):
             self.fair_measures_supported = ['Statistical Parity', 'Impact Parity']
         return self.fair_measures_supported
 
+
     def get_group_value_fairness(self, bias_df, tau=None, fair_measures_requested=None):
         """
         Calculates the fairness measures defined in fair_measures_requested
@@ -111,31 +113,35 @@ class Fairness(object):
             tau = self.tau
         if not fair_measures_requested:
             fair_measures_requested = self.fair_measures_supported
+
         for fair, input in self.fair_measures_depend.items():
             if fair in fair_measures_requested:
-                bias_df.loc[:,fair] = bias_df[input].apply(self.fair_eval(tau))
-        for fair, input in self.type_parity_depend.items():
 
+                bias_df[fair] = bias_df[input].apply(self.fair_eval(tau))
+
+        for fair, input in self.type_parity_depend.items():
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
-                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
+                    bias_df[fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
                 else:
-                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
+                    bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
             elif input[1] in bias_df.columns:
-                bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
+                bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
                 print('get_group_value_fairness: No Parity measure input found on bias_df')
+
         for fair, input in self.high_level_fairness_depend.items():
             if input[0] in bias_df.columns:
                 if input[1] in bias_df.columns:
-                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
+                    bias_df[fair] = bias_df.apply(self.high_level_pair_eval(input[0], input[1]), axis=1)
                 else:
-                    bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
+                    bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[0]), axis=1)
             elif input[1] in bias_df.columns:
-                bias_df.loc[:,fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
+                bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
         if 'Unsupervised Fairness' not in bias_df.columns and 'Supervised Fairness' not in bias_df.columns:
             logging.info('get_group_value_fairness: No high level measure input found on bias_df' + input[1])
         return bias_df
+
 
     def _fill_groupby_attribute_fairness(self, groupby_obj, key_columns,
                                         group_attribute_df, measures):
@@ -189,6 +195,7 @@ class Fairness(object):
                                                                   highlevel_cols)
         return group_attribute_df
 
+
     def get_overall_fairness(self, group_attribute_df):
         """
         Calculates overall fairness regardless of the group_attributes.
@@ -214,6 +221,7 @@ class Fairness(object):
         else:
             overall_fairness['Overall Fairness'] = 'Undefined'
         return overall_fairness
+
 
     def list_parities(self, df):
         """
