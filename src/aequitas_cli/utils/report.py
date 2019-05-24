@@ -121,19 +121,15 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     for col in aux_df.columns:
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
-            # idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
-
-            indicate_ref = lambda x, y: x if x != y else 'Ref'
 
             # set value in rows of new df for reference group equal to Ref
-            # with warnings.catch_warnings(record=True):
-            #     warnings.filterwarnings("ignore", category=SettingWithCopyWarning, lineno=131)
-            #     aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group], col] = 'Ref'
-
-            aux_df.loc[:, col] = aux_df[['attribute_value', ref_group]].apply(lambda x: indicate_ref(*x), axis=1)
+            with warnings.catch_warnings(record=True):
+                warnings.filterwarnings("ignore", category=Warning, lineno=127)
+                aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group], col] = 'Ref'
 
 
-
+            # indicate_ref = lambda x, y: x if x != y else 'Ref'
+            # aux_df.loc[:, col] = aux_df[['attribute_value', ref_group]].apply(lambda x: indicate_ref(*x), axis=1)
 
 
 
@@ -202,7 +198,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
         else:
             colstr = colstr.split(' ')[0].upper() + ' Disparity'
         map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
+        aux_df.loc[:,col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
     # this is hardcoded. If metrics supported by aequitas change this needs to change
     cols_order = ['Attribute Value', 'PPR Disparity', 'PPREV Disparity', 'FDR Disparity', 'FPR Disparity', 'FOR Disparity',
