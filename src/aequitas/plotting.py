@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors
 import matplotlib.cm
 
-
 from aequitas import squarify_flipped as sf
 
 logging.getLogger(__name__)
@@ -51,6 +50,7 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
     for attribute in attributes:
         attr_table = \
             disparities_table.loc[disparities_table['attribute_name'] == attribute]
+
         attr_refs = {}
         for col in ref_group_cols:
             if col in ('label' + ref_group_flag, 'score' + ref_group_flag):

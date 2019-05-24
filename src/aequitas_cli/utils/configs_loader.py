@@ -44,7 +44,11 @@ class Configs(object):
         try:
             if configs_path:
                 with open(configs_path, 'r') as stream:
-                    configs_fromfile = yaml.load(stream)
+                    # recommended for loading untrusted input.
+                    configs_fromfile = yaml.load(stream, Loader=yaml.SafeLoader)
+                    # currently (PyYAML 5.1) FullLoader is default loader called by
+                    # yaml.load(input) (after issuing the warning)
+                    # configs_fromfile = yaml.load(stream, Loader=yaml.FullLoader)
             else:
                 configs_fromfile = {}
         except FileNotFoundError:

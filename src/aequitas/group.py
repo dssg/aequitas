@@ -1,5 +1,5 @@
 import logging
-
+import warnings
 import pandas as pd
 
 logging.getLogger(__name__)
@@ -115,25 +115,60 @@ class Group(object):
 
         return group_functions
 
-    def get_crosstabs(self, df, score_thresholds=None, model_id=1, attr_cols=None):
+
+
+    def _check_model_id(self, df, method_table_name):
+        if 'model_id' in df.columns:
+            df_models = df.model_id.unique()
+            if len(df_models) != 1:
+                raise ValueError('This method requires one and only one model_id in the dataframe. '
+                                 f'Tip: Check that {method_table_name}.model_id.unique() returns a one-element array. ')
+            else:
+                return df_models[0]
+        else:
+            return 0
+
+
+    def get_multimodel_crosstabs(self, df, score_thresholds=None, attr_cols=None):
+        df_models = df.model_id.unique()
+        crosstab_list = []
+        attr_cols = {}
+        if len(df_models) > 1:
+            for model in df_models:
+                model_df = df.loc[df['model_id'] == model]
+                model_crosstab, model_attr_cols = self.get_crosstabs(model_df, score_thresholds=score_thresholds, attr_cols=attr_cols)
+                crosstab_list.append(model_crosstab)
+                attr_cols.add(model_attr_cols)
+
+            return pd.concat(crosstab_list, ignore_index=True), list(attr_cols)
+        else:
+            return self.get_crosstabs(df, score_thresholds=score_thresholds, attr_cols=attr_cols)
+
+
+
+    def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
         Creates univariate groups and calculates group metrics.
 
         :param df: a dataframe containing the following required columns [score,  label_value].
         :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param model_id: the model ID on which to subset the df.
         :param attr_cols: optional, list of names of columns corresponding to
             group attributes (i.e., gender, age category, race, etc.).
 
         :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
+        model_id = self._check_model_id(df, method_table_name='df')
+
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
+
         # check if all attr_cols exist in df
-        check = [col in df.columns for col in attr_cols]
-        if False in check:
+        # check = [col in df.columns for col in attr_cols]
+        df_cols = set(df.columns)
+        if len(set(attr_cols) - df_cols) > 0:
             raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
+
         # check if all columns are strings:
         non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
         if non_string_cols.empty is False:
@@ -143,7 +178,10 @@ class Group(object):
         count_ones = None  # it also serves as flag to set parameter to 'binary'
 
         if not score_thresholds:
-            df['score'] = df['score'].astype(float)
+            with warnings.catch_warnings(record=True) as w:
+                warnings.filterwarnings("ignore", message="A value is trying to be set on a copy of a slice from a DataFrame.\nTry using .loc[row_indexer,col_indexer] = value instead")
+                df.loc[:, 'score'] = df['score'].astype(float)
+
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
@@ -161,7 +199,6 @@ class Group(object):
             # find the priors_df
             col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
             counts = col_group.size()
-            print("COUNTS:::", counts)
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
                 'model_id': [model_id] * len(counts),
@@ -215,6 +252,7 @@ class Group(object):
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
         return groups_df, attr_cols
+
 
     def list_absolute_metrics(self, df):
         """

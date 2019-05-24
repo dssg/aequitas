@@ -1,5 +1,5 @@
 import logging
-
+import warnings
 from aequitas.plotting import assemble_ref_groups
 
 import pandas as pd
@@ -675,7 +675,11 @@ class Bias(object):
 
         count_ones = None
         if not score_thresholds:
-            original_df['score'] = original_df['score'].astype(float)
+            with warnings.catch_warnings(record=True) as w:
+                warnings.filterwarnings("ignore",
+                                        message="A value is trying to be set on a copy of a slice from a DataFrame.\nTry using .loc[row_indexer,col_indexer] = value instead")
+                original_df.loc[:, 'score'] = original_df['score'].astype(float)
+
             count_ones = original_df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
