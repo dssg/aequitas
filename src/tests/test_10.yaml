@@ -14,3 +14,4 @@ fairness_threshold: 0.5
 
 plot_bias_metrics: ["for", "fpr", "fnr"]
 plot_bias_disparities: ["precision", "fpr", "fdr", "for"]
+plot_disparity_attributes: ["class"]

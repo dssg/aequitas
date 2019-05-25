@@ -339,6 +339,7 @@ class Plot(object):
                 plot_table = group_table.dropna(axis=0, subset=[group_metric])
 
                 model_table = plot_table.loc[plot_table['model_id'] == model]
+
             else:
                 model_table = group_table.loc[group_table['model_id'] == model]
 
