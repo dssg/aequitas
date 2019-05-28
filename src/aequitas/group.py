@@ -130,6 +130,17 @@ class Group(object):
 
 
     def get_multimodel_crosstabs(self, df, score_thresholds=None, attr_cols=None):
+        """
+        Calls `get_crosstabs()` for univariate groups and calculates group
+        metrics for results from multiple models.
+
+        :param df: a dataframe containing the following required columns [score,  label_value].
+        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param attr_cols: optional, list of names of columns corresponding to
+            group attributes (i.e., gender, age category, race, etc.).
+
+        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
+        """
         df_models = df.model_id.unique()
         crosstab_list = []
         if len(df_models) > 1:
@@ -138,6 +149,7 @@ class Group(object):
                 model_crosstab, model_attr_cols = self.get_crosstabs(model_df, score_thresholds=score_thresholds, attr_cols=attr_cols)
                 crosstab_list.append(model_crosstab)
 
+            # Note: only returns model_attr_cols from last iteration, as all will be same
             return pd.concat(crosstab_list, ignore_index=True), model_attr_cols
         else:
             return self.get_crosstabs(df, score_thresholds=score_thresholds, attr_cols=attr_cols)
@@ -146,7 +158,8 @@ class Group(object):
 
     def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
-        Creates univariate groups and calculates group metrics.
+        Creates univariate groups and calculates group metrics for results
+        from a single model.
 
         :param df: a dataframe containing the following required columns [score,  label_value].
         :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }

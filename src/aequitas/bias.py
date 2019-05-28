@@ -218,7 +218,6 @@ class Bias(object):
         if not fill_divbyzero:
             fill_divbyzero = self.fill_divbyzero
 
-
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:

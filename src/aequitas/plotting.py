@@ -300,17 +300,44 @@ class Plot(object):
 
 
 
-    def multimodel_plot_group_metric(self, group_table, group_metric, ax_lim=None,
-                               ncols=3, title=True, label_dict=None, show_figure=True,
-                               min_group_size = None, sharey=True):
+    def multimodel_plot_group_metric(self, group_table, group_metric,
+                                     ncols=3, title=True, label_dict=None,
+                                     show_figure=True, selected_models=None,
+                                     min_group_size = None):
+        """
+        Plot a single group metric across all attribute groups for multiple models.
 
-        df_models = group_table.model_id.unique()
+        :param group_table: group table. Output of of group.get_crosstabs() or
+            bias.get_disparity functions.
+        :param group_metric: the metric to plot. Must be a column in the group_table.
+        :param ncols: The number of subplots to plot per row visualization
+            figure.
+            Default is 3.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param label_dict: optional, dictionary of replacement labels for data.
+            Default is None.
+        :param show_figure: Whether to show figure (plt.show()). Default is
+            True.
+        :param selected_models: which models to visualize. Default is all models in group_table.
+        :param min_group_size: minimum size for groups to include in visualization
+            (as a proportion of total sample).
+        :return: A Matplotlib axis
+        """
+        # requirement: at least two model_id values
+        df_models = self._check_multiple_models(group_table, method_table_name='group_table')
+
+        if not selected_models:
+            selected_models = df_models
+
+        plot_table = group_table.loc[group_table['model_id'].isin(selected_models)]
+
+
         num_metrics = len(df_models)
 
         total_plot_width = 25
 
         fig, axs, rows, axes_to_remove = self.generate_axes(ncols=ncols, num_metrics=num_metrics,
-                                                       total_plot_width=total_plot_width, sharey=sharey)
+                                                       total_plot_width=total_plot_width, sharey=True)
 
         # set a different distribution to be plotted in each subplot
         ax_col = -1
@@ -319,34 +346,34 @@ class Plot(object):
 
         for model in df_models:
 
-            if group_table.loc[group_table['model_id'] == model, group_metric].isnull().all():
+            if plot_table.loc[plot_table['model_id'] == model, group_metric].isnull().all():
                 logging.warning(f"Cannot plot metric '{group_metric}', only NaN values.")
                 axes_to_remove += 1
                 continue
 
-            elif group_table.loc[group_table['model_id'] == model, group_metric].isnull().any():
+            elif plot_table.loc[plot_table['model_id'] == model, group_metric].isnull().any():
                 # determine which group(s) have missing values
-                missing = ", ".join(group_table.loc[(group_table['model_id'] == model) &
-                                                    (group_table[
+                missing = ", ".join(plot_table.loc[(plot_table['model_id'] == model) &
+                                                    (plot_table[
                                                          group_metric].isnull()), 'attribute_value'].values.tolist())
 
-                attr = ", ".join(group_table.loc[(group_table['model_id'] == model) &
-                                                 (group_table[
+                attr = ", ".join(plot_table.loc[(plot_table['model_id'] == model) &
+                                                 (plot_table[
                                                       group_metric].isnull()), 'attribute_name'].values.tolist())
 
                 logging.warning(f"Model {model} '{attr}' group '{missing}' value for metric "
                                 f"'{group_metric}' is NA, group not included in visualization.")
-                plot_table = group_table.dropna(axis=0, subset=[group_metric])
+                plot_table = plot_table.dropna(axis=0, subset=[group_metric])
 
                 model_table = plot_table.loc[plot_table['model_id'] == model]
 
             else:
-                model_table = group_table.loc[group_table['model_id'] == model]
+                model_table = plot_table.loc[plot_table['model_id'] == model]
 
             current_subplot, ax_row, ax_col = self.iterate_subplots(axs, ncols, rows, ax_col, ax_row)
 
             self.plot_group_metric(group_table=model_table, group_metric=group_metric,
-                                   ax=current_subplot, ax_lim=ax_lim, title=title, label_dict=label_dict,
+                                   ax=current_subplot, ax_lim=None, title=title, label_dict=label_dict,
                                    min_group_size = min_group_size)
             col_num += 1
 
@@ -361,22 +388,49 @@ class Plot(object):
         return fig
 
 
-    def multimodel_plot_fairness_group(self, fairness_table, group_metric, ax_lim=None,
+    def multimodel_plot_fairness_group(self, fairness_table, group_metric,
                                ncols=3, title=True, label_dict=None, show_figure=True,
-                               min_group_size = None, sharey=True):
+                               selected_models=None, min_group_size = None):
+        """
+        Plot a single group metric colored by parity determination across all
+        attribute groups for multiple models.
 
+        :param fairness_table: a fairness table. Output of a Fairness.get_fairness
+            function.
+        :param group_metric: the metric to plot. Must be a column in the group_table.
+        :param ncols: The number of subplots to plot per row visualization
+            figure.
+            Default is 3.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param label_dict: optional, dictionary of replacement labels for data.
+            Default is None.
+        :param show_figure: Whether to show figure (plt.show()). Default is
+            True.
+        :param selected_models: which models to visualize. Default is all models in fairness_table.
+        :param min_group_size: minimum size for groups to include in visualization
+            (as a proportion of total sample)
+
+        :return: A Matplotlib axis
+
+        """
         parity_list = list(fairness_table.columns[fairness_table.columns.str.contains(' Parity')])
         if len(parity_list) < 1:
             raise ValueError("multimodel_plot_fairness_disparity: No parity determinations found in fairness_table.")
 
-        df_models = fairness_table.model_id.unique()
-        num_metrics = len(df_models)
+        # requires at least 2 models
+        df_models = self._check_multiple_models(fairness_table, method_table_name='fairness_table')
 
+        if not selected_models:
+            selected_models = df_models
+
+        plot_table = fairness_table.loc[fairness_table['model_id'].isin(selected_models)]
+
+        num_metrics = len(df_models)
 
         total_plot_width = 25
 
         fig, axs, rows, axes_to_remove = self.generate_axes(ncols=ncols, num_metrics=num_metrics,
-                                                       total_plot_width=total_plot_width, sharey=sharey)
+                                                       total_plot_width=total_plot_width, sharey=True)
 
         # set a different distribution to be plotted in each subplot
         ax_col = -1
@@ -388,35 +442,35 @@ class Plot(object):
 
         for model in df_models:
 
-            if fairness_table.loc[fairness_table['model_id'] == model, group_metric].isnull().all():
+            if plot_table.loc[plot_table['model_id'] == model, group_metric].isnull().all():
                 logging.warning(f"Cannot plot metric '{group_metric}', only NaN values.")
                 axes_to_remove += 1
                 continue
 
-            elif fairness_table.loc[fairness_table['model_id'] == model, group_metric].isnull().any():
+            elif plot_table.loc[plot_table['model_id'] == model, group_metric].isnull().any():
                 # determine which group(s) have missing values
-                missing = ", ".join(fairness_table.loc[(fairness_table['model_id'] == model) &
-                                                       (fairness_table[
+                missing = ", ".join(plot_table.loc[(plot_table['model_id'] == model) &
+                                                       (plot_table[
                                                             group_metric].isnull()), 'attribute_value'].values.tolist())
 
-                attr = ", ".join(fairness_table.loc[(fairness_table['model_id'] == model) &
-                                                    (fairness_table[
+                attr = ", ".join(plot_table.loc[(plot_table['model_id'] == model) &
+                                                    (plot_table[
                                                          group_metric].isnull()), 'attribute_name'].values.tolist())
 
                 logging.warning(f"Model {model} '{attr}' group '{missing}' value for metric "
                                 f"'{group_metric}' is NA, group not included in visualization.")
 
-                plot_table = fairness_table.dropna(axis=0, subset=[group_metric])
+                plot_table = plot_table.dropna(axis=0, subset=[group_metric])
 
                 model_table = plot_table.loc[plot_table['model_id'] == model]
 
             else:
-                model_table = fairness_table.loc[fairness_table['model_id'] == model]
+                model_table = plot_table.loc[plot_table['model_id'] == model]
 
             current_subplot, ax_row, ax_col = self.iterate_subplots(axs, ncols, rows, ax_col, ax_row)
 
             self.plot_fairness_group(fairness_table=model_table, group_metric=group_metric,
-                                   ax=current_subplot, ax_lim=ax_lim, title=title, label_dict=label_dict,
+                                   ax=current_subplot, ax_lim=None, title=title, label_dict=label_dict,
                                    min_group_size = min_group_size)
 
 
@@ -439,24 +493,48 @@ class Plot(object):
     def multimodel_plot_disparity(self, disparity_table, group_metric,
                                   attribute_name, color_mapping=None,
                                   label_dict=None, title=True, show_figure=True,
-                                  highlight_fairness=False, min_group_size=None,
-                                  significance_alpha=0.05, ncols=3, sharey=True):
-        df_models = disparity_table.model_id.unique()
-        num_metrics = len(df_models)
+                                  highlight_fairness=True, selected_models=None,
+                                  min_group_size=None, significance_alpha=0.05):
+        """
+        Create treemaps to compare multiple model values for a single bias
+        disparity metric across attribute groups.
 
-        total_plot_width = 25
+        Adapted from https://plot.ly/python/treemaps/,
+        https://gist.github.com/gVallverdu/0b446d0061a785c808dbe79262a37eea,
+        and https://fcpython.com/visualisation/python-treemaps-squarify-matplotlib
 
-        fig, axs, rows, axes_to_remove = self.generate_axes(ncols=ncols, num_metrics=num_metrics,
-                                                       total_plot_width=total_plot_width,
-                                                            sharey=sharey, hspace=0.5,
-                                                            indiv_height=8)
+        :param disparity_table: a disparity table. Output of bias.get_disparity or
+            fairness.get_fairness function.
+        :param group_metric: the metric to plot. Must be a column in the
+            disparity_table.
+        :param attribute_name: which attribute to plot group_metric across.
+        :param color_mapping: matplotlib colormapping for treemap value boxes.
+        :param label_dict: optional, dictionary of replacement labels for data.
+            Default is None.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param highlight_fairness: whether to highlight treemaps by disparity
+            magnitude, or by related fairness determination.
+        :param show_figure: Whether to show figure (plt.show()). Default is
+            True.
+        :param selected_models: which models to visualize. Default is all models in disparity_table.
+        :param min_group_size: minimum proportion of total group size (all data)
+            a population group must meet in order to be included in bias metric
+            visualization.
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
 
-        # set a different distribution to be plotted in each subplot
-        ax_col = -1
-        ax_row = 0
-        col_num = 0
+        :return: A Matplotlib figure
+        """
+        # requires at least 2 models
+        df_models = self._check_multiple_models(disparity_table, method_table_name='disparity_table')
 
-        if group_metric + '_disparity' not in disparity_table.columns:
+        if not selected_models:
+            selected_models = df_models
+
+        plot_table = disparity_table.loc[disparity_table['model_id'].isin(selected_models)]
+
+        if group_metric + '_disparity' not in plot_table.columns:
             related_disparity = group_metric
 
         else:
@@ -465,8 +543,21 @@ class Plot(object):
         viz_title = \
             f"MODEL COMPARISON: {related_disparity.replace('_', ' ').upper()}"
 
+        num_metrics = len(df_models)
+        ncols=3
+        total_plot_width = 25
+
+        fig, axs, rows, axes_to_remove = self.generate_axes(
+            ncols=ncols, num_metrics=num_metrics, total_plot_width=total_plot_width,
+            sharey=True, hspace=0.5, indiv_height=8)
+
+        # set a different distribution to be plotted in each subplot
+        ax_col = -1
+        ax_row = 0
+        col_num = 0
+
         for model in df_models:
-            model_table = disparity_table.loc[disparity_table['model_id'] == model]
+            model_table = plot_table.loc[plot_table['model_id'] == model]
 
             current_subplot, ax_row, ax_col = self.iterate_subplots(axs, ncols, rows, ax_col, ax_row)
 
@@ -494,21 +585,48 @@ class Plot(object):
 
 
 
-    def multimodel_plot_fairness_disparity(self, disparity_table, group_metric,
+    def multimodel_plot_fairness_disparity(self, fairness_table, group_metric,
                                            attribute_name, label_dict=None,
-                                           title=True, show_figure=True,
-                                           min_group_size=None, significance_alpha=0.05,
-                                           ncols=3, sharey=True):
+                                           title=True, show_figure=True, selected_models=None,
+                                           min_group_size=None, significance_alpha=0.05):
+        """
+        Create treemaps to compare multiple model fairness determinations for a
+        single bias disparity metric across attribute groups.
 
+        :param fairness_table: a fairness table. Output of a Fairness.get_fairness
+            function.
+        :param group_metric: the metric to plot. Must be a column in the
+            disparity_table.
+        :param attribute_name: which attribute to plot group_metric across.
+        :param color_mapping: matplotlib colormapping for treemap value boxes.
+        :param label_dict: optional, dictionary of replacement labels for data.
+            Default is None.
+        :param title: whether to include a title in visualizations. Default is True.
+        :param show_figure: Whether to show figure (plt.show()). Default is
+            True.
+        :param selected_models: which models to visualize. Default is all models in fairness_table.
+        :param min_group_size: minimum proportion of total group size (all data)
+            a population group must meet in order to be included in bias metric
+            visualization.
+        :param significance_alpha: statistical significance level. Used to
+            determine visual representation of significance (number of
+            asterisks on treemap).
+
+        :return: A Matplotlib figure
+        """
         return self.multimodel_plot_disparity(
-            disparity_table=disparity_table, group_metric=group_metric,
+            disparity_table=fairness_table, group_metric=group_metric,
             attribute_name=attribute_name, label_dict=label_dict, title=title,
-            show_figure=show_figure, highlight_fairness=True, min_group_size=min_group_size,
-            significance_alpha=significance_alpha, ncols=ncols, sharey=sharey)
+            show_figure=show_figure, selected_models=selected_models,
+            highlight_fairness=True, min_group_size=min_group_size,
+            significance_alpha=significance_alpha)
 
 
     @classmethod
     def _check_model_id(cls, df, method_table_name):
+        """
+        Ensure single model in df, return model_id if so
+        """
         if 'model_id' in df.columns:
             df_models = df.model_id.unique()
             if len(df_models) != 1:
@@ -521,6 +639,9 @@ class Plot(object):
 
     @classmethod
     def _check_multiple_models(cls, df, method_table_name):
+        """
+        Ensure multiple models in df, return model_ids if so
+        """
         if 'model_id' in df.columns:
             df_models = df.model_id.unique()
             if len(df_models) < 2:
@@ -912,7 +1033,7 @@ class Plot(object):
         This function plots absolute group metrics as indicated by the config file,
         colored based on calculated parity.
 
-        :param fairness_table: a fairness table. Output of fairness.get_fairness
+        :param fairness_table: fairness table. Output of a Fairness.get_fairness
             function.
         :param group_metric: the fairness metric to plot. Must be a column in the fairness_table.
         :param ax: a matplotlib Axis. If not passed a new figure will be created.
@@ -1463,7 +1584,8 @@ class Plot(object):
         """
         Plot multiple metrics at once from a fairness object table.
 
-        :param fairness_table: output of fairness.get_fairness functions.
+        :param fairness_table: fairness table. Output of a Fairness.get_fairness_
+            function.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
                 - Predicted Prevalence (pprev),
@@ -1496,7 +1618,8 @@ class Plot(object):
         """
         Plot multiple metrics at once from a fairness object table.
 
-        :param fairness_table: output of fairness.get_fairness functions.
+        :param fairness_table: a fairness table. Output of a Fairness.get_fairness
+            function.
         :param attributes: which attribute(s) to plot metrics for. If this value is null, will plot metrics against all attributes.
         :param metrics: which metric(s) to plot, or 'all.'
             If this value is null, will plot:
@@ -1531,6 +1654,25 @@ class Plot(object):
                               x_jitter=None, y_jitter=None, selected_models=None, ncols=3,
                               scatter_kws={'legend': 'full'}, title=True, sharey=True,
                               show_figure=True):
+        """
+        :param disparity_table: disparity table. output of bias.get_disparity, or
+            fairness.get_fairness function.
+        :param attribute: attributes: which attribute values (sample groups) to plot x and y metrics for.
+        :param x_metric: the metric to plot on the X axis. Must be a column in the disparity_table.
+        :param y_metric: the metric to plot on the Y axis. Must be a column in the disparity_table.
+        :param x_jitter: jitter for x values. Default is None.
+        :param y_jitter: jitter for y values. Default is None.
+        :param selected_models: which models to visualize. Default is all models in disparity_table.
+        :param ncols: The number of subplots to plot per row visualization
+            figure.
+            Default is 3.
+        :param scatter_kws: keyword arguments for scatterplot
+        :param title: whether to include a title in visualizations. Default is True.
+        :param sharey: whether comparison subplots should share Y axis. Default is True
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+
+        :return: A Matplotlib figure
+        """
 
         df_models = self._check_multiple_models(disparity_table, method_table_name='disparity_table')
 
@@ -1621,17 +1763,36 @@ class Plot(object):
 
 
 
-    def multimodel_comparison(self, disparities_table, x_metric, y_metric='precision',
-                              x_agg_method='mean', y_agg_method='mean',
+    def multimodel_comparison(self, disparity_table, x_metric, y_metric='precision',
+                              x_agg_method='mean', y_agg_method='mean', title=True,
                               x_jitter=None, y_jitter=None, selected_models=None,
                               ax=None, scatter_kws={'legend': 'full'}, show_figure=True):
+        """
+        Compare two absolute bias metrics or bias metric disparities across models.
 
-        df_models = self._check_multiple_models(disparities_table, method_table_name='disparities_table')
+        :param disparity_table: disparity table. output of bias.get_disparity, or
+            fairness.get_fairness function.
+        :param x_metric: the metric to plot on the X axis. Must be a column in the disparity_table.
+        :param y_metric: the metric to plot on the Y axis. Must be a column in the disparity_table.
+        :param x_agg_method: Method to aggregate metric values for X axis. ('mean', 'median', 'max', 'min')
+        :param y_agg_method: Method to aggregate metric values for X axis. ('mean', 'median', 'max', 'min')
+        :param title: whether to include a title in visualizations. Default is True.
+        :param x_jitter: jitter for x values. Default is None.
+        :param y_jitter: jitter for y values. Default is None.
+        :param selected_models: which models to visualize. Default is all models in disparity_table.
+        :param ax: a matplotlib Axis. If not passed, a new figure will be created.
+        :param scatter_kws: keyword arguments for scatterplot
+        :param show_figure: whether to show figure (plt.show()). Default is True.
+
+        :return: A Matplotlib axis
+        """
+
+        df_models = self._check_multiple_models(disparity_table, method_table_name='disparities_table')
 
         if not selected_models:
             selected_models = df_models
 
-        plot_table = disparities_table.loc[disparities_table['model_id'].isin(selected_models)]
+        plot_table = disparity_table.loc[disparity_table['model_id'].isin(selected_models)]
 
         # requirement: at least two model_id values
         if len(selected_models) < 2:
@@ -1685,8 +1846,9 @@ class Plot(object):
 
         # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-        plot_title = f"MODEL COMPARISON: {y_clean} BY {x_clean}"
-        ax.set_title(plot_title, fontsize=20)
+        if title:
+            plot_title = f"MODEL COMPARISON: {y_clean} BY {x_clean}"
+            ax.set_title(plot_title, fontsize=20)
 
         if show_figure:
             plt.show()
