@@ -375,6 +375,10 @@ class Plot(object):
             self.plot_group_metric(group_table=model_table, group_metric=group_metric,
                                    ax=current_subplot, ax_lim=None, title=title, label_dict=label_dict,
                                    min_group_size = min_group_size)
+
+            if title:
+                current_subplot.set_title(f"{group_metric.upper()} (Model {model})", fontsize=20)
+
             col_num += 1
 
         # disable axes not being used
@@ -473,6 +477,9 @@ class Plot(object):
                                    ax=current_subplot, ax_lim=None, title=title, label_dict=label_dict,
                                    min_group_size = min_group_size)
 
+            if title:
+                current_subplot.set_title(f"{group_metric.upper()} (Model {model})", fontsize=20)
+
 
             col_num += 1
 
@@ -567,6 +574,11 @@ class Plot(object):
                                 title=title, highlight_fairness=highlight_fairness,
                                 min_group_size=min_group_size,
                                 significance_alpha=significance_alpha)
+            if title:
+                current_subplot.set_title(f"{(' ').join(related_disparity.split('_')).upper()}: {attribute_name.upper()} (Model {model})",
+                                 fontsize=23)
+
+
             col_num += 1
 
         # disable axes not being used
@@ -751,7 +763,7 @@ class Plot(object):
                                                    values, label_colors,
                                                    grp_sizes):
                 next_position = label_position_values.popleft()
-                group_label = f"{label} (Group Size: {g_size:,})"
+                group_label = f"{label} (Num: {g_size:,})"
 
                 if ax_lim < 3:
                     CHAR_PLACEHOLDER = 0.03
@@ -1013,8 +1025,8 @@ class Plot(object):
                                     acronyms=False)
 
         if title:
-            ax.set_title(f"{(' ').join(related_disparity.split('_')).upper()}: {attribute_name.upper()} (Model {model_id})",
-                     fontsize=23, fontweight="bold")
+            ax.set_title(f"{(' ').join(related_disparity.split('_')).upper()}: {attribute_name.upper()}",
+                     fontsize=23)
 
         if not highlight_fairness:
             # create dummy invisible image with a color map to leverage for color bar
@@ -1123,12 +1135,12 @@ class Plot(object):
                     grp_sizes):
 
                 next_position = label_position_values.popleft()
-                group_label = f"{label} (Group Size: {g_size:,})"
+                group_label = f"{label} (Num: {g_size:,})"
 
                 if ax_lim < 3:
-                    CHAR_PLACEHOLDER = 0.0175
+                    CHAR_PLACEHOLDER = 0.03
                 else:
-                    CHAR_PLACEHOLDER = 0.05
+                    CHAR_PLACEHOLDER = 0.25
 
                 label_length = len(group_label) * CHAR_PLACEHOLDER
                 max_val_length = 7 * CHAR_PLACEHOLDER
@@ -1172,7 +1184,7 @@ class Plot(object):
         ax.set_xlabel('Absolute Metric Magnitude')
 
         if title:
-            ax.set_title(f"{group_metric.upper()} (Model {model_id})", fontsize=20)
+            ax.set_title(f"{group_metric.upper()}", fontsize=20)
 
         return ax
 
@@ -1299,7 +1311,7 @@ class Plot(object):
         ax_row = 0
 
         viz_title = \
-            f"{(', ').join(list(map(lambda x: x.upper(), metrics)))} (Model {model_id})"
+            f"{(', ').join(list(map(lambda x: x.upper(), metrics)))}"
 
         for group_metric in metrics:
             if (ax_col >= ncols) and ((ax_col + 1) % ncols) == 1:
@@ -1411,7 +1423,7 @@ class Plot(object):
                 metrics = [disparity for disparity in all_disparities if
                            disparity in data_table.columns]
             viz_title = f"{(', ').join(map(lambda x:x.upper(), metrics))} " \
-                        f"ACROSS ATTRIBUTES (Model {model_id})"
+                        f"ACROSS ATTRIBUTES"
 
         num_metrics = len(attributes) * len(metrics)
         if num_metrics > 2:
@@ -1701,7 +1713,7 @@ class Plot(object):
             f"MODEL COMPARISON: {x_metric.replace('_', ' ').upper()} BY {y_metric.replace('_', ' ').upper()} " \
                 f"ACROSS {attribute.replace('_', ' ').upper()}"
 
-        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
+        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True, center="dark")
 
         for group in groups:
             # subset df to get only that attribute, no need to aggregate
@@ -1815,12 +1827,22 @@ class Plot(object):
                 "Aggregation methods 'x_agg_method' and 'y_agg_method' must "
                 "take one of the following values: 'mean', 'median', 'max', 'min'.")
 
+        weighted_mean = lambda x: np.average(x, weights=plot_table.loc[x.index, "group_size"])
+
+        if x_agg_method == "mean":
+            if "_disparity" not in x_metric:
+                x_agg_method = weighted_mean
+
+        if y_agg_method == "mean":
+            if "_disparity" not in y_metric:
+                y_agg_method = weighted_mean
+
         collected_df = plot_table.groupby('model_id', as_index=False).agg({x_metric: x_agg_method, y_metric:y_agg_method})
 
         if ax is None:
             fig, ax = plt.subplots(figsize=(8, 5))
 
-        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True)
+        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True, center="dark")
 
         with sns.axes_style("whitegrid"):
 
