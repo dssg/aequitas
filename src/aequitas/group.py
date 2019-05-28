@@ -130,17 +130,27 @@ class Group(object):
 
 
     def get_multimodel_crosstabs(self, df, score_thresholds=None, attr_cols=None):
+        """
+        Calls `get_crosstabs()` for univariate groups and calculates group
+        metrics for results from multiple models.
+
+        :param df: a dataframe containing the following required columns [score,  label_value].
+        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param attr_cols: optional, list of names of columns corresponding to
+            group attributes (i.e., gender, age category, race, etc.).
+
+        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
+        """
         df_models = df.model_id.unique()
         crosstab_list = []
-        attr_cols = {}
         if len(df_models) > 1:
             for model in df_models:
                 model_df = df.loc[df['model_id'] == model]
                 model_crosstab, model_attr_cols = self.get_crosstabs(model_df, score_thresholds=score_thresholds, attr_cols=attr_cols)
                 crosstab_list.append(model_crosstab)
-                attr_cols.add(model_attr_cols)
 
-            return pd.concat(crosstab_list, ignore_index=True), list(attr_cols)
+            # Note: only returns model_attr_cols from last iteration, as all will be same
+            return pd.concat(crosstab_list, ignore_index=True), model_attr_cols
         else:
             return self.get_crosstabs(df, score_thresholds=score_thresholds, attr_cols=attr_cols)
 
@@ -148,7 +158,8 @@ class Group(object):
 
     def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
-        Creates univariate groups and calculates group metrics.
+        Creates univariate groups and calculates group metrics for results
+        from a single model.
 
         :param df: a dataframe containing the following required columns [score,  label_value].
         :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
@@ -163,9 +174,10 @@ class Group(object):
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
 
+        df_cols = set(df.columns)
         # check if all attr_cols exist in df
         # check = [col in df.columns for col in attr_cols]
-        df_cols = set(df.columns)
+
         if len(set(attr_cols) - df_cols) > 0:
             raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
 
