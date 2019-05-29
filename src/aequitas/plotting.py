@@ -1713,7 +1713,7 @@ class Plot(object):
             f"MODEL COMPARISON: {x_metric.replace('_', ' ').upper()} BY {y_metric.replace('_', ' ').upper()} " \
                 f"ACROSS {attribute.replace('_', ' ').upper()}"
 
-        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True, center="dark")
+        aq_palette = sns.diverging_palette(225, 35, sep=10, n=20, as_cmap=True, center="dark")
 
         for group in groups:
             # subset df to get only that attribute, no need to aggregate
@@ -1786,8 +1786,8 @@ class Plot(object):
             fairness.get_fairness function.
         :param x_metric: the metric to plot on the X axis. Must be a column in the disparity_table.
         :param y_metric: the metric to plot on the Y axis. Must be a column in the disparity_table.
-        :param x_agg_method: Method to aggregate metric values for X axis. ('mean', 'median', 'max', 'min')
-        :param y_agg_method: Method to aggregate metric values for X axis. ('mean', 'median', 'max', 'min')
+        :param x_agg_method: Method to aggregate metric values for X axis. Options: 'mean', 'median', 'max', 'min'. Default is 'mean'. For absolute metrics, 'mean' aggregation is a weighted average by group size.
+        :param y_agg_method: Method to aggregate metric values for Y axis. Options: 'mean', 'median', 'max', 'min'. Default is 'mean'. For absolute metrics, 'mean' aggregation is a weighted average by group size.
         :param title: whether to include a title in visualizations. Default is True.
         :param x_jitter: jitter for x values. Default is None.
         :param y_jitter: jitter for y values. Default is None.
@@ -1827,28 +1827,31 @@ class Plot(object):
                 "Aggregation methods 'x_agg_method' and 'y_agg_method' must "
                 "take one of the following values: 'mean', 'median', 'max', 'min'.")
 
-        weighted_mean = lambda x: np.average(x, weights=plot_table.loc[x.index, "group_size"])
+        # should never really have NaNs for one model but not another, but handling JIC
+        get_indices = lambda x: ~np.isnan(x)
+        get_weights = lambda x: plot_table.loc[x.index, "group_size"]
+        wtd_mean = lambda x: (np.average(x[get_indices(x)], axis=0, weights=get_weights(x)[get_indices(x)]))
 
         if x_agg_method == "mean":
             if "_disparity" not in x_metric:
-                x_agg_method = weighted_mean
+                x_agg_method = wtd_mean
 
         if y_agg_method == "mean":
             if "_disparity" not in y_metric:
-                y_agg_method = weighted_mean
+                y_agg_method = wtd_mean
 
         collected_df = plot_table.groupby('model_id', as_index=False).agg({x_metric: x_agg_method, y_metric:y_agg_method})
 
         if ax is None:
             fig, ax = plt.subplots(figsize=(8, 5))
 
-        aq_palette = sns.diverging_palette(225, 35, sep=10, as_cmap=True, center="dark")
+        aq_palette = sns.diverging_palette(225, 35, sep=10, n=40, as_cmap=True, center="dark")
 
         with sns.axes_style("whitegrid"):
 
             ax = sns.scatterplot(x=x_metric, y=y_metric, data=collected_df, hue='model_id',
                                  x_jitter=x_jitter, y_jitter=y_jitter, palette=aq_palette,
-                                **scatter_kws)
+                                 alpha=0.5, **scatter_kws)
 
         ax.xaxis.grid(color='lightgray', which='major')
         ax.yaxis.grid(color='lightgray', which='major')
