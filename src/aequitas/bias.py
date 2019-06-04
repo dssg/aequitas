@@ -166,7 +166,7 @@ class Bias(object):
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
             base_sig = [sig for sig in ['label_value_significance', 'score_significance'] if
-                        ''.join(sig.split('_significance')) in selected_significance]
+                        sig.replace('_significance', '') in selected_significance]
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
