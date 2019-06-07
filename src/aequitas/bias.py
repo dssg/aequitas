@@ -437,7 +437,7 @@ class Bias(object):
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
             base_sig=[sig for sig in ['label_value_significance', 'score_significance'] if
-                      ''.join(sig.split('_significance')) in selected_significance]
+                      sig.replace('_significance', '') in selected_significance]
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -641,6 +641,7 @@ class Bias(object):
             non_attr_cols = [
                 'id', 'model_id', 'entity_id', 'score', 'label_value',
                 'rank_abs', 'rank_pct']
+
             # index of the columns that are attributes
             attr_cols = original_df.columns[~original_df.columns.isin(non_attr_cols)]
 
@@ -715,7 +716,6 @@ class Bias(object):
                     for name, func in binary_col_functions.items():
                         func = func(thres_unit, 'label_value', thres_val)
                         original_df.loc[:, name] = col_group.apply(
-                            # func).reset_index(level=0, drop=True)
                             func).reset_index(drop=True)
 
             # add columns for error-based significance
@@ -751,8 +751,9 @@ class Bias(object):
             measures += ['label_value']
 
             for measure in measures:
+
                 # only calculate significance if in selected_significance
-                if (measure in selected_significance) or (''.join(measure.split('binary_')) in selected_significance):
+                if (measure in selected_significance) or (measure.replace('binary_', '') in selected_significance):
 
                     cls._calculate_significance(original_df, disparity_df,
                                                 attribute, measure, ref_dict=ref_dict,

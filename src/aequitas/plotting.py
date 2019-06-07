@@ -41,7 +41,11 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
 
     # Note: specific measures is a set
     if specific_measures:
-        specific_measures.intersection({label_score_ref})
+        if len(specific_measures) < 1:
+            raise ValueError("At least one metric must be passed for which to "
+                             "find refrence group.")
+
+        specific_measures = specific_measures.intersection({label_score_ref})
         ref_group_cols = {measure + ref_group_flag for measure in specific_measures if
              measure + ref_group_flag in ref_group_cols}
 
@@ -60,18 +64,19 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
             attr_refs[metric_key] = \
                 attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
         if label_score_ref:
-            tried = 0
+            is_valid_label_ref = lambda label: label + ref_group_flag in disparities_table.columns
 
-            if label_score_ref + ref_group_flag not in disparities_table.columns:
-                while (label_score_ref + ref_group_flag not in disparities_table.columns) and (tried <= len(specific_measures)):
-                    label_score_ref = next(iter(specific_measures))
-                    tried += 1
+            if not is_valid_label_ref(label_score_ref):
+                try:
+                    label_score_ref = next(measure for measure in specific_measures if is_valid_label_ref(measure))
+                    logging.warning("The specified reference measure for label "
+                                    "value and score is not included in the "
+                                    f"data frame. Using '{label_score_ref}' "
+                                    "reference group as label value and score "
+                                    "reference instead.")
 
-                logging.warning("The specified reference measure for label "
-                                  "value and score is not included in the "
-                                  f"data frame. Using '{label_score_ref}' "
-                                  "reference group as label value and score "
-                                  "reference instead.")
+                except StopIteration:
+                    raise ValueError("No valid metric passed to 'assemble_ref_groups()'.")
 
             attr_refs['label_value'] = attr_refs[label_score_ref]
             attr_refs['score'] = attr_refs[label_score_ref]
