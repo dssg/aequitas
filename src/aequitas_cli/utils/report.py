@@ -121,10 +121,8 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     for col in aux_df.columns:
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
-            # with warnings.catch_warnings(record=True):
-            #     warnings.filterwarnings("ignore", message="│A value is trying to be set on a copy of a slice from a DataFrame", lineno=129)
-                # idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
-                # set value in rows of new df for reference group equal to Ref
+
+            # set value in rows of new df for reference group equal to Ref
             indicate_ref = lambda x, y: x if x != y else 'Ref'
             aux_df.loc[:, col] = aux_df[['attribute_value', ref_group]].apply(lambda x: indicate_ref(*x), axis=1)
 

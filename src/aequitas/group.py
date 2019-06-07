@@ -170,8 +170,6 @@ class Group(object):
         """
         model_id = self._check_model_id(df, method_table_name='df')
 
-
-
         if not attr_cols:
             non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are

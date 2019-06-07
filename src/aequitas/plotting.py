@@ -241,7 +241,7 @@ class Plot(object):
             raise ValueError(f"failed to find only one index for the reference "
                              f"group for attribute_name = {attribute_name} and "
                              f"attribute_value of reference = {ref_group_name} "
-                             f"and model_id={model_id}".format())
+                             f"and model_id={model_id}")
 
         relative_ind = disparities_table.index.get_loc(idx)
         return relative_ind, ref_group_name
@@ -1827,6 +1827,7 @@ class Plot(object):
                 "Aggregation methods 'x_agg_method' and 'y_agg_method' must "
                 "take one of the following values: 'mean', 'median', 'max', 'min'.")
 
+
         # should never really have NaNs for one model but not another, but handling JIC
         get_indices = lambda x: ~np.isnan(x)
         get_weights = lambda x: plot_table.loc[x.index, "group_size"]
@@ -1851,7 +1852,7 @@ class Plot(object):
 
             ax = sns.scatterplot(x=x_metric, y=y_metric, data=collected_df, hue='model_id',
                                  x_jitter=x_jitter, y_jitter=y_jitter, palette=aq_palette,
-                                 alpha=0.5, **scatter_kws)
+                                 alpha=0.75, **scatter_kws)
 
         ax.xaxis.grid(color='lightgray', which='major')
         ax.yaxis.grid(color='lightgray', which='major')
