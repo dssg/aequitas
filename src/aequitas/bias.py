@@ -119,7 +119,7 @@ class Bias(object):
                                            '_ref_group_value']] = \
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
             except KeyError:
-                raise Exception(
+                raise KeyError(
                     'get_bias_min_metric:: one of the following columns is not '
                     'on the input dataframe : model_id, parameter, attribute_name '
                     'or any of the input_group_metrics '
@@ -137,10 +137,11 @@ class Bias(object):
             return df
 
         else:
+            # add statistical_significance
             if not selected_significance:
                 selected_significance = self.input_group_metrics + ['label_value', 'score']
 
-            # add statistical_significance
+            # only proceed with columns actually in dataframe
             selected_significance = set( original_cols.intersection(selected_significance) )
 
             ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
@@ -166,7 +167,7 @@ class Bias(object):
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
             base_sig = [sig for sig in ['label_value_significance', 'score_significance'] if
-                        ''.join(sig.split('_significance')) in selected_significance]
+                        sig.replace('_significance', '') in selected_significance]
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -221,7 +222,7 @@ class Bias(object):
         try:
             df_major_group = df.loc[df.groupby(key_columns)['group_size'].idxmax()]
         except KeyError:
-            raise Exception('get_bias_major_group:: one of the following columns '
+            raise KeyError('get_bias_major_group:: one of the following columns '
                           'is not on the input dataframe : model_id, parameter, '
                           'attribute_name, group_size')
 
@@ -293,7 +294,7 @@ class Bias(object):
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
             base_sig = [sig for sig in ['label_value_significance', 'score_significance'] if
-                        ''.join(sig.split('_significance')) in selected_significance]
+                        sig.replace('_significance', '') in selected_significance]
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -359,7 +360,7 @@ class Bias(object):
         try:
             self._verify_ref_groups_dict_len(df, ref_groups_dict)
         except ValueError:
-            raise Exception('Bias.get_disparity_predefined_groups(): the number of '
+            raise ValueError('Bias.get_disparity_predefined_groups(): the number of '
                           'predefined group values to use as reference is less '
                           'than the actual number of attributes in the input '
                           'dataframe.')
@@ -371,10 +372,14 @@ class Bias(object):
                                      (df['attribute_value'] == val)]
                 self._verify_ref_group_loc(group_slice)
                 df_ref_group = pd.concat([df_ref_group, group_slice])
-        except (KeyError, ValueError):
-            raise Exception('get_disparity_predefined_groups(): reference groups '
+        except KeyError:
+            raise KeyError('get_disparity_predefined_groups(): reference groups '
                           'and values provided do not exist as columns/values '
                           'in the input dataframe.(Note: check for syntax errors)')
+        except ValueError:
+            raise ValueError('get_disparity_predefined_groups(): reference groups '
+                           'and values provided do not exist as columns/values '
+                           'in the input dataframe.(Note: check for syntax errors)')
 
         disparity_metrics = [col + '_disparity' for col in input_group_metrics]
         df_to_merge = pd.DataFrame()
@@ -659,14 +664,12 @@ class Bias(object):
                 (original_df.columns.isin(attr_cols))]
 
         if not non_string_cols.empty:
-            raise Exception(
+            raise ValueError(
                 'get_statistical_significance: statistical significance was '
                 'not calculated. There are non-string cols within attr_cols.')
 
-        if not selected_significance:
-            binary_inclusions = {f'binary_{col}' for col in cls.significance_cols}
-        else:
-            binary_inclusions = {f'binary_{col}' for col in selected_significance}
+        binary_inclusions = {f'binary_{col}' for col in (selected_significance or
+                                                         cls.significance_cols)}
 
         # if no score_thresholds are provided, we assume that rank_abs equals
         # the number  of 1s in the score column; it also serves as flag to set
@@ -730,24 +733,7 @@ class Bias(object):
             # add columns for the rest of columns in dictionary keys
             # binary score, fnr, fpr already added above
             for col in (binary_inclusions - binary_col_functions.keys() - {'label_value'}):
-                # binary_col = f'binary_{col}'
-                # original_df.loc[:, binary_col] = original_df.loc[:, SIGNIF_BASES[binary_col]]
                 original_df.loc[:, col] = original_df.loc[:, SIGNIF_BASES[col]]
-
-            # original_df.loc[:, 'binary_precision'] = original_df.loc[:, 'binary_fpr']
-            # original_df.loc[:, 'binary_tnr'] = original_df.loc[:, 'binary_fpr']
-            # original_df.loc[:, 'binary_fdr'] = original_df.loc[:, 'binary_fpr']
-            #
-            # # npv, for, tpr are based on false negatives
-            # original_df.loc[:, 'binary_npv'] = original_df.loc[:, 'binary_fnr']
-            # original_df.loc[:, 'binary_tpr'] = original_df.loc[:, 'binary_fnr']
-            # original_df.loc[:, 'binary_for'] = original_df.loc[:, 'binary_fnr']
-            # # fdr numerator matches fpr numerator
-            #
-            # # pprev and ppr based on score
-            # original_df.loc[:, 'binary_ppr'] = original_df.loc[:, 'binary_score']
-            # original_df.loc[:, 'binary_pprev'] = original_df.loc[:, 'binary_score']
-
 
             # ensure only predicted positive values included in true positive
             # error based metrics, and only predicted negative values in false
@@ -781,7 +767,7 @@ class Bias(object):
         try:
             return list(df.columns[df.columns.str.contains('_disparity')])
         except KeyError:
-            raise Exception("No disparity columns found in dataframe. Tip: "
+            raise KeyError("No disparity columns found in dataframe. Tip: "
                             "make sure you have already passed the dataframe "
                             "through a 'get_disparity_' method.")
 
@@ -793,7 +779,7 @@ class Bias(object):
         try:
             return list(df.columns[df.columns.str.contains('_significance')])
         except KeyError:
-            raise Exception("No significance columns found in dataframe. Tip: "
+            raise KeyError("No significance columns found in dataframe. Tip: "
                             "make sure you set the 'check_significance' parameter"
                             " to True in 'get_disparity_' method(s).")
 
@@ -803,3 +789,4 @@ class Bias(object):
         View list of all calculated absolute bias metrics in df
         """
         return list(set(self.input_group_metrics).intersection(df.columns))
+
