@@ -45,7 +45,7 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
             raise ValueError("At least one metric must be passed for which to "
                              "find refrence group.")
 
-        specific_measures = specific_measures.intersection({label_score_ref})
+        specific_measures = specific_measures.union({label_score_ref})
         ref_group_cols = {measure + ref_group_flag for measure in specific_measures if
              measure + ref_group_flag in ref_group_cols}
 
@@ -60,7 +60,7 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
             if col in ('label' + ref_group_flag, 'score' + ref_group_flag):
                 continue
 
-            metric_key = "".join(col.split(ref_group_flag))
+            metric_key = col.replace(ref_group_flag, '')
             attr_refs[metric_key] = \
                 attr_table.loc[attr_table['attribute_name'] == attribute, col].min()
         if label_score_ref:
@@ -76,7 +76,7 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
                                     "reference instead.")
 
                 except StopIteration:
-                    raise ValueError("No valid metric passed to 'assemble_ref_groups()'.")
+                    raise ValueError("None of metrics passed in 'specific_measures' are in dataframe.")
 
             attr_refs['label_value'] = attr_refs[label_score_ref]
             attr_refs['score'] = attr_refs[label_score_ref]
@@ -229,7 +229,7 @@ class Plot(object):
             raise ValueError('This method requires one and only one model_id in the disparities table. '
                              'Tip: check disparities_table.model_id.unique() should be just one element list.')
         # get absolute metric name from passed group metric (vs. a disparity name)
-        abs_metric = "".join(group_metric.split('_disparity'))
+        abs_metric = group_metric.replace('_disparity', '')
 
         all_ref_groups = assemble_ref_groups(disparities_table, ref_group_flag)
         ref_group_name = all_ref_groups[attribute_name][abs_metric]
@@ -580,7 +580,7 @@ class Plot(object):
                                 min_group_size=min_group_size,
                                 significance_alpha=significance_alpha)
             if title:
-                current_subplot.set_title(f"{(' ').join(related_disparity.split('_')).upper()}: {attribute_name.upper()} (Model {model})",
+                current_subplot.set_title(f"{related_disparity.replace('_', ' ').upper()}: {attribute_name.upper()} (Model {model})",
                                  fontsize=23)
 
 
@@ -697,7 +697,7 @@ class Plot(object):
             raise ValueError(f"Specified disparity metric '{group_metric}' not "
                              f"in 'group_table'.")
 
-        if group_table[group_metric].isnull().any():
+        if group_table[group_metric].isnull().all():
             raise ValueError(f"Cannot plot {group_metric}, has NaN values.")
 
         if ax is None:
@@ -815,7 +815,7 @@ class Plot(object):
         ax.set_xlabel("Absolute Metric Magnitude")
 
         if title:
-            ax.set_title(f"{group_metric.upper()} (Model {model_id})", fontsize=20)
+            ax.set_title(f"{group_metric.upper()}", fontsize=20)
 
         return ax
 
@@ -1030,7 +1030,7 @@ class Plot(object):
                                     acronyms=False)
 
         if title:
-            ax.set_title(f"{(' ').join(related_disparity.split('_')).upper()}: {attribute_name.upper()}",
+            ax.set_title(f"{related_disparity.replace('_', ' ').upper()}: {attribute_name.upper()}",
                      fontsize=23)
 
         if not highlight_fairness:
