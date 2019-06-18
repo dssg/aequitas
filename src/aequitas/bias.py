@@ -139,7 +139,6 @@ class Bias(object):
             return df
 
         else:
-
             # add statistical_significance
             if not selected_significance:
                 selected_significance = self.input_group_metrics
@@ -579,8 +578,6 @@ class Bias(object):
                            'binary_for': 'for', 'binary_fdr': 'fdr',
                            'binary_ppr': 'ppr', 'binary_pprev': 'pprev'
                             }
-        # print(attribute)
-        # print(ref_dict[attribute])
 
         ref_group = ref_dict[attribute][binaries_lookup.get(measure)]
 
@@ -599,14 +596,14 @@ class Bias(object):
         # run SciPy statistical significance test between each group and
         # reference group
         for attr_val, eq_var in sample_dict.items():
-            # print(attr_val)
+
             _, difference_significance_p = stats.ttest_ind(
                 sample_dict[ref_group],
                 sample_dict[attr_val],
                 axis=None,
                 equal_var=eq_variance_dict[attr_val],
                 nan_policy='omit')
-            # print(difference_significance_p)
+
             measure = measure.replace('binary_', '')
 
             # add column to crosstab to indicate statistical significance
