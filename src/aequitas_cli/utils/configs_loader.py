@@ -19,7 +19,9 @@ class Configs(object):
                  project_description={'title': '', 'goal': ''},
                  ref_groups=None, db=None,
                  fairness_measures=original_fairness_measures,
-                 plot_bias_disparities=(), plot_bias_metrics=()):
+                 plot_bias_disparities=(), plot_bias_metrics=(),
+                 check_significance=False, selected_significance=False,
+                 mask_significance=True, alpha = 5e-2):
 
         self.ref_groups_method = ref_groups_method
         self.fairness_threshold = fairness_threshold
@@ -32,13 +34,21 @@ class Configs(object):
         self.project_description = project_description
         self.plot_bias_metrics = plot_bias_metrics
         self.plot_bias_disparities = plot_bias_disparities
+        self.check_significance = check_significance
+        self.selected_significance = selected_significance
+        self.mask_significance = mask_significance
+        self.alpha = alpha
 
     @staticmethod
     def load_configs(configs_path):
         try:
             if configs_path:
                 with open(configs_path, 'r') as stream:
-                    configs_fromfile = yaml.load(stream)
+                    # recommended for loading untrusted input.
+                    configs_fromfile = yaml.load(stream, Loader=yaml.SafeLoader)
+                    # currently (PyYAML 5.1) FullLoader is default loader called by
+                    # yaml.load(input) (after issuing the warning)
+                    # configs_fromfile = yaml.load(stream, Loader=yaml.FullLoader)
             else:
                 configs_fromfile = {}
         except FileNotFoundError:

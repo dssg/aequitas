@@ -1,6 +1,6 @@
 import datetime
 import logging
-
+# import warnings
 import pandas as pd
 from markdown2 import markdown
 from tabulate import tabulate
@@ -109,7 +109,9 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     group_value_df = group_value_df.round(2)
     group_value_df = group_value_df.applymap(str)
     def_cols = ['attribute_value']
-    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute]
+    # make copy of relevant rows as new df
+    aux_df = group_value_df.loc[group_value_df['attribute_name'] == attribute].copy()
+
     metrics = {}
     for par, disp in fairness_measures_depend.items():
         if par in fairness_measures:
@@ -119,8 +121,10 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
     for col in aux_df.columns:
         if col in metrics.keys():
             ref_group = metrics[col].replace('_disparity', '_ref_group_value')
-            idx = aux_df.loc[aux_df['attribute_value'] == aux_df[ref_group]].index
-            aux_df.loc[idx, col] = 'Ref'
+
+            # set value in rows of new df for reference group equal to Ref
+            indicate_ref = lambda x, y: x if x != y else 'Ref'
+            aux_df.loc[:, col] = aux_df[['attribute_value', ref_group]].apply(lambda x: indicate_ref(*x), axis=1)
 
     map = {}
     aux_df = aux_df[def_cols + fairness_measures]
@@ -130,7 +134,7 @@ def get_parity_group_report(group_value_df, attribute, fairness_measures, fairne
         else:
             colstr = col
         map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
+        aux_df.loc[:, col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-2)'
     aux_df = aux_df.rename(index=str, columns=map)
     cols_order = ['Attribute Value', 'Statistical Parity', 'Impact Parity', 'FDR Parity', 'FPR Parity', 'FOR Parity',
                   'FNR Parity']
@@ -166,8 +170,8 @@ def setup_group_value_df(group_value_df, fairness_measures, fairness_measures_de
             group_value_df.loc[group_value_df[metrics[col]] == 'False', col] = '##red##' + group_value_df[col][group_value_df[
                                                                                                                    metrics[
                                                                                                                        col]] == 'False']
-    group_value_df['group_size_pct'] = group_size
-    print('******************', group_value_df['group_size_pct'])
+    # group_value_df['group_size_pct'] = group_size
+    # print('**********GROUP SIZES********\n', group_value_df['group_size_pct'])
     return group_value_df
 
 
@@ -187,7 +191,7 @@ def get_disparities_group_report(group_value_df, attribute, fairness_measures, f
         else:
             colstr = colstr.split(' ')[0].upper() + ' Disparity'
         map[col] = colstr  #+ ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-        aux_df[col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
+        aux_df.loc[:,col] = '[' + aux_df[col] + ']' + '(#' + '-'.join(attribute.lower().split(' ')) + '-3)'
     aux_df = aux_df.rename(index=str, columns=map)
     # this is hardcoded. If metrics supported by aequitas change this needs to change
     cols_order = ['Attribute Value', 'PPR Disparity', 'PPREV Disparity', 'FDR Disparity', 'FPR Disparity', 'FOR Disparity',
