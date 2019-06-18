@@ -739,7 +739,7 @@ class Bias(object):
 
             # add columns for the rest of columns in dictionary keys
             # binary score, fnr, fpr already added above
-            for col in (binary_inclusions - binary_col_functions.keys() - {'label_value'}):
+            for col in (binary_inclusions - binary_col_functions.keys()):
                 original_df.loc[:, col] = original_df[SIGNIF_BASES[col]]
 
             # ensure only predicted positive values included in true positive
