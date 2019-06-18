@@ -45,7 +45,7 @@ class Bias(object):
                                  input_group_metrics=None, fill_divbyzero=None,
                                  check_significance=False,  alpha = 5e-2,
                                  mask_significance = True, label_score_ref='fpr',
-                                 selected_significance=False):
+                                 selected_significance=None):
         """
         Calculates disparities between groups for the predefined list of
         group metrics using the group with the minimum value for each absolute
@@ -183,7 +183,7 @@ class Bias(object):
                                   input_group_metrics=None,
                                   fill_divbyzero=None, check_significance=False,
                                   alpha = 5e-2, mask_significance=True,
-                                  selected_significance=False):
+                                  selected_significance=None):
         """
         Calculates disparities between groups for the predefined list of group
         metrics using the majority group within each attribute as the reference
