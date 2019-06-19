@@ -39,13 +39,13 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
-        self.significance_cols = self.input_group_metrics + ['label_value', 'score']
+        self.significance_cols = set(self.input_group_metrics).union({'label_value', 'score'})
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
                                  check_significance=False,  alpha = 5e-2,
                                  mask_significance = True, label_score_ref='fpr',
-                                 selected_significance=None):
+                                 selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of
         group metrics using the group with the minimum value for each absolute
@@ -65,7 +65,7 @@ class Bias(object):
             for disparity metrics. Default is False.
         :param selected_significance: specific measures (beyond label_value and
             score) to which to limit statistical significance calculations when
-            check_significance is True. Default is None, i.e., significance
+            check_significance is True. Default is False, i.e., significance
             will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
@@ -143,9 +143,10 @@ class Bias(object):
             if not selected_significance:
                 selected_significance = self.input_group_metrics
 
-            # only proceed with columns actually in dataframe
-            selected_significance = set( original_cols.intersection(selected_significance) )
+                # only proceed with columns actually in dataframe
+            selected_significance = set(original_cols.intersection(selected_significance))
 
+            # always includes label and score significance
             selected_significance = selected_significance.union({'label_value', 'score'})
 
             ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
@@ -183,7 +184,7 @@ class Bias(object):
                                   input_group_metrics=None,
                                   fill_divbyzero=None, check_significance=False,
                                   alpha = 5e-2, mask_significance=True,
-                                  selected_significance=None):
+                                  selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of group
         metrics using the majority group within each attribute as the reference
@@ -203,7 +204,7 @@ class Bias(object):
             for disparity metrics. Default is False.
         :param selected_significance: specific measures (beyond label_value and
             score) to which to limit statistical significance calculations when
-            check_significance is True. Default is None, i.e., significance
+            check_significance is True. Default is False, i.e., significance
             will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
@@ -265,6 +266,7 @@ class Bias(object):
             # only proceed with columns actually in dataframe
             selected_significance = set(original_cols.intersection(selected_significance))
 
+            # always includes label and score significance
             selected_significance = selected_significance.union({'label_value', 'score'})
 
             ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
@@ -324,7 +326,7 @@ class Bias(object):
                                         fill_divbyzero=None,
                                         check_significance=False, alpha=5e-2,
                                         mask_significance=True,
-                                        selected_significance=None):
+                                        selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of group
         metrics using a predefined reference group (denominator) value for each
@@ -345,7 +347,7 @@ class Bias(object):
             for disparity metrics. Default is False.
         :param selected_significance: specific measures (beyond label_value and
             score) to which to limit statistical significance calculations when
-            check_significance is True. Default is None, i.e., significance
+            check_significance is True. Default is False, i.e., significance
             will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
@@ -417,6 +419,7 @@ class Bias(object):
             # only proceed with columns actually in dataframe
             selected_significance = set( original_cols.intersection(selected_significance) )
 
+            # always includes label and score significance
             selected_significance = selected_significance.union({'label_value', 'score'})
 
             # compile dictionary of reference groups based on bias-augmented crosstab
@@ -621,7 +624,7 @@ class Bias(object):
     def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
                                      score_thresholds=None,
                                      attr_cols=None, alpha=5e-2,
-                                     selected_significance=None):
+                                     selected_significance=False):
         """
 
         :param original_df: a dataframe containing a required raw 'score' column
@@ -685,7 +688,7 @@ class Bias(object):
             # skip binary column creation if all necessary columns already created
             elif not binary_inclusions - set(non_string_cols):
                 measures = set(original_df.columns[original_df.columns.str.contains('binary_')])
-                measures |= {'label_value'}
+                measures = measures.union({'label_value'})
 
                 for attribute in set(attr_cols) - measures:
                     for measure in measures:
@@ -773,7 +776,7 @@ class Bias(object):
         original_df.loc[original_df['binary_score'] == 1, FNR_BASED] = pd.np.nan
 
         measures = set(original_df.columns[original_df.columns.str.contains('binary_')])
-        measures |= {'label_value'}
+        measures = measures.union({'label_value'})
 
         for attribute in attr_cols:
             for measure in measures:
