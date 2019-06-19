@@ -39,7 +39,7 @@ class Bias(object):
         else:
             self.fill_divbyzero = fill_divbyzero
         self.non_attr_cols = non_attr_cols
-
+        self.significance_cols = set(self.input_group_metrics).union({'label_value', 'score'})
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
@@ -63,8 +63,10 @@ class Bias(object):
             zero. Default is None.
         :param check_significance: whether to determine statistical signifance
             for disparity metrics. Default is False.
-        :param selected_significance: measures for which to determine statistical
-            significance. Default is all metrics, including label_value and score.
+        :param selected_significance: specific measures (beyond label_value and
+            score) to which to limit statistical significance calculations when
+            check_significance is True. Default is False, i.e., significance
+            will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
         :param mask_significance: whether to display a T/F mask over calculated
@@ -139,10 +141,13 @@ class Bias(object):
         else:
             # add statistical_significance
             if not selected_significance:
-                selected_significance = self.input_group_metrics + ['label_value', 'score']
+                selected_significance = self.input_group_metrics
 
-            # only proceed with columns actually in dataframe
-            selected_significance = set( original_cols.intersection(selected_significance) )
+                # only proceed with columns actually in dataframe
+            selected_significance = set(original_cols.intersection(selected_significance))
+
+            # always includes label and score significance
+            selected_significance = selected_significance.union({'label_value', 'score'})
 
             ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                                   specific_measures=selected_significance,
@@ -164,10 +169,9 @@ class Bias(object):
                 df.loc[:, significance_cols] = pd.np.select(
                     [truemask, falsemask], [True, False], default=None)
 
-            # check what new disparity columns are and order as disparity,
-            # ref_group, significance for each
-            base_sig = [sig for sig in ['label_value_significance', 'score_significance'] if
-                        sig.replace('_significance', '') in selected_significance]
+            # order new calculated metric columns: disparity, ref_group, then
+            # significance for each
+            base_sig=['label_value_significance', 'score_significance']
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -198,8 +202,10 @@ class Bias(object):
             zero. Default is None.
         :param check_significance: whether to determine statistical signifance
             for disparity metrics. Default is False.
-        :param selected_significance: measures for which to determine statistical
-            significance. Default is all metrics, including label_value and score.
+        :param selected_significance: specific measures (beyond label_value and
+            score) to which to limit statistical significance calculations when
+            check_significance is True. Default is False, i.e., significance
+            will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
         :param mask_significance: whether to display a T/F mask over calculated
@@ -255,13 +261,17 @@ class Bias(object):
 
         else:
             if not selected_significance:
-                    selected_significance = self.input_group_metrics + ['label_value', 'score']
+                selected_significance = self.input_group_metrics
 
-            selected_significance = set( original_cols.intersection(selected_significance) )
+            # only proceed with columns actually in dataframe
+            selected_significance = set(original_cols.intersection(selected_significance))
 
+            # always includes label and score significance
+            selected_significance = selected_significance.union({'label_value', 'score'})
 
-                # use an item from set of selected metrics for significance calculation
-
+            ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                                  specific_measures=selected_significance,
+                                                  label_score_ref=None)
 
             ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
                                                   specific_measures=selected_significance,
@@ -293,8 +303,7 @@ class Bias(object):
 
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
-            base_sig = [sig for sig in ['label_value_significance', 'score_significance'] if
-                        sig.replace('_significance', '') in selected_significance]
+            base_sig=['label_value_significance', 'score_significance']
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -336,8 +345,10 @@ class Bias(object):
             zero. Default is None.
         :param check_significance: whether to determine statistical signifance
             for disparity metrics. Default is False.
-        :param selected_significance: measures for which to determine statistical
-            significance. Default is all metrics, including label_value and score.
+        :param selected_significance: specific measures (beyond label_value and
+            score) to which to limit statistical significance calculations when
+            check_significance is True. Default is False, i.e., significance
+            will be calculated for all metrics.
         :param alpha: statistical significance level to use in significance
             determination. Default is 5e-2 (0.05).
         :param mask_significance: whether to display a T/F mask over calculated
@@ -403,9 +414,13 @@ class Bias(object):
 
         else:
             if not selected_significance:
-                selected_significance = self.input_group_metrics + ['label_value', 'score']
+                selected_significance = self.input_group_metrics
 
+            # only proceed with columns actually in dataframe
             selected_significance = set( original_cols.intersection(selected_significance) )
+
+            # always includes label and score significance
+            selected_significance = selected_significance.union({'label_value', 'score'})
 
             # compile dictionary of reference groups based on bias-augmented crosstab
             full_ref_dict = {}
@@ -436,8 +451,7 @@ class Bias(object):
 
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
-            base_sig=[sig for sig in ['label_value_significance', 'score_significance'] if
-                      sig.replace('_significance', '') in selected_significance]
+            base_sig=['label_value_significance', 'score_significance']
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
@@ -489,7 +503,7 @@ class Bias(object):
         eq_variance = {ref_group: True}
 
         for attr_value, sample in sample_dict.items():
-            # make default normality_p value (only used when len(sample) < 8)
+            # make default normality_p value (only used when len(sample) < 20)
             # large enough that it is always greater than alpha
             normality_p = pd.np.inf
 
@@ -532,7 +546,6 @@ class Bias(object):
             _, equal_variance_p = stats.bartlett(sample_dict[ref_group], sample_list)
 
             eq_variance[attr_value] = equal_variance_p >= alpha
-
 
         return eq_variance
 
@@ -579,13 +592,13 @@ class Bias(object):
         sample_dict = cls._get_measure_sample(original_df=original_df,
                                               attribute=attribute, measure=measure)
 
+
         # run SciPy equal variance tests between each group and a given
         # reference group, store results in dictionary to pass to statistical
         # significance tests
         eq_variance_dict = cls._check_equal_variance(sample_dict=sample_dict,
                                                     ref_group=ref_group,
                                                     alpha=alpha)
-
         # run SciPy statistical significance test between each group and
         # reference group
         for attr_val, eq_var in sample_dict.items():
@@ -597,7 +610,7 @@ class Bias(object):
                 equal_var=eq_variance_dict[attr_val],
                 nan_policy='omit')
 
-            measure = "".join(measure.split('binary_'))
+            measure = measure.replace('binary_', '')
 
             # add column to crosstab to indicate statistical significance
             disparity_df.loc[disparity_df['attribute_value'] == attr_val,
@@ -610,7 +623,8 @@ class Bias(object):
     @classmethod
     def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
                                      score_thresholds=None,
-                                     attr_cols=None, alpha=5e-2, selected_significance=False):
+                                     attr_cols=None, alpha=5e-2,
+                                     selected_significance=False):
         """
 
         :param original_df: a dataframe containing a required raw 'score' column
@@ -645,17 +659,11 @@ class Bias(object):
             # index of the columns that are attributes
             attr_cols = original_df.columns[~original_df.columns.isin(non_attr_cols)]
 
-        for col in attr_cols:
-            # find the priors_df
-            col_group = original_df.fillna({col: 'pd.np.nan'}).groupby(col)
-            counts = col_group.size()
-
         # check if all attr_cols exist in df
-
         if set(attr_cols) - set(original_df.columns):
             raise ValueError(
                 f"Not all attribute columns provided '{attr_cols}' exist in "
-                f"input dataframe!")
+                f"input dataframe.")
 
         # check if all columns are strings:
         non_string_cols = \
@@ -664,34 +672,60 @@ class Bias(object):
                 (original_df.dtypes != str) &
                 (original_df.columns.isin(attr_cols))]
 
-        if not non_string_cols.empty:
-            raise ValueError(
-                'get_statistical_significance: statistical significance was '
-                'not calculated. There are non-string cols within attr_cols.')
-
         binary_inclusions = {f'binary_{col}' for col in (selected_significance or
-                                                         cls.significance_cols)}
+                                                         cls.significance_cols)
+                             if col != 'label_value'}
+
+        # check whether necessary binary columns already created
+        if not non_string_cols.empty:
+            # check whether error message is required based on if only binary columns
+            if not all('binary_' in col for col in non_string_cols):
+                raise ValueError(
+                    'get_statistical_significance: statistical significance was '
+                    'not calculated. There are non-string cols within attr_cols.')
+
+
+            # skip binary column creation if all necessary columns already created
+            elif not binary_inclusions - set(non_string_cols):
+                measures = set(original_df.columns[original_df.columns.str.contains('binary_')])
+                measures = measures.union({'label_value'})
+
+                for attribute in set(attr_cols) - measures:
+                    for measure in measures:
+
+                        # only calculate significance if in selected_significance
+                        if (measure in selected_significance) or (
+                                measure.replace('binary_', '') in selected_significance):
+                            cls._calculate_significance(original_df, disparity_df,
+                                                        attribute, measure, ref_dict=ref_dict,
+                                                        alpha=alpha)
+
+                return disparity_df
+
+            else:
+                # drop old binary columns and generate those in binary_inclusions
+                # as though non_string_cols was empty
+                drop_cols = list(original_df.columns[original_df.columns.str.contains('binary_')])
+                drop_cols += list(original_df.columns[original_df.columns.str.contains('rank_')])
+                original_df = original_df.drop(drop_cols, axis=1)
+
+        # create binary columns if non_string_cols is empty or binaries dropped
 
         # if no score_thresholds are provided, we assume that rank_abs equals
         # the number  of 1s in the score column; it also serves as flag to set
         # parameter to 'binary'
-
         count_ones = None
         if not score_thresholds:
-            with warnings.catch_warnings(record=True) as w:
-                warnings.filterwarnings("ignore",
-                                        message="A value is trying to be set on a copy of a slice from a DataFrame.\nTry using .loc[row_indexer,col_indexer] = value instead")
-                original_df.loc[:, 'score'] = original_df.loc[:, 'score'].astype(float)
+            original_df.loc[:, 'score'] = original_df.loc[:,'score'].astype(float)
 
             count_ones = original_df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
-        original_df = original_df.sort_values('score', ascending=False)
-        original_df['rank_abs'] = range(1, len(original_df) + 1)
-        original_df['rank_pct'] = original_df['rank_abs'] / len(original_df)
+        original_df.sort_values('score', ascending=False, inplace=True)
+        original_df.loc[:,'rank_abs'] = range(1, len(original_df) + 1)
+        original_df.loc[:,'rank_pct'] = original_df.loc[:,'rank_abs'] / len(original_df)
 
-        # Define formula for binary false positive, false negative, and binary
-        # score
+        # Define formula for binary false positive, false negative, binary score
         binary_false_pos = lambda rank_col, label_col, thres: lambda x: (
             (x[rank_col] <= thres) & (x[label_col] == 0)).astype(int)
 
@@ -706,50 +740,45 @@ class Bias(object):
                                 'binary_fnr': binary_false_neg
                                 }
 
+        for thres_unit, thres_values in score_thresholds.items():
+            for thres_val in thres_values:
+                for name, func in binary_col_functions.items():
+                    func = func(thres_unit, 'label_value', thres_val)
+                    original_df.loc[:, name] = original_df.apply(func, axis=1)
+
+        # add columns for error-based significance
+        # precision, tnr, fdr are based on false positives
+        SIGNIF_BASES = {
+            'binary_precision': 'binary_fpr',
+            'binary_tnr': 'binary_fpr',
+            'binary_fdr': 'binary_fpr',
+            'binary_npv': 'binary_fnr',
+            'binary_tpr': 'binary_fnr',
+            'binary_for': 'binary_fnr',
+            'binary_ppr': 'binary_score',
+            'binary_pprev': 'binary_score'}
+
+        # add columns for the rest of columns in dictionary keys
+        # binary score, fnr, fpr already added above
+        for col in (binary_inclusions - binary_col_functions.keys()):
+            original_df.loc[:, col] = original_df.loc[:,SIGNIF_BASES[col]]
+
+        # ensure only predicted positive values included in true positive
+        # error based metrics, and only predicted negative values in false
+        # positive error based metrics
+        POSITIVE_ONLY = ['binary_fpr', 'binary_tnr', 'binary_precision', 'binary_fdr']
+        NEGATIVE_ONLY = ['binary_fnr', 'binary_tpr', 'binary_npv', 'binary_for']
+
+        FPR_BASED = [metric for metric in POSITIVE_ONLY if metric in binary_inclusions]
+        FNR_BASED = [metric for metric in NEGATIVE_ONLY if metric in binary_inclusions]
+
+        original_df.loc[original_df['binary_score'] == 0, FPR_BASED] = pd.np.nan
+        original_df.loc[original_df['binary_score'] == 1, FNR_BASED] = pd.np.nan
+
+        measures = set(original_df.columns[original_df.columns.str.contains('binary_')])
+        measures = measures.union({'label_value'})
+
         for attribute in attr_cols:
-            # fill missing values with NaN
-            col_group = original_df.fillna({attribute: 'pd.np.nan'}).groupby(attribute)
-
-            for thres_unit, thres_values in score_thresholds.items():
-                for thres_val in thres_values:
-
-                    for name, func in binary_col_functions.items():
-                        func = func(thres_unit, 'label_value', thres_val)
-                        original_df.loc[:, name] = col_group.apply(
-                            func).reset_index(drop=True)
-
-            # add columns for error-based significance
-            # precision, tnr, fdr are based on false positives
-            SIGNIF_BASES = {
-                'binary_precision': 'binary_fpr',
-                'binary_tnr': 'binary_fpr',
-                'binary_fdr': 'binary_fpr',
-                'binary_npv': 'binary_fnr',
-                'binary_tpr': 'binary_fnr',
-                'binary_for': 'binary_fnr',
-                'binary_ppr': 'binary_score',
-                'binary_pprev': 'binary_score'}
-
-            # add columns for the rest of columns in dictionary keys
-            # binary score, fnr, fpr already added above
-            for col in (binary_inclusions - binary_col_functions.keys() - {'label_value'}):
-                original_df.loc[:, col] = original_df.loc[:, SIGNIF_BASES[col]]
-
-            # ensure only predicted positive values included in true positive
-            # error based metrics, and only predicted negative values in false
-            # positive error based metrics
-            POSITIVE_ONLY = ['binary_fpr', 'binary_tnr', 'binary_precision', 'binary_fdr']
-            NEGATIVE_ONLY = ['binary_fnr', 'binary_tpr', 'binary_npv', 'binary_for']
-
-            FPR_BASED = [metric for metric in POSITIVE_ONLY if metric in binary_inclusions]
-            FNR_BASED = [metric for metric in NEGATIVE_ONLY if metric in binary_inclusions]
-
-            original_df.loc[original_df['binary_score'] == 0, FPR_BASED] = pd.np.nan
-            original_df.loc[original_df['binary_score'] == 1, FNR_BASED] = pd.np.nan
-
-            measures = list(original_df.columns[original_df.columns.str.contains('binary_')])
-            measures += ['label_value']
-
             for measure in measures:
 
                 # only calculate significance if in selected_significance
@@ -790,4 +819,3 @@ class Bias(object):
         View list of all calculated absolute bias metrics in df
         """
         return list(set(self.input_group_metrics).intersection(df.columns))
-

@@ -141,8 +141,13 @@ class Group(object):
 
         :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
+        if 'model_id' not in df.columns:
+            raise ValueError("This method expects at least two distinct 'model_id' values "
+                             f"in the dataframe. Tip: Check that 'df'' has a column called 'model_id.'")
+
         df_models = df.model_id.unique()
         crosstab_list = []
+
         if len(df_models) > 1:
             for model in df_models:
                 model_df = df.loc[df['model_id'] == model]
@@ -176,8 +181,6 @@ class Group(object):
 
         df_cols = set(df.columns)
         # check if all attr_cols exist in df
-        # check = [col in df.columns for col in attr_cols]
-
         if len(set(attr_cols) - df_cols) > 0:
             raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
 
@@ -190,10 +193,7 @@ class Group(object):
         count_ones = None  # it also serves as flag to set parameter to 'binary'
 
         if not score_thresholds:
-            with warnings.catch_warnings(record=True) as w:
-                warnings.filterwarnings("ignore", message="A value is trying to be set on a copy of a slice from a DataFrame.\nTry using .loc[row_indexer,col_indexer] = value instead")
-                df.loc[:, 'score'] = df['score'].astype(float)
-
+            df.loc[:, 'score'] = df.loc[:,'score'].astype(float)
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
@@ -209,7 +209,7 @@ class Group(object):
         # for each group variable do
         for col in attr_cols:
             # find the priors_df
-            col_group = df.fillna({col: 'pd.np.nan'}).groupby(col)
+            col_group = df.fillna({col: pd.np.nan}).groupby(col)
             counts = col_group.size()
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
@@ -232,7 +232,7 @@ class Group(object):
             # units (percentage ranks and absolute ranks)
             # YAML ex: thresholds:
             #              rank_abs: [300]
-            #              rank_pct: [1.0, 5.0, 10.0]
+            #              rank_pct: [0.01, 0.02, 0.05, 0.10]
             for thres_unit, thres_values in score_thresholds.items():
 
                 for thres_val in thres_values:
