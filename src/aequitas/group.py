@@ -193,7 +193,7 @@ class Group(object):
         count_ones = None  # it also serves as flag to set parameter to 'binary'
 
         if not score_thresholds:
-            df.loc['score'] = df['score'].astype(float)
+            df.loc[:, 'score'] = df.loc[:,'score'].astype(float)
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
