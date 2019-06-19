@@ -271,6 +271,10 @@ class Bias(object):
                                                   specific_measures=selected_significance,
                                                   label_score_ref=None)
 
+            ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
+                                                  specific_measures=selected_significance,
+                                                  label_score_ref=None)
+
             attr_cols = df['attribute_name'].unique()
 
             for attribute in attr_cols:
@@ -595,6 +599,7 @@ class Bias(object):
         # run SciPy statistical significance test between each group and
         # reference group
         for attr_val, eq_var in sample_dict.items():
+
             _, difference_significance_p = stats.ttest_ind(
                 sample_dict[ref_group],
                 sample_dict[attr_val],
@@ -772,13 +777,13 @@ class Bias(object):
 
         for attribute in attr_cols:
             for measure in measures:
+
                 # only calculate significance if in selected_significance
                 if (measure in selected_significance) or (measure.replace('binary_', '') in selected_significance):
 
                     cls._calculate_significance(original_df, disparity_df,
                                                 attribute, measure, ref_dict=ref_dict,
                                                 alpha=alpha)
-
         return disparity_df
 
 
@@ -811,4 +816,3 @@ class Bias(object):
         View list of all calculated absolute bias metrics in df
         """
         return list(set(self.input_group_metrics).intersection(df.columns))
-

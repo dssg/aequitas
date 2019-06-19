@@ -815,7 +815,7 @@ class Plot(object):
         ax.set_xlabel("Absolute Metric Magnitude")
 
         if title:
-            ax.set_title(f"{group_metric.upper()}", fontsize=20)
+            ax.set_title(f"{group_metric.upper()} (Model {model_id})", fontsize=20)
 
         return ax
 
@@ -1886,11 +1886,3 @@ class Plot(object):
 
         else:
             return ax
-
-
-
-
-
-
-
-

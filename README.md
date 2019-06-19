@@ -33,14 +33,12 @@ Install Aequitas using pip:
     pip install aequitas
 
 
-Install master from source:
+**If pip fails**, try installing master from source:
 
+    git clone https://github.com/dssg/aequitas.git
+    cd aequitas
     python setup.py install
-
-...or named as an installation requirement, *e.g.* via ``pip``:
-
-    python -m pip install git+https://github.com/dssg/aequitas.git
-
+(Note: be mindful of the python version you use to run setup.py)
 
 You may then import the ``aequitas`` module from Python:
 
