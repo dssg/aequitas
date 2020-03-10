@@ -120,7 +120,7 @@ To get started, preprocess your input data. Input data has slightly different re
 
 If you plan to bin or discretize continuous features manually, note that `get_crosstabs()` expects attribute columns to be of type 'string,' so don't forget to recast any 'categorical' type columns!
 ``` python
-    from Aequitas.preprocessing import preprocess_input_df
+    from aequitas.preprocessing import preprocess_input_df
     
     # double-check that categorical columns are of type 'string'
     df['categorical_column_name'] = df['categorical_column_name'].astype(str)
