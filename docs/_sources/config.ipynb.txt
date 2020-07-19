@@ -25,7 +25,7 @@
     "The predefined reference groups are set in the configuration file.\n",
     "\n",
     "```\n",
-    "ref_groups_method: \"predefind\"\n",
+    "ref_groups_method: \"predefined\"\n",
     "\n",
     "reference_groups:\n",
     "  \"gender\": \"male\"\n",
