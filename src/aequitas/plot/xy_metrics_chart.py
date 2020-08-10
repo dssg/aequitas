@@ -2,25 +2,25 @@ import math
 import altair as alt
 import pandas as pd
 
-from zaiquitas.plot.commons.helpers import no_axis
-from zaiquitas.plot.commons.legend import draw_legend
-from zaiquitas.plot.commons.scales import (
+from aequitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons.legend import draw_legend
+from aequitas.plot.commons.scales import (
     get_chart_size_range,
     get_color_scale,
     get_bubble_size_scale,
     get_shape_scale,
 )
-from zaiquitas.plot.commons.tooltips import get_tooltip_text_group_size
-from zaiquitas.plot.commons.style.classes import (
+from aequitas.plot.commons.tooltips import get_tooltip_text_group_size
+from aequitas.plot.commons.style.classes import (
     Threshold_Band,
     Threshold_Rule,
     Axis,
     Rule,
     Bubble,
 )
-from zaiquitas.plot.commons.style.text import FONT
-import zaiquitas.plot.commons.style.sizes as Sizes
-import zaiquitas.plot.commons.initializers as Initializer
+from aequitas.plot.commons.style.text import FONT
+import aequitas.plot.commons.style.sizes as Sizes
+import aequitas.plot.commons.initializers as Initializer
 
 # Default chart sizing options
 CHART_PADDING = 0.05

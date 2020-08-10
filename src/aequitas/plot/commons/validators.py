@@ -1,5 +1,5 @@
-import zaiquitas.plot.commons.style.sizes as Sizes
-from zaiquitas.plot.commons.helpers import calculate_chart_size_from_elements, to_list
+import aequitas.plot.commons.style.sizes as Sizes
+from aequitas.plot.commons.helpers import calculate_chart_size_from_elements, to_list
 
 METRICS_LIST = [
     "tpr",

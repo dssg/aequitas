@@ -2,22 +2,22 @@ import math
 import altair as alt
 import pandas as pd
 
-from zaiquitas.plot.commons.helpers import (
+from aequitas.plot.commons.helpers import (
     no_axis,
     transform_ratio,
     calculate_chart_size_from_elements,
     to_list,
     format_number,
 )
-from zaiquitas.plot.commons.tooltips import (
+from aequitas.plot.commons.tooltips import (
     get_tooltip_text_group_size,
     get_tooltip_text_disparity_explanation,
 )
-from zaiquitas.plot.commons.style.classes import Title, Subtitle, Parity_Result
-from zaiquitas.plot.commons.style.text import FONT
-import zaiquitas.plot.commons.style.sizes as Sizes
-import zaiquitas.plot.commons.initializers as Initializer
-import zaiquitas.plot.commons.validators as Validator
+from aequitas.plot.commons.style.classes import Title, Subtitle, Parity_Result
+from aequitas.plot.commons.style.text import FONT
+import aequitas.plot.commons.style.sizes as Sizes
+import aequitas.plot.commons.initializers as Initializer
+import aequitas.plot.commons.validators as Validator
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
