@@ -1,8 +1,8 @@
 import altair as alt
 
-import zaiquitas.plot.commons.validators as Validator
-import zaiquitas.plot.commons.scales as Scales
-from zaiquitas.plot.commons.helpers import to_list, calculate_chart_size_from_elements
+import aequitas.plot.commons.validators as Validator
+import aequitas.plot.commons.scales as Scales
+from aequitas.plot.commons.helpers import to_list, calculate_chart_size_from_elements
 
 
 def __sanitize_metrics(metrics_list):

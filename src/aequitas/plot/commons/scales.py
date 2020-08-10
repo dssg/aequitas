@@ -1,5 +1,5 @@
-from zaiquitas.plot.commons.style.classes import Shape
-import zaiquitas.plot.commons.style.color as Colors
+from aequitas.plot.commons.style.classes import Shape
+import aequitas.plot.commons.style.color as Colors
 import altair as alt
 
 import math

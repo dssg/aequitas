@@ -1,5 +1,5 @@
-import zaiquitas.plot.commons.style.color as Color
-import zaiquitas.plot.commons.style.text as Text
+import aequitas.plot.commons.style.color as Color
+import aequitas.plot.commons.style.text as Text
 
 
 class Bubble:

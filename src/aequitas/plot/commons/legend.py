@@ -1,8 +1,8 @@
 import pandas as pd
 import altair as alt
-from zaiquitas.plot.commons.style.classes import Legend
-from zaiquitas.plot.commons.style.text import FONT
-from zaiquitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons.style.classes import Legend
+from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.helpers import no_axis
 
 
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})

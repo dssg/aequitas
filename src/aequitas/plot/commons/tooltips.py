@@ -1,4 +1,4 @@
-from zaiquitas.plot.commons.helpers import format_number
+from aequitas.plot.commons.helpers import format_number
 
 
 def get_tooltip_text_group_size(plot_table):

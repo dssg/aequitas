@@ -2,17 +2,17 @@ import math
 import altair as alt
 import pandas as pd
 
-from zaiquitas.plot.bubble_disparity_chart import (
+from aequitas.plot.bubble_disparity_chart import (
     get_disparity_bubble_chart_components,
 )
-from zaiquitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
+from aequitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
 
-from zaiquitas.plot.commons.legend import draw_legend
+from aequitas.plot.commons.legend import draw_legend
 
-from zaiquitas.plot.commons.style.classes import Title, Metric_Axis
-from zaiquitas.plot.commons.style.text import FONT
-import zaiquitas.plot.commons.style.sizes as Sizes
-import zaiquitas.plot.commons.initializers as Initializer
+from aequitas.plot.commons.style.classes import Title, Metric_Axis
+from aequitas.plot.commons.style.text import FONT
+import aequitas.plot.commons.style.sizes as Sizes
+import aequitas.plot.commons.initializers as Initializer
 
 # Default chart sizing options
 CHART_PADDING = 0.1
