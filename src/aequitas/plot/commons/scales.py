@@ -1,12 +1,15 @@
-from aequitas.plot.commons.style.classes import Shape
+from aequitas.plot.commons.style.classes import Shape, Bubble
+from aequitas.plot.commons.style.sizes import Disparity_Chart
 import aequitas.plot.commons.style.color as Colors
 import altair as alt
 
 import math
 
 
-def get_chart_size_range(length, padding):
+def get_chart_size_range(length, padding=Disparity_Chart.padding):
     """Calculate the chart size range for a given axis based on the length and padding."""
+    # Using Disparity_Chart.padding as the default as the scatter needs to use a different value (0.05)
+    # It's indifferent to use Disparity_Chart.padding or Metric_Chart.padding as they both are 0.1
     return [length * padding, length * (1 - padding)]
 
 
@@ -66,12 +69,12 @@ def get_shape_scale(plot_table, ref_group, accessibility_mode=False):
     return shape_scale
 
 
-def get_bubble_size_scale(plot_table, metrics, chart_height, chart_padding):
+def get_bubble_size_scale(plot_table, metrics, chart_height):
     """Create the scale for the bubble size"""
 
-    max_bubble_ratio = (chart_height * (1 - 2 * chart_padding)) / len(metrics) / 4
+    max_bubble_radius = (chart_height * Bubble.max_bubble_ratio) / len(metrics)
     bubble_size_domain = [0, plot_table["group_size"].max() * 1.2]
-    bubble_size_range = [0, max_bubble_ratio ** 2 * math.pi]
+    bubble_size_range = [0, max_bubble_radius ** 2 * math.pi]
 
     bubble_size_scale = alt.Scale(domain=bubble_size_domain, range=bubble_size_range)
     return bubble_size_scale

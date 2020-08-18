@@ -12,8 +12,15 @@ from aequitas.plot.commons.helpers import (
 from aequitas.plot.commons.tooltips import (
     get_tooltip_text_group_size,
     get_tooltip_text_disparity_explanation,
+    get_tooltip_text_parity_test_explanation,
 )
-from aequitas.plot.commons.style.classes import Title, Subtitle, Parity_Result
+from aequitas.plot.commons.style.classes import (
+    Title,
+    Subtitle,
+    Parity_Result,
+    Annotation,
+    Legend,
+)
 from aequitas.plot.commons.style.text import FONT
 import aequitas.plot.commons.style.sizes as Sizes
 import aequitas.plot.commons.initializers as Initializer
@@ -82,6 +89,7 @@ def __draw_attribute_title(attribute, width, size_constants):
             font=FONT,
             size=Title.font_size,
             color=Title.font_color,
+            fontWeight=Title.font_weight,
         )
         .encode(text=alt.value(attribute.upper()),)
         .properties(width=width, height=size_constants["attribute_titles_height"])
@@ -102,6 +110,7 @@ def __draw_metric_line_titles(metrics, size_constants):
                 align="center",
                 baseline="middle",
                 font=FONT,
+                fontWeight=Title.font_weight,
                 size=Title.font_size,
                 color=Title.font_color,
             )
@@ -225,7 +234,9 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             alt.Color(
                 f"{metric}_parity_result:O",
                 scale=color_scale,
-                legend=alt.Legend(title="Parity Test Result", padding=20),
+                legend=alt.Legend(
+                    title="Parity Test", padding=20,
+                ),
             ),
             tooltip=population_bar_tooltips,
         )
@@ -242,7 +253,9 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
         alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
         alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
         alt.Tooltip(
-            field=f"{metric}_parity_result", type="nominal", title="Parity Test"
+            field=f"tooltip_parity_test_explanation_{metric}",
+            type="nominal",
+            title="Parity Test",
         ),
         alt.Tooltip(
             field=f"tooltip_disparity_explanation_{metric}",
@@ -277,6 +290,37 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
     )
 
 
+def __draw_parity_test_explanation(fairness_threshold, x_position):
+    """Draw text that explains what does pass/fail mean in the parity test results."""
+
+    explanation_text = alt.Chart(DUMMY_DF).mark_text(
+        baseline="top",
+        align="left",
+        font=FONT,
+        fill=Annotation.font_color,
+        fontSize=Annotation.font_size,
+        fontWeight=Annotation.font_weight,
+    )
+
+    explanation_text_group = explanation_text.encode(
+        x=alt.value(x_position),
+        y=alt.value(0),
+        text=alt.value(
+            f"For a group to pass the parity test its disparity to the reference group cannot exceed the fairness threshold ({fairness_threshold})."
+        ),
+    )
+
+    explanation_text_attribute = explanation_text.encode(
+        x=alt.value(x_position),
+        y=alt.value(Annotation.font_size * Annotation.line_spacing),
+        text=alt.value(
+            f"An attribute passes the parity test for a given metric if all its groups pass the test."
+        ),
+    )
+
+    return explanation_text_group + explanation_text_attribute
+
+
 def __create_population_bar_df(attribute_df, metric):
     """ Creates a pandas aggregation of the attribute_df by parity result, along with the
     list of groups tooltip variable. """
@@ -302,8 +346,12 @@ def __create_population_bar_df(attribute_df, metric):
         )
         .reset_index()
     )
-    population_bar_df["tooltip_group_size"] = get_tooltip_text_group_size(
-        population_bar_df
+
+    population_bar_df["tooltip_group_size"] = population_bar_df.apply(
+        lambda row: get_tooltip_text_group_size(
+            row["group_size"], row["total_entities"]
+        ),
+        axis=1,
     )
 
     return population_bar_df
@@ -328,18 +376,37 @@ def __create_group_rank_variable(attribute_df, metric):
     )
 
 
-def __create_tooltip_variables(attribute_df, metric):
+def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
     """ Creates disparity explanation and formatted group size tooltip variables. """
 
-    # DISPARITY EXPLANATION
-    attribute_df[
-        f"tooltip_disparity_explanation_{metric}"
-    ] = get_tooltip_text_disparity_explanation(
-        attribute_df, metric, attribute_df["ref_group_value"].iloc[0]
+    # PARITY TEST EXPLANATION
+    attribute_df[f"tooltip_parity_test_explanation_{metric}"] = attribute_df.apply(
+        lambda row: get_tooltip_text_parity_test_explanation(
+            row[f"{metric}_parity_result"], metric, fairness_threshold,
+        ),
+        axis=1,
     )
 
+    # DISPARITY EXPLANATION
+    ref_group = attribute_df["ref_group_value"].iloc[0]
+
+    attribute_df[f"tooltip_disparity_explanation_{metric}"] = attribute_df.apply(
+        lambda row: get_tooltip_text_disparity_explanation(
+            row[f"{metric}_disparity_scaled"],
+            row["attribute_value"],
+            metric,
+            ref_group,
+        ),
+        axis=1,
+    )
     # FORMATTED GROUP SIZE
-    attribute_df["tooltip_group_size"] = get_tooltip_text_group_size(attribute_df)
+
+    attribute_df["tooltip_group_size"] = attribute_df.apply(
+        lambda row: get_tooltip_text_group_size(
+            row["group_size"], row["total_entities"]
+        ),
+        axis=1,
+    )
 
 
 def __create_disparity_variables(attribute_df, metric, fairness_threshold):
@@ -352,7 +419,10 @@ def __create_disparity_variables(attribute_df, metric, fairness_threshold):
 
     # PARITY RESULT
     attribute_df[f"{metric}_parity_result"] = attribute_df.apply(
-        __get_parity_result_variable, metric=metric, fairness_threshold=fairness_threshold, axis=1
+        __get_parity_result_variable,
+        metric=metric,
+        fairness_threshold=fairness_threshold,
+        axis=1,
     )
 
 
@@ -366,7 +436,7 @@ def __get_attribute_column(
     for metric in metrics:
         # CREATE VARIABLES IN DF
         __create_disparity_variables(attribute_df, metric, fairness_threshold)
-        __create_tooltip_variables(attribute_df, metric)
+        __create_tooltip_variables(attribute_df, metric, fairness_threshold)
         __create_group_rank_variable(attribute_df, metric)
 
         # PARITY RESULT TEXT
@@ -487,7 +557,12 @@ def plot_summary_chart(
 
         # ATTRIBUTE COLUMN
         attribute_column = __get_attribute_column(
-            attribute_df, metrics, scales, attribute, size_constants, fairness_threshold,
+            attribute_df,
+            metrics,
+            scales,
+            attribute,
+            size_constants,
+            fairness_threshold,
         )
 
         attribute_columns.append((attribute_column))
@@ -499,13 +574,32 @@ def plot_summary_chart(
         spacing=size_constants["column_spacing"] + size_constants["column_width"],
     )
     # ADD METRIC TITLES
-    Summary_Chart = alt.hconcat(
+    summary_chart_table = alt.hconcat(
         metric_titles,
         summary_chart_columns,
         bounds="flush",
         spacing=size_constants["metric_titles_width"]
         + size_constants["column_spacing"],
-    ).configure_view(strokeWidth=0)
+    )
+
+    summary_chart_explanation = __draw_parity_test_explanation(
+        fairness_threshold, size_constants["column_spacing"] / 2
+    )
+
+    Summary_Chart = (
+        alt.vconcat(summary_chart_table, summary_chart_explanation)
+        .configure_legend(
+            labelFont=FONT,
+            labelColor=Legend.font_color,
+            labelFontSize=Legend.font_size,
+            titleFont=FONT,
+            titleColor=Legend.font_color,
+            titleFontSize=Legend.title_font_size,
+            titleFontWeight=Legend.title_font_weight,
+            titlePadding=Legend.title_margin_bottom + Legend.vertical_spacing,
+        )
+        .configure_view(strokeWidth=0)
+    )
 
     return Summary_Chart
 

@@ -9,17 +9,13 @@ METRICS_LIST = [
     "fpr",
     "fnr",
     "npv",
-    "precision",
-    "pp",
-    "pn",
     "ppr",
+    "precision",
     "pprev",
-    "fp",
-    "fn",
-    "tn",
-    "tp",
     "prev",
+    "group_size_pct",
 ]
+NON_DISPARITY_METRICS_LIST = ["prev", "group_size_pct"]
 DF_FIELDS = ["attribute_name", "attribute_value", "group_size", "total_entities"]
 
 # DATA
@@ -46,15 +42,18 @@ def dataframe(df, metrics_list):
         except KeyError:
             print(f'The dataframe does not contain the column "{metric}".')
             raise
-        try:
-            df[f"{metric}_disparity"]
-        except KeyError:
-            print(f'The dataframe does not contain the column "{metric}_disparity".')
-            raise
+        if metric not in NON_DISPARITY_METRICS_LIST:
+            try:
+                df[f"{metric}_disparity"]
+            except KeyError:
+                print(
+                    f'The dataframe does not contain the column "{metric}_disparity".'
+                )
+                raise
 
 
 def metrics(metrics):
-    """Validates if metrics are valid fariness metrics.
+    """Validates if  if there are no duplicated metrics, and if all metrics are valid fairness metrics.
 
     :param metrics: a metric or a list of metrics
     :type metrics: str or list 
@@ -62,6 +61,11 @@ def metrics(metrics):
     """
 
     metrics = to_list(metrics)
+
+    if len(metrics) != len(set(metrics)):
+        raise ValueError(
+            f"There is at least one duplicated metric in the metrics list."
+        )
 
     for metric in metrics:
         if metric not in METRICS_LIST:
@@ -93,12 +97,13 @@ def fairness_threshold(fairness_threshold):
     :param fairness_threshold: a threshold value
     :type fairness_threshold: number
     """
-    try:
-        if fairness_threshold <= 1:
-            raise ValueError(f"Fairness Threshold value must be greater than 1.")
-    except TypeError:
-        print("Fairness Threshold value must be a number")
-        raise
+    if fairness_threshold is not None:
+        try:
+            if fairness_threshold <= 1:
+                raise ValueError(f"Fairness Threshold value must be greater than 1.")
+        except TypeError:
+            print("Fairness Threshold value must be a number")
+            raise
 
 
 # SIZES

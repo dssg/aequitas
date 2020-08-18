@@ -14,26 +14,24 @@ from aequitas.plot.commons.tooltips import get_tooltip_text_group_size
 from aequitas.plot.commons.style.classes import (
     Threshold_Band,
     Threshold_Rule,
-    Axis,
     Rule,
     Bubble,
+    Scatter_Axis
 )
 from aequitas.plot.commons.style.text import FONT
 import aequitas.plot.commons.style.sizes as Sizes
 import aequitas.plot.commons.initializers as Initializer
-
-# Default chart sizing options
-CHART_PADDING = 0.05
+import aequitas.plot.commons.validators as Validator
 
 
-def __get_position_scales(chart_height, chart_width, chart_padding):
+def __get_position_scales(chart_height, chart_width):
     """Computes the scales for x and y encodings to be used in the xy metrics chart."""
 
     position_scales = dict()
 
     # X-Y RANGES (based on chart dimensions)
-    x_range = get_chart_size_range(chart_width, chart_padding)  #
-    y_range = get_chart_size_range(chart_height, chart_padding)  #
+    x_range = get_chart_size_range(chart_width, Sizes.XY_Chart.padding)
+    y_range = get_chart_size_range(chart_height, Sizes.XY_Chart.padding)
     y_range.reverse()
 
     # METRICS SCALES
@@ -133,7 +131,7 @@ def __draw_threshold_bands(
     )
 
 
-def __draw_tick_labels(scales, chart_height, chart_width, chart_padding):
+def __draw_tick_labels(scales, chart_height, chart_width):
     """Draws the numbers in both axes."""
 
     axis_values = [0, 0.25, 0.5, 0.75, 1]
@@ -143,11 +141,12 @@ def __draw_tick_labels(scales, chart_height, chart_width, chart_padding):
     x_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            yOffset=Axis.label_font_size * 1.5,
+            yOffset=Scatter_Axis.label_font_size * 1.5,
             tooltip="",
             align="center",
-            fontSize=Axis.label_font_size,
-            fontWeight=Axis.label_font_weight,
+            fontSize=Scatter_Axis.label_font_size,
+            color=Scatter_Axis.label_color,
+            fontWeight=Scatter_Axis.label_font_weight,
             font=FONT,
         )
         .encode(
@@ -162,13 +161,13 @@ def __draw_tick_labels(scales, chart_height, chart_width, chart_padding):
     y_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            # yOffset=2,
             baseline="middle",
-            xOffset=-Axis.label_font_size * 1.5,
+            xOffset=-Scatter_Axis.label_font_size * 1.5,
             tooltip="",
             align="center",
-            fontSize=Axis.label_font_size,
-            fontWeight=Axis.label_font_weight,
+            fontSize=Scatter_Axis.label_font_size,
+            fontWeight=Scatter_Axis.label_font_weight,
+            color=Scatter_Axis.label_color,
             font=FONT,
         )
         .encode(
@@ -241,7 +240,13 @@ def __draw_bubbles(
         y_metric,
     ]
     metric_plot_table = plot_table[fields_to_keep_in_metric_table].copy(deep=True)
-    metric_plot_table["tooltip_group_size"] = get_tooltip_text_group_size(plot_table)
+
+    metric_plot_table["tooltip_group_size"] = plot_table.apply(
+        lambda row: get_tooltip_text_group_size(
+            row["group_size"], row["total_entities"]
+        ),
+        axis=1,
+    )
 
     # COLOR ENCODING
     bubble_color_encoding = alt.condition(
@@ -299,7 +304,6 @@ def plot_xy_metrics_chart(
     fairness_threshold=1.25,
     chart_height=None,
     chart_width=None,
-    chart_padding=CHART_PADDING,
     accessibility_mode=False,
 ):
     """ Draws XY scatterplot, with the group_size encoded in the bubble size, based on the two metrics provided. 
@@ -322,12 +326,11 @@ def plot_xy_metrics_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
         Sizes.XY_Chart,
         accessibility_mode,
     )
 
-    position_scales = __get_position_scales(chart_height, chart_width, chart_padding,)
+    position_scales = __get_position_scales(chart_height, chart_width)
 
     scales = dict(global_scales, **position_scales)
 
@@ -335,7 +338,7 @@ def plot_xy_metrics_chart(
     axis_rules = __draw_axis_rules(x_metric, y_metric, scales)
 
     # TICK LABELS
-    tick_labels = __draw_tick_labels(scales, chart_height, chart_width, chart_padding)
+    tick_labels = __draw_tick_labels(scales, chart_height, chart_width)
 
     # INITIATE CHART
     chart = axis_rules + tick_labels
@@ -351,7 +354,7 @@ def plot_xy_metrics_chart(
         y_ref_group_value = plot_table.loc[ref_group_index, y_metric].iloc[0]
 
         # Y AXIS
-        if y_metric != "prev":
+        if y_metric not in Validator.NON_DISPARITY_METRICS_LIST:
             y_thresholds = __draw_threshold_bands(
                 ref_group_value=y_ref_group_value,
                 fairness_threshold=fairness_threshold,
@@ -363,7 +366,7 @@ def plot_xy_metrics_chart(
             chart += y_thresholds
 
         # X AXIS
-        if x_metric != "prev":
+        if x_metric not in Validator.NON_DISPARITY_METRICS_LIST:
             x_thresholds = __draw_threshold_bands(
                 ref_group_value=x_ref_group_value,
                 fairness_threshold=fairness_threshold,
@@ -392,12 +395,12 @@ def plot_xy_metrics_chart(
         .properties(height=chart_height, width=chart_width)
         .configure_axis(
             titleFont=FONT,
-            titleColor=Axis.title_color,
-            titleFontSize=Axis.title_font_size,
-            titleFontWeight=Axis.title_font_weight,
-            labelFontSize=Axis.label_font_size,
-            labelColor=Axis.label_color,
-            labelFont=FONT,
+            titleColor=Scatter_Axis.title_color,
+            titleFontSize=Scatter_Axis.title_font_size,
+            titleFontWeight=Scatter_Axis.title_font_weight,
+            titleAngle=0,
+        ).configure_axisLeft(
+            titlePadding=Scatter_Axis.title_padding,
         )
         .resolve_scale(y="independent", x="independent", size="independent")
         .resolve_axis(x="shared", y="shared")

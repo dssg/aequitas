@@ -23,7 +23,7 @@ from aequitas.plot.commons.style.classes import (
 )
 
 from aequitas.plot.commons.style.text import FONT
-import aequitas.plot.commons.style.sizes as Sizes
+from aequitas.plot.commons.style.sizes import Disparity_Chart
 import aequitas.plot.commons.initializers as Initializer
 
 
@@ -31,12 +31,9 @@ import aequitas.plot.commons.initializers as Initializer
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-# Default chart sizing options
-CHART_PADDING = 0.1
-
 
 def __get_position_scales(
-    plot_table, metrics, fairness_threshold, chart_height, chart_width, chart_padding
+    plot_table, metrics, fairness_threshold, chart_height, chart_width
 ):
     """Computes the scales for x and y encodings to be used in the disparity bubble chart."""
 
@@ -44,7 +41,7 @@ def __get_position_scales(
 
     # DISPARITIES SCALE
     ## RANGE
-    x_range = get_chart_size_range(chart_width, chart_padding)
+    x_range = get_chart_size_range(chart_width)
 
     ## DOMAIN
     ### Get max absolute disparity
@@ -63,7 +60,7 @@ def __get_position_scales(
     position_scales["x"] = alt.Scale(domain=x_domain, range=x_range)
 
     # METRICS SCALE
-    y_range = get_chart_size_range(chart_height, chart_padding)
+    y_range = get_chart_size_range(chart_height)
     if chart_height < 300:
         y_range[0] = 30
     y_domain = [metric.upper() for metric in metrics]
@@ -140,14 +137,14 @@ def __draw_x_ticks_labels(scales, chart_height):
         .encode(
             text=alt.Text("label:N"),
             x=alt.X("value:Q", scale=scales["x"],),
-            y=alt.value(CHART_PADDING * chart_height * 0.7),
+            y=alt.value(Disparity_Chart.padding * chart_height * 0.7),
         )
     )
 
     return tick_labels
 
 
-def __draw_text_annotations(ref_group, chart_height, chart_width, chart_padding):
+def __draw_text_annotations(ref_group, chart_height, chart_width):
     """Draws on chart text annotations."""
 
     # FONT
@@ -165,8 +162,8 @@ def __draw_text_annotations(ref_group, chart_height, chart_width, chart_padding)
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width * (1 - 1.5 * chart_padding)),
-            y=alt.value(CHART_PADDING * chart_height * 0.3),
+            x=alt.value(chart_width * (1 - 1.5 * Disparity_Chart.padding)),
+            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
             text=alt.value("TIMES LARGER"),
         )
     )
@@ -181,8 +178,8 @@ def __draw_text_annotations(ref_group, chart_height, chart_width, chart_padding)
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width * 1.5 * chart_padding),
-            y=alt.value(CHART_PADDING * chart_height * 0.3),
+            x=alt.value(chart_width * 1.5 * Disparity_Chart.padding),
+            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
             text=alt.value("TIMES SMALLER"),
         )
     )
@@ -198,7 +195,7 @@ def __draw_text_annotations(ref_group, chart_height, chart_width, chart_padding)
         )
         .encode(
             x=alt.value(chart_width / 2),
-            y=alt.value(CHART_PADDING * chart_height * 0.3),
+            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
             text=alt.value("EQUAL"),
         )
     )
@@ -206,7 +203,7 @@ def __draw_text_annotations(ref_group, chart_height, chart_width, chart_padding)
     return text_times_smaller + text_times_larger + text_reference_group
 
 
-def __draw_reference_rule(ref_group, chart_height, chart_width, chart_padding):
+def __draw_reference_rule(ref_group, chart_height, chart_width):
     """Draws vertical reference rule where the ratio is the same as the reference group."""
 
     reference_rule = (
@@ -218,8 +215,8 @@ def __draw_reference_rule(ref_group, chart_height, chart_width, chart_padding):
         )
         .encode(
             x=alt.value(chart_width / 2),
-            y=alt.value(chart_height * chart_padding / 1.2),
-            y2=alt.value(chart_height * (1 - chart_padding / 1.2)),
+            y=alt.value(chart_height * Disparity_Chart.padding / 1.2),
+            y2=alt.value(chart_height * (1 - Disparity_Chart.padding / 1.2)),
             tooltip=alt.value(f"{ref_group} [REF]"),
         )
     )
@@ -228,7 +225,7 @@ def __draw_reference_rule(ref_group, chart_height, chart_width, chart_padding):
 
 
 def __draw_threshold_rules(
-    threshold_df, scales, chart_height, chart_padding, accessibility_mode=False
+    threshold_df, scales, chart_height, accessibility_mode=False
 ):
     """Draws threshold rules: red lines that mark the defined fairness_threshold in the chart."""
     stroke_color = (
@@ -246,8 +243,8 @@ def __draw_threshold_rules(
             tooltip="",
         )
         .encode(
-            y=alt.value(chart_padding * chart_height),
-            y2=alt.value((1 - chart_padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
         )
     )
 
@@ -258,12 +255,7 @@ def __draw_threshold_rules(
 
 
 def __draw_threshold_bands(
-    threshold_df,
-    scales,
-    chart_height,
-    chart_width,
-    chart_padding,
-    accessibility_mode=False,
+    threshold_df, scales, chart_height, chart_width, accessibility_mode=False,
 ):
     """Draws threshold bands: regions painted red where the metric value is above the defined fairness_threshold."""
     fill_color = (
@@ -274,8 +266,8 @@ def __draw_threshold_bands(
         alt.Chart(threshold_df)
         .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
         .encode(
-            y=alt.value(chart_padding * chart_height),
-            y2=alt.value((1 - chart_padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
         )
     )
 
@@ -290,7 +282,7 @@ def __draw_threshold_bands(
 
 
 def __draw_threshold_text(
-    fairness_threshold, ref_group, chart_height, chart_padding, accessibility_mode=False
+    fairness_threshold, ref_group, chart_height, accessibility_mode=False
 ):
     """Draw text that helps to read the threshold elements of the chart."""
     font_color = (
@@ -310,7 +302,7 @@ def __draw_threshold_text(
         )
         .encode(
             x=alt.value(0),
-            y=alt.value(chart_height * (1 - 2 / 3 * chart_padding)),
+            y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding)),
             text=alt.value(
                 f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
             ),
@@ -326,7 +318,6 @@ def __get_threshold_elements(
     scales,
     chart_height,
     chart_width,
-    chart_padding,
     accessibility_mode=False,
 ):
     """Gets threshold elements (rules, bands and text) for the chart."""
@@ -344,22 +335,17 @@ def __get_threshold_elements(
 
     # RULES
     threshold_rules = __draw_threshold_rules(
-        threshold_df, scales, chart_height, chart_padding, accessibility_mode
+        threshold_df, scales, chart_height, accessibility_mode
     )
 
     # BANDS
     threshold_bands = __draw_threshold_bands(
-        threshold_df,
-        scales,
-        chart_height,
-        chart_width,
-        chart_padding,
-        accessibility_mode,
+        threshold_df, scales, chart_height, chart_width, accessibility_mode,
     )
 
     # HELPER TEXT
     threshold_text = __draw_threshold_text(
-        fairness_threshold, ref_group, chart_height, chart_padding, accessibility_mode
+        fairness_threshold, ref_group, chart_height, accessibility_mode
     )
 
     return threshold_rules + threshold_bands + threshold_text
@@ -388,7 +374,12 @@ def __draw_bubbles(
         alt.value(Bubble.color_faded),
     )
 
-    plot_table["tooltip_group_size"] = get_tooltip_text_group_size(plot_table)
+    plot_table["tooltip_group_size"] = plot_table.apply(
+        lambda row: get_tooltip_text_group_size(
+            row["group_size"], row["total_entities"]
+        ),
+        axis=1,
+    )
 
     # CHART INITIALIZATION
     bubble_centers = alt.Chart().mark_point()
@@ -397,9 +388,15 @@ def __draw_bubbles(
     # LAYERING THE METRICS
     for metric in metrics:
 
-        plot_table[
-            f"tooltip_disparity_explanation_{metric}"
-        ] = get_tooltip_text_disparity_explanation(plot_table, metric, ref_group)
+        plot_table[f"tooltip_disparity_explanation_{metric}"] = plot_table.apply(
+            lambda row: get_tooltip_text_disparity_explanation(
+                row[f"{metric}_disparity_scaled"],
+                row["attribute_value"],
+                metric,
+                ref_group,
+            ),
+            axis=1,
+        )
 
         bubble_tooltip_encoding = [
             alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
@@ -465,7 +462,6 @@ def get_disparity_bubble_chart_components(
     fairness_threshold,
     chart_height,
     chart_width,
-    chart_padding,
     accessibility_mode=False,
     concat_chart=False,
 ):
@@ -479,24 +475,20 @@ def get_disparity_bubble_chart_components(
 
     # POSITION SCALES
     position_scales = __get_position_scales(
-        plot_table, metrics, fairness_threshold, chart_height, chart_width, chart_padding,
+        plot_table, metrics, fairness_threshold, chart_height, chart_width
     )
 
     scales = dict(global_scales, **position_scales)
 
     # RULES
     horizontal_rules = __draw_metrics_rules(metrics, scales, concat_chart)
-    reference_rule = __draw_reference_rule(
-        ref_group, chart_height, chart_width, chart_padding
-    )
+    reference_rule = __draw_reference_rule(ref_group, chart_height, chart_width)
 
     # LABELS
     x_ticks_labels = __draw_x_ticks_labels(scales, chart_height)
 
     # ANNOTATIONS
-    text_annotations = __draw_text_annotations(
-        ref_group, chart_height, chart_width, chart_padding
-    )
+    text_annotations = __draw_text_annotations(ref_group, chart_height, chart_width)
 
     # BUBBLES - CENTERS & AREAS
     bubbles = __draw_bubbles(plot_table, metrics, ref_group, scales, selection,)
@@ -509,7 +501,6 @@ def get_disparity_bubble_chart_components(
             scales,
             chart_height,
             chart_width,
-            chart_padding,
             accessibility_mode,
         )
 
@@ -542,8 +533,7 @@ def plot_disparity_bubble_chart(
     attribute,
     fairness_threshold=1.25,
     chart_height=None,
-    chart_width=Sizes.Disparity_Chart.full_width,
-    chart_padding=CHART_PADDING,
+    chart_width=Disparity_Chart.full_width,
     accessibility_mode=False,
 ):
     """Draws bubble chart to visualize disparity in selected metrics versus that of a reference group for a given attribute."""
@@ -562,8 +552,7 @@ def plot_disparity_bubble_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
-        Sizes.Disparity_Chart,
+        Disparity_Chart,
         accessibility_mode,
     )
 
@@ -577,7 +566,6 @@ def plot_disparity_bubble_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
         accessibility_mode,
     )
 

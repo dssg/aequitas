@@ -2,20 +2,15 @@ import math
 import altair as alt
 import pandas as pd
 
-from aequitas.plot.bubble_disparity_chart import (
-    get_disparity_bubble_chart_components,
-)
+from aequitas.plot.bubble_disparity_chart import get_disparity_bubble_chart_components
 from aequitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
 
 from aequitas.plot.commons.legend import draw_legend
 
-from aequitas.plot.commons.style.classes import Title, Metric_Axis
+from aequitas.plot.commons.style.classes import Chart_Title, Title, Metric_Axis
 from aequitas.plot.commons.style.text import FONT
 import aequitas.plot.commons.style.sizes as Sizes
 import aequitas.plot.commons.initializers as Initializer
-
-# Default chart sizing options
-CHART_PADDING = 0.1
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -39,14 +34,15 @@ def draw_chart_title(chart_title, chart_width):
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="center",
-            fill=Title.font_color,
-            fontSize=Title.font_size,
+            fill=Chart_Title.font_color,
+            fontSize=Chart_Title.font_size,
+            fontWeight=Chart_Title.font_weight,
             font=FONT,
             tooltip="",
         )
         .encode(
             x=alt.value(chart_width / 2),
-            y=alt.value(Title.margin_top),
+            y=alt.value(Chart_Title.margin_top),
             text=alt.value(chart_title),
         )
     )
@@ -61,7 +57,6 @@ def plot_concatenated_bubble_charts(
     fairness_threshold=1.25,
     chart_height=None,
     chart_width=Sizes.Concat_Chart.full_width,
-    chart_padding=CHART_PADDING,
     accessibility_mode=False,
 ):
     """Draws bubble chart to visualize the values of the selected metrics for a given attribute."""
@@ -80,7 +75,6 @@ def plot_concatenated_bubble_charts(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
         Sizes.Disparity_Chart,
         accessibility_mode,
     )
@@ -105,7 +99,6 @@ def plot_concatenated_bubble_charts(
                 fairness_threshold,
                 chart_height,
                 chart_sizes["disparity_chart_width"],
-                chart_padding,
                 accessibility_mode,
                 concat_chart=True,
             )
@@ -127,7 +120,6 @@ def plot_concatenated_bubble_charts(
                 fairness_threshold,
                 chart_height,
                 chart_sizes["metric_chart_width"],
-                chart_padding,
                 accessibility_mode,
                 concat_chart=True,
             )

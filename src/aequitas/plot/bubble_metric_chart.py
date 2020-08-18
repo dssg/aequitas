@@ -26,24 +26,19 @@ import aequitas.plot.commons.initializers as Initializer
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-# Default chart sizing options
-CHART_PADDING = 0.1
 
-
-def __get_position_scales(
-    metrics, chart_height, chart_width, chart_padding, concat_chart
-):
+def __get_position_scales(metrics, chart_height, chart_width, concat_chart):
     """Computes the scales for x and y encodings to be used in the metric bubble chart."""
 
     position_scales = dict()
 
     # METRICS VALUES SCALE
-    x_range = get_chart_size_range(chart_width, chart_padding)
+    x_range = get_chart_size_range(chart_width)
     x_domain = [0, 1]
     position_scales["x"] = alt.Scale(domain=x_domain, range=x_range)
 
     # METRICS LABELS SCALE
-    y_range = get_chart_size_range(chart_height, chart_padding)
+    y_range = get_chart_size_range(chart_height)
     y_domain = [metric.upper() for metric in metrics]
     position_scales["y"] = alt.Scale(domain=y_domain, range=y_range)
 
@@ -121,7 +116,7 @@ def __draw_x_ticks_labels(scales, chart_height):
         .encode(
             text=alt.Text("value:N"),
             x=alt.X("value:Q", scale=scales["x"],),
-            y=alt.value(CHART_PADDING * chart_height * 0.7),
+            y=alt.value(Metric_Chart.padding * chart_height * 0.7),
         )
     )
 
@@ -190,7 +185,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
 
 def __draw_threshold_text(
-    fairness_threshold, ref_group, chart_height, chart_padding, accessibility_mode=False
+    fairness_threshold, ref_group, chart_height, accessibility_mode=False
 ):
     """Draw text that helps to read the fairness threshold elements of the chart."""
     font_color = (
@@ -210,7 +205,7 @@ def __draw_threshold_text(
         )
         .encode(
             x=alt.value(0),
-            y=alt.value(chart_height * (1 - 2 / 3 * chart_padding)),
+            y=alt.value(chart_height * (1 - 2 / 3 * Metric_Chart.padding)),
             text=alt.value(
                 f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
             ),
@@ -227,7 +222,6 @@ def __get_threshold_elements(
     ref_group,
     scales,
     chart_height,
-    chart_padding,
     concat_chart,
     accessibility_mode=False,
 ):
@@ -277,7 +271,7 @@ def __get_threshold_elements(
         return lower_threshold_rules + upper_threshold_rules + threshold_bands
     else:
         threshold_text = __draw_threshold_text(
-            fairness_threshold, ref_group, chart_height, chart_padding, accessibility_mode
+            fairness_threshold, ref_group, chart_height, accessibility_mode
         )
 
         return (
@@ -310,14 +304,24 @@ def __draw_bubbles(
     bubble_centers = alt.Chart().mark_point()
     bubble_areas = alt.Chart().mark_circle()
 
-    plot_table["tooltip_group_size"] = get_tooltip_text_group_size(plot_table)
-
+    plot_table["tooltip_group_size"] = plot_table.apply(
+        lambda row: get_tooltip_text_group_size(
+            row["group_size"], row["total_entities"]
+        ),
+        axis=1,
+    )
     # LAYERING THE METRICS
     for metric in metrics:
         # TOOLTIP
-        plot_table[
-            f"tooltip_disparity_explanation_{metric}"
-        ] = get_tooltip_text_disparity_explanation(plot_table, metric, ref_group)
+        plot_table[f"tooltip_disparity_explanation_{metric}"] = plot_table.apply(
+            lambda row: get_tooltip_text_disparity_explanation(
+                row[f"{metric}_disparity_scaled"],
+                row["attribute_value"],
+                metric,
+                ref_group,
+            ),
+            axis=1,
+        )
 
         bubble_tooltip_encoding = [
             alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
@@ -383,7 +387,6 @@ def get_metric_bubble_chart_components(
     fairness_threshold,
     chart_height,
     chart_width,
-    chart_padding,
     accessibility_mode=False,
     concat_chart=False,
 ):
@@ -397,7 +400,7 @@ def get_metric_bubble_chart_components(
 
     # POSITION SCALES
     position_scales = __get_position_scales(
-        metrics, chart_height, chart_width, chart_padding, concat_chart
+        metrics, chart_height, chart_width, concat_chart
     )
     scales = dict(global_scales, **position_scales)
 
@@ -420,7 +423,6 @@ def get_metric_bubble_chart_components(
             ref_group,
             scales,
             chart_height,
-            chart_padding,
             concat_chart,
             accessibility_mode,
         )
@@ -446,7 +448,6 @@ def plot_metric_bubble_chart(
     fairness_threshold=1.25,
     chart_height=None,
     chart_width=Metric_Chart.full_width,
-    chart_padding=CHART_PADDING,
     accessibility_mode=False,
 ):
     """Draws bubble chart to visualize the values of the selected metrics for a given attribute."""
@@ -465,7 +466,6 @@ def plot_metric_bubble_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
         Metric_Chart,
         accessibility_mode,
     )
@@ -479,7 +479,6 @@ def plot_metric_bubble_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        chart_padding,
         accessibility_mode,
     )
 
