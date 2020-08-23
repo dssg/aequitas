@@ -1,7 +1,7 @@
 import logging
 import warnings
 from aequitas.plotting import assemble_ref_groups
-
+import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -99,7 +99,7 @@ class Bias(object):
 
                 # if entire column for a group metric is NaN, cast min value
                 # index column to same index as any other group for that attribute
-                if any(pd.np.isnan(val) for val in idxmin.values):
+                if any(np.isnan(val) for val in idxmin.values):
                     if len(idxmin) >= 1:
                         idxmin.loc[idxmin.isna()] = df.loc[
                             df["attribute_name"].isin(
@@ -133,7 +133,7 @@ class Bias(object):
             df[group_metric + '_disparity'] = \
                 df[group_metric] / df[group_metric + '_disparity']
             # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(pd.np.inf, fill_divbyzero)
+        df = df.replace(np.inf, fill_divbyzero)
 
         if not check_significance:
             return df
@@ -166,7 +166,7 @@ class Bias(object):
                 truemask = df.loc[:, significance_cols] < alpha
                 falsemask = df.loc[:, significance_cols] >= alpha
 
-                df.loc[:, significance_cols] = pd.np.select(
+                df.loc[:, significance_cols] = np.select(
                     [truemask, falsemask], [True, False], default=None)
 
             # order new calculated metric columns: disparity, ref_group, then
@@ -248,7 +248,7 @@ class Bias(object):
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
 
         # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(pd.np.inf, fill_divbyzero)
+        df = df.replace(np.inf, fill_divbyzero)
 
         # when there is a zero in the numerator and a zero in denominator it is
         # considered NaN after division, so if 0/0 we assume 1.0 disparity
@@ -298,7 +298,7 @@ class Bias(object):
                 truemask = df.loc[:, significance_cols] < alpha
                 falsemask = df.loc[:, significance_cols] >= alpha
 
-                df.loc[:, significance_cols] = pd.np.select(
+                df.loc[:, significance_cols] = np.select(
                     [truemask, falsemask], [True, False], default=None)
 
             # check what new disparity columns are and order as disparity,
@@ -408,7 +408,7 @@ class Bias(object):
         df[disparity_metrics] = df[input_group_metrics].divide(df[disparity_metrics].values)
 
         # We are capping the disparity values to 10.0 when divided by zero...
-        df = df.replace(pd.np.inf, fill_divbyzero)
+        df = df.replace(np.inf, fill_divbyzero)
         if not check_significance:
             return df
 
@@ -446,7 +446,7 @@ class Bias(object):
                 truemask = df.loc[:, significance_cols] < alpha
                 falsemask = df.loc[:, significance_cols] >= alpha
 
-                df.loc[:, significance_cols] = pd.np.select(
+                df.loc[:, significance_cols] = np.select(
                     [truemask, falsemask], [True, False], default=None)
 
             # check what new disparity columns are and order as disparity,
@@ -505,7 +505,7 @@ class Bias(object):
         for attr_value, sample in sample_dict.items():
             # make default normality_p value (only used when len(sample) < 20)
             # large enough that it is always greater than alpha
-            normality_p = pd.np.inf
+            normality_p = np.inf
 
             # skew test requires at least 20 samples
             if len(sample) > 20:
@@ -772,8 +772,8 @@ class Bias(object):
         FPR_BASED = [metric for metric in POSITIVE_ONLY if metric in binary_inclusions]
         FNR_BASED = [metric for metric in NEGATIVE_ONLY if metric in binary_inclusions]
 
-        original_df.loc[original_df['binary_score'] == 0, FPR_BASED] = pd.np.nan
-        original_df.loc[original_df['binary_score'] == 1, FNR_BASED] = pd.np.nan
+        original_df.loc[original_df['binary_score'] == 0, FPR_BASED] = np.nan
+        original_df.loc[original_df['binary_score'] == 1, FNR_BASED] = np.nan
 
         measures = set(original_df.columns[original_df.columns.str.contains('binary_')])
         measures = measures.union({'label_value'})
