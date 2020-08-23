@@ -1,7 +1,7 @@
 import altair as alt
 
-import aequitas.plot.commons.validators as Validator
-import aequitas.plot.commons.scales as Scales
+from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons import scales as Scales
 from aequitas.plot.commons.helpers import to_list, calculate_chart_size_from_elements
 
 

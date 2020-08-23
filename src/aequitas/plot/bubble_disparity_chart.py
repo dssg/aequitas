@@ -24,7 +24,7 @@ from aequitas.plot.commons.style.classes import (
 
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Disparity_Chart
-import aequitas.plot.commons.initializers as Initializer
+from aequitas.plot.commons import initializers as Initializer
 
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it

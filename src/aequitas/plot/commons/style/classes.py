@@ -1,5 +1,5 @@
-import aequitas.plot.commons.style.color as Color
-import aequitas.plot.commons.style.text as Text
+from aequitas.plot.commons.style import color as Color
+from aequitas.plot.commons.style import text as Text
 
 
 class Bubble:
