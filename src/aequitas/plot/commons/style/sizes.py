@@ -17,7 +17,7 @@ class Disparity_Chart:
     min_line_height = 80
     full_width = 800
     min_width = 400
-
+    padding = 0.1
 
 class Metric_Chart:
     vertical_header_height = 50
@@ -25,6 +25,7 @@ class Metric_Chart:
     min_line_height = 80
     full_width = 450
     min_width = 400
+    padding = 0.1
 
 
 class Concat_Chart:
@@ -39,3 +40,4 @@ class Concat_Chart:
 class XY_Chart:
     full_side = 450
     min_side = 200
+    padding = 0.05

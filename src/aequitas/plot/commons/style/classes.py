@@ -6,11 +6,18 @@ class Bubble:
     opacity = 0.2
     color_faded = Color.FADED
     center_size = 60
+    max_bubble_ratio = 0.2  # From bubble size scale: (1 - 2 * chart_padding) / 4
 
 
 class Title:
     font_size = Text.FONT_SIZE_LARGE
+    font_weight = Text.FONT_WEIGHT_REGULAR
     font_color = Color.GRAY
+
+
+class Chart_Title(Title):
+    font_size = Text.FONT_SIZE_EXTRA_LARGE
+    font_weight = Text.FONT_WEIGHT_BOLD
     margin_top = -15
 
 
@@ -25,6 +32,7 @@ class Annotation:
     font_color = Color.GRAY
     font_color_reference = Color.REFERENCE
     font_color_threshold = Color.THRESHOLD
+    line_spacing = 1.25
 
 
 class Rule:
@@ -56,10 +64,14 @@ class Axis(Rule):
 class Metric_Axis(Axis):
     offset = 20
     label_font_size = Text.FONT_SIZE_LARGE
-    label_font_weight = Text.FONT_WEIGHT_REGULAR
     label_padding = -30
     label_padding_concat_chart = -10
     label_angle = 0
+
+class Scatter_Axis(Axis):
+    title_padding = 30
+    title_font_size = Text.FONT_SIZE_LARGE
+    title_font_weight = Text.FONT_WEIGHT_LIGHT
 
 
 class Threshold_Band:
@@ -69,11 +81,17 @@ class Threshold_Band:
 
 
 class Legend:
+    margin_top = 30
     color_faded = Color.FADED
     font_color = Color.GRAY
     font_size = Text.FONT_SIZE_SMALL
     font_weight = Text.FONT_WEIGHT_LIGHT
     vertical_spacing = 10
+    horizontal_spacing = 4
+    title_font_size = Text.FONT_SIZE_REGULAR
+    title_font_weight = Text.FONT_WEIGHT_LIGHT
+    title_margin_bottom = 5
+    circle_radius = 4
 
 
 class Parity_Result:

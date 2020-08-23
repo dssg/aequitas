@@ -12,7 +12,7 @@ def __sanitize_metrics(metrics_list):
         print('"metrics_list" must be a list of strings.')
 
 
-def __filter_df(disparity_df, metrics, attribute):
+def __filter_df(disparity_df, metrics, attribute, xy_plot=False):
     viz_fields = [
         "attribute_name",
         "attribute_value",
@@ -20,7 +20,9 @@ def __filter_df(disparity_df, metrics, attribute):
         "total_entities",
     ]
     viz_fields += metrics
-    viz_fields += [f"{metric}_disparity" for metric in metrics]
+
+    if not xy_plot:
+        viz_fields += [f"{metric}_disparity" for metric in metrics]
 
     plot_table = disparity_df[viz_fields][
         disparity_df["attribute_name"] == attribute
@@ -61,12 +63,12 @@ def __calculate_default_sizes(
 
 
 def __get_global_scales(
-    plot_table, ref_group, metrics, chart_height, chart_padding, accessibility_mode
+    plot_table, ref_group, metrics, chart_height, accessibility_mode
 ):
     global_scales = dict()
     global_scales["color"] = Scales.get_color_scale(plot_table, ref_group)
     global_scales["bubble_size"] = Scales.get_bubble_size_scale(
-        plot_table, metrics, chart_height, chart_padding
+        plot_table, metrics, chart_height
     )
     global_scales["shape"] = Scales.get_shape_scale(
         plot_table, ref_group, accessibility_mode
@@ -82,7 +84,6 @@ def prepare_bubble_chart(
     fairness_threshold,
     chart_height,
     chart_width,
-    chart_padding,
     chart_default_sizes,
     accessibility_mode,
 ):
@@ -111,7 +112,7 @@ def prepare_bubble_chart(
     # GLOBAL CHART MECHANICS
     ## SCALES: COLOR, BUBBLE SIZE, SHAPE
     global_scales = __get_global_scales(
-        plot_table, ref_group, metrics, chart_height, chart_padding, accessibility_mode
+        plot_table, ref_group, metrics, chart_height, accessibility_mode
     )
 
     # SELECTION
@@ -138,6 +139,8 @@ def prepare_summary_chart(
     chart_default_sizes,
 ):
     ## If a specific list of attributes was not passed, use all from df
+    if fairness_threshold is None:
+        raise ValueError("Fairness threshold cannot be None for the Summary chart.")
 
     metrics = __sanitize_metrics(metrics_list)
 
@@ -164,7 +167,6 @@ def prepare_xy_chart(
     fairness_threshold,
     chart_height,
     chart_width,
-    chart_padding,
     chart_default_sizes,
     accessibility_mode,
 ):
@@ -186,17 +188,18 @@ def prepare_xy_chart(
     Validator.chart_size_xy(chart_width, chart_height)
 
     # REF GROUP DEFINITION
-    # ref_group is primarily taken from y_metric. If y_metric is prevalence/fraud rate, then ref_group is taken from x_metric
-    if y_metric != "prev":
+    ## ref_group is taken from x_metric as long as it's not part of the metrics that
+    ## do not have disparity variables (such as prev)
+    if x_metric in Validator.NON_DISPARITY_METRICS_LIST:
         ref_group = disparity_df.iloc[0][f"{y_metric}_ref_group_value"]
     else:
         ref_group = disparity_df.iloc[0][f"{x_metric}_ref_group_value"]
 
-    plot_table = __filter_df(disparity_df, metrics, attribute)
+    plot_table = __filter_df(disparity_df, metrics, attribute, xy_plot=True)
 
     # SCALES
     global_scales = __get_global_scales(
-        plot_table, ref_group, metrics, chart_height, chart_padding, accessibility_mode
+        plot_table, ref_group, metrics, chart_height, accessibility_mode
     )
 
     # SELECTION
