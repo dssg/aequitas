@@ -19,9 +19,9 @@ from aequitas.plot.commons.style.classes import (
     Scatter_Axis
 )
 from aequitas.plot.commons.style.text import FONT
-import aequitas.plot.commons.style.sizes as Sizes
-import aequitas.plot.commons.initializers as Initializer
-import aequitas.plot.commons.validators as Validator
+from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons import initializers as Initializer
+from aequitas.plot.commons import validators as Validator
 
 
 def __get_position_scales(chart_height, chart_width):

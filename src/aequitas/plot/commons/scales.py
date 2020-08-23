@@ -1,6 +1,6 @@
 from aequitas.plot.commons.style.classes import Shape, Bubble
 from aequitas.plot.commons.style.sizes import Disparity_Chart
-import aequitas.plot.commons.style.color as Colors
+from aequitas.plot.commons.style import color as Colors
 import altair as alt
 
 import math

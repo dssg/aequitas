@@ -22,9 +22,9 @@ from aequitas.plot.commons.style.classes import (
     Legend,
 )
 from aequitas.plot.commons.style.text import FONT
-import aequitas.plot.commons.style.sizes as Sizes
-import aequitas.plot.commons.initializers as Initializer
-import aequitas.plot.commons.validators as Validator
+from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons import initializers as Initializer
+from aequitas.plot.commons import validators as Validator
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
