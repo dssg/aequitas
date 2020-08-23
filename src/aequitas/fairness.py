@@ -1,5 +1,5 @@
 import logging
-
+import numpy as np
 import pandas as pd
 
 logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class Fairness(object):
         """
 
         if not fair_eval:
-            self.fair_eval = lambda tau: lambda x: pd.np.nan if pd.np.isnan(x) else \
+            self.fair_eval = lambda tau: lambda x: np.nan if np.isnan(x) else \
                 (True if tau <= x <= 1 / tau else False)
         else:
             self.fair_eval = fair_eval
@@ -42,11 +42,11 @@ class Fairness(object):
         # Set high-level fairness evaluation to NA (undefined) if both
         # underlying parity determinations are NA. If only one parity is NA,
         # evaluation is determined by the defined parity.
-        self.high_level_pair_eval = lambda col1, col2: lambda x: pd.np.nan if (pd.np.isnan(x[col1]) and pd.np.isnan(x[col2])) \
+        self.high_level_pair_eval = lambda col1, col2: lambda x: np.nan if (np.isnan(x[col1]) and np.isnan(x[col2])) \
             else \
             (True if (x[col1] is True and x[col2] is True) else False)
 
-        self.high_level_single_eval = lambda col: lambda x: pd.np.nan if pd.np.isnan(x[col]) else (True if x[col] is True else
+        self.high_level_single_eval = lambda col: lambda x: np.nan if np.isnan(x[col]) else (True if x[col] is True else
         False)
 
         # the fair_measures_depend define the bias metrics that serve as input to the fairness evaluation and respective

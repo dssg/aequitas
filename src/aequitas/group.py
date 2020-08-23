@@ -1,7 +1,7 @@
 import logging
 import warnings
 import pandas as pd
-
+import numpy as np
 logging.getLogger(__name__)
 
 __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
@@ -30,7 +30,7 @@ class Group(object):
         calculations.
         """
 
-        divide = lambda x, y: x / y if y != 0 else pd.np.nan
+        divide = lambda x, y: x / y if y != 0 else np.nan
 
         predicted_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
             (x[rank_col] <= thres).sum()
@@ -209,7 +209,7 @@ class Group(object):
         # for each group variable do
         for col in attr_cols:
             # find the priors_df
-            col_group = df.fillna({col: pd.np.nan}).groupby(col)
+            col_group = df.fillna({col: np.nan}).groupby(col)
             counts = col_group.size()
             # distinct entities within group value
             this_prior_df = pd.DataFrame({
