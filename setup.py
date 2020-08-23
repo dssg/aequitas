@@ -35,7 +35,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name='aequitas',
-    version='0.38.1',
+    version='0.39.0',
     description="The bias and fairness audit toolkit.",
     long_description=long_description,
     long_description_content_type='text/markdown',
