@@ -96,6 +96,14 @@ class Group(object):
                                                                           thres).sum(
             ).astype(float))
 
+        afp = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(),
+                   len(x) + 0.0)
+
+        afn = lambda rank_col, label_col, thres, k: lambda x: \
+            divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(),
+                   len(x) + 0.0)
+
         group_functions = {'tpr': tpr,
                            'tnr': tnr,
                            'for': fomr,
@@ -104,6 +112,8 @@ class Group(object):
                            'fnr': fnr,
                            'npv': npv,
                            'precision': precision,
+                           'afp': afp,
+                           'afn': afn,
                            'pp': predicted_pos_count,
                            'pn': predicted_neg_count,
                            'ppr': predicted_pos_ratio_k,

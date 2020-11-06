@@ -15,7 +15,7 @@ class Bias(object):
     """
     default_key_columns = ('model_id', 'score_threshold', 'attribute_name')
     all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
-                         'fnr', 'tpr', 'tnr', 'npv')
+                         'fnr', 'tpr', 'tnr', 'npv', 'afp', 'afn')
     non_attr_cols = ('score', 'model_id', 'as_of_date', 'entity_id', 'rank_abs',
                      'rank_pct', 'id', 'label_value')
 
