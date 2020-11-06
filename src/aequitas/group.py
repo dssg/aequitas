@@ -8,6 +8,12 @@ __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kueste
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
+COLUMN_ORDER = ['model_id', 'score_threshold', 'k', 'attribute_name',
+                'attribute_value', 'tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
+                'npv', 'precision', 'pp', 'pn', 'ppr', 'pprev', 'fp', 'fn',
+                'tn', 'tp', 'group_label_pos', 'group_label_neg', 'group_size',
+                'total_entities', 'prev']
+
 class Group(object):
     """
     """
@@ -177,7 +183,6 @@ class Group(object):
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
-        print('model_id, score_thresholds', model_id, score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
         df['rank_pct'] = df['rank_abs'] / len(df)
@@ -247,7 +252,7 @@ class Group(object):
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
-        return groups_df, attr_cols
+        return groups_df[COLUMN_ORDER], attr_cols
 
 
     def list_absolute_metrics(self, df):
