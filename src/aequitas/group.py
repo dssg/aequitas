@@ -8,6 +8,12 @@ __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kueste
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
+COLUMN_ORDER = ['model_id', 'score_threshold', 'k', 'attribute_name',
+                'attribute_value', 'tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
+                'npv', 'precision', 'pp', 'pn', 'ppr', 'pprev', 'fp', 'fn',
+                'tn', 'tp', 'group_label_pos', 'group_label_neg', 'group_size',
+                'total_entities', 'prev']
+
 class Group(object):
     """
     """
@@ -22,28 +28,10 @@ class Group(object):
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
         self.group_functions = self._get_group_functions()
+        self.confusion_matrix_functions = self.get_confusion_matrix_functions()
 
     @staticmethod
-    def _get_group_functions():
-        """
-        Helper function to accumulate lambda functions used in bias metrics
-        calculations.
-        """
-
-        divide = lambda x, y: x / y if y != 0 else np.nan
-
-        predicted_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            (x[rank_col] <= thres).sum()
-
-        predicted_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            (x[rank_col] > thres).sum()
-
-        predicted_pos_ratio_k = lambda rank_col, label_col, thres, k: lambda x: \
-            divide((x[rank_col] <= thres).sum(), k + 0.0)
-
-        predicted_pos_ratio_g = lambda rank_col, label_col, thres, k: lambda x: \
-            divide((x[rank_col] <= thres).sum(), len(x) + 0.0)
-
+    def get_confusion_matrix_functions():
         false_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
             ((x[rank_col] > thres) & (x[label_col] == 1)).sum()
 
@@ -55,46 +43,47 @@ class Group(object):
 
         true_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
             ((x[rank_col] <= thres) & (x[label_col] == 1)).sum()
+        return {
+            'fp': false_pos_count,
+            'fn': false_neg_count,
+            'tn': true_neg_count,
+            'tp': true_pos_count
+        }
 
-        fpr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(),
-                   (x[label_col] == 0).sum().astype(
-                       float))
+    @staticmethod
+    def _get_group_functions():
+        """
+        Helper function to accumulate lambda functions used in bias metrics
+        calculations.
+        """
 
-        tnr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum(), (x[label_col] ==
-                                                                         0).sum().astype(
-                float))
+        divide = lambda x, y: x / y if y != 0 else np.nan
 
-        fnr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(),
-                   (x[label_col] == 1).sum().astype(
-                       float))
+        predicted_pos_count = lambda k: lambda x: x['fp'] + x['tp']
 
-        tpr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(), (x[label_col] ==
-                                                                          1).sum().astype(
-                float))
+        predicted_neg_count = lambda k: lambda x: x['fn'] + x['tn']
 
-        fomr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] > thres) & (x[label_col] == 1)).sum(), (x[rank_col] >
-                                                                         thres).sum(
-            ).astype(float))
+        predicted_pos_ratio_k = lambda k: lambda x: divide(x['fp'] + x['tp'], k)
 
-        npv = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] > thres) & (x[label_col] == 0)).sum(),
-                   (x[rank_col] > thres).sum().astype(
-                       float))
+        predicted_pos_ratio_g = lambda k: lambda x: divide(
+            x['fp'] + x['tp'], x['fn'] + x['tn'] + x['fp'] + x['tp']
+        )
 
-        precision = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] <= thres) & (x[label_col] == 1)).sum(), (x[rank_col] <=
-                                                                          thres).sum(
-            ).astype(float))
+        fpr = lambda k: lambda x: divide(x['fp'], x['fp'] + x['tn'])
 
-        fdr = lambda rank_col, label_col, thres, k: lambda x: \
-            divide(((x[rank_col] <= thres) & (x[label_col] == 0)).sum(), (x[rank_col] <=
-                                                                          thres).sum(
-            ).astype(float))
+        tnr = lambda k: lambda x: divide(x['tn'], x['fp'] + x['tn'])
+
+        fnr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tp'])
+
+        tpr = lambda k: lambda x: divide(x['tp'], x['fn'] + x['tp'])
+
+        fomr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tn'])
+
+        npv = lambda k: lambda x: divide(x['tn'], x['fn'] + x['tn'])
+
+        precision = lambda k: lambda x: divide(x['tp'], x['tp'] + x['fp'])
+
+        fdr = lambda k: lambda x: divide(x['fp'], x['tp'] + x['fp'])
 
         group_functions = {'tpr': tpr,
                            'tnr': tnr,
@@ -108,10 +97,7 @@ class Group(object):
                            'pn': predicted_neg_count,
                            'ppr': predicted_pos_ratio_k,
                            'pprev': predicted_pos_ratio_g,
-                           'fp': false_pos_count,
-                           'fn': false_neg_count,
-                           'tn': true_neg_count,
-                           'tp': true_pos_count}
+                           }
 
         return group_functions
 
@@ -197,7 +183,6 @@ class Group(object):
             count_ones = df['score'].value_counts().get(1.0, 0)
             score_thresholds = {'rank_abs': [count_ones]}
 
-        print('model_id, score_thresholds', model_id, score_thresholds)
         df = df.sort_values('score', ascending=False)
         df['rank_abs'] = range(1, len(df) + 1)
         df['rank_pct'] = df['rank_abs'] / len(df)
@@ -242,7 +227,7 @@ class Group(object):
                     # denote threshold as binary if numeric count_ones value
                     # donate as [rank value]_abs or [rank_value]_pct otherwise
                     score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
-                    for name, func in self.group_functions.items():
+                    for name, func in self.confusion_matrix_functions.items():
                         func = func(thres_unit, 'label_value', thres_val, k)
                         feat_bias = col_group.apply(func)
                         metrics_df = pd.DataFrame({
@@ -258,12 +243,16 @@ class Group(object):
                             flag = 1
                         else:
                             this_group_df = this_group_df.merge(metrics_df)
+                    for name, func in self.group_functions.items():
+                        func = func(k)
+                        feat_bias = this_group_df.apply(func, axis=1)
+                        this_group_df[name] = feat_bias
                     dfs.append(this_group_df)
         groups_df = pd.concat(dfs, ignore_index=True)
         priors_df = pd.concat(prior_dfs, ignore_index=True)
         groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
                                                    'attribute_value'])
-        return groups_df, attr_cols
+        return groups_df[COLUMN_ORDER], attr_cols
 
 
     def list_absolute_metrics(self, df):
