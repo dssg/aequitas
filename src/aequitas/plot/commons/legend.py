@@ -20,7 +20,7 @@ def draw_legend(global_scales, selection, chart_width):
 
     # Position the legend to the right of the chart
 
-    title_text_x_position = chart_width * 1.1
+    title_text_x_position = chart_width
     title_text_height = Legend.title_font_size + Legend.title_margin_bottom
     subtitle_text_height = Legend.font_size + Legend.vertical_spacing
 
