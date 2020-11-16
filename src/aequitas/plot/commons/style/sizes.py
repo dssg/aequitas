@@ -16,24 +16,24 @@ class Disparity_Chart:
     line_height = 150
     min_line_height = 80
     full_width = 800
-    min_width = 400
+    min_width = 380
     padding = 0.1
 
 class Metric_Chart:
     vertical_header_height = 50
     line_height = 125
     min_line_height = 80
-    full_width = 450
-    min_width = 400
+    full_width = 800
+    min_width = 380
     padding = 0.1
 
 
 class Concat_Chart:
-    vertical_header_height = 125
-    line_height = 100
-    min_line_height = 80
-    full_width = 950
-    spacing = 20
+    vertical_header_height = 110
+    line_height = 75
+    min_line_height = 50
+    full_width = 760
+    spacing = 0
     min_width = Metric_Chart.min_width + Disparity_Chart.min_width + spacing
 
 

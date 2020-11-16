@@ -91,8 +91,8 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     rules_df = pd.DataFrame(
         {
             "metric": metrics_labels,
-            "x": scales["x"]["domain"][0] - 0.2,
-            "x2": scales["x"]["domain"][1] + 0.2,
+            "x": scales["x"]["domain"][0],
+            "x2": scales["x"]["domain"][1],
         }
     )
 
@@ -327,8 +327,8 @@ def __get_threshold_elements(
         {
             "min": -fairness_threshold + 1,
             "max": fairness_threshold - 1,
-            "lower_end": scales["x"]["domain"][0] - 0.2,
-            "upper_end": scales["x"]["domain"][1] + 0.2,
+            "lower_end": scales["x"]["domain"][0],
+            "upper_end": scales["x"]["domain"][1],
         },
         index=[0],
     )

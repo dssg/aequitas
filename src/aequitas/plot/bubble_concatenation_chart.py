@@ -22,7 +22,7 @@ def __get_chart_sizes(chart_width):
     The individual widths are calculated based on the provided desired overall chart width."""
 
     chart_sizes = dict(
-        disparity_chart_width=0.6 * chart_width, metric_chart_width=0.4 * chart_width
+        disparity_chart_width=0.5 * chart_width, metric_chart_width=0.5 * chart_width
     )
     return chart_sizes
 
@@ -96,7 +96,7 @@ def plot_concatenated_bubble_charts(
         fairness_threshold,
         chart_height,
         chart_width,
-        Sizes.Disparity_Chart,
+        Sizes.Concat_Chart,
         accessibility_mode,
     )
 
