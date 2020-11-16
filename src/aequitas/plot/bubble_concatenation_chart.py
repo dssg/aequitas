@@ -106,7 +106,7 @@ def plot_concatenated_bubble_charts(
     disparity_title = draw_chart_title(
         "DISPARITIES", chart_sizes["disparity_chart_width"]
     )
-    metric_title = draw_chart_title("METRICS", chart_sizes["metric_chart_width"])
+    metric_title = draw_chart_title("ABSOLUTE VALUES", chart_sizes["metric_chart_width"])
 
     # DISPARITY CHART
     disparity_chart = (
