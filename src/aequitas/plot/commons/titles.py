@@ -9,5 +9,5 @@ def get_title_configuration():
         "font": FONT,
         "fontWeight": Chart_Title.font_weight,
         "fontSize": Chart_Title.font_size,
-        "color": Chart_Title.font_color
+        "color": Chart_Title.font_color,
     }

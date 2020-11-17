@@ -64,10 +64,11 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         )
 
     horizontal_rules = (
-        alt.Chart(pd.DataFrame(
-            {"y_position": metrics_labels, "start": 0, "end": 1}))
+        alt.Chart(pd.DataFrame({"y_position": metrics_labels, "start": 0, "end": 1}))
         .mark_rule(
-            strokeWidth=Metric_Axis.stroke_width, stroke=Metric_Axis.stroke, tooltip="",
+            strokeWidth=Metric_Axis.stroke_width,
+            stroke=Metric_Axis.stroke,
+            tooltip="",
         )
         .encode(
             y=alt.Y("y_position:N", scale=scales["y"], axis=y_axis),
@@ -87,7 +88,11 @@ def __draw_domain_rules(scales):
 
     vertical_domain_rules = (
         alt.Chart(domain_rules_df)
-        .mark_rule(strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip="",)
+        .mark_rule(
+            strokeWidth=Rule.stroke_width,
+            stroke=Rule.stroke,
+            tooltip="",
+        )
         .encode(
             x=alt.X("x_position:Q", scale=scales["x"]),
             y=alt.value(scales["y"]["range"][0]),
@@ -117,7 +122,10 @@ def __draw_x_ticks_labels(scales, chart_height):
         )
         .encode(
             text=alt.Text("value:N"),
-            x=alt.X("value:Q", scale=scales["x"],),
+            x=alt.X(
+                "value:Q",
+                scale=scales["x"],
+            ),
             y=alt.value(Metric_Chart.padding * chart_height * 0.7),
         )
     )
@@ -148,8 +156,7 @@ def __draw_threshold_rules(threshold_df, scales, position, accessibility_mode=Fa
                 scale=scales["x"],
             ),
             x2=f"{position}_threshold_value:Q",
-            y=alt.Y(field="metric", type="nominal",
-                    scale=scales["y"], axis=no_axis()),
+            y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
         )
     )
     return threshold_rules
@@ -166,8 +173,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
         alt.Chart(threshold_df)
         .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
         .encode(
-            y=alt.Y(field="metric", type="nominal",
-                    scale=scales["y"], axis=no_axis()),
+            y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("lower_threshold_value:Q", scale=scales["x"]),
             x2="lower_end:Q",
         )
@@ -177,8 +183,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
         alt.Chart(threshold_df)
         .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
         .encode(
-            y=alt.Y(field="metric", type="nominal",
-                    scale=scales["y"], axis=no_axis()),
+            y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("upper_threshold_value:Q", scale=scales["x"]),
             x2="upper_end:Q"
             # scales["x"]["range"][1]
@@ -269,8 +274,7 @@ def __get_threshold_elements(
     )
 
     # BANDS
-    threshold_bands = __draw_threshold_bands(
-        threshold_df, scales, accessibility_mode)
+    threshold_bands = __draw_threshold_bands(threshold_df, scales, accessibility_mode)
 
     # HELPER TEXT
     if concat_chart:
@@ -289,7 +293,11 @@ def __get_threshold_elements(
 
 
 def __draw_bubbles(
-    plot_table, metrics, ref_group, scales, selection,
+    plot_table,
+    metrics,
+    ref_group,
+    scales,
+    selection,
 ):
     """Draws the bubbles for all metrics."""
 
@@ -330,10 +338,8 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value",
-                        type="nominal", title="Group"),
-            alt.Tooltip(field="tooltip_group_size",
-                        type="nominal", title="Group Size"),
+            alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
+            alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
@@ -348,8 +354,7 @@ def __draw_bubbles(
         ]
 
         # BUBBLE CENTERS
-        trigger_centers = alt.selection_multi(
-            empty="all", fields=["attribute_value"])
+        trigger_centers = alt.selection_multi(empty="all", fields=["attribute_value"])
 
         bubble_centers += (
             alt.Chart(plot_table)
@@ -357,8 +362,7 @@ def __draw_bubbles(
             .mark_point(filled=True, size=Bubble.center_size)
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
-                y=alt.Y("metric_variable:N",
-                        scale=scales["y"], axis=no_axis()),
+                y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
                 tooltip=bubble_tooltip_encoding,
                 color=bubble_color_encoding,
                 shape=alt.Shape(
@@ -369,8 +373,7 @@ def __draw_bubbles(
         )
 
         # BUBBLE AREAS
-        trigger_areas = alt.selection_multi(
-            empty="all", fields=["attribute_value"])
+        trigger_areas = alt.selection_multi(empty="all", fields=["attribute_value"])
 
         bubble_areas += (
             alt.Chart(plot_table)
@@ -378,12 +381,10 @@ def __draw_bubbles(
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
-                y=alt.Y("metric_variable:N",
-                        scale=scales["y"], axis=no_axis()),
+                y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
                 tooltip=bubble_tooltip_encoding,
                 color=bubble_color_encoding,
-                size=alt.Size("group_size:Q", legend=None,
-                              scale=scales["bubble_size"]),
+                size=alt.Size("group_size:Q", legend=None, scale=scales["bubble_size"]),
             )
             .add_selection(trigger_areas)
         )
@@ -426,7 +427,12 @@ def get_metric_bubble_chart_components(
 
     # BUBBLES - CENTERS & AREAS
     bubbles = __draw_bubbles(
-        plot_table, metrics, ref_group, scales, selection,)
+        plot_table,
+        metrics,
+        ref_group,
+        scales,
+        selection,
+    )
 
     # THRESHOLD, BANDS & ANNOTATION
     if fairness_threshold is not None:
@@ -527,7 +533,11 @@ def plot_metric_bubble_chart(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .properties(height=chart_height, width=chart_width, title=f"Absolute values by {attribute.title()}")
+        .properties(
+            height=chart_height,
+            width=chart_width,
+            title=f"Absolute values by {attribute.title()}",
+        )
         .configure_title(**get_title_configuration())
         .resolve_scale(y="independent", size="independent")
     )
