@@ -6,19 +6,21 @@ class Bubble:
     opacity = 0.2
     color_faded = Color.FADED
     center_size = 60
-    max_bubble_ratio = 0.2  # From bubble size scale: (1 - 2 * chart_padding) / 4
+    # From bubble size scale: (1 - 2 * chart_padding) / 4
+    max_bubble_ratio = 0.2
 
 
 class Title:
-    font_size = Text.FONT_SIZE_LARGE
+    font_size = Text.FONT_SIZE_REGULAR
     font_weight = Text.FONT_WEIGHT_REGULAR
     font_color = Color.GRAY
+    margin_top = -15
 
 
 class Chart_Title(Title):
     font_size = Text.FONT_SIZE_EXTRA_LARGE
     font_weight = Text.FONT_WEIGHT_BOLD
-    margin_top = -15
+    margin_top = -10
 
 
 class Subtitle:
@@ -67,6 +69,7 @@ class Metric_Axis(Axis):
     label_padding = -30
     label_padding_concat_chart = -10
     label_angle = 0
+
 
 class Scatter_Axis(Axis):
     title_padding = 30

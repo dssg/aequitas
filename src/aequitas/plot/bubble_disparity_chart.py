@@ -25,6 +25,7 @@ from aequitas.plot.commons.style.classes import (
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
+from aequitas.plot.commons.titles import get_title_configuration
 
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
@@ -40,17 +41,20 @@ def __get_position_scales(
     position_scales = dict()
 
     # DISPARITIES SCALE
-    ## RANGE
+    # RANGE
     x_range = get_chart_size_range(chart_width)
 
-    ## DOMAIN
-    ### Get max absolute disparity
-    scaled_disparities_col_names = [f"{metric}_disparity_scaled" for metric in metrics]
-    max_column = lambda x: max(x.min(), x.max(), key=abs)
-    max_disparities = plot_table[scaled_disparities_col_names].apply(max_column, axis=1)
+    # DOMAIN
+    # Get max absolute disparity
+    scaled_disparities_col_names = [
+        f"{metric}_disparity_scaled" for metric in metrics]
+
+    def max_column(x): return max(x.min(), x.max(), key=abs)
+    max_disparities = plot_table[scaled_disparities_col_names].apply(
+        max_column, axis=1)
     abs_max_disparity = abs(max_column(max_disparities))
 
-    ### If fairness_threshold is defined, get max between threshold and max absolute disparity
+    # If fairness_threshold is defined, get max between threshold and max absolute disparity
     if fairness_threshold is not None:
         x_domain_limit = math.ceil(max(abs_max_disparity, fairness_threshold))
     else:
@@ -248,8 +252,10 @@ def __draw_threshold_rules(
         )
     )
 
-    lower_threshold_rule = threshold_rule.encode(x=alt.X("min:Q", scale=scales["x"]),)
-    upper_threshold_rule = threshold_rule.encode(x=alt.X("max:Q", scale=scales["x"]),)
+    lower_threshold_rule = threshold_rule.encode(
+        x=alt.X("min:Q", scale=scales["x"]),)
+    upper_threshold_rule = threshold_rule.encode(
+        x=alt.X("max:Q", scale=scales["x"]),)
 
     return lower_threshold_rule + upper_threshold_rule
 
@@ -399,8 +405,10 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-            alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+            alt.Tooltip(field="attribute_value",
+                        type="nominal", title="Group"),
+            alt.Tooltip(field="tooltip_group_size",
+                        type="nominal", title="Group Size"),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
@@ -415,15 +423,18 @@ def __draw_bubbles(
         ]
 
         # BUBBLE CENTERS
-        trigger_centers = alt.selection_multi(empty="all", fields=["attribute_value"])
+        trigger_centers = alt.selection_multi(
+            empty="all", fields=["attribute_value"])
 
         bubble_centers += (
             alt.Chart(plot_table)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .mark_point(filled=True, size=Bubble.center_size)
             .encode(
-                x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
-                y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
+                x=alt.X(f"{metric}_disparity_scaled:Q",
+                        scale=scales["x"], axis=x_axis),
+                y=alt.Y("metric_variable:N",
+                        scale=scales["y"], axis=no_axis()),
                 tooltip=bubble_tooltip_encoding,
                 color=bubble_color_encoding,
                 shape=alt.Shape(
@@ -434,18 +445,22 @@ def __draw_bubbles(
         )
 
         # BUBBLE AREAS
-        trigger_areas = alt.selection_multi(empty="all", fields=["attribute_value"])
+        trigger_areas = alt.selection_multi(
+            empty="all", fields=["attribute_value"])
 
         bubble_areas += (
             alt.Chart(plot_table)
             .mark_circle(opacity=Bubble.opacity)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .encode(
-                x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
-                y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
+                x=alt.X(f"{metric}_disparity_scaled:Q",
+                        scale=scales["x"], axis=x_axis),
+                y=alt.Y("metric_variable:N",
+                        scale=scales["y"], axis=no_axis()),
                 tooltip=bubble_tooltip_encoding,
                 color=bubble_color_encoding,
-                size=alt.Size("group_size:Q", legend=None, scale=scales["bubble_size"]),
+                size=alt.Size("group_size:Q", legend=None,
+                              scale=scales["bubble_size"]),
             )
             .add_selection(trigger_areas)
         )
@@ -482,16 +497,19 @@ def get_disparity_bubble_chart_components(
 
     # RULES
     horizontal_rules = __draw_metrics_rules(metrics, scales, concat_chart)
-    reference_rule = __draw_reference_rule(ref_group, chart_height, chart_width)
+    reference_rule = __draw_reference_rule(
+        ref_group, chart_height, chart_width)
 
     # LABELS
     x_ticks_labels = __draw_x_ticks_labels(scales, chart_height)
 
     # ANNOTATIONS
-    text_annotations = __draw_text_annotations(ref_group, chart_height, chart_width)
+    text_annotations = __draw_text_annotations(
+        ref_group, chart_height, chart_width)
 
     # BUBBLES - CENTERS & AREAS
-    bubbles = __draw_bubbles(plot_table, metrics, ref_group, scales, selection,)
+    bubbles = __draw_bubbles(
+        plot_table, metrics, ref_group, scales, selection,)
 
     # THRESHOLD & BANDS
     if fairness_threshold is not None:
@@ -602,7 +620,8 @@ def plot_disparity_bubble_chart(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .properties(height=chart_height, width=chart_width)
+        .configure_title(**get_title_configuration())
+        .properties(height=chart_height, width=chart_width, title=f"Disparities on {attribute.title()}")
         .resolve_scale(y="independent", size="independent")
     )
 

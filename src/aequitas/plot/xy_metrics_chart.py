@@ -18,10 +18,12 @@ from aequitas.plot.commons.style.classes import (
     Bubble,
     Scatter_Axis
 )
+
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style import sizes as Sizes
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons.titles import get_title_configuration
 
 
 def __get_position_scales(chart_height, chart_width):
@@ -136,7 +138,8 @@ def __draw_tick_labels(scales, chart_height, chart_width):
 
     axis_values = [0, 0.25, 0.5, 0.75, 1]
 
-    axis_df = pd.DataFrame({"main_axis_values": axis_values, "aux_axis_position": 0})
+    axis_df = pd.DataFrame(
+        {"main_axis_values": axis_values, "aux_axis_position": 0})
 
     x_tick_labels = (
         alt.Chart(axis_df)
@@ -239,7 +242,8 @@ def __draw_bubbles(
         x_metric,
         y_metric,
     ]
-    metric_plot_table = plot_table[fields_to_keep_in_metric_table].copy(deep=True)
+    metric_plot_table = plot_table[fields_to_keep_in_metric_table].copy(
+        deep=True)
 
     metric_plot_table["tooltip_group_size"] = plot_table.apply(
         lambda row: get_tooltip_text_group_size(
@@ -258,7 +262,8 @@ def __draw_bubbles(
     # TOOLTIP ENCODING
     bubble_tooltip_encoding = [
         alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+        alt.Tooltip(field="tooltip_group_size",
+                    type="nominal", title="Group Size"),
         alt.Tooltip(
             field=x_metric, type="quantitative", format=".2f", title=x_metric.upper()
         ),
@@ -276,7 +281,8 @@ def __draw_bubbles(
             y=alt.Y(f"{y_metric}:Q", scale=scales["y"], axis=no_axis()),
             tooltip=bubble_tooltip_encoding,
             color=bubble_color_encoding,
-            shape=alt.Shape("attribute_value:N", scale=scales["shape"], legend=None),
+            shape=alt.Shape("attribute_value:N",
+                            scale=scales["shape"], legend=None),
         )
     )
 
@@ -285,7 +291,8 @@ def __draw_bubbles(
         alt.Chart(metric_plot_table)
         .mark_circle(opacity=Bubble.opacity)
         .encode(
-            size=alt.Size("group_size:Q", legend=None, scale=scales["bubble_size"]),
+            size=alt.Size("group_size:Q", legend=None,
+                          scale=scales["bubble_size"]),
             x=alt.X(f"{x_metric}:Q", scale=scales["x"], axis=no_axis()),
             y=alt.Y(f"{y_metric}:Q", scale=scales["y"], axis=no_axis()),
             tooltip=bubble_tooltip_encoding,
@@ -413,7 +420,9 @@ def plot_xy_metrics_chart(
     # CONFIGURATION
     styled_chart = (
         chart.configure_view(strokeWidth=0)
-        .properties(height=chart_height, width=chart_width)
+        .properties(height=chart_height, width=chart_width,
+                    title=f"{y_metric.upper()} by {x_metric.upper()} on {attribute.title()}")
+        .configure_title(**get_title_configuration())
         .configure_axis(
             titleFont=FONT,
             titleColor=Scatter_Axis.title_color,
