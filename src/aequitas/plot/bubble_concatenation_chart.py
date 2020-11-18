@@ -162,7 +162,7 @@ def plot_concatenated_bubble_charts(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .configure_title(**get_title_configuration())
+        .configure_title(dx=chart_width / 2, **get_title_configuration())
         .properties(title=f"{attribute.title()}")
     )
 
