@@ -117,13 +117,20 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     return metrics_rules
 
 
+def __get_x_axis_values(x_domain, zero=True):
+    domain_spread = [x for x in list(range(x_domain[0], x_domain[1] + 1))]
+    axis_values = domain_spread
+    
+    if zero:
+        return axis_values
+    return [x for x in axis_values if x != 0]
+
+
 def __draw_x_ticks_labels(scales, chart_height):
     """Draws the numbers in the horizontal axis."""
 
     # The values to be drawn, we don't want to draw 0 (which corresponds to a ratio of 1) as we later draw an annotation.
-    axis_values = [
-        x for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain)
 
     # Given the semantic of the chart, (how many times smaller or larger) we draw absolute values.
     axis_values_labels = [abs(x) + 1 if x != 0 else "=" for x in axis_values]
@@ -386,11 +393,7 @@ def __draw_bubbles(
     """Draws the bubbles for all metrics."""
 
     # X AXIS GRIDLINES
-    axis_values = [
-        x
-        for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-        if x != 0
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain, zero=False)
 
     x_axis = alt.Axis(
         values=axis_values, ticks=False, domain=False, labels=False, title=None
