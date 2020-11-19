@@ -21,7 +21,7 @@ from aequitas.plot.commons.style.classes import (
 )
 
 from aequitas.plot.commons.style.text import FONT
-from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons.style.sizes import XY_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
 
@@ -32,8 +32,8 @@ def __get_position_scales(chart_height, chart_width):
     position_scales = dict()
 
     # X-Y RANGES (based on chart dimensions)
-    x_range = get_chart_size_range(chart_width, Sizes.XY_Chart.padding)
-    y_range = get_chart_size_range(chart_height, Sizes.XY_Chart.padding)
+    x_range = get_chart_size_range(chart_width, XY_Chart.padding_x)
+    y_range = get_chart_size_range(chart_height, XY_Chart.padding_y)
     y_range.reverse()
 
     # METRICS SCALES
@@ -360,7 +360,7 @@ def plot_xy_metrics_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        Sizes.XY_Chart,
+        XY_Chart,
         accessibility_mode,
     )
 

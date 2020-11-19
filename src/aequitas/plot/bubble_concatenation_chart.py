@@ -154,7 +154,7 @@ def plot_concatenated_bubble_charts(
     )
 
     full_chart = (
-        alt.hconcat(disparity_chart, metric_chart, bounds="flush", spacing=20)
+        alt.hconcat(disparity_chart, metric_chart, bounds="flush", spacing=0)
         .configure_view(strokeWidth=0)
         .configure_axisLeft(
             labelFontSize=Metric_Axis.label_font_size,

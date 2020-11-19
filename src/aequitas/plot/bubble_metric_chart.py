@@ -34,12 +34,12 @@ def __get_position_scales(metrics, chart_height, chart_width, concat_chart):
     position_scales = dict()
 
     # METRICS VALUES SCALE
-    x_range = get_chart_size_range(chart_width)
+    x_range = get_chart_size_range(chart_width, Metric_Chart.padding_x)
     x_domain = [0, 1]
     position_scales["x"] = alt.Scale(domain=x_domain, range=x_range)
 
     # METRICS LABELS SCALE
-    y_range = get_chart_size_range(chart_height)
+    y_range = get_chart_size_range(chart_height, Metric_Chart.padding_y)
     y_domain = [metric.upper() for metric in metrics]
     position_scales["y"] = alt.Scale(domain=y_domain, range=y_range)
 
@@ -126,7 +126,7 @@ def __draw_x_ticks_labels(scales, chart_height):
                 "value:Q",
                 scale=scales["x"],
             ),
-            y=alt.value(Metric_Chart.padding * chart_height * 0.7),
+            y=alt.value(Metric_Chart.padding_y * chart_height * 0.7),
         )
     )
 
@@ -215,7 +215,7 @@ def __draw_threshold_text(
         )
         .encode(
             x=alt.value(0),
-            y=alt.value(chart_height * (1 - 2 / 3 * Metric_Chart.padding)),
+            y=alt.value(chart_height * (1 - 2 / 3 * Metric_Chart.padding_y)),
             text=alt.value(
                 f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
             ),
