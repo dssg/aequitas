@@ -1,5 +1,7 @@
 class Chart:
     full_chart_padding = {"top": 15, "bottom": 10}
+    padding_x = 0.05
+    padding_y = 0.1
 
 
 class Summary_Chart(Chart):
@@ -21,7 +23,6 @@ class Disparity_Chart(Chart):
     min_line_height = 80
     full_width = 800
     min_width = 380
-    padding = 0.1
 
 
 class Metric_Chart(Chart):
@@ -30,7 +31,6 @@ class Metric_Chart(Chart):
     min_line_height = 80
     full_width = 800
     min_width = 380
-    padding = 0.1
 
 
 class Concat_Chart(Chart):
@@ -45,4 +45,4 @@ class Concat_Chart(Chart):
 class XY_Chart(Chart):
     full_side = 450
     min_side = 200
-    padding = 0.05
+    padding_y = 0.05

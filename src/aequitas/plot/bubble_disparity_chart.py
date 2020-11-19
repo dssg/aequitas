@@ -42,7 +42,7 @@ def __get_position_scales(
 
     # DISPARITIES SCALE
     # RANGE
-    x_range = get_chart_size_range(chart_width)
+    x_range = get_chart_size_range(chart_width, Disparity_Chart.padding_x)
 
     # DOMAIN
     # Get max absolute disparity
@@ -64,7 +64,7 @@ def __get_position_scales(
     position_scales["x"] = alt.Scale(domain=x_domain, range=x_range)
 
     # METRICS SCALE
-    y_range = get_chart_size_range(chart_height)
+    y_range = get_chart_size_range(chart_height, Disparity_Chart.padding_y)
     if chart_height < 300:
         y_range[0] = 30
     y_domain = [metric.upper() for metric in metrics]
@@ -117,13 +117,33 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     return metrics_rules
 
 
+def __get_x_axis_values(x_domain, zero=True):
+    TICK_STEP_OPTIONS = [1, 2, 5, 10, 20, 50, 100]
+
+    def list_axis_values(limit, step):
+        axis_start = max([1, step - 1])
+        positive_axis_values = list(range(axis_start, limit, step))
+        negative_axis_values = [-x for x in positive_axis_values][::-1]
+        axis_values = positive_axis_values + negative_axis_values
+        return axis_values
+
+    domain_limit = x_domain[1] + 1
+
+    for tick_step in TICK_STEP_OPTIONS:
+        if domain_limit / tick_step <= 6 or tick_step == TICK_STEP_OPTIONS[-1]:
+            axis_values = list_axis_values(domain_limit, tick_step)
+            break
+
+    if zero:
+        return axis_values + [0]
+    return axis_values
+
+
 def __draw_x_ticks_labels(scales, chart_height):
     """Draws the numbers in the horizontal axis."""
 
     # The values to be drawn, we don't want to draw 0 (which corresponds to a ratio of 1) as we later draw an annotation.
-    axis_values = [
-        x for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain)
 
     # Given the semantic of the chart, (how many times smaller or larger) we draw absolute values.
     axis_values_labels = [abs(x) + 1 if x != 0 else "=" for x in axis_values]
@@ -146,14 +166,14 @@ def __draw_x_ticks_labels(scales, chart_height):
                 "value:Q",
                 scale=scales["x"],
             ),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.7),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.7),
         )
     )
 
     return tick_labels
 
 
-def __draw_text_annotations(ref_group, chart_height, chart_width):
+def __draw_text_annotations(ref_group, chart_height, x_range):
     """Draws on chart text annotations."""
 
     # FONT
@@ -167,14 +187,14 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
     text_times_larger = (
         alt.Chart(DUMMY_DF)
         .mark_text(
-            align="left",
+            align="right",
             fill=Annotation.font_color,
             fontSize=Annotation.font_size,
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width * (1 - 1.5 * Disparity_Chart.padding)),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
+            x=alt.value(x_range[1]),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
             text=alt.value("Times Larger"),
         )
     )
@@ -183,14 +203,14 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
     text_times_smaller = (
         alt.Chart(DUMMY_DF)
         .mark_text(
-            align="right",
+            align="left",
             fill=Annotation.font_color,
             fontSize=Annotation.font_size,
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width * 1.5 * Disparity_Chart.padding),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
+            x=alt.value(x_range[0]),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
             text=alt.value("Times Smaller"),
         )
     )
@@ -205,8 +225,8 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width / 2),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
+            x=alt.value(x_range[0] + (x_range[1] - x_range[0]) / 2),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
             text=alt.value("Equal"),
         )
     )
@@ -226,8 +246,8 @@ def __draw_reference_rule(ref_group, chart_height, chart_width):
         )
         .encode(
             x=alt.value(chart_width / 2),
-            y=alt.value(chart_height * Disparity_Chart.padding / 1.2),
-            y2=alt.value(chart_height * (1 - Disparity_Chart.padding / 1.2)),
+            y=alt.value(chart_height * Disparity_Chart.padding_y / 1.2),
+            y2=alt.value(chart_height * (1 - Disparity_Chart.padding_y / 1.2)),
             tooltip=alt.value(f"{ref_group} [REF]"),
         )
     )
@@ -254,8 +274,8 @@ def __draw_threshold_rules(
             tooltip="",
         )
         .encode(
-            y=alt.value(Disparity_Chart.padding * chart_height),
-            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding_y * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
         )
     )
 
@@ -285,8 +305,8 @@ def __draw_threshold_bands(
         alt.Chart(threshold_df)
         .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
         .encode(
-            y=alt.value(Disparity_Chart.padding * chart_height),
-            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding_y * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
         )
     )
 
@@ -323,7 +343,7 @@ def __draw_threshold_text(
         )
         .encode(
             x=alt.value(0),
-            y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding)),
+            y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding_y)),
             text=alt.value(
                 f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
             ),
@@ -386,11 +406,7 @@ def __draw_bubbles(
     """Draws the bubbles for all metrics."""
 
     # X AXIS GRIDLINES
-    axis_values = [
-        x
-        for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-        if x != 0
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain, zero=False)
 
     x_axis = alt.Axis(
         values=axis_values, ticks=False, domain=False, labels=False, title=None
@@ -517,7 +533,9 @@ def get_disparity_bubble_chart_components(
     x_ticks_labels = __draw_x_ticks_labels(scales, chart_height)
 
     # ANNOTATIONS
-    text_annotations = __draw_text_annotations(ref_group, chart_height, chart_width)
+    text_annotations = __draw_text_annotations(
+        ref_group, chart_height, scales["x"].range
+    )
 
     # BUBBLES - CENTERS & AREAS
     bubbles = __draw_bubbles(

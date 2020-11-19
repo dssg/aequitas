@@ -6,17 +6,16 @@ import altair as alt
 import math
 
 
-def get_chart_size_range(length, padding=Disparity_Chart.padding):
+def get_chart_size_range(length, padding):
     """Calculate the chart size range for a given axis based on the length and padding."""
-    # Using Disparity_Chart.padding as the default as the scatter needs to use a different value (0.05)
-    # It's indifferent to use Disparity_Chart.padding or Metric_Chart.padding as they both are 0.1
+
     return [length * padding, length * (1 - padding)]
 
 
 def get_color_scale(plot_table, ref_group):
-    """ 
-    Calculate the color scale for the bubbles. If there are more groups than the length 
-    of the categorical color palette, then we use the same color for all the non-reference 
+    """
+    Calculate the color scale for the bubbles. If there are more groups than the length
+    of the categorical color palette, then we use the same color for all the non-reference
     groups. Otherwise, we use an encoding where each group is given its own distinct color.
     The reference group bubble is always given the reference color.
     """
@@ -38,10 +37,10 @@ def get_color_scale(plot_table, ref_group):
 
 
 def get_shape_scale(plot_table, ref_group, accessibility_mode=False):
-    """ 
+    """
     Calculate the shape scale for the bubbles centers. The reference group bubble center
-    is a cross while the others are circles. If accessibility_mode is on and there are 
-    more colors in the categorical color palette than different non-reference groups , then we 
+    is a cross while the others are circles. If accessibility_mode is on and there are
+    more colors in the categorical color palette than different non-reference groups , then we
     also use shapes to distinguish between colors in the scale.
     """
 
