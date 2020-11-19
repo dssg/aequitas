@@ -9,7 +9,7 @@ from aequitas.plot.commons.legend import draw_legend
 
 from aequitas.plot.commons.style.classes import Title, Metric_Axis, Chart_Title
 from aequitas.plot.commons.style.text import FONT
-from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons.style.sizes import Concat_Chart
 from aequitas.plot.commons import initializers as Initializer
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
@@ -56,7 +56,7 @@ def plot_concatenated_bubble_charts(
     attribute,
     fairness_threshold=1.25,
     chart_height=None,
-    chart_width=Sizes.Concat_Chart.full_width,
+    chart_width=Concat_Chart.full_width,
     accessibility_mode=False,
 ):
     """Draws a concatenation of the disparity bubble chart and the metric values bubble chart,
@@ -96,7 +96,7 @@ def plot_concatenated_bubble_charts(
         fairness_threshold,
         chart_height,
         chart_width,
-        Sizes.Concat_Chart,
+        Concat_Chart,
         accessibility_mode,
     )
 
@@ -104,10 +104,10 @@ def plot_concatenated_bubble_charts(
 
     # TITLES
     disparity_title = draw_chart_title(
-        "DISPARITIES", chart_sizes["disparity_chart_width"]
+        "Disparities", chart_sizes["disparity_chart_width"]
     )
     metric_title = draw_chart_title(
-        "ABSOLUTE VALUES", chart_sizes["metric_chart_width"]
+        "Absolute Values", chart_sizes["metric_chart_width"]
     )
 
     # DISPARITY CHART
@@ -170,7 +170,9 @@ def plot_concatenated_bubble_charts(
             color=Chart_Title.font_color,
             dx=chart_width / 2,
         )
-        .properties(title=f"{attribute.title()}")
+        .properties(
+            title=f"{attribute.title()}", padding=Concat_Chart.full_chart_padding
+        )
     )
 
     return full_chart

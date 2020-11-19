@@ -435,6 +435,7 @@ def plot_xy_metrics_chart(
             height=chart_height,
             width=chart_width,
             title=f"{y_metric.upper()} by {x_metric.upper()} on {attribute.title()}",
+            padding=XY_Chart.full_chart_padding,
         )
         .configure_title(
             align="center",
