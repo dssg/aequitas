@@ -17,6 +17,7 @@ from aequitas.plot.commons.style.classes import (
     Annotation,
     Bubble,
     Rule,
+    Chart_Title
 )
 from aequitas.plot.commons.style.sizes import Metric_Chart
 from aequitas.plot.commons.style.text import FONT
@@ -65,7 +66,9 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     horizontal_rules = (
         alt.Chart(pd.DataFrame({"y_position": metrics_labels, "start": 0, "end": 1}))
         .mark_rule(
-            strokeWidth=Metric_Axis.stroke_width, stroke=Metric_Axis.stroke, tooltip="",
+            strokeWidth=Metric_Axis.stroke_width,
+            stroke=Metric_Axis.stroke,
+            tooltip="",
         )
         .encode(
             y=alt.Y("y_position:N", scale=scales["y"], axis=y_axis),
@@ -85,7 +88,11 @@ def __draw_domain_rules(scales):
 
     vertical_domain_rules = (
         alt.Chart(domain_rules_df)
-        .mark_rule(strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip="",)
+        .mark_rule(
+            strokeWidth=Rule.stroke_width,
+            stroke=Rule.stroke,
+            tooltip="",
+        )
         .encode(
             x=alt.X("x_position:Q", scale=scales["x"]),
             y=alt.value(scales["y"]["range"][0]),
@@ -115,7 +122,10 @@ def __draw_x_ticks_labels(scales, chart_height):
         )
         .encode(
             text=alt.Text("value:N"),
-            x=alt.X("value:Q", scale=scales["x"],),
+            x=alt.X(
+                "value:Q",
+                scale=scales["x"],
+            ),
             y=alt.value(Metric_Chart.padding * chart_height * 0.7),
         )
     )
@@ -232,17 +242,17 @@ def __get_threshold_elements(
 
     # CREATE THRESHOLD DF
     for metric in metrics:
-        ## Get reference value for each metric
+        # Get reference value for each metric
         ref_group_value = plot_table.loc[plot_table["attribute_value"] == ref_group][
             metric
         ].iloc[0]
 
-        ## Enforce max upper boundary on 1
+        # Enforce max upper boundary on 1
         upper_values.append(min(ref_group_value * fairness_threshold, 1))
 
         lower_values.append(ref_group_value / fairness_threshold)
 
-    ## Convert to uppercase to match bubbles' Y axis
+    # Convert to uppercase to match bubbles' Y axis
     metrics_labels = [metric.upper() for metric in metrics]
 
     threshold_df = pd.DataFrame(
@@ -283,7 +293,11 @@ def __get_threshold_elements(
 
 
 def __draw_bubbles(
-    plot_table, metrics, ref_group, scales, selection,
+    plot_table,
+    metrics,
+    ref_group,
+    scales,
+    selection,
 ):
     """Draws the bubbles for all metrics."""
 
@@ -412,7 +426,13 @@ def get_metric_bubble_chart_components(
     x_ticks_labels = __draw_x_ticks_labels(scales, chart_height)
 
     # BUBBLES - CENTERS & AREAS
-    bubbles = __draw_bubbles(plot_table, metrics, ref_group, scales, selection,)
+    bubbles = __draw_bubbles(
+        plot_table,
+        metrics,
+        ref_group,
+        scales,
+        selection,
+    )
 
     # THRESHOLD, BANDS & ANNOTATION
     if fairness_threshold is not None:
@@ -513,7 +533,19 @@ def plot_metric_bubble_chart(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .properties(height=chart_height, width=chart_width)
+        .properties(
+            height=chart_height,
+            width=chart_width,
+            title=f"Absolute values by {attribute.title()}",
+        )
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
         .resolve_scale(y="independent", size="independent")
     )
 

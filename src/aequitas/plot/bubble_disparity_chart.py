@@ -20,6 +20,7 @@ from aequitas.plot.commons.style.classes import (
     Threshold_Rule,
     Threshold_Band,
     Bubble,
+    Chart_Title,
 )
 
 from aequitas.plot.commons.style.text import FONT
@@ -40,17 +41,20 @@ def __get_position_scales(
     position_scales = dict()
 
     # DISPARITIES SCALE
-    ## RANGE
+    # RANGE
     x_range = get_chart_size_range(chart_width)
 
-    ## DOMAIN
-    ### Get max absolute disparity
+    # DOMAIN
+    # Get max absolute disparity
     scaled_disparities_col_names = [f"{metric}_disparity_scaled" for metric in metrics]
-    max_column = lambda x: max(x.min(), x.max(), key=abs)
+
+    def max_column(x):
+        return max(x.min(), x.max(), key=abs)
+
     max_disparities = plot_table[scaled_disparities_col_names].apply(max_column, axis=1)
     abs_max_disparity = abs(max_column(max_disparities))
 
-    ### If fairness_threshold is defined, get max between threshold and max absolute disparity
+    # If fairness_threshold is defined, get max between threshold and max absolute disparity
     if fairness_threshold is not None:
         x_domain_limit = math.ceil(max(abs_max_disparity, fairness_threshold))
     else:
@@ -70,7 +74,7 @@ def __get_position_scales(
 
 
 def __draw_metrics_rules(metrics, scales, concat_chart):
-    """Draws an horizontal rule and the left-hand side label for each metric. 
+    """Draws an horizontal rule and the left-hand side label for each metric.
     The groups' bubbles will be positioned on this horizontal rule."""
 
     metrics_labels = [metric.upper() for metric in metrics]
@@ -99,7 +103,9 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     metrics_rules = (
         alt.Chart(rules_df)
         .mark_rule(
-            strokeWidth=Metric_Axis.stroke_width, stroke=Metric_Axis.stroke, tooltip="",
+            strokeWidth=Metric_Axis.stroke_width,
+            stroke=Metric_Axis.stroke,
+            tooltip="",
         )
         .encode(
             y=alt.Y("metric:N", scale=scales["y"], axis=metrics_axis),
@@ -136,7 +142,10 @@ def __draw_x_ticks_labels(scales, chart_height):
         )
         .encode(
             text=alt.Text("label:N"),
-            x=alt.X("value:Q", scale=scales["x"],),
+            x=alt.X(
+                "value:Q",
+                scale=scales["x"],
+            ),
             y=alt.value(Disparity_Chart.padding * chart_height * 0.7),
         )
     )
@@ -149,7 +158,9 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
 
     # FONT
     annotation_text_params = dict(
-        font=FONT, fontWeight=Annotation.font_weight, tooltip="",
+        font=FONT,
+        fontWeight=Annotation.font_weight,
+        tooltip="",
     )
 
     # TIMES LARGER TEXT
@@ -248,14 +259,22 @@ def __draw_threshold_rules(
         )
     )
 
-    lower_threshold_rule = threshold_rule.encode(x=alt.X("min:Q", scale=scales["x"]),)
-    upper_threshold_rule = threshold_rule.encode(x=alt.X("max:Q", scale=scales["x"]),)
+    lower_threshold_rule = threshold_rule.encode(
+        x=alt.X("min:Q", scale=scales["x"]),
+    )
+    upper_threshold_rule = threshold_rule.encode(
+        x=alt.X("max:Q", scale=scales["x"]),
+    )
 
     return lower_threshold_rule + upper_threshold_rule
 
 
 def __draw_threshold_bands(
-    threshold_df, scales, chart_height, chart_width, accessibility_mode=False,
+    threshold_df,
+    scales,
+    chart_height,
+    chart_width,
+    accessibility_mode=False,
 ):
     """Draws threshold bands: regions painted red where the metric value is above the defined fairness_threshold."""
     fill_color = (
@@ -272,10 +291,12 @@ def __draw_threshold_bands(
     )
 
     lower_threshold_band = threshold_band.encode(
-        x2="lower_end:Q", x=alt.X("min:Q", scale=scales["x"]),
+        x2="lower_end:Q",
+        x=alt.X("min:Q", scale=scales["x"]),
     )
     upper_threshold_band = threshold_band.encode(
-        x=alt.X("max:Q", scale=scales["x"]), x2="upper_end:Q",
+        x=alt.X("max:Q", scale=scales["x"]),
+        x2="upper_end:Q",
     )
 
     return lower_threshold_band + upper_threshold_band
@@ -340,7 +361,11 @@ def __get_threshold_elements(
 
     # BANDS
     threshold_bands = __draw_threshold_bands(
-        threshold_df, scales, chart_height, chart_width, accessibility_mode,
+        threshold_df,
+        scales,
+        chart_height,
+        chart_width,
+        accessibility_mode,
     )
 
     # HELPER TEXT
@@ -352,7 +377,11 @@ def __get_threshold_elements(
 
 
 def __draw_bubbles(
-    plot_table, metrics, ref_group, scales, selection,
+    plot_table,
+    metrics,
+    ref_group,
+    scales,
+    selection,
 ):
     """Draws the bubbles for all metrics."""
 
@@ -491,7 +520,13 @@ def get_disparity_bubble_chart_components(
     text_annotations = __draw_text_annotations(ref_group, chart_height, chart_width)
 
     # BUBBLES - CENTERS & AREAS
-    bubbles = __draw_bubbles(plot_table, metrics, ref_group, scales, selection,)
+    bubbles = __draw_bubbles(
+        plot_table,
+        metrics,
+        ref_group,
+        scales,
+        selection,
+    )
 
     # THRESHOLD & BANDS
     if fairness_threshold is not None:
@@ -536,7 +571,7 @@ def plot_disparity_bubble_chart(
     chart_width=Disparity_Chart.full_width,
     accessibility_mode=False,
 ):
-    """Draws bubble chart to visualize disparity in selected metrics versus that of a 
+    """Draws bubble chart to visualize disparity in selected metrics versus that of a
     reference group for a given attribute.
 
     :param disparity_df: a dataframe generated by the Aequitas Bias class
@@ -596,13 +631,27 @@ def plot_disparity_bubble_chart(
 
     # FINALIZE CHART
     disparity_chart = (
-        full_chart.configure_view(strokeWidth=0,)
+        full_chart.configure_view(
+            strokeWidth=0,
+        )
         .configure_axisLeft(
             labelFontSize=Metric_Axis.label_font_size,
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .properties(height=chart_height, width=chart_width)
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
+        .properties(
+            height=chart_height,
+            width=chart_width,
+            title=f"Disparities on {attribute.title()}",
+        )
         .resolve_scale(y="independent", size="independent")
     )
 
