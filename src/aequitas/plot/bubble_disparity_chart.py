@@ -118,9 +118,22 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
 
 
 def __get_x_axis_values(x_domain, zero=True):
-    domain_spread = [x for x in list(range(x_domain[0], x_domain[1] + 1))]
-    axis_values = domain_spread
-    
+    TICK_SPACING_OPTIONS = [1, 2, 5, 10, 20, 50, 100]
+    domain_limit = x_domain[1] + 1
+
+    axis_values = []
+    tick_spacing_index = 0
+    while len(axis_values) == 0:
+        tick_spacing = TICK_SPACING_OPTIONS[tick_spacing_index]
+        if domain_limit / tick_spacing <= 5:
+            positive_axis_values = list(range(0, domain_limit + 1, tick_spacing))
+            positive_axis_values = [
+                x - 1 if x != 0 else 0 for x in positive_axis_values
+            ]
+            negative_axis_values = [-x for x in positive_axis_values][::-1]
+            axis_values = list(set(negative_axis_values) | set(positive_axis_values))
+        tick_spacing_index += 1
+
     if zero:
         return axis_values
     return [x for x in axis_values if x != 0]
