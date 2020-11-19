@@ -17,7 +17,7 @@ from aequitas.plot.commons.style.classes import (
     Annotation,
     Bubble,
     Rule,
-    Chart_Title
+    Chart_Title,
 )
 from aequitas.plot.commons.style.sizes import Metric_Chart
 from aequitas.plot.commons.style.text import FONT
@@ -537,6 +537,7 @@ def plot_metric_bubble_chart(
             height=chart_height,
             width=chart_width,
             title=f"Absolute values by {attribute.title()}",
+            padding=Metric_Chart.full_chart_padding,
         )
         .configure_title(
             align="center",

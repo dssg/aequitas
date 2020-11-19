@@ -175,7 +175,7 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
         .encode(
             x=alt.value(chart_width * (1 - 1.5 * Disparity_Chart.padding)),
             y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("TIMES LARGER"),
+            text=alt.value("Times Larger"),
         )
     )
 
@@ -191,7 +191,7 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
         .encode(
             x=alt.value(chart_width * 1.5 * Disparity_Chart.padding),
             y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("TIMES SMALLER"),
+            text=alt.value("Times Smaller"),
         )
     )
 
@@ -207,7 +207,7 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
         .encode(
             x=alt.value(chart_width / 2),
             y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("EQUAL"),
+            text=alt.value("Equal"),
         )
     )
 
@@ -651,6 +651,7 @@ def plot_disparity_bubble_chart(
             height=chart_height,
             width=chart_width,
             title=f"Disparities on {attribute.title()}",
+            padding=Disparity_Chart.full_chart_padding,
         )
         .resolve_scale(y="independent", size="independent")
     )

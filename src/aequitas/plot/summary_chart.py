@@ -22,7 +22,7 @@ from aequitas.plot.commons.style.classes import (
     Legend,
 )
 from aequitas.plot.commons.style.text import FONT
-from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
 
@@ -61,12 +61,10 @@ def __get_size_constants(
         # Chart sizes
         attribute_titles_height=0.15 * chart_height,
         line_spacing=0.2 * chart_height / num_metrics,
-        line_height=Sizes.Summary_Chart.line_height_ratio * chart_height / num_metrics,
+        line_height=Summary_Chart.line_height_ratio * chart_height / num_metrics,
         metric_titles_width=0.1 * chart_width,
         column_spacing=0.15 * chart_width / num_attributes,
-        column_width=Sizes.Summary_Chart.column_width_ratio
-        * chart_width
-        / num_attributes,
+        column_width=Summary_Chart.column_width_ratio * chart_width / num_attributes,
         # Circle size
         ## Conditional definition of the size where for each additional unit in
         ## max_num_groups, we subtract 25 squared pixels from the area of the
@@ -92,7 +90,7 @@ def __draw_attribute_title(attribute, width, size_constants):
             fontWeight=Title.font_weight,
         )
         .encode(
-            text=alt.value(attribute.upper()),
+            text=alt.value(attribute.title()),
         )
         .properties(width=width, height=size_constants["attribute_titles_height"])
     )
@@ -533,7 +531,7 @@ def plot_summary_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        Sizes.Summary_Chart,
+        Summary_Chart,
     )
 
     num_metrics = len(metrics)
@@ -613,8 +611,9 @@ def plot_summary_chart(
         fairness_threshold, size_constants["column_spacing"] / 2
     )
 
-    Summary_Chart = (
+    full_summary_chart = (
         alt.vconcat(summary_chart_table, summary_chart_explanation)
+        .properties(padding=Summary_Chart.full_chart_padding)
         .configure_legend(
             labelFont=FONT,
             labelColor=Legend.font_color,
@@ -628,4 +627,4 @@ def plot_summary_chart(
         .configure_view(strokeWidth=0)
     )
 
-    return Summary_Chart
+    return full_summary_chart

@@ -1,4 +1,8 @@
-class Summary_Chart:
+class Chart:
+    full_chart_padding = {"top": 15, "bottom": 10}
+
+
+class Summary_Chart(Chart):
     vertical_header_height = 45
     line_height = 85
     min_line_height = 50
@@ -11,7 +15,7 @@ class Summary_Chart:
     column_width_ratio = 0.75
 
 
-class Disparity_Chart:
+class Disparity_Chart(Chart):
     vertical_header_height = 100
     line_height = 150
     min_line_height = 80
@@ -19,7 +23,8 @@ class Disparity_Chart:
     min_width = 380
     padding = 0.1
 
-class Metric_Chart:
+
+class Metric_Chart(Chart):
     vertical_header_height = 50
     line_height = 125
     min_line_height = 80
@@ -28,7 +33,7 @@ class Metric_Chart:
     padding = 0.1
 
 
-class Concat_Chart:
+class Concat_Chart(Chart):
     vertical_header_height = 110
     line_height = 75
     min_line_height = 50
@@ -37,7 +42,7 @@ class Concat_Chart:
     min_width = Metric_Chart.min_width + Disparity_Chart.min_width + spacing
 
 
-class XY_Chart:
+class XY_Chart(Chart):
     full_side = 450
     min_side = 200
     padding = 0.05
