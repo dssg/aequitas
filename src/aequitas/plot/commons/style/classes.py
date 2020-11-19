@@ -12,7 +12,7 @@ class Bubble:
 
 class Title:
     font_size = Text.FONT_SIZE_REGULAR
-    font_weight = Text.FONT_WEIGHT_REGULAR
+    font_weight = Text.FONT_WEIGHT_BOLD
     font_color = Color.GRAY
     margin_top = -15
 
@@ -30,7 +30,7 @@ class Subtitle:
 
 class Annotation:
     font_size = Text.FONT_SIZE_SMALL
-    font_weight = Text.FONT_WEIGHT_LIGHT
+    font_weight = Text.FONT_WEIGHT_REGULAR
     font_color = Color.GRAY
     font_color_reference = Color.REFERENCE
     font_color_threshold = Color.THRESHOLD
@@ -60,7 +60,7 @@ class Axis(Rule):
     title_font_weight = Text.FONT_WEIGHT_REGULAR
     label_color = Color.GRAY
     label_font_size = Text.FONT_SIZE_SMALL
-    label_font_weight = Text.FONT_WEIGHT_LIGHT
+    label_font_weight = Text.FONT_WEIGHT_REGULAR
 
 
 class Metric_Axis(Axis):
@@ -74,7 +74,7 @@ class Metric_Axis(Axis):
 class Scatter_Axis(Axis):
     title_padding = 30
     title_font_size = Text.FONT_SIZE_LARGE
-    title_font_weight = Text.FONT_WEIGHT_LIGHT
+    title_font_weight = Text.FONT_WEIGHT_REGULAR
 
 
 class Threshold_Band:
@@ -88,11 +88,11 @@ class Legend:
     color_faded = Color.FADED
     font_color = Color.GRAY
     font_size = Text.FONT_SIZE_SMALL
-    font_weight = Text.FONT_WEIGHT_LIGHT
+    font_weight = Text.FONT_WEIGHT_REGULAR
     vertical_spacing = 10
     horizontal_spacing = 4
     title_font_size = Text.FONT_SIZE_REGULAR
-    title_font_weight = Text.FONT_WEIGHT_LIGHT
+    title_font_weight = Text.FONT_WEIGHT_REGULAR
     title_margin_bottom = 5
     circle_radius = 4
 
