@@ -118,25 +118,25 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
 
 
 def __get_x_axis_values(x_domain, zero=True):
-    TICK_SPACING_OPTIONS = [1, 2, 5, 10, 20, 50, 100]
+    TICK_STEP_OPTIONS = [1, 2, 5, 10, 20, 50, 100]
+
+    def list_axis_values(limit, step):
+        axis_start = max([1, step - 1])
+        positive_axis_values = list(range(axis_start, limit, step))
+        negative_axis_values = [-x for x in positive_axis_values][::-1]
+        axis_values = positive_axis_values + negative_axis_values
+        return axis_values
+
     domain_limit = x_domain[1] + 1
 
-    axis_values = []
-    tick_spacing_index = 0
-    while len(axis_values) == 0:
-        tick_spacing = TICK_SPACING_OPTIONS[tick_spacing_index]
-        if domain_limit / tick_spacing <= 5:
-            positive_axis_values = list(range(0, domain_limit + 1, tick_spacing))
-            positive_axis_values = [
-                x - 1 if x != 0 else 0 for x in positive_axis_values
-            ]
-            negative_axis_values = [-x for x in positive_axis_values][::-1]
-            axis_values = list(set(negative_axis_values) | set(positive_axis_values))
-        tick_spacing_index += 1
+    for tick_step in TICK_STEP_OPTIONS:
+        if domain_limit / tick_step <= 6 or tick_step == TICK_STEP_OPTIONS[-1]:
+            axis_values = list_axis_values(domain_limit, tick_step)
+            break
 
     if zero:
-        return axis_values
-    return [x for x in axis_values if x != 0]
+        return axis_values + [0]
+    return axis_values
 
 
 def __draw_x_ticks_labels(scales, chart_height):
