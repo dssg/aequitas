@@ -7,11 +7,10 @@ from aequitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
 
 from aequitas.plot.commons.legend import draw_legend
 
-from aequitas.plot.commons.style.classes import Title, Metric_Axis
+from aequitas.plot.commons.style.classes import Title, Metric_Axis, Chart_Title
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style import sizes as Sizes
 from aequitas.plot.commons import initializers as Initializer
-from aequitas.plot.commons.titles import get_title_configuration
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -162,7 +161,15 @@ def plot_concatenated_bubble_charts(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .configure_title(dx=chart_width / 2, **get_title_configuration())
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+            dx=chart_width / 2,
+        )
         .properties(title=f"{attribute.title()}")
     )
 

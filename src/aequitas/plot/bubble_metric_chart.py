@@ -17,11 +17,11 @@ from aequitas.plot.commons.style.classes import (
     Annotation,
     Bubble,
     Rule,
+    Chart_Title
 )
 from aequitas.plot.commons.style.sizes import Metric_Chart
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons import initializers as Initializer
-from aequitas.plot.commons.titles import get_title_configuration
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -538,7 +538,14 @@ def plot_metric_bubble_chart(
             width=chart_width,
             title=f"Absolute values by {attribute.title()}",
         )
-        .configure_title(**get_title_configuration())
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
         .resolve_scale(y="independent", size="independent")
     )
 

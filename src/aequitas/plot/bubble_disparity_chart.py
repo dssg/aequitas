@@ -20,12 +20,12 @@ from aequitas.plot.commons.style.classes import (
     Threshold_Rule,
     Threshold_Band,
     Bubble,
+    Chart_Title,
 )
 
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
-from aequitas.plot.commons.titles import get_title_configuration
 
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
@@ -639,7 +639,14 @@ def plot_disparity_bubble_chart(
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .configure_title(**get_title_configuration())
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
         .properties(
             height=chart_height,
             width=chart_width,

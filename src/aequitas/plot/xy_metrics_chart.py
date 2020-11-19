@@ -17,13 +17,13 @@ from aequitas.plot.commons.style.classes import (
     Rule,
     Bubble,
     Scatter_Axis,
+    Chart_Title,
 )
 
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style import sizes as Sizes
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
-from aequitas.plot.commons.titles import get_title_configuration
 
 
 def __get_position_scales(chart_height, chart_width):
@@ -436,7 +436,14 @@ def plot_xy_metrics_chart(
             width=chart_width,
             title=f"{y_metric.upper()} by {x_metric.upper()} on {attribute.title()}",
         )
-        .configure_title(**get_title_configuration())
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
         .configure_axis(
             titleFont=FONT,
             titleColor=Scatter_Axis.title_color,
