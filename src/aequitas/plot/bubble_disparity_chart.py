@@ -20,6 +20,7 @@ from aequitas.plot.commons.style.classes import (
     Threshold_Rule,
     Threshold_Band,
     Bubble,
+    Chart_Title,
 )
 
 from aequitas.plot.commons.style.text import FONT
@@ -40,17 +41,20 @@ def __get_position_scales(
     position_scales = dict()
 
     # DISPARITIES SCALE
-    ## RANGE
-    x_range = get_chart_size_range(chart_width)
+    # RANGE
+    x_range = get_chart_size_range(chart_width, Disparity_Chart.padding_x)
 
-    ## DOMAIN
-    ### Get max absolute disparity
+    # DOMAIN
+    # Get max absolute disparity
     scaled_disparities_col_names = [f"{metric}_disparity_scaled" for metric in metrics]
-    max_column = lambda x: max(x.min(), x.max(), key=abs)
+
+    def max_column(x):
+        return max(x.min(), x.max(), key=abs)
+
     max_disparities = plot_table[scaled_disparities_col_names].apply(max_column, axis=1)
     abs_max_disparity = abs(max_column(max_disparities))
 
-    ### If fairness_threshold is defined, get max between threshold and max absolute disparity
+    # If fairness_threshold is defined, get max between threshold and max absolute disparity
     if fairness_threshold is not None:
         x_domain_limit = math.ceil(max(abs_max_disparity, fairness_threshold))
     else:
@@ -60,7 +64,7 @@ def __get_position_scales(
     position_scales["x"] = alt.Scale(domain=x_domain, range=x_range)
 
     # METRICS SCALE
-    y_range = get_chart_size_range(chart_height)
+    y_range = get_chart_size_range(chart_height, Disparity_Chart.padding_y)
     if chart_height < 300:
         y_range[0] = 30
     y_domain = [metric.upper() for metric in metrics]
@@ -70,7 +74,7 @@ def __get_position_scales(
 
 
 def __draw_metrics_rules(metrics, scales, concat_chart):
-    """Draws an horizontal rule and the left-hand side label for each metric. 
+    """Draws an horizontal rule and the left-hand side label for each metric.
     The groups' bubbles will be positioned on this horizontal rule."""
 
     metrics_labels = [metric.upper() for metric in metrics]
@@ -91,15 +95,17 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     rules_df = pd.DataFrame(
         {
             "metric": metrics_labels,
-            "x": scales["x"]["domain"][0] - 0.2,
-            "x2": scales["x"]["domain"][1] + 0.2,
+            "x": scales["x"]["domain"][0],
+            "x2": scales["x"]["domain"][1],
         }
     )
 
     metrics_rules = (
         alt.Chart(rules_df)
         .mark_rule(
-            strokeWidth=Metric_Axis.stroke_width, stroke=Metric_Axis.stroke, tooltip="",
+            strokeWidth=Metric_Axis.stroke_width,
+            stroke=Metric_Axis.stroke,
+            tooltip="",
         )
         .encode(
             y=alt.Y("metric:N", scale=scales["y"], axis=metrics_axis),
@@ -111,13 +117,33 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     return metrics_rules
 
 
+def __get_x_axis_values(x_domain, zero=True):
+    TICK_STEP_OPTIONS = [1, 2, 5, 10, 20, 50, 100]
+
+    def list_axis_values(limit, step):
+        axis_start = max([1, step - 1])
+        positive_axis_values = list(range(axis_start, limit, step))
+        negative_axis_values = [-x for x in positive_axis_values][::-1]
+        axis_values = positive_axis_values + negative_axis_values
+        return axis_values
+
+    domain_limit = x_domain[1] + 1
+
+    for tick_step in TICK_STEP_OPTIONS:
+        if domain_limit / tick_step <= 6 or tick_step == TICK_STEP_OPTIONS[-1]:
+            axis_values = list_axis_values(domain_limit, tick_step)
+            break
+
+    if zero:
+        return axis_values + [0]
+    return axis_values
+
+
 def __draw_x_ticks_labels(scales, chart_height):
     """Draws the numbers in the horizontal axis."""
 
     # The values to be drawn, we don't want to draw 0 (which corresponds to a ratio of 1) as we later draw an annotation.
-    axis_values = [
-        x for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain)
 
     # Given the semantic of the chart, (how many times smaller or larger) we draw absolute values.
     axis_values_labels = [abs(x) + 1 if x != 0 else "=" for x in axis_values]
@@ -136,40 +162,29 @@ def __draw_x_ticks_labels(scales, chart_height):
         )
         .encode(
             text=alt.Text("label:N"),
-            x=alt.X("value:Q", scale=scales["x"],),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.7),
+            x=alt.X(
+                "value:Q",
+                scale=scales["x"],
+            ),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.7),
         )
     )
 
     return tick_labels
 
 
-def __draw_text_annotations(ref_group, chart_height, chart_width):
+def __draw_text_annotations(ref_group, chart_height, x_range):
     """Draws on chart text annotations."""
 
     # FONT
     annotation_text_params = dict(
-        font=FONT, fontWeight=Annotation.font_weight, tooltip="",
+        font=FONT,
+        fontWeight=Annotation.font_weight,
+        tooltip="",
     )
 
     # TIMES LARGER TEXT
     text_times_larger = (
-        alt.Chart(DUMMY_DF)
-        .mark_text(
-            align="left",
-            fill=Annotation.font_color,
-            fontSize=Annotation.font_size,
-            **annotation_text_params,
-        )
-        .encode(
-            x=alt.value(chart_width * (1 - 1.5 * Disparity_Chart.padding)),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("TIMES LARGER"),
-        )
-    )
-
-    # TIMES SMALLER TEXT
-    text_times_smaller = (
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="right",
@@ -178,9 +193,25 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width * 1.5 * Disparity_Chart.padding),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("TIMES SMALLER"),
+            x=alt.value(x_range[1]),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
+            text=alt.value("Times Larger"),
+        )
+    )
+
+    # TIMES SMALLER TEXT
+    text_times_smaller = (
+        alt.Chart(DUMMY_DF)
+        .mark_text(
+            align="left",
+            fill=Annotation.font_color,
+            fontSize=Annotation.font_size,
+            **annotation_text_params,
+        )
+        .encode(
+            x=alt.value(x_range[0]),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
+            text=alt.value("Times Smaller"),
         )
     )
 
@@ -194,9 +225,9 @@ def __draw_text_annotations(ref_group, chart_height, chart_width):
             **annotation_text_params,
         )
         .encode(
-            x=alt.value(chart_width / 2),
-            y=alt.value(Disparity_Chart.padding * chart_height * 0.3),
-            text=alt.value("EQUAL"),
+            x=alt.value(x_range[0] + (x_range[1] - x_range[0]) / 2),
+            y=alt.value(Disparity_Chart.padding_y * chart_height * 0.3),
+            text=alt.value("Equal"),
         )
     )
 
@@ -215,8 +246,8 @@ def __draw_reference_rule(ref_group, chart_height, chart_width):
         )
         .encode(
             x=alt.value(chart_width / 2),
-            y=alt.value(chart_height * Disparity_Chart.padding / 1.2),
-            y2=alt.value(chart_height * (1 - Disparity_Chart.padding / 1.2)),
+            y=alt.value(chart_height * Disparity_Chart.padding_y / 1.2),
+            y2=alt.value(chart_height * (1 - Disparity_Chart.padding_y / 1.2)),
             tooltip=alt.value(f"{ref_group} [REF]"),
         )
     )
@@ -243,19 +274,27 @@ def __draw_threshold_rules(
             tooltip="",
         )
         .encode(
-            y=alt.value(Disparity_Chart.padding * chart_height),
-            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding_y * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
         )
     )
 
-    lower_threshold_rule = threshold_rule.encode(x=alt.X("min:Q", scale=scales["x"]),)
-    upper_threshold_rule = threshold_rule.encode(x=alt.X("max:Q", scale=scales["x"]),)
+    lower_threshold_rule = threshold_rule.encode(
+        x=alt.X("min:Q", scale=scales["x"]),
+    )
+    upper_threshold_rule = threshold_rule.encode(
+        x=alt.X("max:Q", scale=scales["x"]),
+    )
 
     return lower_threshold_rule + upper_threshold_rule
 
 
 def __draw_threshold_bands(
-    threshold_df, scales, chart_height, chart_width, accessibility_mode=False,
+    threshold_df,
+    scales,
+    chart_height,
+    chart_width,
+    accessibility_mode=False,
 ):
     """Draws threshold bands: regions painted red where the metric value is above the defined fairness_threshold."""
     fill_color = (
@@ -266,16 +305,18 @@ def __draw_threshold_bands(
         alt.Chart(threshold_df)
         .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
         .encode(
-            y=alt.value(Disparity_Chart.padding * chart_height),
-            y2=alt.value((1 - Disparity_Chart.padding) * chart_height),
+            y=alt.value(Disparity_Chart.padding_y * chart_height),
+            y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
         )
     )
 
     lower_threshold_band = threshold_band.encode(
-        x2="lower_end:Q", x=alt.X("min:Q", scale=scales["x"]),
+        x2="lower_end:Q",
+        x=alt.X("min:Q", scale=scales["x"]),
     )
     upper_threshold_band = threshold_band.encode(
-        x=alt.X("max:Q", scale=scales["x"]), x2="upper_end:Q",
+        x=alt.X("max:Q", scale=scales["x"]),
+        x2="upper_end:Q",
     )
 
     return lower_threshold_band + upper_threshold_band
@@ -302,7 +343,7 @@ def __draw_threshold_text(
         )
         .encode(
             x=alt.value(0),
-            y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding)),
+            y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding_y)),
             text=alt.value(
                 f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
             ),
@@ -327,8 +368,8 @@ def __get_threshold_elements(
         {
             "min": -fairness_threshold + 1,
             "max": fairness_threshold - 1,
-            "lower_end": scales["x"]["domain"][0] - 0.2,
-            "upper_end": scales["x"]["domain"][1] + 0.2,
+            "lower_end": scales["x"]["domain"][0],
+            "upper_end": scales["x"]["domain"][1],
         },
         index=[0],
     )
@@ -340,7 +381,11 @@ def __get_threshold_elements(
 
     # BANDS
     threshold_bands = __draw_threshold_bands(
-        threshold_df, scales, chart_height, chart_width, accessibility_mode,
+        threshold_df,
+        scales,
+        chart_height,
+        chart_width,
+        accessibility_mode,
     )
 
     # HELPER TEXT
@@ -352,16 +397,16 @@ def __get_threshold_elements(
 
 
 def __draw_bubbles(
-    plot_table, metrics, ref_group, scales, selection,
+    plot_table,
+    metrics,
+    ref_group,
+    scales,
+    selection,
 ):
     """Draws the bubbles for all metrics."""
 
     # X AXIS GRIDLINES
-    axis_values = [
-        x
-        for x in list(range(scales["x"].domain[0], scales["x"].domain[1] + 1))
-        if x != 0
-    ]
+    axis_values = __get_x_axis_values(scales["x"].domain, zero=False)
 
     x_axis = alt.Axis(
         values=axis_values, ticks=False, domain=False, labels=False, title=None
@@ -488,10 +533,18 @@ def get_disparity_bubble_chart_components(
     x_ticks_labels = __draw_x_ticks_labels(scales, chart_height)
 
     # ANNOTATIONS
-    text_annotations = __draw_text_annotations(ref_group, chart_height, chart_width)
+    text_annotations = __draw_text_annotations(
+        ref_group, chart_height, scales["x"].range
+    )
 
     # BUBBLES - CENTERS & AREAS
-    bubbles = __draw_bubbles(plot_table, metrics, ref_group, scales, selection,)
+    bubbles = __draw_bubbles(
+        plot_table,
+        metrics,
+        ref_group,
+        scales,
+        selection,
+    )
 
     # THRESHOLD & BANDS
     if fairness_threshold is not None:
@@ -536,7 +589,7 @@ def plot_disparity_bubble_chart(
     chart_width=Disparity_Chart.full_width,
     accessibility_mode=False,
 ):
-    """Draws bubble chart to visualize disparity in selected metrics versus that of a 
+    """Draws bubble chart to visualize disparity in selected metrics versus that of a
     reference group for a given attribute.
 
     :param disparity_df: a dataframe generated by the Aequitas Bias class
@@ -596,13 +649,28 @@ def plot_disparity_bubble_chart(
 
     # FINALIZE CHART
     disparity_chart = (
-        full_chart.configure_view(strokeWidth=0,)
+        full_chart.configure_view(
+            strokeWidth=0,
+        )
         .configure_axisLeft(
             labelFontSize=Metric_Axis.label_font_size,
             labelColor=Metric_Axis.label_color,
             labelFont=FONT,
         )
-        .properties(height=chart_height, width=chart_width)
+        .configure_title(
+            align="center",
+            baseline="middle",
+            font=FONT,
+            fontWeight=Chart_Title.font_weight,
+            fontSize=Chart_Title.font_size,
+            color=Chart_Title.font_color,
+        )
+        .properties(
+            height=chart_height,
+            width=chart_width,
+            title=f"Disparities on {attribute.title()}",
+            padding=Disparity_Chart.full_chart_padding,
+        )
         .resolve_scale(y="independent", size="independent")
     )
 
