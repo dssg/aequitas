@@ -1,7 +1,8 @@
 import re
 from pathlib import Path
 from setuptools import find_packages, setup
-
+import sys
+import shutil
 
 ROOT_PATH = Path(__file__).parent
 
@@ -11,7 +12,30 @@ README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
-#with open(README_PATH, encoding='utf-8') as f:
+
+NAME = 'aequitas'
+
+EXCLUDE_LIST = ['tests', 'tests.*']
+
+if '-l' in sys.argv or '--lite' in sys.argv:
+    NAME += '-light'
+    EXCLUDE_LIST += [
+        'aequitas_cli',
+        'aequitas_cli.*',
+        'aequitas_webapp',
+        'aequitas_webapp.*',
+    ]
+    SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'light.txt'
+    try:
+        sys.argv.remove('-l')
+    except ValueError:
+        sys.argv.remove('--light')
+
+else:
+    SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'full.txt'
+shutil.copy(SELECTED_REQUIREMENTS_PATH, REQUIREMENTS_PATH)
+
+# with open(README_PATH, encoding='utf-8') as f:
 #    long_description = f.read()
 
 long_description = """
@@ -34,7 +58,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 
 setup(
-    name='aequitas',
+    name=NAME,
     version='0.41.0',
     description="The bias and fairness audit toolkit.",
     long_description=long_description,
@@ -42,7 +66,7 @@ setup(
     author="Center for Data Science and Public Policy",
     author_email='datascifellows@gmail.com',
     url='https://github.com/dssg/aequitas',
-    packages=find_packages('src', exclude=['tests', 'tests.*']),
+    packages=find_packages('src', exclude=EXCLUDE_LIST),
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=REQUIREMENTS,
