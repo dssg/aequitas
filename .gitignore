@@ -3,6 +3,7 @@ __pycache__/
 /build/
 /dist/
 /requirement/main.txt
+MANIFEST.in
 
 /.install.*.bash.inc
 *.ipynb_checkpoint*

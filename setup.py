@@ -12,27 +12,32 @@ README_PATH = ROOT_PATH / 'README.md'
 
 REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
+MANIFEST_PATH = ROOT_PATH / 'MANIFEST.in'
 
 NAME = 'aequitas'
 
 EXCLUDE_LIST = ['tests', 'tests.*']
 
 if '-l' in sys.argv or '--lite' in sys.argv:
-    NAME += '-light'
+    NAME += '-lite'
     EXCLUDE_LIST += [
         'aequitas_cli',
         'aequitas_cli.*',
         'aequitas_webapp',
         'aequitas_webapp.*',
     ]
-    SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'light.txt'
+    SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'lite.txt'
+    SELECTED_MANIFEST_PATH = ROOT_PATH / 'LITE_MANIFEST.in'
     try:
         sys.argv.remove('-l')
     except ValueError:
-        sys.argv.remove('--light')
+        sys.argv.remove('--lite')
 
 else:
     SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'full.txt'
+    SELECTED_MANIFEST_PATH = ROOT_PATH / 'FULL_MANIFEST.in'
+
+shutil.copy(SELECTED_MANIFEST_PATH, MANIFEST_PATH)
 shutil.copy(SELECTED_REQUIREMENTS_PATH, REQUIREMENTS_PATH)
 
 # with open(README_PATH, encoding='utf-8') as f:
