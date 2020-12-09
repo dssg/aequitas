@@ -22,7 +22,7 @@ from aequitas.plot.commons.style.classes import (
     Legend,
 )
 from aequitas.plot.commons.style.text import FONT
-from aequitas.plot.commons.style import sizes as Sizes
+from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
 
@@ -32,7 +32,7 @@ DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
 
 def __get_scales(max_num_groups):
-    """ Creates an Altair scale for the color of the parity test result, and another
+    """Creates an Altair scale for the color of the parity test result, and another
     for the x axis of the group circles subplot."""
 
     scales = dict()
@@ -53,7 +53,7 @@ def __get_scales(max_num_groups):
 def __get_size_constants(
     chart_height, chart_width, num_attributes, num_metrics, max_num_groups
 ):
-    """ Calculates the heights, widths and spacings of the components of the summary chart
+    """Calculates the heights, widths and spacings of the components of the summary chart
     based on the provided desired overall chart height and width, as well as the number of
     attributes (columns) and metrics (lines)."""
 
@@ -61,12 +61,10 @@ def __get_size_constants(
         # Chart sizes
         attribute_titles_height=0.15 * chart_height,
         line_spacing=0.2 * chart_height / num_metrics,
-        line_height=Sizes.Summary_Chart.line_height_ratio * chart_height / num_metrics,
+        line_height=Summary_Chart.line_height_ratio * chart_height / num_metrics,
         metric_titles_width=0.1 * chart_width,
         column_spacing=0.15 * chart_width / num_attributes,
-        column_width=Sizes.Summary_Chart.column_width_ratio
-        * chart_width
-        / num_attributes,
+        column_width=Summary_Chart.column_width_ratio * chart_width / num_attributes,
         # Circle size
         ## Conditional definition of the size where for each additional unit in
         ## max_num_groups, we subtract 25 squared pixels from the area of the
@@ -91,7 +89,9 @@ def __draw_attribute_title(attribute, width, size_constants):
             color=Title.font_color,
             fontWeight=Title.font_weight,
         )
-        .encode(text=alt.value(attribute.upper()),)
+        .encode(
+            text=alt.value(attribute.title()),
+        )
         .properties(width=width, height=size_constants["attribute_titles_height"])
     )
 
@@ -193,7 +193,7 @@ def __get_parity_result_variable(row, metric, fairness_threshold):
 
 
 def __draw_parity_result_text(parity_result, color_scale):
-    """ Draws the uppercased text result of the provided parity test (Pass, Fail or Reference), 
+    """Draws the uppercased text result of the provided parity test (Pass, Fail or Reference),
     color-coded according to the provided Altair scale."""
 
     return (
@@ -220,7 +220,11 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
     """ Draws a stacked bar of the sum of the percentage of population of the groups that obtained each result for the parity test."""
     population_bar_tooltips = [
         alt.Tooltip(field=f"{metric}_parity_result", type="nominal", title="Parity"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Size",),
+        alt.Tooltip(
+            field="tooltip_group_size",
+            type="nominal",
+            title="Size",
+        ),
         alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title="Groups"),
     ]
 
@@ -235,7 +239,8 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
                 f"{metric}_parity_result:O",
                 scale=color_scale,
                 legend=alt.Legend(
-                    title="Parity Test", padding=20,
+                    title="Parity Test",
+                    padding=20,
                 ),
             ),
             tooltip=population_bar_tooltips,
@@ -246,7 +251,7 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
 
 
 def __draw_group_circles(plot_df, metric, scales, size_constants):
-    """ Draws a circle for each group, color-coded by the result of the parity test.
+    """Draws a circle for each group, color-coded by the result of the parity test.
     The groups are spread around the central reference group according to their disparity."""
 
     circle_tooltip_encoding = [
@@ -322,8 +327,8 @@ def __draw_parity_test_explanation(fairness_threshold, x_position):
 
 
 def __create_population_bar_df(attribute_df, metric):
-    """ Creates a pandas aggregation of the attribute_df by parity result, along with the
-    list of groups tooltip variable. """
+    """Creates a pandas aggregation of the attribute_df by parity result, along with the
+    list of groups tooltip variable."""
 
     attribute_df["group_size_formatted"] = attribute_df.apply(
         lambda row: format_number(row["group_size"]), axis=1
@@ -382,7 +387,9 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
     # PARITY TEST EXPLANATION
     attribute_df[f"tooltip_parity_test_explanation_{metric}"] = attribute_df.apply(
         lambda row: get_tooltip_text_parity_test_explanation(
-            row[f"{metric}_parity_result"], metric, fairness_threshold,
+            row[f"{metric}_parity_result"],
+            metric,
+            fairness_threshold,
         ),
         axis=1,
     )
@@ -491,7 +498,7 @@ def plot_summary_chart(
     chart_width=None,
 ):
     """Draws chart that summarizes the parity results for the provided metrics across the existing attributes.
-    This includes an overall result, the specific results by each attribute's groups as well as the percentage 
+    This includes an overall result, the specific results by each attribute's groups as well as the percentage
     of population by result.
 
     :param disparity_df: a dataframe generated by the Aequitas Bias class
@@ -524,7 +531,7 @@ def plot_summary_chart(
         fairness_threshold,
         chart_height,
         chart_width,
-        Sizes.Summary_Chart,
+        Summary_Chart,
     )
 
     num_metrics = len(metrics)
@@ -604,8 +611,9 @@ def plot_summary_chart(
         fairness_threshold, size_constants["column_spacing"] / 2
     )
 
-    Summary_Chart = (
+    full_summary_chart = (
         alt.vconcat(summary_chart_table, summary_chart_explanation)
+        .properties(padding=Summary_Chart.full_chart_padding)
         .configure_legend(
             labelFont=FONT,
             labelColor=Legend.font_color,
@@ -619,5 +627,4 @@ def plot_summary_chart(
         .configure_view(strokeWidth=0)
     )
 
-    return Summary_Chart
-
+    return full_summary_chart
