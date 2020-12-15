@@ -191,9 +191,13 @@ def prepare_xy_chart(
     ## ref_group is taken from x_metric as long as it's not part of the metrics that
     ## do not have disparity variables (such as prev)
     if x_metric in Validator.NON_DISPARITY_METRICS_LIST:
-        ref_group = disparity_df.iloc[0][f"{y_metric}_ref_group_value"]
+        ref_group = disparity_df[disparity_df["attribute_name"] == attribute].iloc[0][
+            f"{y_metric}_ref_group_value"
+        ]
     else:
-        ref_group = disparity_df.iloc[0][f"{x_metric}_ref_group_value"]
+        ref_group = disparity_df[disparity_df["attribute_name"] == attribute].iloc[0][
+            f"{x_metric}_ref_group_value"
+        ]
 
     plot_table = __filter_df(disparity_df, metrics, attribute, xy_plot=True)
 
@@ -217,4 +221,3 @@ def prepare_xy_chart(
         chart_width,
         interactive_selection_group,
     )
-
