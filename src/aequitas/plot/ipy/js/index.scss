@@ -1,0 +1,42 @@
+$title-font-size: 22px;
+$axis-title-font-size: 18px;
+
+$grey-dark-3: #384140;
+$grey-light-3: #e1e1e1;
+
+.aequitas-chart {
+    text-align: center;
+    color: $grey-dark-3;
+
+    h1 {
+        font-size: $title-font-size;
+        font-weight: bold;
+        color: $grey-dark-3;
+    }
+}
+
+.aequitas-grid {
+    line {
+        stroke: $grey-light-3;
+        stroke-width: 1px;
+    }
+}
+
+.aequitas-row-names {
+    font-weight: bold;
+    font-size: $axis-title-font-size;
+    fill: $grey-dark-3;
+}
+
+.aequitas-row-line {
+    stroke-width: 1px;
+    stroke: $grey-dark-3;
+}
+
+.aequitas-bubble {
+    opacity: 0.2;
+
+    &:hover {
+        opacity: 0.3;
+    }
+}

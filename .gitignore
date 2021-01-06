@@ -11,6 +11,8 @@ __pycache__/
 
 *.DS_Store*
 
+/node_modules/
+.package-lock.json
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
