@@ -1,10 +1,11 @@
+@import "./colors.scss";
+
 $title-font-size: 22px;
 $axis-title-font-size: 18px;
 
-$grey-dark-3: #384140;
-$grey-light-3: #e1e1e1;
-
 .aequitas-chart {
+    display: flex;
+    flex-direction: column;
     text-align: center;
     color: $grey-dark-3;
 
@@ -13,6 +14,11 @@ $grey-light-3: #e1e1e1;
         font-weight: bold;
         color: $grey-dark-3;
     }
+}
+
+.aequitas-chart-area {
+    display: flex;
+    flex-direction: row;
 }
 
 .aequitas-grid {
@@ -35,8 +41,44 @@ $grey-light-3: #e1e1e1;
 
 .aequitas-bubble {
     opacity: 0.2;
+}
 
-    &:hover {
-        opacity: 0.3;
+.aequitas-equal-ref-line {
+    stroke: $grey-dark-3;
+    stroke-dasharray: 5 5;
+    stroke-width: 2px;
+}
+
+.aequitas-threshold {
+    &-band {
+        opacity: 0.1;
     }
+    &-rule {
+        opacity: 0.8;
+        stroke-width: 2px;
+    }
+}
+
+.aequitas-legend {
+    &-title {
+        font-weight: bolder;
+        font-size: $axis-title-font-size;
+    }
+
+    &-item {
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        p {
+            margin: 0px 7px;
+        }
+    }
+}
+
+.circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
 }

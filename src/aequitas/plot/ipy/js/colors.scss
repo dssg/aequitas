@@ -1,0 +1,18 @@
+$grey-dark-3: #384140;
+$grey-light-3: #e1e1e1;
+
+$threshold-red: rgb(217, 46, 28);
+$reference-grey: rgb(117, 117, 117);
+
+$blue: rgb(100, 143, 255);
+$orange: rgb(254, 97, 0);
+$pink: rgb(220, 38, 127);
+$yellow: rgb(255, 176, 0);
+$purple: rgb(120, 94, 240);
+
+:export {
+    thresholdRed: $threshold-red;
+    referenceGrey: $reference-grey;
+    greyDark: $grey-dark-3;
+    categoricalPalette: $blue, $orange, $pink, $yellow, $purple;
+}

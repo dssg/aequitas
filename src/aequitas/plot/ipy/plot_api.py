@@ -56,6 +56,11 @@ def plot_disparity_bubble_chart(
 ):
 
     metrics = __sanitize_metrics(metrics_list)
+
+    ref_group = disparity_df.loc[disparity_df["attribute_name"] == attribute][
+        f"{metrics[0]}_ref_group_value"
+    ].iloc[0]
+
     plot_table = __filter_df(disparity_df, metrics, attribute)
 
     for metric in metrics:
@@ -67,6 +72,7 @@ def plot_disparity_bubble_chart(
         "data": plot_table.to_dict("records"),
         "metrics": metrics,
         "attribute": attribute,
+        "ref_group": ref_group,
         "fairness_threshold": fairness_threshold,
         "chart_height": chart_height,
         "chart_width": chart_width,
