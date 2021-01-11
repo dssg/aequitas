@@ -4,12 +4,11 @@ import { select } from "d3-selection";
 
 import "./index.scss";
 
-import DisparityChart from "./containers/DisparityChart";
-import DisparityChartLayout from "./containers/DisparityChartLayout";
+import DisparityLayout from "./containers/DisparityLayout";
 
 export function plotDisparityBubbleChart(divId, payload) {
   ReactDOM.render(
-    <DisparityChartLayout
+    <DisparityLayout
       metrics={payload.metrics}
       attribute={payload.attribute}
       referenceGroup={payload["ref_group"]}

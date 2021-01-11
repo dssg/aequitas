@@ -1,16 +1,30 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-export default function ThresholdBands(props) {
+const propTypes = {
+  color: PropTypes.string.isRequired,
+  fairnessThreshold: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  scale: PropTypes.func.isRequired,
+  y: PropTypes.number.isRequired,
+};
+
+function ThresholdBands(props) {
   function renderThresholdBand(side) {
-    let x = props.scale.range()[0];
-    let width = props.scale(-props.fairnessThreshold) - props.scale.range()[0];
-    let ruleX = x + width;
+    let x, width, ruleX;
 
-    if (side === "right") {
+    if (side === "left") {
+      x = props.scale.range()[0];
+      width = props.scale(-props.fairnessThreshold) - props.scale.range()[0];
+      ruleX = x + width;
+    } else if (side === "right") {
       x = props.scale(props.fairnessThreshold);
       width = props.scale.range()[1] - props.scale(props.fairnessThreshold);
       ruleX = x;
+    } else {
+      return null;
     }
+
     return (
       <g key={`threshold-band-${side}`}>
         <rect
@@ -34,3 +48,6 @@ export default function ThresholdBands(props) {
   }
   return <g>{[renderThresholdBand("left"), renderThresholdBand("right")]}</g>;
 }
+
+ThresholdBands.propTypes = propTypes;
+export default ThresholdBands;

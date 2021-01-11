@@ -1,9 +1,17 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { GlyphCircle, GlyphCross, GlyphSquare } from "@vx/glyph";
 
 import shapes from "../enums/shapes";
 
-export default function BubbleCenter(props) {
+const propTypes = {
+  fill: PropTypes.string.isRequired,
+  shape: PropTypes.string.isRequired,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+};
+
+function BubbleCenter(props) {
   let Glyph;
 
   switch (props.shape) {
@@ -19,3 +27,6 @@ export default function BubbleCenter(props) {
 
   return <Glyph left={props.x} top={props.y} size={50} fill={props.fill} />;
 }
+
+BubbleCenter.prototype = propTypes;
+export default BubbleCenter;

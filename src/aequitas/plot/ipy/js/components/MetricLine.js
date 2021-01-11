@@ -1,9 +1,15 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Text } from "@vx/text";
 
-import sizes from "../enums/sizes";
+const propTypes = {
+  lineEnd: PropTypes.number.isRequired,
+  lineStart: PropTypes.number.isRequired,
+  metric: PropTypes.string.isRequired,
+  y: PropTypes.number.isRequired,
+};
 
-export default function MetricLine(props) {
+function MetricLine(props) {
   return (
     <g>
       <Text x={0} y={props.y} className="aequitas-row-names">
@@ -19,3 +25,6 @@ export default function MetricLine(props) {
     </g>
   );
 }
+
+MetricLine.propTypes = propTypes;
+export default MetricLine;

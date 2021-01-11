@@ -1,19 +1,29 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { isNull } from "lodash";
 import { scaleLinear, scalePow } from "d3-scale";
 import { max } from "d3-array";
 
 import colors from "../colors.scss";
 import sizes from "../enums/sizes";
-import { highlightColor } from "../utils/colors";
 
 import DisparityAxis from "../components/DisparityAxis";
-import Bubble from "../components/Bubble";
-import MetricLine from "../components/MetricLine";
 import ThresholdBands from "../components/ThresholdBands";
+import DisparityRow from "./DisparityRow";
 
-export default function DisparityChart(props) {
-  console.log(props.data);
+const propTypes = {
+  accessibilityMode: PropTypes.bool.isRequired,
+  data: PropTypes.array.isRequired,
+  fairnessThreshold: PropTypes.number.isRequired,
+  handleActiveGroup: PropTypes.func.isRequired,
+  metrics: PropTypes.array.isRequired,
+  referenceGroup: PropTypes.string.isRequired,
+  scaleColor: PropTypes.func.isRequired,
+  scaleShape: PropTypes.func.isRequired,
+  activeGroup: PropTypes.string,
+};
+
+function DisparityChart(props) {
   const chartAreaHeight = sizes.ROW_HEIGHT * props.metrics.length;
   const fullHeight = chartAreaHeight;
   sizes.MARGIN.top + sizes.MARGIN.bottom;
@@ -53,40 +63,24 @@ export default function DisparityChart(props) {
       {props.metrics.map((metric, index) => {
         const metricAxisY = sizes.ROW_HEIGHT * (index + 0.5);
         return (
-          <g height={sizes.ROW_HEIGHT} key={`row-${metric}`}>
-            <MetricLine
-              y={metricAxisY}
-              metric={metric}
-              lineStart={sizes.MARGIN.left}
-              lineEnd={sizes.WIDTH - sizes.MARGIN.right}
-            />
-            {props.data.map((group, index) => {
-              const groupName = group["attribute_value"];
-
-              let groupColor = props.scaleColor(groupName);
-
-              if (groupName === props.hoverGroup) {
-                groupColor = highlightColor(groupColor);
-              }
-
-              return (
-                <Bubble
-                  key={`bubble-${props.metric}-${groupName}`}
-                  x={scaleDisparity(group[`${metric}_disparity_scaled`])}
-                  y={metricAxisY}
-                  size={scaleBubbleSize(group["group_size"])}
-                  color={groupColor}
-                  index={index}
-                  group={group}
-                  groupCount={props.data.length}
-                  centerShape={props.scaleShape(groupName)}
-                  handleHoverGroup={props.handleHoverGroup}
-                />
-              );
-            })}
-          </g>
+          <DisparityRow
+            key={`row-${metric}`}
+            metric={metric}
+            data={props.data}
+            y={metricAxisY}
+            referenceGroup={props.referenceGroup}
+            scaleColor={props.scaleColor}
+            scaleShape={props.scaleShape}
+            scaleDisparity={scaleDisparity}
+            scaleBubbleSize={scaleBubbleSize}
+            activeGroup={props.activeGroup}
+            handleActiveGroup={props.handleActiveGroup}
+          />
         );
       })}
     </svg>
   );
 }
+
+DisparityChart.propTypes = propTypes;
+export default DisparityChart;

@@ -17,7 +17,7 @@
     "babel-loader": "^8.0.5",
     "css-loader": "^2.1.1",
     "file-loader": "^3.0.1",
-    "prop-types": "^15.6.2",
+    "prop-types": "^15.7.2",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "sass": "^1.32.0",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
+    "@tippyjs/react": "^4.2.0",
     "@vx/axis": "0.0.199",
     "@vx/glyph": "0.0.199",
     "@vx/grid": "0.0.199",
@@ -40,6 +41,7 @@
     "d3-scale": "^3.2.3",
     "d3-selection": "^2.0.0",
     "lodash": "^4.17.15",
+    "react-onclickoutside": "^6.9.0",
     "tinycolor2": "^1.4.2"
   }
 }
