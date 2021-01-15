@@ -44,24 +44,36 @@ def __make_plot_html(id, render_function_name, payload):
     return plot_html
 
 
+def __filter_df_alt(disparity_df, metrics, xy_plot=False):
+    viz_fields = [
+        "attribute_name",
+        "attribute_value",
+        "group_size",
+        "total_entities",
+    ]
+    viz_fields += metrics
+
+    if not xy_plot:
+        viz_fields += [f"{metric}_disparity" for metric in metrics]
+        viz_fields += [f"{metric}_ref_group_value" for metric in metrics]
+
+    plot_table = disparity_df[viz_fields].copy(deep=True)
+
+    return plot_table
+
+
 def plot_disparity_bubble_chart(
     disparity_df,
     metrics_list,
-    attribute,
+    attribute=None,
     fairness_threshold=1.25,
-    chart_height=None,
-    chart_width=600,
     accessibility_mode=False,
     id=__id_generator(),
 ):
 
     metrics = __sanitize_metrics(metrics_list)
 
-    ref_group = disparity_df.loc[disparity_df["attribute_name"] == attribute][
-        f"{metrics[0]}_ref_group_value"
-    ].iloc[0]
-
-    plot_table = __filter_df(disparity_df, metrics, attribute)
+    plot_table = __filter_df_alt(disparity_df, metrics)
 
     for metric in metrics:
         plot_table[f"{metric}_disparity_scaled"] = plot_table.apply(
@@ -72,10 +84,7 @@ def plot_disparity_bubble_chart(
         "data": plot_table.to_dict("records"),
         "metrics": metrics,
         "attribute": attribute,
-        "ref_group": ref_group,
         "fairness_threshold": fairness_threshold,
-        "chart_height": chart_height,
-        "chart_width": chart_width,
         "accessibility_mode": accessibility_mode,
     }
 

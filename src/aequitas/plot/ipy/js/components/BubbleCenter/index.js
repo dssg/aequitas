@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { GlyphCircle, GlyphCross, GlyphSquare } from "@vx/glyph";
 
-import shapes from "../enums/shapes";
+import shapes from "~/constants/shapes";
 
 const propTypes = {
   fill: PropTypes.string.isRequired,

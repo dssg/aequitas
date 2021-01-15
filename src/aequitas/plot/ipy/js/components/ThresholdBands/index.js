@@ -1,5 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Tippy from "@tippyjs/react";
+
+import Tooltip from "./Tooltip";
+import "./style.scss";
 
 const propTypes = {
   color: PropTypes.string.isRequired,
@@ -15,16 +19,16 @@ function ThresholdBands(props) {
 
     if (side === "left") {
       x = props.scale.range()[0];
-      width = props.scale(-props.fairnessThreshold) - props.scale.range()[0];
+      width =
+        props.scale(-props.fairnessThreshold + 1) - props.scale.range()[0];
       ruleX = x + width;
     } else if (side === "right") {
-      x = props.scale(props.fairnessThreshold);
-      width = props.scale.range()[1] - props.scale(props.fairnessThreshold);
+      x = props.scale(props.fairnessThreshold - 1);
+      width = props.scale.range()[1] - props.scale(props.fairnessThreshold - 1);
       ruleX = x;
     } else {
       return null;
     }
-
     return (
       <g key={`threshold-band-${side}`}>
         <rect
@@ -35,14 +39,24 @@ function ThresholdBands(props) {
           height={props.height}
           fill={props.color}
         />
-        <line
-          className="aequitas-threshold-rule"
-          x1={ruleX}
-          x2={ruleX}
-          y1={props.y}
-          y2={props.height}
-          stroke={props.color}
-        />
+        <Tippy
+          content={
+            <Tooltip
+              fairnessThreshold={props.fairnessThreshold}
+              color={props.color}
+            />
+          }
+          placement="top"
+        >
+          <line
+            className="aequitas-threshold-rule"
+            x1={ruleX}
+            x2={ruleX}
+            y1={props.y}
+            y2={props.height}
+            stroke={props.color}
+          />
+        </Tippy>
       </g>
     );
   }

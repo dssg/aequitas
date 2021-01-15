@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import BubbleCenter from "../components/BubbleCenter";
+import BubbleCenter from "~/components/BubbleCenter";
+
+import "./style.scss";
 
 const propTypes = {
   centerShape: PropTypes.string.isRequired,

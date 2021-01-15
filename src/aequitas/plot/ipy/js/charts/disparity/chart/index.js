@@ -1,15 +1,17 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { isNull } from "lodash";
-import { scaleLinear, scalePow } from "d3-scale";
-import { max } from "d3-array";
 
-import colors from "../colors.scss";
-import sizes from "../enums/sizes";
+import colors from "~/constants/colors.scss";
+import sizes from "~/constants/sizes";
 
-import DisparityAxis from "../components/DisparityAxis";
-import ThresholdBands from "../components/ThresholdBands";
-import DisparityRow from "./DisparityRow";
+import Axis from "./Axis";
+import Row from "./Row";
+import ThresholdBands from "~/components/ThresholdBands";
+
+import { getScalePositionDisparity, getScaleSizeBubble } from "~/utils/scales";
+
+import "./style.scss";
 
 const propTypes = {
   accessibilityMode: PropTypes.bool.isRequired,
@@ -23,32 +25,20 @@ const propTypes = {
   activeGroup: PropTypes.string,
 };
 
-function DisparityChart(props) {
+function Chart(props) {
   const chartAreaHeight = sizes.ROW_HEIGHT * props.metrics.length;
-  const fullHeight = chartAreaHeight;
-  sizes.MARGIN.top + sizes.MARGIN.bottom;
 
-  const maxAbsoluteDisparity = max(
-    props.metrics.map((metric) =>
-      max(props.data, (row) => Math.abs(row[`${metric}_disparity_scaled`]))
-    )
+  const scaleDisparity = getScalePositionDisparity(
+    props.data,
+    props.metrics,
+    props.fairnessThreshold
   );
 
-  const maxGroupSize = max(props.data, (row) => row["group_size"]);
-
-  const scaleDisparity = scaleLinear()
-    .domain([-maxAbsoluteDisparity, maxAbsoluteDisparity])
-    .range([sizes.MARGIN.left, sizes.WIDTH - sizes.MARGIN.right])
-    .nice();
-
-  const scaleBubbleSize = scalePow()
-    .exponent(0.5)
-    .domain([0, maxGroupSize])
-    .range([0, sizes.ROW_HEIGHT / 4]);
+  const scaleBubbleSize = getScaleSizeBubble(props.data);
 
   return (
-    <svg width={sizes.WIDTH} height={fullHeight}>
-      <DisparityAxis scale={scaleDisparity} chartAreaHeight={chartAreaHeight} />
+    <svg width={sizes.WIDTH} height={chartAreaHeight}>
+      <Axis scale={scaleDisparity} chartAreaHeight={chartAreaHeight} />
       {!isNull(props.fairnessThreshold) ? (
         <ThresholdBands
           fairnessThreshold={props.fairnessThreshold}
@@ -63,7 +53,7 @@ function DisparityChart(props) {
       {props.metrics.map((metric, index) => {
         const metricAxisY = sizes.ROW_HEIGHT * (index + 0.5);
         return (
-          <DisparityRow
+          <Row
             key={`row-${metric}`}
             metric={metric}
             data={props.data}
@@ -82,5 +72,6 @@ function DisparityChart(props) {
   );
 }
 
-DisparityChart.propTypes = propTypes;
-export default DisparityChart;
+Chart.propTypes = propTypes;
+
+export default Chart;

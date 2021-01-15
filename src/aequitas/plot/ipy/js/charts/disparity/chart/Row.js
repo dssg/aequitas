@@ -3,11 +3,12 @@ import PropTypes from "prop-types";
 import Tippy from "@tippyjs/react";
 import onClickOutside from "react-onclickoutside";
 
-import MetricLine from "../components/MetricLine";
-import Bubble from "../containers/Bubble";
-import { getGroupColor } from "../utils/colors";
-import sizes from "../enums/sizes";
-import Tooltip from "../components/Tooltip";
+import MetricLine from "~/components/MetricLine";
+import Bubble from "~/components/Bubble";
+import Tooltip from "./Tooltip";
+
+import { getGroupColorNew } from "~/utils/colors";
+import sizes from "~/constants/sizes";
 
 const propTypes = {
   data: PropTypes.array.isRequired,
@@ -22,8 +23,8 @@ const propTypes = {
   activeGroup: PropTypes.string,
 };
 
-function DisparityRow(props) {
-  DisparityRow.handleClickOutside = () => {
+function Row(props) {
+  Row.handleClickOutside = () => {
     return props.handleActiveGroup(null, true);
   };
   return (
@@ -36,14 +37,14 @@ function DisparityRow(props) {
       />
       {props.data.map((row) => {
         const groupName = row["attribute_value"];
-        const groupColor = getGroupColor(
+        const groupColor = getGroupColorNew(
           groupName,
           props.activeGroup,
           props.scaleColor
         );
 
         return (
-          <g key={`aequitas-bubble-${props.metric}-${groupName}`}>
+          <g key={`aequitas-bubble-$45{props.metric}-${groupName}`}>
             <Tippy
               content={
                 <Tooltip
@@ -76,9 +77,9 @@ function DisparityRow(props) {
 }
 
 const clickOutsideConfig = {
-  handleClickOutside: () => DisparityRow.handleClickOutside,
+  handleClickOutside: () => Row.handleClickOutside,
 };
 
-DisparityRow.propTypes = propTypes;
+Row.propTypes = propTypes;
 
-export default onClickOutside(DisparityRow, clickOutsideConfig);
+export default onClickOutside(Row, clickOutsideConfig);

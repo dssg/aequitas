@@ -1,0 +1,25 @@
+@import "~/constants/text.scss";
+
+.aequitas-threshold-band {
+    opacity: 0.1;
+}
+
+.aequitas-threshold-rule {
+    opacity: 0.8;
+    stroke-width: 2px;
+    cursor: pointer;
+}
+
+.aequitas-threshold-tooltip {
+    width: auto;
+    text-align: center;
+    height: auto;
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    font-size: $small-font-size;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    background-color: white;
+    border: 0;
+}

@@ -1,0 +1,13 @@
+@import "~/constants/text.scss";
+@import "~/constants/colors.scss";
+
+.aequitas-metric-label {
+    font-weight: bold;
+    font-size: $large-font-size;
+    fill: $grey-dark-3;
+}
+
+.aequitas-metric-line {
+    stroke-width: 1px;
+    stroke: $grey-dark-3;
+}

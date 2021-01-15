@@ -1,3 +1,5 @@
+var path = require('path');
+
 const config = {
   entry: ["./js/index.js"],
   output: {
@@ -34,6 +36,9 @@ const config = {
   },
   resolve: {
     extensions: [".js"],
+    alias: {
+      ["~"]: path.resolve(__dirname, "js"),
+    },
   },
   devServer: {
     writeToDisk: true,

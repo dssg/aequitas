@@ -6,20 +6,18 @@ import { AxisTop } from "@vx/axis";
 import { Text } from "@vx/text";
 import { GridColumns } from "@vx/grid";
 
-import sizesEnum from "../enums/sizes";
+import sizes from "~/constants/sizes";
 
-const propTypes = {
-  chartAreaHeight: PropTypes.number.isRequired,
-  scale: PropTypes.func.isRequired,
-};
-
-function getTickValues(limit) {
+const getTickValues = (maxTickValue) => {
   const TICK_STEP_OPTIONS = [1, 2, 5, 10, 20, 50, 100];
   let tickValues = [];
 
   for (let tickStep of TICK_STEP_OPTIONS) {
-    if (limit / tickStep <= 6 || tickStep === [...TICK_STEP_OPTIONS].pop()) {
-      const tickStart = Math.ceil(limit / tickStep) * tickStep;
+    if (
+      maxTickValue / tickStep <= 6 ||
+      tickStep === [...TICK_STEP_OPTIONS].pop()
+    ) {
+      const tickStart = Math.ceil(maxTickValue / tickStep) * tickStep;
       tickValues = range(-tickStart, tickStart + 1, tickStep);
       if (tickStep > 1) {
         tickValues = tickValues.map((value) => {
@@ -38,70 +36,56 @@ function getTickValues(limit) {
     }
   }
   return tickValues;
-}
+};
 
-function DisparityAxis(props) {
+function Axis(props) {
   const tickValues = getTickValues(props.scale.domain()[1]);
-  function renderTextAnnotations() {
+
+  function renderTextAnnotations(text, x, anchor) {
     return (
-      <g>
-        <Text
-          x={sizesEnum.MARGIN.left}
-          y={0}
-          textAnchor="start"
-          verticalAnchor="start"
-        >
-          Times Smaller
-        </Text>
-        <Text
-          x={sizesEnum.WIDTH - sizesEnum.MARGIN.right}
-          y={0}
-          textAnchor="end"
-          verticalAnchor="start"
-        >
-          Times Larger
-        </Text>
-        <Text
-          x={props.scale(0)}
-          y={0}
-          textAnchor="middle"
-          verticalAnchor="start"
-        >
-          Equal
-        </Text>
-      </g>
+      <Text x={x} y={0} textAnchor={anchor} verticalAnchor="start">
+        {text}
+      </Text>
     );
   }
+
   return (
     <g className="aequitas-axis">
-      {renderTextAnnotations()}
+      {renderTextAnnotations("Times Smaller", props.scale.range()[0], "start")}
+      {renderTextAnnotations("Equal", props.scale(0), "middle")}
+      {renderTextAnnotations("Times Larger", props.scale.range()[1], "end")}
+
       <AxisTop
         scale={props.scale}
-        top={sizesEnum.MARGIN.top}
-        hideAxisLine
-        hideTicks
+        top={sizes.MARGIN.top}
         tickFormat={(value) =>
           value === 0 ? "=" : format("d")(Math.abs(value) + 1)
         }
         tickValues={tickValues}
+        hideAxisLine
+        hideTicks
       />
       <GridColumns
+        className="aequitas-grid"
         scale={props.scale}
         height={props.chartAreaHeight}
-        top={sizesEnum.MARGIN.top}
-        className="aequitas-grid"
+        top={sizes.MARGIN.top}
         tickValues={tickValues}
       />
       <line
         x1={props.scale(0)}
         x2={props.scale(0)}
-        y1={sizesEnum.MARGIN.top}
-        y2={sizesEnum.MARGIN.top + props.chartAreaHeight}
+        y1={sizes.MARGIN.top}
+        y2={sizes.MARGIN.top + props.chartAreaHeight}
         className="aequitas-equal-ref-line"
       />
     </g>
   );
 }
 
-DisparityAxis.propTypes = propTypes;
-export default DisparityAxis;
+Axis.propTypes = {
+  chartAreaHeight: PropTypes.number,
+  scale: PropTypes.func,
+};
+
+export default Axis;

@@ -16,3 +16,15 @@ export function getGroupColor(group, activeGroup, scale) {
 
   return scale(group);
 }
+
+export function getGroupColorNew(group, activeGroup, scale, hoverGroup) {
+  if (group === hoverGroup) {
+    return highlight(scale(group));
+  }
+
+  if (group !== activeGroup && !isNull(activeGroup)) {
+    return fade(scale(group));
+  }
+
+  return scale(group);
+}

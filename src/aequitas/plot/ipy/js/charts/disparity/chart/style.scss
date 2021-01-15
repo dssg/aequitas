@@ -1,0 +1,42 @@
+@import "~/constants/colors.scss";
+@import "~/constants/text.scss";
+
+.aequitas-axis {
+    text {
+        fill: $grey-semi-3;
+        font-size: $small-font-size;
+    }
+}
+
+.aequitas-grid {
+    line {
+        stroke: $grey-light-3;
+        stroke-width: 1px;
+    }
+}
+
+.aequitas-tooltip {
+    width: auto;
+    height: auto;
+    background-color: $grey-dark-3;
+    color: white;
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    border-left-style: solid;
+    border-left-width: 5px;
+    border-top-width: 0;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+}
+
+.aequitas-tooltip-item {
+    display: flex;
+    flex-direction: row;
+}
+
+.aequitas-tooltip-item-label {
+    font-weight: lighter;
+    min-width: 70px;
+}

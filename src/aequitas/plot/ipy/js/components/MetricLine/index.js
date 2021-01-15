@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Text } from "@vx/text";
 
+import "./style.scss";
+
 const propTypes = {
   lineEnd: PropTypes.number.isRequired,
   lineStart: PropTypes.number.isRequired,
@@ -12,7 +14,12 @@ const propTypes = {
 function MetricLine(props) {
   return (
     <g>
-      <Text x={0} y={props.y} className="aequitas-row-names">
+      <Text
+        x={0}
+        y={props.y}
+        className="aequitas-metric-label"
+        verticalAnchor="middle"
+      >
         {props.metric.toUpperCase()}
       </Text>
       <line
@@ -20,7 +27,7 @@ function MetricLine(props) {
         y1={props.y}
         x2={props.lineEnd}
         y2={props.y}
-        className="aequitas-row-line"
+        className="aequitas-metric-line"
       />
     </g>
   );

@@ -1,0 +1,26 @@
+@import "~/constants/text.scss";
+
+.aequitas-legend {
+    h1 {
+        font-weight: bolder;
+        font-size: $large-font-size;
+        margin: 5px 0 10px 0;
+    }
+
+    h2 {
+        font-weight: normal;
+        font-size: $normal-font-size;
+        margin: 5px 0 10px 0;
+    }
+
+    &-item {
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        p {
+            margin: 0px 7px;
+        }
+    }
+}

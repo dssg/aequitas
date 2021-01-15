@@ -1,0 +1,11 @@
+.aequitas-bubble {
+    cursor: pointer;
+}
+
+.aequitas-bubble-area {
+    opacity: 0.2;
+
+    &:hover {
+        opacity: 0.3;
+    }
+}
