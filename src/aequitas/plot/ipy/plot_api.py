@@ -18,7 +18,7 @@ def __id_generator(size=15):
 
 def __make_plot_html(id, render_function_name, payload):
     aequitas_viz_lib_path = pkg_resources.resource_filename(
-        __name__, "build/aequitas.js"
+        __name__, "dist/aequitas.js"
     )
     bundle = open(aequitas_viz_lib_path, "r", encoding="utf8").read()
     plot_html = """

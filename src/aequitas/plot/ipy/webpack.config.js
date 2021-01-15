@@ -1,9 +1,9 @@
-var path = require('path');
+var path = require("path");
 
 const config = {
   entry: ["./js/index.js"],
   output: {
-    path: __dirname + "/build",
+    path: __dirname + "/dist",
     filename: "aequitas.js",
     library: "aequitas",
   },
