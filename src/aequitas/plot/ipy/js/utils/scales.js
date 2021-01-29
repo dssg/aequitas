@@ -39,6 +39,12 @@ export function getScalePositionDisparity(data, metrics, fairnessThreshold) {
     .nice();
 }
 
+export function getScalePositionAbsolute() {
+  return scaleLinear()
+    .domain([0, 1])
+    .range([sizes.MARGIN.left, sizes.WIDTH - sizes.MARGIN.right]);
+}
+
 export function getScaleSizeBubble(data) {
   const maxGroupSize = max(data, (row) => row["group_size"]);
 
