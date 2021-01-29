@@ -4,11 +4,26 @@ import { select } from "d3-selection";
 
 import "./index.scss";
 
-import Disparity from "~/charts/disparity";
+import BubbleChart from "~/charts/bubbleChart";
 
 export function plotDisparityBubbleChart(divId, payload) {
   ReactDOM.render(
-    <Disparity
+    <BubbleChart
+      isDisparityChart={true}
+      metrics={payload.metrics}
+      attribute={payload.attribute}
+      data={payload.data}
+      accessibilityMode={payload["accessibility_mode"]}
+      fairnessThreshold={payload["fairness_threshold"]}
+    />,
+    select(divId).node()
+  );
+}
+
+export function plotMetricBubbleChart(divId, payload) {
+  ReactDOM.render(
+    <BubbleChart
+      isDisparityChart={false}
       metrics={payload.metrics}
       attribute={payload.attribute}
       data={payload.data}

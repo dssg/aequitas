@@ -40,3 +40,14 @@
     font-weight: lighter;
     min-width: 70px;
 }
+
+.aequitas-equal-ref-line {
+    stroke: $grey-dark-3;
+    stroke-dasharray: 5 5;
+    stroke-width: 2px;
+}
+
+.aequitas-absolute-boundary-ref-line {
+    stroke: $grey-dark-3;
+    stroke-width: 1px;
+}

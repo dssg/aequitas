@@ -1,20 +1,27 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { isNull } from "lodash";
+// import { Zoom } from "@vx/zoom";
 
 import colors from "~/constants/colors.scss";
 import sizes from "~/constants/sizes";
 
-import Axis from "./Axis";
+import AxisDisparity from "./AxisDisparity";
+import AxisAbsolute from "./AxisAbsolute";
 import Row from "./Row";
 import ThresholdBands from "~/components/ThresholdBands";
 
-import { getScalePositionDisparity, getScaleSizeBubble } from "~/utils/scales";
+import {
+  getScalePositionDisparity,
+  getScalePositionAbsolute,
+  getScaleSizeBubble
+} from "~/utils/scales";
 
 import "./style.scss";
 
 const propTypes = {
   accessibilityMode: PropTypes.bool.isRequired,
+  isDisparityChart: PropTypes.bool.isRequired,
   data: PropTypes.array.isRequired,
   fairnessThreshold: PropTypes.number.isRequired,
   handleActiveGroup: PropTypes.func.isRequired,
@@ -22,29 +29,38 @@ const propTypes = {
   referenceGroup: PropTypes.string.isRequired,
   scaleColor: PropTypes.func.isRequired,
   scaleShape: PropTypes.func.isRequired,
-  activeGroup: PropTypes.string,
+  activeGroup: PropTypes.string
 };
 
 function Chart(props) {
   const chartAreaHeight = sizes.ROW_HEIGHT * props.metrics.length;
 
-  const scaleDisparity = getScalePositionDisparity(
-    props.data,
-    props.metrics,
-    props.fairnessThreshold
-  );
+  const scalePosition = props.isDisparityChart
+    ? getScalePositionDisparity(
+        props.data,
+        props.metrics,
+        props.fairnessThreshold
+      )
+    : getScalePositionAbsolute();
 
   const scaleBubbleSize = getScaleSizeBubble(props.data);
 
   return (
     <svg width={sizes.WIDTH} height={chartAreaHeight}>
-      <Axis scale={scaleDisparity} chartAreaHeight={chartAreaHeight} />
-      {!isNull(props.fairnessThreshold) ? (
+      {props.isDisparityChart ? (
+        <AxisDisparity
+          scale={scalePosition}
+          chartAreaHeight={chartAreaHeight}
+        />
+      ) : (
+        <AxisAbsolute scale={scalePosition} chartAreaHeight={chartAreaHeight} />
+      )}
+      {!isNull(props.fairnessThreshold) && props.isDisparityChart ? (
         <ThresholdBands
           fairnessThreshold={props.fairnessThreshold}
           y={sizes.MARGIN.top}
           height={chartAreaHeight}
-          scale={scaleDisparity}
+          scale={scalePosition}
           color={
             props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
           }
@@ -55,13 +71,14 @@ function Chart(props) {
         return (
           <Row
             key={`row-${metric}`}
+            isDisparityChart={props.isDisparityChart}
             metric={metric}
             data={props.data}
             y={metricAxisY}
             referenceGroup={props.referenceGroup}
             scaleColor={props.scaleColor}
             scaleShape={props.scaleShape}
-            scaleDisparity={scaleDisparity}
+            scalePosition={scalePosition}
             scaleBubbleSize={scaleBubbleSize}
             activeGroup={props.activeGroup}
             handleActiveGroup={props.handleActiveGroup}

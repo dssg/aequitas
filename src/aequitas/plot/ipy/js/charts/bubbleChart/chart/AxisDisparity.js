@@ -38,7 +38,7 @@ const getTickValues = (maxTickValue) => {
   return tickValues;
 };
 
-function Axis(props) {
+function AxisDisparity(props) {
   const tickValues = getTickValues(props.scale.domain()[1]);
 
   function renderTextAnnotations(text, x, anchor) {
@@ -83,9 +83,9 @@ function Axis(props) {
   );
 }
 
-Axis.propTypes = {
+AxisDisparity.propTypes = {
   chartAreaHeight: PropTypes.number,
-  scale: PropTypes.func,
+  scale: PropTypes.func
 };
 
-export default Axis;
+export default AxisDisparity;
