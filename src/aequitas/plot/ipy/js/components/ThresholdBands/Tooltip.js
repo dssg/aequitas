@@ -1,4 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+const propTypes = {
+    fairnessThreshold: PropTypes.number.isRequired,
+    color: PropTypes.string.isRequired,
+  };
 
 export default function Tooltip(props) {
   return (
@@ -11,3 +17,5 @@ export default function Tooltip(props) {
     </div>
   );
 }
+
+Tooltip.propTypes = propTypes;
