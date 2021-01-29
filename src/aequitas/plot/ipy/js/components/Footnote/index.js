@@ -17,7 +17,7 @@ function Footnote(props) {
       >
         The metric value for any group should not be{" "}
         <span className="aequitas-bold-text">
-          {format(".2")(Math.abs(props.fairnessThreshold))} (or more) times{" "}
+          {format(".3")(Math.abs(props.fairnessThreshold))} (or more) times{" "}
         </span>
         smaller or larger than that of the reference group{" "}
         <span className="aequitas-bold-text">{props.referenceGroup}</span>
