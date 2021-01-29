@@ -90,3 +90,33 @@ def plot_disparity_bubble_chart(
 
     plot_html = __make_plot_html(id, "plotDisparityBubbleChart", payload)
     return display(HTML(plot_html))
+
+
+def plot_metric_bubble_chart(
+    disparity_df,
+    metrics_list,
+    attribute=None,
+    fairness_threshold=1.25,
+    accessibility_mode=False,
+    id=__id_generator(),
+):
+
+    metrics = __sanitize_metrics(metrics_list)
+
+    plot_table = __filter_df_alt(disparity_df, metrics)
+
+    for metric in metrics:
+        plot_table[f"{metric}_disparity_scaled"] = plot_table.apply(
+            lambda row: transform_ratio(row[f"{metric}_disparity"]), axis=1
+        )
+
+    payload = {
+        "data": plot_table.to_dict("records"),
+        "metrics": metrics,
+        "attribute": attribute,
+        "fairness_threshold": fairness_threshold,
+        "accessibility_mode": accessibility_mode,
+    }
+    
+    plot_html = __make_plot_html(id, "plotMetricBubbleChart", payload)
+    return display(HTML(plot_html))
