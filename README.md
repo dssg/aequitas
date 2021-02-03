@@ -14,6 +14,7 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
 [Try out the Aequitas web application](http://aequitas.dssg.io/) 
 
 
+[Try out our interact colab notebook using the COMPAS dataset.] (https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
 
 
 ## Documentation
@@ -21,7 +22,7 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
 For usage examples of the python library, see our [demo notebook](https://colab.research.google.com/github/dssg/fairness_tutorial/blob/master/notebooks/single_model_audit.ipynb) from the KDD 2020 hands-on tutorial. Alternatively, have a look to
-[COMPAS notebook](https://github.com/dssg/aequitas/blob/master/docs/source/examples/compas_demo.ipynb) using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
+[COMPAS notebook](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb) using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
 
 ## Installation
