@@ -1,6 +1,6 @@
 export default {
   WIDTH: 800,
-  ROW_HEIGHT: 200,
+  ROW_HEIGHT: 180,
   MARGIN: {
     top: 40,
     right: 20,

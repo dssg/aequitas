@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Select from "react-select";
+import { isNull } from "lodash";
 
 import Chart from "./chart";
+import AxisDisparity from "./chart/AxisDisparity";
+import AxisAbsolute from "./chart/AxisAbsolute";
+import ThresholdsAbsolute from "./chart/ThresholdsAbsolute";
+import ThresholdsDisparity from "./chart/ThresholdsDisparity";
 import Legend from "~/components/Legend";
 import Footnote from "~/components/Footnote";
 
-import { getScaleColor, getScaleShape } from "~/utils/scales";
+import {
+  getScaleColor,
+  getScaleShape,
+  getScaleSizeBubble,
+  getScalePositionDisparity,
+  getScalePositionAbsolute
+} from "~/utils/scales";
 import { toTitleCase } from "~/utils/helpers";
+import sizes from "~/constants/sizes";
+import colors from "~/constants/colors.scss";
+
 import "./style.scss";
 
 const propTypes = {
@@ -16,14 +30,20 @@ const propTypes = {
   attribute: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
   accessibilityMode: PropTypes.bool.isRequired,
-  fairnessThreshold: PropTypes.number.isRequired
+  fairnessThreshold: PropTypes.number
 };
 
 function BubbleChart(props) {
+  //
+  // ATTRIBUTES
+  //
   const attributes = [
     ...new Set(props.data.map((row) => row["attribute_name"]))
   ];
 
+  //
+  // HOOKS: STATE & EFFECT
+  //
   const [activeGroup, setActiveGroup] = useState(null);
   const [selectedAttribute, setSelectedAttribute] = useState(
     props.attribute || attributes[0]
@@ -35,33 +55,90 @@ function BubbleChart(props) {
     dataToPlot[0][`${props.metrics[0]}_ref_group_value`]
   );
 
+  useEffect(() => {
+    const newData = props.data.filter(
+      (row) => row["attribute_name"] === selectedAttribute
+    );
+    setDataToPlot(newData);
+    setReferenceGroup(newData[0][`${props.metrics[0]}_ref_group_value`]);
+  }, [props.data, props.metrics, selectedAttribute]);
+
+  //
+  //   VARIABLES
+  //
   const selectOptions = attributes.map((attribute) => {
     return {
       value: attribute,
       label: toTitleCase(attribute)
     };
   });
-
   const groups = [
     referenceGroup,
     ...dataToPlot
       .map((row) => row["attribute_value"])
       .filter((item) => item !== referenceGroup)
   ];
+  const chartAreaHeight =
+    sizes.ROW_HEIGHT * props.metrics.length + sizes.MARGIN.top;
+  const dataColumnSuffix = props.isDisparityChart ? "_disparity_scaled" : "";
+  let dataColumnNames = {};
+  props.metrics.map(
+    (metric) => (dataColumnNames[metric] = `${metric}${dataColumnSuffix}`)
+  );
 
+  //
+  // SCALES
+  //
   const scaleColor = getScaleColor(groups);
   const scaleShape = getScaleShape(groups, props.accessibilityMode);
+  const scaleBubbleSize = getScaleSizeBubble(props.data);
+  const scalePosition = props.isDisparityChart
+    ? getScalePositionDisparity(
+        props.data,
+        props.metrics,
+        props.fairnessThreshold
+      )
+    : getScalePositionAbsolute();
 
-  useEffect(() => {
-    setDataToPlot(
-      props.data.filter((row) => row["attribute_name"] === selectedAttribute)
+  //
+  // DISPARITY/ABSOLUTE COMPONENTS
+  //
+  const AxisComponent = props.isDisparityChart ? (
+    <AxisDisparity scale={scalePosition} chartAreaHeight={chartAreaHeight} />
+  ) : (
+    <AxisAbsolute scale={scalePosition} chartAreaHeight={chartAreaHeight} />
+  );
+
+  let ThresholdsComponent;
+  if (!isNull(props.fairnessThreshold)) {
+    ThresholdsComponent = props.isDisparityChart ? (
+      <ThresholdsDisparity
+        fairnessThreshold={props.fairnessThreshold}
+        chartAreaHeight={chartAreaHeight}
+        scalePosition={scalePosition}
+        thresholdColor={
+          props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
+        }
+      />
+    ) : (
+      <ThresholdsAbsolute
+        fairnessThreshold={props.fairnessThreshold}
+        scalePosition={scalePosition}
+        thresholdColor={
+          props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
+        }
+        metrics={props.metrics}
+        referenceGroup={referenceGroup}
+        data={dataToPlot}
+      />
     );
-  }, [props.data, selectedAttribute]);
+  } else {
+    ThresholdsComponent = null;
+  }
 
-  useEffect(() => {
-    setReferenceGroup(dataToPlot[0][`${props.metrics[0]}_ref_group_value`]);
-  }, [props.metrics, dataToPlot]);
-
+  //
+  // RETURN
+  //
   return (
     <div className="aequitas">
       <div className="aequitas-title">
@@ -78,16 +155,19 @@ function BubbleChart(props) {
       </div>
       <div className="aequitas-chart-area">
         <Chart
-          accessibilityMode={props.accessibilityMode}
-          isDisparityChart={props.isDisparityChart}
           data={dataToPlot}
-          fairnessThreshold={props.fairnessThreshold}
           handleActiveGroup={setActiveGroup}
           metrics={props.metrics}
           referenceGroup={referenceGroup}
           scaleColor={scaleColor}
           scaleShape={scaleShape}
+          scaleBubbleSize={scaleBubbleSize}
+          scalePosition={scalePosition}
           activeGroup={activeGroup}
+          AxisComponent={AxisComponent}
+          ThresholdsComponent={ThresholdsComponent}
+          chartAreaHeight={chartAreaHeight}
+          dataColumnNames={dataColumnNames}
         />
         <Legend
           groups={groups}
