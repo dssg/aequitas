@@ -14,7 +14,7 @@ Aequitas is an open-source bias audit toolkit for data scientists, machine learn
 [Try out the Aequitas web application](http://aequitas.dssg.io/) 
 
 
-[Try out our interact colab notebook using the COMPAS dataset.] (https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
+[Try out our interact colab notebook using the COMPAS dataset.](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
 
 
 ## Documentation
