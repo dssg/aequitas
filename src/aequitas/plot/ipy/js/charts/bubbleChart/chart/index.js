@@ -1,11 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-// import { Zoom } from "@vx/zoom";
-
-import sizes from "~/constants/sizes";
-
 import Row from "./Row";
+import sizes from "~/constants/sizes";
 
 import "./style.scss";
 
@@ -26,10 +23,11 @@ const propTypes = {
 };
 
 function Chart(props) {
+  const { AxisComponent, ThresholdsComponent } = props;
   return (
     <svg width={sizes.WIDTH} height={props.chartAreaHeight}>
-      {props.AxisComponent}
-      {props.ThresholdsComponent}
+      {AxisComponent}
+      {ThresholdsComponent}
       {props.metrics.map((metric, index) => {
         const metricAxisY = sizes.MARGIN.top + sizes.ROW_HEIGHT * (index + 0.5);
         return (

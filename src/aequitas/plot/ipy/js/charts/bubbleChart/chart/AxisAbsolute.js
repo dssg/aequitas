@@ -11,8 +11,6 @@ function AxisAbsolute(props) {
       <AxisTop
         scale={props.scale}
         top={sizes.MARGIN.top}
-        // tickFormat=".1f"
-        // tickValues={tickValues}
         hideAxisLine
         hideTicks
       />
@@ -21,7 +19,6 @@ function AxisAbsolute(props) {
         scale={props.scale}
         height={props.chartAreaHeight}
         top={sizes.MARGIN.top}
-        // tickValues={tickValues}
       />
       <line
         x1={props.scale(0)}

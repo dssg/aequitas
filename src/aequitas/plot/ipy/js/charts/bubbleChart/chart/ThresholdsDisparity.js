@@ -39,7 +39,6 @@ function ThresholdsDisparity(props) {
         y1={sizes.MARGIN.top}
         y2={sizes.MARGIN.top + props.chartAreaHeight}
         width={width}
-        height={props.chartAreaHeight}
         thresholdDisplayString={props.fairnessThreshold.toString()}
       />
     );

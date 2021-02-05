@@ -103,30 +103,24 @@ function BubbleChart(props) {
   //
   // DISPARITY/ABSOLUTE COMPONENTS
   //
-  const AxisComponent = props.isDisparityChart ? (
-    <AxisDisparity scale={scalePosition} chartAreaHeight={chartAreaHeight} />
-  ) : (
-    <AxisAbsolute scale={scalePosition} chartAreaHeight={chartAreaHeight} />
+  const Axis = props.isDisparityChart ? AxisDisparity : AxisAbsolute;
+  const AxisComponent = (
+    <Axis scale={scalePosition} chartAreaHeight={chartAreaHeight} />
   );
 
-  let ThresholdsComponent;
+  let ThresholdsComponent, Thresholds;
   if (!isNull(props.fairnessThreshold)) {
-    ThresholdsComponent = props.isDisparityChart ? (
-      <ThresholdsDisparity
+    Thresholds = props.isDisparityChart
+      ? ThresholdsDisparity
+      : ThresholdsAbsolute;
+    ThresholdsComponent = (
+      <Thresholds
         fairnessThreshold={props.fairnessThreshold}
+        scalePosition={scalePosition}
+        thresholdColor={
+          props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
+        }
         chartAreaHeight={chartAreaHeight}
-        scalePosition={scalePosition}
-        thresholdColor={
-          props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
-        }
-      />
-    ) : (
-      <ThresholdsAbsolute
-        fairnessThreshold={props.fairnessThreshold}
-        scalePosition={scalePosition}
-        thresholdColor={
-          props.accessibilityMode ? colors.referenceGrey : colors.thresholdRed
-        }
         metrics={props.metrics}
         referenceGroup={referenceGroup}
         data={dataToPlot}

@@ -14,7 +14,6 @@ const propTypes = {
   y1: PropTypes.number.isRequired,
   y2: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   thresholdDisplayString: PropTypes.string.isRequired
 };
 
@@ -29,7 +28,7 @@ function ThresholdBand(props) {
         x={props.x}
         y={props.y1}
         width={props.width}
-        height={props.height}
+        height={props.y2 - props.y1}
         fill={props.thresholdColor}
       />
       <Tippy

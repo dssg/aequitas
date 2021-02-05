@@ -41,7 +41,8 @@ function ThresholdsAbsolute(props) {
     const thresholdDisplayString = `${metric.toUpperCase()} = ${thresholdValue.toPrecision(
       2
     )}`;
-    const test = (
+
+    return (
       <ThresholdBand
         key={`${side}-${metric}`}
         thresholdColor={props.thresholdColor}
@@ -52,12 +53,9 @@ function ThresholdsAbsolute(props) {
         y1={sizes.MARGIN.top + index * sizes.ROW_HEIGHT}
         y2={sizes.MARGIN.top + (index + 1) * sizes.ROW_HEIGHT}
         width={width}
-        height={sizes.ROW_HEIGHT}
         thresholdDisplayString={thresholdDisplayString}
       />
     );
-
-    return test;
   }
 
   const sides = ["left", "right"];
