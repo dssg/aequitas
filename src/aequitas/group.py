@@ -2,6 +2,7 @@ import logging
 import warnings
 import pandas as pd
 import numpy as np
+import uuid
 logging.getLogger(__name__)
 
 __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
@@ -14,11 +15,53 @@ COLUMN_ORDER = ['model_id', 'score_threshold', 'k', 'attribute_name',
                 'tn', 'tp', 'group_label_pos', 'group_label_neg', 'group_size',
                 'total_entities', 'prev']
 
+
+def gen_metrics_df(df, attr_cols, score, score_threshold):
+    divide = lambda x, y: x / y if y != 0 else np.nan
+    model_id = 0
+    columns = [
+        'model_id', 'score_threshold', 'k', 'attribute_name', 'attribute_value',
+       'tpr', 'tnr', 'fomr', 'fdr', 'fpr', 'fnr', 'npv', 'precision', 'pp',
+       'pn', 'ppr', 'pprev', 'fp', 'fn', 'tn', 'tp', 'group_label_pos',
+       'group_label_neg', 'group_size', 'total_entities', 'prev']
+    final_dict = {column: [] for column in columns}
+    k = df[df[score]==1].shape[0]
+    for attribute_name in attr_cols:
+        grouped_data = df.groupby(by=[attribute_name, score, "label_value",]).size().to_dict()
+        attribute_values = set([key[0] for key in grouped_data.keys()])
+        for attribute_value in attribute_values:
+            tp = grouped_data.get((attribute_value, 1, 1), 0)
+            tn = grouped_data.get((attribute_value, 0, 0), 0)
+            fp = grouped_data.get((attribute_value, 1, 0), 0)
+            fn = grouped_data.get((attribute_value, 0, 1), 0)
+            tpr = divide(tp, fn + tp)
+            tnr = divide(tn, fp + tn)
+            fomr = divide(fn, fn + tn)
+            fdr = divide(fp, tp + fp)
+            fpr = divide(fp, fp + tn)
+            fnr = divide(fn, fn + tp)
+            npv = divide(tn, fn + tn)
+            precision = divide(tp, tp + fp)
+            pp = fp + tp
+            pn = fn + tn
+            ppr = divide(pp, k)
+            pprev = divide (pp, pp + pn)
+            group_label_pos = (fn + tp)
+            group_label_neg = (fp + tn)
+            group_size = group_label_pos + group_label_neg
+            total_entities = df.shape[0]
+            prev = (fn + tp) / group_size
+            for key in final_dict.keys():
+                final_dict[key].append(locals()[key])
+    return pd.DataFrame(final_dict).rename(columns={"fomr": "for"})
+
+
 class Group(object):
     """
     """
     all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
                          'fnr', 'tpr', 'tnr', 'npv', 'prev')
+
     def __init__(self, input_group_metrics=all_group_metrics):
         """
         """
@@ -27,7 +70,6 @@ class Group(object):
             (x[label_col] == 0).sum()
         self.label_pos_count = lambda label_col: lambda x: \
             (x[label_col] == 1).sum()
-        self.group_functions = self._get_group_functions()
         self.confusion_matrix_functions = self.get_confusion_matrix_functions()
 
     @staticmethod
@@ -50,59 +92,6 @@ class Group(object):
             'tp': true_pos_count
         }
 
-    @staticmethod
-    def _get_group_functions():
-        """
-        Helper function to accumulate lambda functions used in bias metrics
-        calculations.
-        """
-
-        divide = lambda x, y: x / y if y != 0 else np.nan
-
-        predicted_pos_count = lambda k: lambda x: x['fp'] + x['tp']
-
-        predicted_neg_count = lambda k: lambda x: x['fn'] + x['tn']
-
-        predicted_pos_ratio_k = lambda k: lambda x: divide(x['fp'] + x['tp'], k)
-
-        predicted_pos_ratio_g = lambda k: lambda x: divide(
-            x['fp'] + x['tp'], x['fn'] + x['tn'] + x['fp'] + x['tp']
-        )
-
-        fpr = lambda k: lambda x: divide(x['fp'], x['fp'] + x['tn'])
-
-        tnr = lambda k: lambda x: divide(x['tn'], x['fp'] + x['tn'])
-
-        fnr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tp'])
-
-        tpr = lambda k: lambda x: divide(x['tp'], x['fn'] + x['tp'])
-
-        fomr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tn'])
-
-        npv = lambda k: lambda x: divide(x['tn'], x['fn'] + x['tn'])
-
-        precision = lambda k: lambda x: divide(x['tp'], x['tp'] + x['fp'])
-
-        fdr = lambda k: lambda x: divide(x['fp'], x['tp'] + x['fp'])
-
-        group_functions = {'tpr': tpr,
-                           'tnr': tnr,
-                           'for': fomr,
-                           'fdr': fdr,
-                           'fpr': fpr,
-                           'fnr': fnr,
-                           'npv': npv,
-                           'precision': precision,
-                           'pp': predicted_pos_count,
-                           'pn': predicted_neg_count,
-                           'ppr': predicted_pos_ratio_k,
-                           'pprev': predicted_pos_ratio_g,
-                           }
-
-        return group_functions
-
-
-
     def _check_model_id(self, df, method_table_name):
         if 'model_id' in df.columns:
             df_models = df.model_id.unique()
@@ -113,7 +102,6 @@ class Group(object):
                 return df_models[0]
         else:
             return 0
-
 
     def get_multimodel_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
@@ -145,115 +133,73 @@ class Group(object):
         else:
             return self.get_crosstabs(df, score_thresholds=score_thresholds, attr_cols=attr_cols)
 
-
-
     def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
         """
         Creates univariate groups and calculates group metrics for results
         from a single model.
 
         :param df: a dataframe containing the following required columns [score,  label_value].
-        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score_val': []}
         :param attr_cols: optional, list of names of columns corresponding to
             group attributes (i.e., gender, age category, race, etc.).
 
         :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
         """
-        model_id = self._check_model_id(df, method_table_name='df')
-
+        df = df.copy()  # To not transform original dataframe.
         if not attr_cols:
-            non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
-            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
+            non_attr_cols = ['id', 'model_id', 'entity_id', 'score',
+                             'label_value']
+            attr_cols = df.columns[~df.columns.isin(
+                non_attr_cols)]  # index of the columns that are
 
-        df_cols = set(df.columns)
-        # check if all attr_cols exist in df
-        if len(set(attr_cols) - df_cols) > 0:
-            raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
-
-        # check if all columns are strings:
-        non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
-        if non_string_cols.empty is False:
-            raise Exception('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
-
-        # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
-        count_ones = None  # it also serves as flag to set parameter to 'binary'
-
-        if not score_thresholds:
-            df.loc[:, 'score'] = df.loc[:,'score'].astype(float)
-            count_ones = df['score'].value_counts().get(1.0, 0)
-            score_thresholds = {'rank_abs': [count_ones]}
-
-        df = df.sort_values('score', ascending=False)
-        df['rank_abs'] = range(1, len(df) + 1)
-        df['rank_pct'] = df['rank_abs'] / len(df)
-        dfs = []
-        prior_dfs = []
-        # calculate the bias for these columns
-        # not default(non_attr_cols), therefore represent the group variables!
-        logging.info('getcrosstabs: attribute columns to perform crosstabs:' + ','.join(attr_cols))
-        # for each group variable do
+        # Validation step.
         for col in attr_cols:
-            # find the priors_df
-            col_group = df.fillna({col: np.nan}).groupby(col)
-            counts = col_group.size()
-            # distinct entities within group value
-            this_prior_df = pd.DataFrame({
-                'model_id': [model_id] * len(counts),
-                'attribute_name': [col] * len(counts),
-                'attribute_value': counts.index.values,
-                'group_label_pos': col_group.apply(self.label_pos_count(
-                    'label_value')).values,
-                'group_label_neg': col_group.apply(self.label_neg_count(
-                    'label_value')).values,
-                'group_size': counts.values,
-                'total_entities': [len(df)] * len(counts)
-            })
-            this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
-            # for each model_id and as_of_date the priors_df has length
-            # attribute_names * attribute_values
-            prior_dfs.append(this_prior_df)
+            # Validate if column is in dataframe.
+            if col not in df.columns:
+                raise KeyError(
+                    f'The attribute column \'{col}\' is not on the dataframe.')
+            # Validate if column has correct datatype.
+            if df[col].dtype not in (object, str):
+                raise TypeError(
+                    f'The attribute column \'{col}\' has in invalid datatype.')
+        if len(df['label_value'].unique()) > 2:
+            raise ValueError('Labels are not binarized.')
+        else:
+            df['label_value'] = df['label_value'].astype(int)
 
-            # we calculate the bias for two different types of score_thresholds
-            # units (percentage ranks and absolute ranks)
-            # YAML ex: thresholds:
-            #              rank_abs: [300]
-            #              rank_pct: [0.01, 0.02, 0.05, 0.10]
-            for thres_unit, thres_values in score_thresholds.items():
+        count_ones = None  # it also serves as flag to set parameter to 'binary'
+        confusion_matrixes = []
+        binarized_scores = False
+        if not score_thresholds and len(df['score'].unique()) > 2:
+            raise ValueError(f'Scores are not binarized. Provide a threshold.')
+        elif not score_thresholds:  # No thresholds given and binarized
+            df['score'] = df['score'].astype(int)
+            confusion_matrixes.append(
+                gen_metrics_df(df, attr_cols, 'score', 'binary 0/1'))
+            score_thresholds = {}
 
-                for thres_val in thres_values:
-                    flag = 0
-                    k = (df[thres_unit] <= thres_val).sum()
-
-                    # denote threshold as binary if numeric count_ones value
-                    # donate as [rank value]_abs or [rank_value]_pct otherwise
-                    score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
-                    for name, func in self.confusion_matrix_functions.items():
-                        func = func(thres_unit, 'label_value', thres_val, k)
-                        feat_bias = col_group.apply(func)
-                        metrics_df = pd.DataFrame({
-                            'model_id': [model_id] * len(feat_bias),
-                            'score_threshold': [score_threshold] * len(feat_bias),
-                            'k': [k] * len(feat_bias),
-                            'attribute_name': [col] * len(feat_bias),
-                            'attribute_value': feat_bias.index.values,
-                            name: feat_bias.values
-                        })
-                        if flag == 0:
-                            this_group_df = metrics_df
-                            flag = 1
-                        else:
-                            this_group_df = this_group_df.merge(metrics_df)
-                    for name, func in self.group_functions.items():
-                        func = func(k)
-                        feat_bias = this_group_df.apply(func, axis=1)
-                        this_group_df[name] = feat_bias
-                    dfs.append(this_group_df)
-        groups_df = pd.concat(dfs, ignore_index=True)
-        priors_df = pd.concat(prior_dfs, ignore_index=True)
-        groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
-                                                   'attribute_value'])
-        return groups_df[COLUMN_ORDER], attr_cols
-
+        binarized_column = uuid.uuid4()  # Add a column with the binarized scores
+        sorted_df = False  # Flag to sort the dataframe in the first run
+        for key, values in score_thresholds.items():
+            for value in values:
+                if not sorted_df:
+                    df = df.sort_values('score', ascending=False).reset_index(
+                        drop=True)
+                    sorted_df = True
+                if key == 'rank_abs':
+                    df[binarized_column] = (df.index < value).astype(int)
+                elif key == 'rank_pct':
+                    df[binarized_column] = (
+                                df.index < value * df.shape[0]).astype(int)
+                elif key == 'score_val':
+                    df[binarized_column] = (df['score_val'] >= value).astype(
+                        int)
+                else:
+                    raise KeyError(f'Invalid keys')
+                confusion_matrixes.append(
+                    gen_metrics_df(df, attr_cols, binarized_column,
+                                   f'{value}_{key[-3:]}'))
+        return pd.concat(confusion_matrixes), attr_cols
 
     def list_absolute_metrics(self, df):
         """
