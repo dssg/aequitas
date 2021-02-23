@@ -97,20 +97,18 @@ class Bias(object):
                 # simply put outside the loop(the merge...)
                 idxmin = df.groupby(key_columns)[group_metric].idxmin()
 
-                # if entire column for a group metric is NaN, cast min value
-                # index column to same index as any other group for that attribute
+                # if entire column for a group metric is NaN, cast min value index
+                # column to the same index as that of any other group for that attribute
                 if any(np.isnan(val) for val in idxmin.values):
                     if len(idxmin) >= 1:
-                        idxmin.loc[idxmin.isna()] = df.loc[
-                            df["attribute_name"].isin(
-                                idxmin.index.get_level_values('attribute_name').values
-                            )
-                        ].index[0]
+                        idxmin_not_nan = df.reset_index().groupby(key_columns)['index'].min()
+                        idxmin.loc[idxmin.isna()] = pd.merge(
+                            left=idxmin.loc[idxmin.isna()], right=idxmin_not_nan,
+                            left_index=True, right_index=True, how='inner',
+                        )['index'].values
                     else:
                         raise Exception(f"A minimum value for group_metric "
                                       f"{group_metric} could not be calculated.")
-                        continue
-
 
                 df_min_idx = df.loc[idxmin]
 
@@ -120,6 +118,7 @@ class Bias(object):
                 df_to_merge[key_columns + [group_metric + '_disparity', group_metric +
                                            '_ref_group_value']] = \
                     df_min_idx[key_columns + [group_metric, 'attribute_value']]
+
             except KeyError:
                 raise KeyError(
                     'get_bias_min_metric:: one of the following columns is not '
