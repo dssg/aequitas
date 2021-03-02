@@ -35,14 +35,20 @@ export function getScalePositionDisparity(data, metrics, fairnessThreshold) {
 
   return scaleLinear()
     .domain([-maxAbsoluteDisparity, maxAbsoluteDisparity])
-    .range([sizes.MARGIN.left, sizes.WIDTH - sizes.MARGIN.right])
+    .range([
+      sizes.AXIS.LEFT.width,
+      sizes.CHART_WIDTH - sizes.CHART_PADDING.right
+    ])
     .nice();
 }
 
-export function getScalePositionAbsolute() {
+export function getScalePositionAbsolute(axisBounds) {
   return scaleLinear()
-    .domain([0, 1])
-    .range([sizes.MARGIN.left, sizes.WIDTH - sizes.MARGIN.right]);
+    .domain(axisBounds)
+    .range([
+      sizes.AXIS.LEFT.width,
+      sizes.CHART_WIDTH - sizes.CHART_PADDING.right
+    ]);
 }
 
 export function getScaleSizeBubble(data) {

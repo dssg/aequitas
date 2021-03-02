@@ -1,10 +1,25 @@
-export default {
-  WIDTH: 800,
+export default Object.freeze({
+  CHART_WIDTH: 800,
   ROW_HEIGHT: 180,
-  MARGIN: {
-    top: 40,
-    right: 20,
-    bottom: 20,
-    left: 50,
+  CHART_PADDING: {
+    right: 20
   },
-};
+  AXIS: {
+    LEFT: {
+      width: 60
+    },
+    TOP: {
+      height: 40
+    }
+  },
+  LEGEND_MARGIN: {
+    left: 10
+  },
+  BOUNDS_INPUT: {
+    width: 30,
+    height: 20
+  },
+  RESET_BUTTON: {
+    width: 40
+  }
+});

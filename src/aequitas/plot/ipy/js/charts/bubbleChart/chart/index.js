@@ -25,11 +25,12 @@ const propTypes = {
 function Chart(props) {
   const { AxisComponent, ThresholdsComponent } = props;
   return (
-    <svg width={sizes.WIDTH} height={props.chartAreaHeight}>
+    <svg width={sizes.CHART_WIDTH} height={props.chartAreaHeight}>
       {AxisComponent}
       {ThresholdsComponent}
       {props.metrics.map((metric, index) => {
-        const metricAxisY = sizes.MARGIN.top + sizes.ROW_HEIGHT * (index + 0.5);
+        const metricAxisY =
+          sizes.AXIS.TOP.height + sizes.ROW_HEIGHT * (index + 0.5);
         return (
           <Row
             key={`row-${metric}`}
@@ -44,6 +45,7 @@ function Chart(props) {
             activeGroup={props.activeGroup}
             handleActiveGroup={props.handleActiveGroup}
             dataColumnNames={props.dataColumnNames}
+            axisBounds={props.axisBounds}
           />
         );
       })}

@@ -13,7 +13,10 @@ function Legend(props) {
   return (
     <div
       className="aequitas-legend"
-      style={{ marginTop: sizes.MARGIN.top + 50 }}
+      style={{
+        marginTop: sizes.AXIS.TOP.height + 50,
+        marginLeft: sizes.LEGEND_MARGIN.left
+      }}
     >
       <h1>Groups:</h1>
       <h2>Click to highlight a group</h2>
@@ -41,7 +44,7 @@ Legend.propTypes = {
   groups: PropTypes.array,
   handleSelect: PropTypes.func,
   scaleColor: PropTypes.func,
-  scaleShape: PropTypes.func,
+  scaleShape: PropTypes.func
 };
 
 export default Legend;

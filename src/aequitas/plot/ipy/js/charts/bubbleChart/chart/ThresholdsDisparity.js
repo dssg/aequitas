@@ -36,10 +36,11 @@ function ThresholdsDisparity(props) {
         svgKeySuffix={`${side}`}
         x={x}
         ruleX={ruleX}
-        y1={sizes.MARGIN.top}
-        y2={sizes.MARGIN.top + props.chartAreaHeight}
+        y1={sizes.AXIS.TOP.height}
+        y2={sizes.AXIS.TOP.height + props.chartAreaHeight}
         width={width}
-        thresholdDisplayString={props.fairnessThreshold.toString()}
+        thresholdTooltipString={props.fairnessThreshold.toString()}
+        displayRule={true}
       />
     );
   }

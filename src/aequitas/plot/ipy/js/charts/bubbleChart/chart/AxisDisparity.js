@@ -57,7 +57,7 @@ function AxisDisparity(props) {
 
       <AxisTop
         scale={props.scale}
-        top={sizes.MARGIN.top}
+        top={sizes.AXIS.TOP.height}
         tickFormat={(value) =>
           value === 0 ? "=" : format("d")(Math.abs(value) + 1)
         }
@@ -69,14 +69,14 @@ function AxisDisparity(props) {
         className="aequitas-grid"
         scale={props.scale}
         height={props.chartAreaHeight}
-        top={sizes.MARGIN.top}
+        top={sizes.AXIS.TOP.height}
         tickValues={tickValues}
       />
       <line
         x1={props.scale(0)}
         x2={props.scale(0)}
-        y1={sizes.MARGIN.top}
-        y2={sizes.MARGIN.top + props.chartAreaHeight}
+        y1={sizes.AXIS.TOP.height}
+        y2={sizes.AXIS.TOP.height + props.chartAreaHeight}
         className="aequitas-equal-ref-line"
       />
     </g>

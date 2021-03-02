@@ -15,54 +15,75 @@ const propTypes = {
   data: PropTypes.array.isRequired
 };
 
+const SIDES = ["left", "right"];
+
 function ThresholdsAbsolute(props) {
   function getSingleThresholdBand(side, metric, index) {
-    let metricValue = find(
+    const metricValue = find(
       props.data,
       (row) => row["attribute_value"] === props.referenceGroup
     )[`${metric.toLowerCase()}`];
-
+    const y1 = sizes.AXIS.TOP.height + index * sizes.ROW_HEIGHT;
     let x, width, ruleX, thresholdValue;
 
     if (side === "left") {
       thresholdValue = metricValue / props.fairnessThreshold;
+      // Left band starts with the innerChart:
       x = props.scalePosition.range()[0];
+      // Position threshold rule on the thresholdValue:
       ruleX = props.scalePosition(thresholdValue);
-      width = ruleX - x;
+      // Width of the left band should not be negative (when the threshold falls out of bounds),
+      // and it should not exceed the width of the innerChart:
+      width = Math.min(
+        Math.max(ruleX - x, 0),
+        props.scalePosition.range()[1] - props.scalePosition.range()[0]
+      );
     } else if (side === "right") {
-      thresholdValue = Math.min(metricValue * props.fairnessThreshold, 1);
-      x = props.scalePosition(thresholdValue);
+      thresholdValue = metricValue * props.fairnessThreshold;
+      // Position threshold rule on the thresholdValue:
+      ruleX = props.scalePosition(thresholdValue);
+      // Right band starts on ruleX, if it falls within the innerChart boundaries:
+      x = Math.min(
+        Math.max(ruleX, props.scalePosition.range()[0]),
+        props.scalePosition.range()[1]
+      );
+      // Width of the right band is the distance between its start (x)
+      // and the end of the innerChart
       width = props.scalePosition.range()[1] - x;
-      ruleX = x;
     } else {
       return null;
     }
 
-    const thresholdDisplayString = `${metric.toUpperCase()} = ${thresholdValue.toPrecision(
+    const thresholdTooltipString = `${metric.toUpperCase()} = ${thresholdValue.toPrecision(
       2
     )}`;
+    // From above, threshold rule can fall outside innerChart,
+    // so we check if it should be displayed:
+    const isRuleVisible =
+      ruleX >= props.scalePosition.range()[0] &&
+      ruleX <= props.scalePosition.range()[1];
 
     return (
       <ThresholdBand
-        key={`${side}-${metric}`}
+        key={`${metric}-${side}`}
         thresholdColor={props.thresholdColor}
         fairnessThreshold={props.fairnessThreshold}
-        svgKeySuffix={`${side}-${metric}`}
+        svgKeySuffix={`${metric}-${side}`}
         x={x}
         ruleX={ruleX}
-        y1={sizes.MARGIN.top + index * sizes.ROW_HEIGHT}
-        y2={sizes.MARGIN.top + (index + 1) * sizes.ROW_HEIGHT}
+        y1={y1}
+        y2={y1 + sizes.ROW_HEIGHT}
         width={width}
-        thresholdDisplayString={thresholdDisplayString}
+        thresholdTooltipString={thresholdTooltipString}
+        displayRule={isRuleVisible}
       />
     );
   }
 
-  const sides = ["left", "right"];
   return (
     <g>
       {props.metrics.map((metric, index) => {
-        return sides.map((side) => getSingleThresholdBand(side, metric, index));
+        return SIDES.map((side) => getSingleThresholdBand(side, metric, index));
       })}
     </g>
   );

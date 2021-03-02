@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 const propTypes = {
   fairnessThreshold: PropTypes.number.isRequired,
   thresholdColor: PropTypes.string.isRequired,
-  thresholdDisplayString: PropTypes.string.isRequired
+  thresholdTooltipString: PropTypes.string.isRequired
 };
 
 export default function Tooltip(props) {
@@ -17,7 +17,7 @@ export default function Tooltip(props) {
         Fairness Threshold
         <br />
         <span className="aequitas-bold-text">
-          {props.thresholdDisplayString}
+          {props.thresholdTooltipString}
         </span>
       </p>{" "}
     </div>

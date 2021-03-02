@@ -54,6 +54,7 @@ function BubbleChart(props) {
   const [referenceGroup, setReferenceGroup] = useState(
     dataToPlot[0][`${props.metrics[0]}_ref_group_value`]
   );
+  const [axisBounds, setAxisBounds] = useState([0, 1]);
 
   useEffect(() => {
     const newData = props.data.filter(
@@ -79,7 +80,7 @@ function BubbleChart(props) {
       .filter((item) => item !== referenceGroup)
   ];
   const chartAreaHeight =
-    sizes.ROW_HEIGHT * props.metrics.length + sizes.MARGIN.top;
+    sizes.ROW_HEIGHT * props.metrics.length + sizes.AXIS.TOP.height;
   const dataColumnSuffix = props.isDisparityChart ? "_disparity_scaled" : "";
   let dataColumnNames = {};
   props.metrics.map(
@@ -98,14 +99,19 @@ function BubbleChart(props) {
         props.metrics,
         props.fairnessThreshold
       )
-    : getScalePositionAbsolute();
+    : getScalePositionAbsolute(axisBounds);
 
   //
   // DISPARITY/ABSOLUTE COMPONENTS
   //
   const Axis = props.isDisparityChart ? AxisDisparity : AxisAbsolute;
   const AxisComponent = (
-    <Axis scale={scalePosition} chartAreaHeight={chartAreaHeight} />
+    <Axis
+      scale={scalePosition}
+      chartAreaHeight={chartAreaHeight}
+      axisBounds={axisBounds}
+      setAxisBounds={setAxisBounds}
+    />
   );
 
   let ThresholdsComponent, Thresholds;
@@ -162,6 +168,7 @@ function BubbleChart(props) {
           ThresholdsComponent={ThresholdsComponent}
           chartAreaHeight={chartAreaHeight}
           dataColumnNames={dataColumnNames}
+          axisBounds={axisBounds}
         />
         <Legend
           groups={groups}

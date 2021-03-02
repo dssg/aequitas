@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Tippy from "@tippyjs/react";
 import onClickOutside from "react-onclickoutside";
+import { filter } from "lodash";
 
 import MetricLine from "~/components/MetricLine";
 import Bubble from "~/components/Bubble";
@@ -9,6 +10,7 @@ import Tooltip from "./Tooltip";
 
 import { getGroupColorNew } from "~/utils/colors";
 import sizes from "~/constants/sizes";
+import { fromPairs } from "lodash";
 
 const propTypes = {
   data: PropTypes.array.isRequired,
@@ -29,15 +31,22 @@ function Row(props) {
     return props.handleActiveGroup(null, true);
   };
 
+  const relevantData = filter(
+    props.data,
+    (row) =>
+      row[props.metric] >= props.axisBounds[0] &&
+      row[props.metric] <= props.axisBounds[1]
+  );
+
   return (
     <g height={sizes.ROW_HEIGHT}>
       <MetricLine
         y={props.y}
         metric={props.metric}
-        lineStart={sizes.MARGIN.left}
-        lineEnd={sizes.WIDTH - sizes.MARGIN.right}
+        lineStart={sizes.AXIS.LEFT.width}
+        lineEnd={sizes.CHART_WIDTH - sizes.CHART_PADDING.right}
       />
-      {props.data.map((row) => {
+      {relevantData.map((row) => {
         const groupName = row["attribute_value"];
         const groupColor = getGroupColorNew(
           groupName,
