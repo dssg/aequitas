@@ -248,7 +248,7 @@ class Group(object):
 
         df_models = df.model_id.unique()
         crosstab_list = []
-
+        model_attr_cols = None
         for model in df_models:
             model_df = df.loc[df["model_id"] == model]
             model_crosstab, model_attr_cols = self.get_crosstabs(
