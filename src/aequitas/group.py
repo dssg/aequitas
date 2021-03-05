@@ -8,9 +8,8 @@ import pandas as pd
 logging.getLogger(__name__)
 
 __author__ = (
-    "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
+    "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson, Sérgio Jesus"
 )
-__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
 
 
 class Group(object):
