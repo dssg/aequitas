@@ -308,11 +308,17 @@ class Group(object):
              Metrics for each group in the protected attribute, each specified
              threshold. List of protected attributes.
         """
-        df = df.copy()  # To not transform original dataframe.
         if not attr_cols:
             non_attr_cols = ["id", "model_id", "entity_id", score_col, label_col]
             # index of the columns that are protected attributes.
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
+
+        necessary_cols = attr_cols + [score_col, label_col]
+        for col in ["id", "model_id", "entity_id"]:
+            if col in df.columns:
+                necessary_cols.append(col)
+        # Copy only the necessary columns
+        df = df[necessary_cols].copy()  # To not transform original dataframe.
 
         # Validation step.
         for col in [score_col, label_col]:
