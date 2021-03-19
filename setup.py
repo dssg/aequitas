@@ -14,6 +14,8 @@ REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'main.txt'
 
 MANIFEST_PATH = ROOT_PATH / 'MANIFEST.in'
 
+BUILD_PATH = ROOT_PATH / 'build'
+
 NAME = 'aequitas'
 
 EXCLUDE_LIST = ['tests', 'tests.*']
@@ -36,6 +38,11 @@ if '-l' in sys.argv or '--lite' in sys.argv:
 else:
     SELECTED_REQUIREMENTS_PATH = ROOT_PATH / 'requirement' / 'full.txt'
     SELECTED_MANIFEST_PATH = ROOT_PATH / 'FULL_MANIFEST.in'
+
+try:
+    shutil.rmtree(BUILD_PATH)
+except OSError as e:
+    print(e)
 
 shutil.copy(SELECTED_MANIFEST_PATH, MANIFEST_PATH)
 shutil.copy(SELECTED_REQUIREMENTS_PATH, REQUIREMENTS_PATH)
