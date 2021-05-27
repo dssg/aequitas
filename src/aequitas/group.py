@@ -48,49 +48,18 @@ class Group(object):
         self.absolute_metrics = input_group_metrics
 
     @staticmethod
-    def gen_metrics_df(
-        df: pd.DataFrame,
-        attr_cols: List[str],
-        score: str,
-        label: str,
-        score_threshold: str,
-    ) -> pd.DataFrame:
-        """
-        Calculates metrics for a given dataframe.
-
-        Generates the confusion matrix given the scores in the `score` column
-        and the "label_value" for each unique value in each of the `attr_cols`.
-        Then, the metrics that are derived from the confusion matrix are
-        calculated.
-
-        To add a different metric, add the name of the metric in the `columns`
-        variable and calculate it in the inner for cycle.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            Classification, label and protected attributes on a given dataset.
-            The classification column must already be binary, and in
-            column `score`. The label column must be in the column
-            "label_value".
-        attr_cols : List[str]
-            Columns of the dataframe that represent protected attributes.
-        score : str
-            Column of the dataframe that represents classification result.
-            Values in the column must be binary.
-        label : str
-            Column of the dataframe that represents label of instance.
-            Values in the column must be binary.
-        score_threshold : str
-            Type of threshold used to binarize score.
-        Returns
-        -------
-        pandas.DataFrame
-            Metrics for each group in the protected attribute.
-        """
-        # Method to handle divisions by 0.
-        divide = lambda x, y: x / y if y != 0 else np.nan
-        model_id = Group._check_model_id(df, "df")
+    def gen_df_from_confusion_matrix(
+            tp: int,
+            tn: int,
+            fp: int,
+            fn: int,
+            k: int,
+            model_id: str,
+            score_threshold: str,
+            attribute_name: str,
+            attribute_value: str,
+            total_entities: int,
+    ):
         columns = [  # Columns in the resulting dataframe
             "model_id",
             "score_threshold",
@@ -120,9 +89,77 @@ class Group(object):
             "prev",
         ]
         final_dict = {column: [] for column in columns}
+        divide = lambda x, y: x / y if y != 0 else np.nan
+        # Calculate all metrics from confusion matrix.
+        tpr = divide(tp, fn + tp)
+        tnr = divide(tn, fp + tn)
+        # We can't have variables named 'for', this is changed in return
+        fomr = divide(fn, fn + tn)
+        fdr = divide(fp, tp + fp)
+        fpr = divide(fp, fp + tn)
+        fnr = divide(fn, fn + tp)
+        npv = divide(tn, fn + tn)
+        precision = divide(tp, tp + fp)
+        pp = fp + tp
+        pn = fn + tn
+        ppr = divide(pp, k)
+        pprev = divide(pp, pp + pn)
+        group_label_pos = fn + tp
+        group_label_neg = fp + tn
+        group_size = group_label_pos + group_label_neg
+        prev = (fn + tp) / group_size
+        for key in final_dict.keys():
+            # Maybe using locals is not the best, but it is the least
+            # messy solution in terms of code.
+            final_dict[key].append(locals()[key])
+        # Rename column fomr -> for (impossible to have variable named for).
+        return pd.DataFrame(final_dict).rename(columns={"fomr": "for"})
+
+    @staticmethod
+    def gen_metrics_df(
+        df: pd.DataFrame,
+        attr_cols: List[str],
+        score: str,
+        label: str,
+        score_threshold: str,
+    ) -> pd.DataFrame:
+        """
+        Generates dataframe with metrics for a given threshold.
+
+        Generates the confusion matrix given the scores in the `score` column
+        and the "label_value" for each unique value in each of the `attr_cols`.
+        Then, the metrics that are derived from the confusion matrix are
+        calculated.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Classification, label and protected attributes on a given dataset.
+            The classification column must already be binary, and in
+            column `score`. The label column must be in the column
+            "label_value".
+        attr_cols : List[str]
+            Columns of the dataframe that represent protected attributes.
+        score : str
+            Column of the dataframe that represents classification result.
+            Values in the column must be binary.
+        label : str
+            Column of the dataframe that represents label of instance.
+            Values in the column must be binary.
+        score_threshold : str
+            Type of threshold used to binarize score.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Metrics for each group in the protected attribute.
+        """
+        # Method to handle divisions by 0.
+        model_id = Group._check_model_id(df, "df")
         # k = Total number of predicted positives in sample.
         # This is for pd.DataFrames only.
         k = df[df[score] == 1].shape[0]
+        metrics_dfs = []
         for attribute_name in attr_cols:
             # Create confusion matrix for each group in the form of dictionary.
             # This is for pd.DataFrames only.
@@ -137,31 +174,13 @@ class Group(object):
                 tn = grouped_data.get((attribute_value, 0, 0), 0)
                 fp = grouped_data.get((attribute_value, 1, 0), 0)
                 fn = grouped_data.get((attribute_value, 0, 1), 0)
-                # Calculate all metrics from confusion matrix.
-                tpr = divide(tp, fn + tp)
-                tnr = divide(tn, fp + tn)
-                # We can't have variables named 'for', this is changed in return
-                fomr = divide(fn, fn + tn)
-                fdr = divide(fp, tp + fp)
-                fpr = divide(fp, fp + tn)
-                fnr = divide(fn, fn + tp)
-                npv = divide(tn, fn + tn)
-                precision = divide(tp, tp + fp)
-                pp = fp + tp
-                pn = fn + tn
-                ppr = divide(pp, k)
-                pprev = divide(pp, pp + pn)
-                group_label_pos = fn + tp
-                group_label_neg = fp + tn
-                group_size = group_label_pos + group_label_neg
                 total_entities = df.shape[0]
-                prev = (fn + tp) / group_size
-                for key in final_dict.keys():
-                    # Maybe using locals is not the best, but it is the least
-                    # messy solution in terms of code.
-                    final_dict[key].append(locals()[key])
-        # Rename column fomr -> for (impossible to have variable named for).
-        return pd.DataFrame(final_dict).rename(columns={"fomr": "for"})
+                metrics_df = Group.gen_df_from_confusion_matrix(
+                    tp, tn, fp, fn, k, model_id, score_threshold, attribute_name,
+                    attribute_value, total_entities,
+                )
+                metrics_dfs.append(metrics_df)
+        return pd.concat(metrics_dfs).reset_index().drop(columns="index")
 
     @staticmethod
     def _check_model_id(df: pd.DataFrame, method_table_name: str = "df") -> int:
@@ -313,7 +332,7 @@ class Group(object):
             # index of the columns that are protected attributes.
             attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
 
-        necessary_cols = attr_cols + [score_col, label_col]
+        necessary_cols = list(attr_cols) + [score_col, label_col]
         for col in ["id", "model_id", "entity_id"]:
             if col in df.columns:
                 necessary_cols.append(col)
@@ -380,7 +399,8 @@ class Group(object):
                         f"{value}_{key[-3:]}",
                     )
                 )
-        return pd.concat(metrics_matrices), attr_cols
+        return (pd.concat(metrics_matrices).reset_index().drop(columns="index"),
+                attr_cols)
 
     def list_absolute_metrics(self, df: pd.DataFrame) -> List[Any]:
         """
