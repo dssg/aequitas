@@ -1,262 +1,399 @@
 import logging
-import warnings
-import pandas as pd
+import uuid
+from typing import Any, Dict, List, Tuple, Union
+
 import numpy as np
+import pandas as pd
+
 logging.getLogger(__name__)
 
-__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson"
-__copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+__author__ = (
+    "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson, Sérgio Jesus"
+)
 
-
-COLUMN_ORDER = ['model_id', 'score_threshold', 'k', 'attribute_name',
-                'attribute_value', 'tpr', 'tnr', 'for', 'fdr', 'fpr', 'fnr',
-                'npv', 'precision', 'pp', 'pn', 'ppr', 'pprev', 'fp', 'fn',
-                'tn', 'tp', 'group_label_pos', 'group_label_neg', 'group_size',
-                'total_entities', 'prev']
 
 class Group(object):
     """
+    Calculates absolute metrics for a given dataframe with model scores and
+    labels, divided by different values on protected attributes.
+
+    Attributes
+    ----------
+    absolute_metrics : List[str]
+        Calculated bias metrics.
+
+    Methods
+    -------
+    get_crosstabs(df, score_thresholds=None, attr_cols=None, score_col="score", label_col="label_value")
+        Calculates metrics for a given dataframe.
+    get_multimodel_crosstabs(df, score_thresholds=None, attr_cols=None, score_col="score", label_col="label_value")
+        Calculates metrics for a given dataframe with multiple models.
     """
-    all_group_metrics = ('ppr', 'pprev', 'precision', 'fdr', 'for', 'fpr',
-                         'fnr', 'tpr', 'tnr', 'npv', 'prev')
+
+    all_group_metrics = (
+        "ppr",
+        "pprev",
+        "precision",
+        "fdr",
+        "for",
+        "fpr",
+        "fnr",
+        "tpr",
+        "tnr",
+        "npv",
+        "prev",
+    )
+
     def __init__(self, input_group_metrics=all_group_metrics):
-        """
-        """
         self.absolute_metrics = input_group_metrics
-        self.label_neg_count = lambda label_col: lambda x: \
-            (x[label_col] == 0).sum()
-        self.label_pos_count = lambda label_col: lambda x: \
-            (x[label_col] == 1).sum()
-        self.group_functions = self._get_group_functions()
-        self.confusion_matrix_functions = self.get_confusion_matrix_functions()
 
     @staticmethod
-    def get_confusion_matrix_functions():
-        false_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] > thres) & (x[label_col] == 1)).sum()
-
-        false_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] <= thres) & (x[label_col] == 0)).sum()
-
-        true_neg_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] > thres) & (x[label_col] == 0)).sum()
-
-        true_pos_count = lambda rank_col, label_col, thres, k: lambda x: \
-            ((x[rank_col] <= thres) & (x[label_col] == 1)).sum()
-        return {
-            'fp': false_pos_count,
-            'fn': false_neg_count,
-            'tn': true_neg_count,
-            'tp': true_pos_count
-        }
-
-    @staticmethod
-    def _get_group_functions():
+    def gen_metrics_df(
+        df: pd.DataFrame,
+        attr_cols: List[str],
+        score: str,
+        label: str,
+        score_threshold: str,
+    ) -> pd.DataFrame:
         """
-        Helper function to accumulate lambda functions used in bias metrics
-        calculations.
-        """
+        Calculates metrics for a given dataframe.
 
+        Generates the confusion matrix given the scores in the `score` column
+        and the "label_value" for each unique value in each of the `attr_cols`.
+        Then, the metrics that are derived from the confusion matrix are
+        calculated.
+
+        To add a different metric, add the name of the metric in the `columns`
+        variable and calculate it in the inner for cycle.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Classification, label and protected attributes on a given dataset.
+            The classification column must already be binary, and in
+            column `score`. The label column must be in the column
+            "label_value".
+        attr_cols : List[str]
+            Columns of the dataframe that represent protected attributes.
+        score : str
+            Column of the dataframe that represents classification result.
+            Values in the column must be binary.
+        label : str
+            Column of the dataframe that represents label of instance.
+            Values in the column must be binary.
+        score_threshold : str
+            Type of threshold used to binarize score.
+        Returns
+        -------
+        pandas.DataFrame
+            Metrics for each group in the protected attribute.
+        """
+        # Method to handle divisions by 0.
         divide = lambda x, y: x / y if y != 0 else np.nan
+        model_id = Group._check_model_id(df, "df")
+        columns = [  # Columns in the resulting dataframe
+            "model_id",
+            "score_threshold",
+            "k",
+            "attribute_name",
+            "attribute_value",
+            "tpr",
+            "tnr",
+            "fomr",
+            "fdr",
+            "fpr",
+            "fnr",
+            "npv",
+            "precision",
+            "pp",
+            "pn",
+            "ppr",
+            "pprev",
+            "fp",
+            "fn",
+            "tn",
+            "tp",
+            "group_label_pos",
+            "group_label_neg",
+            "group_size",
+            "total_entities",
+            "prev",
+        ]
+        final_dict = {column: [] for column in columns}
+        # k = Total number of predicted positives in sample.
+        # This is for pd.DataFrames only.
+        k = df[df[score] == 1].shape[0]
+        for attribute_name in attr_cols:
+            # Create confusion matrix for each group in the form of dictionary.
+            # This is for pd.DataFrames only.
+            grouped_data = (
+                df.groupby(by=[attribute_name, score, label]).size().to_dict()
+            )
+            # Select the possible values of the protected attributes (groups)
+            attribute_values = set([key[0] for key in grouped_data.keys()])
+            for attribute_value in attribute_values:
+                # Get confusion matrix from the dictionary.
+                tp = grouped_data.get((attribute_value, 1, 1), 0)
+                tn = grouped_data.get((attribute_value, 0, 0), 0)
+                fp = grouped_data.get((attribute_value, 1, 0), 0)
+                fn = grouped_data.get((attribute_value, 0, 1), 0)
+                # Calculate all metrics from confusion matrix.
+                tpr = divide(tp, fn + tp)
+                tnr = divide(tn, fp + tn)
+                # We can't have variables named 'for', this is changed in return
+                fomr = divide(fn, fn + tn)
+                fdr = divide(fp, tp + fp)
+                fpr = divide(fp, fp + tn)
+                fnr = divide(fn, fn + tp)
+                npv = divide(tn, fn + tn)
+                precision = divide(tp, tp + fp)
+                pp = fp + tp
+                pn = fn + tn
+                ppr = divide(pp, k)
+                pprev = divide(pp, pp + pn)
+                group_label_pos = fn + tp
+                group_label_neg = fp + tn
+                group_size = group_label_pos + group_label_neg
+                total_entities = df.shape[0]
+                prev = (fn + tp) / group_size
+                for key in final_dict.keys():
+                    # Maybe using locals is not the best, but it is the least
+                    # messy solution in terms of code.
+                    final_dict[key].append(locals()[key])
+        # Rename column fomr -> for (impossible to have variable named for).
+        return pd.DataFrame(final_dict).rename(columns={"fomr": "for"})
 
-        predicted_pos_count = lambda k: lambda x: x['fp'] + x['tp']
+    @staticmethod
+    def _check_model_id(df: pd.DataFrame, method_table_name: str = "df") -> int:
+        """
+        Returns the model id in a dataframe.
 
-        predicted_neg_count = lambda k: lambda x: x['fn'] + x['tn']
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Predictions of a model. Might have or not the column "model_id".
+        method_table_name: str
+            Reference name of the dataframe for error message.
 
-        predicted_pos_ratio_k = lambda k: lambda x: divide(x['fp'] + x['tp'], k)
-
-        predicted_pos_ratio_g = lambda k: lambda x: divide(
-            x['fp'] + x['tp'], x['fn'] + x['tn'] + x['fp'] + x['tp']
-        )
-
-        fpr = lambda k: lambda x: divide(x['fp'], x['fp'] + x['tn'])
-
-        tnr = lambda k: lambda x: divide(x['tn'], x['fp'] + x['tn'])
-
-        fnr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tp'])
-
-        tpr = lambda k: lambda x: divide(x['tp'], x['fn'] + x['tp'])
-
-        fomr = lambda k: lambda x: divide(x['fn'], x['fn'] + x['tn'])
-
-        npv = lambda k: lambda x: divide(x['tn'], x['fn'] + x['tn'])
-
-        precision = lambda k: lambda x: divide(x['tp'], x['tp'] + x['fp'])
-
-        fdr = lambda k: lambda x: divide(x['fp'], x['tp'] + x['fp'])
-
-        group_functions = {'tpr': tpr,
-                           'tnr': tnr,
-                           'for': fomr,
-                           'fdr': fdr,
-                           'fpr': fpr,
-                           'fnr': fnr,
-                           'npv': npv,
-                           'precision': precision,
-                           'pp': predicted_pos_count,
-                           'pn': predicted_neg_count,
-                           'ppr': predicted_pos_ratio_k,
-                           'pprev': predicted_pos_ratio_g,
-                           }
-
-        return group_functions
-
-
-
-    def _check_model_id(self, df, method_table_name):
-        if 'model_id' in df.columns:
+        Returns
+        -------
+        int
+            The model id. 0 if no model id column exists.
+        """
+        if "model_id" in df.columns:
             df_models = df.model_id.unique()
             if len(df_models) != 1:
-                raise ValueError('This method requires one and only one model_id in the dataframe. '
-                                 f'Tip: Check that {method_table_name}.model_id.unique() returns a one-element array. ')
+                raise ValueError(
+                    "This method requires one and only one model_id in the "
+                    "dataframe. "
+                    f"Tip: Check that {method_table_name}.model_id.unique() "
+                    "only returns an one-element array. "
+                )
             else:
                 return df_models[0]
         else:
             return 0
 
-
-    def get_multimodel_crosstabs(self, df, score_thresholds=None, attr_cols=None):
+    def get_multimodel_crosstabs(
+        self,
+        df: pd.DataFrame,
+        score_thresholds: Dict[str, List[Union[int, float]]] = None,
+        attr_cols: List[str] = None,
+        score_col: str = "score",
+        label_col: str = "label_value",
+    ) -> Tuple[pd.DataFrame, List[str]]:
         """
-        Calls `get_crosstabs()` for univariate groups and calculates group
-        metrics for results from multiple models.
+        Performs `get_crosstabs()` and calculates group metrics for results
+        from multiple models.
 
-        :param df: a dataframe containing the following required columns [score,  label_value].
-        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param attr_cols: optional, list of names of columns corresponding to
-            group attributes (i.e., gender, age category, race, etc.).
-
-        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
+        Parameters
+        ----------
+        df: pandas.DataFrame
+            Results of model classification. Must contain:
+            [score_col,  label_col, "model_id"].
+        score_thresholds: Dict[str, List[Union[int, float]]]
+            The possible thresholds of the models.
+            Accepted keys:
+                - 'rank_abs' for absolute ranking (top k scores classified as
+                   positive).
+                - 'rank_pct' for percentage ranking (top X% classified as
+                   positive).
+                - 'score_val' for value threshold (Scores above Y classified as
+                   positive).
+            The values for each key represent the different tested thresholds.
+            These must be inside a list.
+            If not specified, it is assumed the scores are already in binary
+            form.
+        attr_cols: List[str]
+            Columns with protected attributes. If not specified, all
+            columns except 'id', 'model_id', 'entity_id', 'score', 'label_value'
+            are used. The values in these columns must be categorical.
+        score_col : str
+            Column of the dataframe that represents classification result.
+            Must be numeric / binary.
+        label_col : str
+            Column of the dataframe that represents label of instance.
+            Values in the column must be binary.
+        Returns
+        -------
+        pandas.DataFrame
+            Metrics for each group in the protected attribute, for combination
+            of model and threshold. List of protected attributes.
         """
-        if 'model_id' not in df.columns:
-            raise ValueError("This method expects at least two distinct 'model_id' values "
-                             f"in the dataframe. Tip: Check that 'df'' has a column called 'model_id.'")
+        if "model_id" not in df.columns:
+            raise ValueError(
+                'The method expects a column named "model_id" in the ' "dataframe."
+            )
 
         df_models = df.model_id.unique()
         crosstab_list = []
+        model_attr_cols = None
+        for model in df_models:
+            model_df = df.loc[df["model_id"] == model]
+            model_crosstab, model_attr_cols = self.get_crosstabs(
+                model_df,
+                score_thresholds=score_thresholds,
+                attr_cols=attr_cols,
+                score_col=score_col,
+                label_col=label_col,
+            )
+            crosstab_list.append(model_crosstab)
+        # Note: only returns model_attr_cols from the last iteration, as they
+        # all are the same
+        return pd.concat(crosstab_list, ignore_index=True), model_attr_cols
 
-        if len(df_models) > 1:
-            for model in df_models:
-                model_df = df.loc[df['model_id'] == model]
-                model_crosstab, model_attr_cols = self.get_crosstabs(model_df, score_thresholds=score_thresholds, attr_cols=attr_cols)
-                crosstab_list.append(model_crosstab)
-
-            # Note: only returns model_attr_cols from last iteration, as all will be same
-            return pd.concat(crosstab_list, ignore_index=True), model_attr_cols
-        else:
-            return self.get_crosstabs(df, score_thresholds=score_thresholds, attr_cols=attr_cols)
-
-
-
-    def get_crosstabs(self, df, score_thresholds=None, attr_cols=None):
+    def get_crosstabs(
+        self,
+        df,
+        score_thresholds: Dict[str, List[Union[int, float]]] = None,
+        attr_cols: List[str] = None,
+        score_col: str = "score",
+        label_col: str = "label_value",
+    ) -> Tuple[pd.DataFrame, List[str]]:
         """
-        Creates univariate groups and calculates group metrics for results
-        from a single model.
+         Creates univariate groups and calculates group metrics for results
+         from a single model.
 
-        :param df: a dataframe containing the following required columns [score,  label_value].
-        :param score_thresholds: dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
-        :param attr_cols: optional, list of names of columns corresponding to
-            group attributes (i.e., gender, age category, race, etc.).
-
-        :return: A dataframe of group score, label, and error statistics and absolute bias metric values grouped by unique attribute values
+         Parameters
+         ----------
+         df : pandas.DataFrame
+             Results of model classification. Must contain:
+             [score_column,  label_column].
+         score_thresholds : Dict[str, List[Union[int, float]]]
+             The possible thresholds of the model.
+             Accepted keys:
+                 - 'rank_abs' for absolute ranking (top k scores classified as
+                    positive).
+                 - 'rank_pct' for percentage ranking (top X% classified as
+                    positive).
+                 - 'score_val' for value threshold (Scores above Y classified as
+                    positive).
+             The values for each key represent the different tested thresholds.
+             These must be inside a list.
+             If not specified, it is assumed the scores are already in binary
+             form.
+         attr_cols: List[str]
+             Columns with protected attributes. If not specified, all
+             columns except 'id', 'model_id', 'entity_id', 'score', 'label_value'
+             are used. The values in these columns must be categorical.
+         score_col : str
+             Column of the dataframe that represents classification result.
+             Must be numeric / binary.
+         label_col : str
+             Column of the dataframe that represents label of instance.
+             Values in the column must be binary.
+         Returns
+         -------
+        Tuple[pd.DataFrame, List[str]]
+             Metrics for each group in the protected attribute, each specified
+             threshold. List of protected attributes.
         """
-        model_id = self._check_model_id(df, method_table_name='df')
-
         if not attr_cols:
-            non_attr_cols = ['id', 'model_id', 'entity_id', 'score', 'label_value', 'rank_abs', 'rank_pct']
-            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]  # index of the columns that are
+            non_attr_cols = ["id", "model_id", "entity_id", score_col, label_col]
+            # index of the columns that are protected attributes.
+            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
 
-        df_cols = set(df.columns)
-        # check if all attr_cols exist in df
-        if len(set(attr_cols) - df_cols) > 0:
-            raise Exception('get_crosstabs: not all attribute columns provided exist in input dataframe!')
+        necessary_cols = attr_cols + [score_col, label_col]
+        for col in ["id", "model_id", "entity_id"]:
+            if col in df.columns:
+                necessary_cols.append(col)
+        # Copy only the necessary columns
+        df = df[necessary_cols].copy()  # To not transform original dataframe.
 
-        # check if all columns are strings:
-        non_string_cols = df.columns[(df.dtypes != object) & (df.dtypes != str) & (df.columns.isin(attr_cols))]
-        if non_string_cols.empty is False:
-            raise Exception('get_crosstabs: input df was not preprocessed. There are non-string cols within attr_cols!')
+        # Validation step.
+        for col in [score_col, label_col]:
+            # Validate if column is in dataframe.
+            if col not in df.columns:
+                raise KeyError(f'The column "{col}" is not on the dataframe.')
+        if len(df[label_col].unique()) > 2:
+            raise ValueError("Labels are not binarized.")
+        else:
+            df[label_col] = df[label_col].astype(int)
 
-        # if no score_thresholds are provided, we assume that rank_abs=number of 1s in the score column
-        count_ones = None  # it also serves as flag to set parameter to 'binary'
-
-        if not score_thresholds:
-            df.loc[:, 'score'] = df.loc[:,'score'].astype(float)
-            count_ones = df['score'].value_counts().get(1.0, 0)
-            score_thresholds = {'rank_abs': [count_ones]}
-
-        df = df.sort_values('score', ascending=False)
-        df['rank_abs'] = range(1, len(df) + 1)
-        df['rank_pct'] = df['rank_abs'] / len(df)
-        dfs = []
-        prior_dfs = []
-        # calculate the bias for these columns
-        # not default(non_attr_cols), therefore represent the group variables!
-        logging.info('getcrosstabs: attribute columns to perform crosstabs:' + ','.join(attr_cols))
-        # for each group variable do
         for col in attr_cols:
-            # find the priors_df
-            col_group = df.fillna({col: np.nan}).groupby(col)
-            counts = col_group.size()
-            # distinct entities within group value
-            this_prior_df = pd.DataFrame({
-                'model_id': [model_id] * len(counts),
-                'attribute_name': [col] * len(counts),
-                'attribute_value': counts.index.values,
-                'group_label_pos': col_group.apply(self.label_pos_count(
-                    'label_value')).values,
-                'group_label_neg': col_group.apply(self.label_neg_count(
-                    'label_value')).values,
-                'group_size': counts.values,
-                'total_entities': [len(df)] * len(counts)
-            })
-            this_prior_df['prev'] = this_prior_df['group_label_pos'] / this_prior_df['group_size']
-            # for each model_id and as_of_date the priors_df has length
-            # attribute_names * attribute_values
-            prior_dfs.append(this_prior_df)
+            # Validate if column is in dataframe.
+            if col not in df.columns:
+                raise KeyError(f'The attribute column "{col}" is not on the dataframe.')
+            # Validate if column has correct datatype.
+            if df[col].dtype not in (object, str):
+                raise TypeError(
+                    f'The attribute column "{col}" has in invalid datatype.'
+                )
 
-            # we calculate the bias for two different types of score_thresholds
-            # units (percentage ranks and absolute ranks)
-            # YAML ex: thresholds:
-            #              rank_abs: [300]
-            #              rank_pct: [0.01, 0.02, 0.05, 0.10]
-            for thres_unit, thres_values in score_thresholds.items():
+        # In case no threshold is provided.
+        metrics_matrices = []
+        if not score_thresholds and len(df[score_col].unique()) > 2:
+            raise ValueError("Scores are not binarized. Provide a threshold.")
+        elif not score_thresholds:  # No thresholds given and binarized
+            df[score_col] = df[score_col].astype(int)
+            metrics_matrices.append(
+                self.gen_metrics_df(df, attr_cols, score_col, label_col, "binary 0/1")
+            )
+            score_thresholds = {}
+        # In case a threshold is provided.
+        binarized_column = str(uuid.uuid4())  # Add a column with binary scores.
+        # This is done to maintain the score for future iterations in threshold.
+        sorted_df = False  # Flag to sort the dataframe in the first run.
+        for key, values in score_thresholds.items():
+            for value in values:
+                if not sorted_df:
+                    # Sort df only once, at the first iteration.
+                    df = df.sort_values(score_col, ascending=False).reset_index(
+                        drop=True
+                    )
+                    sorted_df = True
+                # Cast scores as ints in the dataframe
+                if key == "rank_abs":
+                    df[binarized_column] = (df.index < value).astype(int)
+                elif key == "rank_pct":
+                    df[binarized_column] = (df.index < value * df.shape[0]).astype(int)
+                elif key == "score_val":
+                    df[binarized_column] = (df[score_col] >= value).astype(int)
+                else:
+                    raise KeyError("Invalid keys")
+                metrics_matrices.append(
+                    self.gen_metrics_df(
+                        df,
+                        attr_cols,
+                        binarized_column,
+                        label_col,
+                        f"{value}_{key[-3:]}",
+                    )
+                )
+        return pd.concat(metrics_matrices), attr_cols
 
-                for thres_val in thres_values:
-                    flag = 0
-                    k = (df[thres_unit] <= thres_val).sum()
-
-                    # denote threshold as binary if numeric count_ones value
-                    # donate as [rank value]_abs or [rank_value]_pct otherwise
-                    score_threshold = 'binary 0/1' if count_ones != None else str(thres_val) + '_' + thres_unit[-3:]
-                    for name, func in self.confusion_matrix_functions.items():
-                        func = func(thres_unit, 'label_value', thres_val, k)
-                        feat_bias = col_group.apply(func)
-                        metrics_df = pd.DataFrame({
-                            'model_id': [model_id] * len(feat_bias),
-                            'score_threshold': [score_threshold] * len(feat_bias),
-                            'k': [k] * len(feat_bias),
-                            'attribute_name': [col] * len(feat_bias),
-                            'attribute_value': feat_bias.index.values,
-                            name: feat_bias.values
-                        })
-                        if flag == 0:
-                            this_group_df = metrics_df
-                            flag = 1
-                        else:
-                            this_group_df = this_group_df.merge(metrics_df)
-                    for name, func in self.group_functions.items():
-                        func = func(k)
-                        feat_bias = this_group_df.apply(func, axis=1)
-                        this_group_df[name] = feat_bias
-                    dfs.append(this_group_df)
-        groups_df = pd.concat(dfs, ignore_index=True)
-        priors_df = pd.concat(prior_dfs, ignore_index=True)
-        groups_df = groups_df.merge(priors_df, on=['model_id', 'attribute_name',
-                                                   'attribute_value'])
-        return groups_df[COLUMN_ORDER], attr_cols
-
-
-    def list_absolute_metrics(self, df):
+    def list_absolute_metrics(self, df: pd.DataFrame) -> List[Any]:
         """
-        View list of all calculated absolute bias metrics in df
+        View list of all calculated absolute bias metrics in df.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            The result of the `get_crosstabs` methods.
+
+        Returns
+        -------
+        List[Any]
+            Absolute bias metrics.
         """
         return df.columns.intersection(self.absolute_metrics).tolist()

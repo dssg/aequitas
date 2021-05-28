@@ -118,7 +118,3 @@ def test_threshold_7():
 def test_threshold_8():
     return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
 
-
-def test_plot_fcns_1():
-    # test that absolute group metric and  disparity plots appear
-    return helper('test_10.csv', 'expected_output_test_10.csv', 'test_10.yaml')
