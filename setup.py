@@ -71,7 +71,7 @@ with REQUIREMENTS_PATH.open() as requirements_file:
 
 setup(
     name=NAME,
-    version='0.41.0',
+    version='0.43.0',
     description="The bias and fairness audit toolkit.",
     long_description=long_description,
     long_description_content_type='text/markdown',
