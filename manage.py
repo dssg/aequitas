@@ -176,22 +176,29 @@ class Release(Local):
         else:
             message = self.bump_default_message
 
-        return self.local['bumpversion'][
+        yield self.local['bumpversion'][
             '--message', message,
             args.part,
         ]
 
-    @localmethod
-    def build(self):
+    @localmethod('-l', '--lite', action='store_true', default=False,
+                 dest='lite', help="Build lite version",)
+    def build(self, args):
         """build the python distribution"""
-        return (self.local.FG, self.local['python'][
+        lite_arg = ["-l"] if args.lite else []
+        setup_command = [
             'setup.py',
             'sdist',
             'bdist_wheel',
-        ])
+        ] + lite_arg
+        yield (self.local.FG, self.local['rm']['-r']['dist'])
+        yield (self.local.FG, self.local['python'][setup_command])
 
-    @localmethod('versions', metavar='version', nargs='*',
-                 help="specific version(s) to upload (default: all)")
+    @localmethod('-v', '--versions', default=[], required=False,
+                 help="specific version(s) to upload (default: all)",)
+    @localmethod('-r', '--repository', default="pypi", required=False,
+                 help="repository to upload (default: pypi)",
+                 choices=('testpypi', 'pypi'),)
     def upload(self, args):
         """upload distribution(s) to pypi"""
         if args.versions:
@@ -199,4 +206,16 @@ class Release(Local):
                        for version in args.versions]
         else:
             targets = [f'dist/{self.package_name}-*']
-        return (self.local.FG, self.local['twine']['upload'][targets])
+        yield (self.local.FG, self.local['twine']['upload']['--repository'][args.repository][targets])
+    #
+    # @localmethod('part', choices=('major', 'minor', 'patch'),
+    #              help="part of the version to be bumped")
+    # @localmethod('-l', '--lite', action='store_true', default=False,
+    #              dest='lite', help="Build lite version",)
+    # @localmethod('-r', '--repository', default="pypi", required=False,
+    #              help="repository to upload (default: pypi)",
+    #              choices=('testpypi', 'pypi'),)
+    # def release(self, args):
+    #     self.bump(arg)
+    #     self.build(arg)
+    #     self.upload(arg)
