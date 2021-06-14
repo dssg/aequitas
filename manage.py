@@ -191,8 +191,8 @@ class Release(Local):
             'sdist',
             'bdist_wheel',
         ] + lite_arg
-        yield (self.local.FG, self.local['rm']['-r']['dist'])
-        yield (self.local.FG, self.local['python'][setup_command])
+        yield self.local.FG, self.local['rm']['-r']['dist']
+        yield self.local.FG, self.local['python'][setup_command]
 
     @localmethod('-v', '--versions', default=[], required=False,
                  help="specific version(s) to upload (default: all)",)
@@ -206,16 +206,30 @@ class Release(Local):
                        for version in args.versions]
         else:
             targets = [f'dist/{self.package_name}-*']
-        yield (self.local.FG, self.local['twine']['upload']['--repository'][args.repository][targets])
-    #
-    # @localmethod('part', choices=('major', 'minor', 'patch'),
-    #              help="part of the version to be bumped")
-    # @localmethod('-l', '--lite', action='store_true', default=False,
-    #              dest='lite', help="Build lite version",)
-    # @localmethod('-r', '--repository', default="pypi", required=False,
-    #              help="repository to upload (default: pypi)",
-    #              choices=('testpypi', 'pypi'),)
-    # def release(self, args):
-    #     self.bump(arg)
-    #     self.build(arg)
-    #     self.upload(arg)
+        yield self.local.FG, self.local['twine']['upload']['--repository'][args.repository][targets]
+
+    @localmethod('part', choices=('major', 'minor', 'patch'),
+                 help="part of the version to be bumped")
+    @localmethod('-l', '--lite', action='store_true', default=False,
+                 dest='lite', help="Build lite version",)
+    @localmethod('-r', '--repository', default="pypi", required=False,
+                 help="repository to upload (default: pypi)",
+                 choices=('testpypi', 'pypi'),)
+    def release(self, args):
+        message = self.bump_default_message
+        yield self.local['bumpversion'][
+            '--message', message,
+            args.part,
+        ]
+        lite_arg = ["-l"] if args.lite else []
+        setup_command = [
+                            'setup.py',
+                            'sdist',
+                            'bdist_wheel',
+                        ] + lite_arg
+        yield self.local.FG, self.local['rm']['-r']['dist']
+        yield self.local.FG, self.local['python'][setup_command]
+
+        targets = [f'dist/{self.package_name}-*']
+
+        yield self.local.FG, self.local['twine']['upload']['--repository'][args.repository][targets]
