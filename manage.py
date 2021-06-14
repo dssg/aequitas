@@ -208,19 +208,12 @@ class Release(Local):
             targets = [f'dist/{self.package_name}-*']
         yield self.local.FG, self.local['twine']['upload']['--repository'][args.repository][targets]
 
-    @localmethod('part', choices=('major', 'minor', 'patch'),
-                 help="part of the version to be bumped")
     @localmethod('-l', '--lite', action='store_true', default=False,
                  dest='lite', help="Build lite version",)
     @localmethod('-r', '--repository', default="pypi", required=False,
                  help="repository to upload (default: pypi)",
                  choices=('testpypi', 'pypi'),)
     def release(self, args):
-        message = self.bump_default_message
-        yield self.local['bumpversion'][
-            '--message', message,
-            args.part,
-        ]
         lite_arg = ["-l"] if args.lite else []
         setup_command = [
                             'setup.py',
