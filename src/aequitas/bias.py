@@ -1,5 +1,4 @@
 import logging
-import warnings
 from aequitas.plotting import assemble_ref_groups
 import numpy as np
 import pandas as pd
@@ -61,7 +60,7 @@ class Bias(object):
             the group metrics for which we want to calculate disparity values
         :param fill_divbyzero: optional, fill value to use when divided by
             zero. Default is None.
-        :param check_significance: whether to determine statistical signifance
+        :param check_significance: whether to determine statistical significance
             for disparity metrics. Default is False.
         :param selected_significance: specific measures (beyond label_value and
             score) to which to limit statistical significance calculations when
@@ -78,7 +77,7 @@ class Bias(object):
             for each metric.
         """
 
-        print('get_disparity_min_metric()')
+        logging.info('get_disparity_min_metric()')
         # record df column order
         original_cols = df.columns
 
@@ -213,7 +212,7 @@ class Bias(object):
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
-        print('get_disparity_major_group()')
+        logging.info('get_disparity_major_group()')
         # record df column order
         original_cols = df.columns
 
@@ -356,7 +355,7 @@ class Bias(object):
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
-        print('get_disparity_predefined_group()')
+        logging.info('get_disparity_predefined_group()')
         # record df column order
         original_cols = df.columns
 

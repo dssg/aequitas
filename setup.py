@@ -1,4 +1,5 @@
 import re
+import logging
 from pathlib import Path
 from setuptools import find_packages, setup
 import sys
@@ -42,7 +43,7 @@ else:
 try:
     shutil.rmtree(BUILD_PATH)
 except OSError as e:
-    print(e)
+    logging.error(e)
 
 shutil.copy(SELECTED_MANIFEST_PATH, MANIFEST_PATH)
 shutil.copy(SELECTED_REQUIREMENTS_PATH, REQUIREMENTS_PATH)

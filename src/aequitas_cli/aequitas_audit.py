@@ -198,7 +198,7 @@ def run(df, configs, preprocessed=False):
     else:
         logging.error('run_csv: could not load a proper dataframe from the input filepath provided.')
         exit(1)
-    # print(report)
+
     return group_value_df, report
 
 

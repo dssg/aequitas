@@ -1,3 +1,4 @@
+import logging
 from aequitas.plot.commons.style import sizes as Sizes
 from aequitas.plot.commons.helpers import calculate_chart_size_from_elements, to_list
 
@@ -32,24 +33,24 @@ def dataframe(df, metrics_list):
     for field in DF_FIELDS:
         try:
             df[field]
-        except KeyError:
-            print(f'The dataframe does not contain the column "{field}"')
-            raise
+        except KeyError as e:
+            logging.error(f'The dataframe does not contain the column "{field}"')
+            raise e
 
     for metric in metrics_list:
         try:
             df[metric]
-        except KeyError:
-            print(f'The dataframe does not contain the column "{metric}".')
-            raise
+        except KeyError as e:
+            logging.error(f'The dataframe does not contain the column "{metric}".')
+            raise e
         if metric not in NON_DISPARITY_METRICS_LIST:
             try:
                 df[f"{metric}_disparity"]
-            except KeyError:
-                print(
+            except KeyError as e:
+                logging.error(
                     f'The dataframe does not contain the column "{metric}_disparity".'
                 )
-                raise
+                raise e
 
 
 def metrics(metrics):
@@ -101,9 +102,9 @@ def fairness_threshold(fairness_threshold):
         try:
             if fairness_threshold <= 1:
                 raise ValueError(f"Fairness Threshold value must be greater than 1.")
-        except TypeError:
-            print("Fairness Threshold value must be a number")
-            raise
+        except TypeError as e:
+            logging.error("Fairness Threshold value must be a number")
+            raise e
 
 
 # SIZES

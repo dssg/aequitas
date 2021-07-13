@@ -128,7 +128,7 @@ class Fairness(object):
             elif input[1] in bias_df.columns:
                 bias_df[fair] = bias_df.apply(self.high_level_single_eval(input[1]), axis=1)
             else:
-                print('get_group_value_fairness: No Parity measure input found on bias_df')
+                logging.warning('get_group_value_fairness: No Parity measure input found on bias_df')
 
         for fair, input in self.high_level_fairness_depend.items():
             if input[0] in bias_df.columns:

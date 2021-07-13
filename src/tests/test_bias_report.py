@@ -5,6 +5,7 @@
 
 import os
 import sys
+import logging
 
 timeout = 60
 
@@ -45,7 +46,7 @@ def helper(input_filename, expected_filename, config_file):
     # subtract expected_df from test_df
     except:
         # collect output for
-        print('could not merge')
+        logging.error('could not merge')
         return (test_df, expected_df)
     # see if close enough to 0
 
@@ -53,7 +54,7 @@ def helper(input_filename, expected_filename, config_file):
     EPS = 1e-6
     for col in shared_columns:
         if col not in {'attribute_value', 'attribute_name'}:
-            print('testing {} ...'.format(col))
+            logging.info('testing {} ...'.format(col))
 
             try:
                 # TypeError: numpy boolean subtract, the `-` operator, is

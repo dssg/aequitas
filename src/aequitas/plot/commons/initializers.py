@@ -1,3 +1,4 @@
+import logging
 import altair as alt
 
 from aequitas.plot.commons import validators as Validator
@@ -9,7 +10,7 @@ def __sanitize_metrics(metrics_list):
     try:
         return [metric.lower() for metric in to_list(metrics_list)]
     except AttributeError:
-        print('"metrics_list" must be a list of strings.')
+        logging.error('"metrics_list" must be a list of strings.')
 
 
 def __filter_df(disparity_df, metrics, attribute, xy_plot=False):
