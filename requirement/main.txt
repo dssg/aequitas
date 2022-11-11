@@ -9,6 +9,6 @@ SQLAlchemy>=1.1.1
 tabulate==0.8.2
 xhtml2pdf==0.2.2
 seaborn>=0.9.0
-altair==4.1.0
+altair>=4.1.0
 millify==0.1.1
 scipy>=0.18.1
