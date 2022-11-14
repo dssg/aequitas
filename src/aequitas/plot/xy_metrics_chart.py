@@ -164,8 +164,6 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         )
     )
 
-    axis_df.drop(0, inplace=True)
-
     y_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(

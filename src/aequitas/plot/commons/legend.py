@@ -61,7 +61,7 @@ def draw_legend(global_scales, selection, chart_width):
         .encode(
             x=alt.value(title_text_x_position),
             y=alt.value(Legend.margin_top + title_text_height),
-            text=alt.value("Click to highlight a group."),
+            text=alt.value("(click to highlight)"),
         )
     )
 
