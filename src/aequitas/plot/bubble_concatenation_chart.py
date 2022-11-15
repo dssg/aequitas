@@ -171,7 +171,7 @@ def plot_concatenated_bubble_charts(
             dx=chart_width / 2,
         )
         .properties(
-            title=f"{attribute.title()}", 
+            title=attribute.title(), 
             padding=Concat_Chart.full_chart_padding,
             usermeta=get_chart_metadata("disparity_absolute_chart"),
         )

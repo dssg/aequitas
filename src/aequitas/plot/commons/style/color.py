@@ -2,7 +2,7 @@
 GRAY = "rgb(117, 117, 117)"
 LIGHT_GRAY = "rgb(224, 224, 224)"
 RED = "rgb(217, 46, 28)"
-TEAL = "rgb(20, 152, 181)"
+TEAL = "rgb(0, 163, 158)"
 
 BLUE = "rgb(100, 143, 255)"
 ORANGE = "rgb(254, 97, 0)"
