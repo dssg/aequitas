@@ -1,15 +1,9 @@
-import math
 import altair as alt
 import pandas as pd
 
-from aequitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons.helpers import no_axis, get_chart_metadata
 from aequitas.plot.commons.legend import draw_legend
-from aequitas.plot.commons.scales import (
-    get_chart_size_range,
-    get_color_scale,
-    get_bubble_size_scale,
-    get_shape_scale,
-)
+from aequitas.plot.commons.scales import get_chart_size_range
 from aequitas.plot.commons.tooltips import get_tooltip_text_group_size
 from aequitas.plot.commons.style.classes import (
     Threshold_Band,
@@ -434,6 +428,7 @@ def plot_xy_metrics_chart(
             width=chart_width,
             title=f"{y_metric.upper()} by {x_metric.upper()} on {attribute.title()}",
             padding=XY_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("scatter_chart"),
         )
         .configure_title(
             align="center",

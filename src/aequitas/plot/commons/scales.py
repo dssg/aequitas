@@ -1,5 +1,4 @@
 from aequitas.plot.commons.style.classes import Shape, Bubble
-from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons.style import color as Colors
 import altair as alt
 
@@ -69,7 +68,7 @@ def get_shape_scale(plot_table, ref_group, accessibility_mode=False):
 
 
 def get_bubble_size_scale(plot_table, metrics, chart_height):
-    """Create the scale for the bubble size"""
+    """Create the scale for the bubble size."""
 
     max_bubble_radius = (chart_height * Bubble.max_bubble_ratio) / len(metrics)
     bubble_size_domain = [0, plot_table["group_size"].max() * 1.2]

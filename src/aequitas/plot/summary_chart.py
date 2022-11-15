@@ -1,13 +1,11 @@
-import math
 import altair as alt
 import pandas as pd
 
 from aequitas.plot.commons.helpers import (
     no_axis,
     transform_ratio,
-    calculate_chart_size_from_elements,
-    to_list,
     format_number,
+    get_chart_metadata,
 )
 from aequitas.plot.commons.tooltips import (
     get_tooltip_text_group_size,
@@ -613,7 +611,10 @@ def plot_summary_chart(
 
     full_summary_chart = (
         alt.vconcat(summary_chart_table, summary_chart_explanation)
-        .properties(padding=Summary_Chart.full_chart_padding)
+        .properties(
+            padding=Summary_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("summary_chart"),
+        )
         .configure_legend(
             labelFont=FONT,
             labelColor=Legend.font_color,

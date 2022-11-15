@@ -5,6 +5,7 @@ import pandas as pd
 from aequitas.plot.commons.helpers import (
     no_axis,
     transform_ratio,
+    get_chart_metadata,
 )
 from aequitas.plot.commons.legend import draw_legend
 from aequitas.plot.commons.scales import get_chart_size_range
@@ -670,6 +671,7 @@ def plot_disparity_bubble_chart(
             width=chart_width,
             title=f"Disparities on {attribute.title()}",
             padding=Disparity_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("disparity_chart"),
         )
         .resolve_scale(y="independent", size="independent")
     )

@@ -1,6 +1,6 @@
 # COLORS
-GRAY = "rgb(117,117,117)"
-LIGHT_GRAY = "rgb(224,224,224)"
+GRAY = "rgb(117, 117, 117)"
+LIGHT_GRAY = "rgb(224, 224, 224)"
 RED = "rgb(217, 46, 28)"
 TEAL = "rgb(20, 152, 181)"
 

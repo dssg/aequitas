@@ -1,10 +1,10 @@
-import math
 import altair as alt
 import pandas as pd
 
 from aequitas.plot.bubble_disparity_chart import get_disparity_bubble_chart_components
 from aequitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
 
+from aequitas.plot.commons.helpers import get_chart_metadata
 from aequitas.plot.commons.legend import draw_legend
 
 from aequitas.plot.commons.style.classes import Title, Metric_Axis, Chart_Title
@@ -171,7 +171,9 @@ def plot_concatenated_bubble_charts(
             dx=chart_width / 2,
         )
         .properties(
-            title=f"{attribute.title()}", padding=Concat_Chart.full_chart_padding
+            title=f"{attribute.title()}", 
+            padding=Concat_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("disparity_absolute_chart"),
         )
     )
 

@@ -1,8 +1,11 @@
-import math
 import altair as alt
 import pandas as pd
 
-from aequitas.plot.commons.helpers import no_axis, transform_ratio
+from aequitas.plot.commons.helpers import (
+    no_axis,
+    transform_ratio,
+    get_chart_metadata,
+)
 from aequitas.plot.commons.legend import draw_legend
 from aequitas.plot.commons.scales import get_chart_size_range
 from aequitas.plot.commons.tooltips import (
@@ -538,6 +541,7 @@ def plot_metric_bubble_chart(
             width=chart_width,
             title=f"Absolute values by {attribute.title()}",
             padding=Metric_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("absolute_chart"),
         )
         .configure_title(
             align="center",
