@@ -20,8 +20,8 @@ PARITY_RESULT_PALETTE = [PARITY_PASS, PARITY_FAIL]
 
 
 # Colors will be selected for the groups in the chart by the
-# order that they are in this palette array. Therefore, the
-# order should maximamize constrast for smaller subsets [1:n].
+# order in this palette array. Therefore, the order should 
+# maximize contrast for smaller subsets [1:n].
 CATEGORICAL_PALETTE_COLOR_SAFE = [
     BLUE,
     ORANGE,
