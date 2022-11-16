@@ -307,7 +307,7 @@ def __draw_bubbles(
     # X AXIS GRIDLINES
     axis_values = [0.25, 0.5, 0.75]
     x_axis = alt.Axis(
-        values=axis_values, ticks=False, domain=False, labels=False, title=None
+        values=axis_values, ticks=False, domain=False, labels=False, title=None, gridColor=Axis.grid_color
     )
 
     # COLOR

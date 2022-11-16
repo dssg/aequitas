@@ -61,6 +61,7 @@ class Axis(Rule):
     label_color = Color.GRAY
     label_font_size = Text.FONT_SIZE_SMALL
     label_font_weight = Text.FONT_WEIGHT_REGULAR
+    grid_color = Color.LIGHT_GRAY
 
 
 class Metric_Axis(Axis):
