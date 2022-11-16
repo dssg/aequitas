@@ -1,6 +1,7 @@
 import logging
 import uuid
 from typing import Any, Dict, List, Tuple, Union
+from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
@@ -127,10 +128,12 @@ class Group(object):
             # Create confusion matrix for each group in the form of dictionary.
             # This is for pd.DataFrames only.
             grouped_data = (
-                df.groupby(by=[attribute_name, score, label]).size().to_dict()
+                df.groupby(by=[attribute_name, score, label]).size().to_dict(into=OrderedDict)
             )
-            # Select the possible values of the protected attributes (groups)
-            attribute_values = set([key[0] for key in grouped_data.keys()])
+            # Select the possible (unique) values of the protected attributes (groups).
+            # list(OrderedDict.fromkeys()) works like an ordered set.
+            attribute_values = list(OrderedDict.fromkeys([key[0] for key in grouped_data]))
+
             for attribute_value in attribute_values:
                 # Get confusion matrix from the dictionary.
                 tp = grouped_data.get((attribute_value, 1, 1), 0)
