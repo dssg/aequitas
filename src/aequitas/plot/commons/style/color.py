@@ -1,14 +1,14 @@
 # COLORS
-GRAY = "rgb(117, 117, 117)"
-LIGHT_GRAY = "rgb(224, 224, 224)"
-RED = "rgb(217, 46, 28)"
+GRAY = "rgb(102, 111, 137)"
+LIGHT_GRAY = "rgb(225, 226, 231)"
+RED = "rgb(211, 47, 47)"
 TEAL = "rgb(0, 163, 158)"
 
-BLUE = "rgb(100, 143, 255)"
+BLUE = "rgb(76, 136, 238)"
 ORANGE = "rgb(254, 97, 0)"
 PINK = "rgb(220, 38, 127)"
 YELLOW = "rgb(255, 176, 0)"
-PURPLE = "rgb(120, 94, 240)"
+PURPLE = "rgb(150, 95, 230)"
 
 # NAMED COLORS
 REFERENCE = GRAY
