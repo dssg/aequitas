@@ -544,12 +544,11 @@ def plot_metric_bubble_chart(
             usermeta=get_chart_metadata("absolute_chart"),
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
         )
         .resolve_scale(y="independent", size="independent")
     )

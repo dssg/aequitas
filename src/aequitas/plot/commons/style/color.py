@@ -1,4 +1,5 @@
 # COLORS
+BLACK = "rgb(25, 39, 78)"
 GRAY = "rgb(102, 111, 137)"
 LIGHT_GRAY = "rgb(225, 226, 231)"
 RED = "rgb(211, 47, 47)"

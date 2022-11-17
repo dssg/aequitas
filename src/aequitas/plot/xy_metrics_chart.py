@@ -431,12 +431,11 @@ def plot_xy_metrics_chart(
             usermeta=get_chart_metadata("scatter_chart"),
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
         )
         .configure_axis(
             titleFont=FONT,

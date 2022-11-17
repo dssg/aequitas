@@ -13,7 +13,7 @@ class Bubble:
 class Title:
     font_size = Text.FONT_SIZE_REGULAR
     font_weight = Text.FONT_WEIGHT_BOLD
-    font_color = Color.GRAY
+    font_color = Color.BLACK
     margin_top = -15
 
 
