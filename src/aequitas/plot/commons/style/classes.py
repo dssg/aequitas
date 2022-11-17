@@ -20,7 +20,8 @@ class Title:
 class Chart_Title(Title):
     font_size = Text.FONT_SIZE_EXTRA_LARGE
     font_weight = Text.FONT_WEIGHT_BOLD
-    margin_top = -10
+    anchor = "start"
+    offset = 20
 
 
 class Subtitle:

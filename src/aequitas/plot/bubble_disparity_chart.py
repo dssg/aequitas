@@ -90,7 +90,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         labelPadding=Metric_Axis.label_padding
         if not concat_chart
         else Metric_Axis.label_padding_concat_chart,
-        title="",
+        title=None,
     )
 
     rules_df = pd.DataFrame(
@@ -659,12 +659,12 @@ def plot_disparity_bubble_chart(
             labelFont=FONT,
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
+            offset=Chart_Title.offset,
         )
         .properties(
             height=chart_height,
