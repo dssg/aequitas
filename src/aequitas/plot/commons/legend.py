@@ -56,7 +56,7 @@ def draw_legend(global_scales, selection, chart_width):
             color=Legend.font_color,
             fontSize=Legend.font_size,
             font=FONT,
-            fontWeight=Legend.font_weight,
+            fontWeight=Legend.title_font_weight,
         )
         .encode(
             x=alt.value(title_text_x_position),
