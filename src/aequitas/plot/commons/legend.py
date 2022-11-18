@@ -15,13 +15,13 @@ def draw_legend(global_scales, selection, chart_width):
 
     groups = global_scales["color"].domain
     labels = groups.copy()
-    labels[0] = labels[0] + " [REF]"
+    labels[0] = f"{labels[0]} [REF]"
     legend_df = pd.DataFrame({"attribute_value": groups, "label": labels})
 
     # Position the legend to the right of the chart
 
     title_text_x_position = chart_width
-    title_text_height = Legend.title_font_size + Legend.title_margin_bottom
+    title_text_height = Legend.title_font_size + Legend.row_padding
     subtitle_text_height = Legend.font_size + Legend.vertical_spacing
 
     entries_circles_x_position = title_text_x_position + Legend.horizontal_spacing
@@ -34,7 +34,6 @@ def draw_legend(global_scales, selection, chart_width):
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
-            baseline="middle",
             color=Legend.title_font_color,
             fontSize=Legend.title_font_size,
             font=FONT,
@@ -42,7 +41,7 @@ def draw_legend(global_scales, selection, chart_width):
         )
         .encode(
             x=alt.value(title_text_x_position),
-            y=alt.value(Legend.margin_top),
+            y=alt.value(Legend.margin),
             text=alt.value("Groups"),
         )
     )
@@ -52,15 +51,14 @@ def draw_legend(global_scales, selection, chart_width):
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
-            baseline="middle",
-            color=Legend.font_color,
-            fontSize=Legend.font_size,
+            color=Legend.title_font_color,
+            fontSize=Legend.title_font_size,
             font=FONT,
             fontWeight=Legend.title_font_weight,
         )
         .encode(
             x=alt.value(title_text_x_position),
-            y=alt.value(Legend.margin_top + title_text_height),
+            y=alt.value(Legend.margin + title_text_height),
             text=alt.value("(click to highlight)"),
         )
     )
@@ -73,9 +71,9 @@ def draw_legend(global_scales, selection, chart_width):
         alt.value(Legend.color_faded),
     )
 
-    # Offset the positioning of the legend items after the subitlr text
+    # Offset the positioning of the legend items after the subtitle text
     legend_start_y_position = (
-        Legend.margin_top + title_text_height + subtitle_text_height
+        Legend.margin + title_text_height + subtitle_text_height
     )
 
     y_scale = alt.Scale(

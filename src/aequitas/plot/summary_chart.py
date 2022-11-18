@@ -207,7 +207,13 @@ def __draw_parity_result_text(parity_result, color_scale):
         .encode(
             alt.Y("y_position:Q", scale=alt.Scale(domain=[3, 1]), axis=no_axis()),
             alt.Color(
-                "parity_result:O", scale=color_scale, legend=alt.Legend(title="")
+                "parity_result:O",
+                scale=color_scale,
+                legend=alt.Legend(
+                    title="Parity Test", 
+                    padding=Legend.margin,
+                    offset=0,
+                ),
             ),
             text=alt.value(parity_result.upper()),
         )
@@ -236,10 +242,7 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             alt.Color(
                 f"{metric}_parity_result:O",
                 scale=color_scale,
-                legend=alt.Legend(
-                    title="Parity Test",
-                    padding=20,
-                ),
+                legend=None,
             ),
             tooltip=population_bar_tooltips,
         )
@@ -285,7 +288,7 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
             alt.Color(
                 f"{metric}_parity_result:O",
                 scale=scales["color"],
-                legend=alt.Legend(title=""),
+                legend=None,
             ),
             size=alt.value(size_constants["group_circle_size"]),
             tooltip=circle_tooltip_encoding,
@@ -616,14 +619,15 @@ def plot_summary_chart(
             usermeta=get_chart_metadata("summary_chart"),
         )
         .configure_legend(
-            labelFont=FONT,
             labelColor=Legend.font_color,
+            labelFont=FONT,
             labelFontSize=Legend.font_size,
+            symbolSize=Legend.symbol_size,
+            titleColor=Legend.title_font_color,
             titleFont=FONT,
-            titleColor=Legend.font_color,
             titleFontSize=Legend.title_font_size,
             titleFontWeight=Legend.title_font_weight,
-            titlePadding=Legend.title_margin_bottom + Legend.vertical_spacing,
+            titlePadding=Legend.title_padding,
         )
         .configure_view(strokeWidth=0)
     )

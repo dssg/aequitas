@@ -86,18 +86,20 @@ class Threshold_Band:
 
 
 class Legend:
-    margin_top = 30
+    margin = 20
     color_faded = Color.FADED
-    font_color = Color.BLACK
+    font_color = Color.GRAY
     font_size = Text.FONT_SIZE_SMALL
     font_weight = Text.FONT_WEIGHT_REGULAR
-    vertical_spacing = 10
     horizontal_spacing = 4
     title_font_color = Color.BLACK
     title_font_size = Text.FONT_SIZE_SMALL
     title_font_weight = Text.FONT_WEIGHT_BOLD
-    title_margin_bottom = 5
+    title_padding = 8
+    row_padding = 2
+    vertical_spacing = 10
     circle_radius = 4
+    symbol_size = 40
 
 
 class Parity_Result:
