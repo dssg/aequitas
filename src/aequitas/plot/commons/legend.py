@@ -88,13 +88,10 @@ def draw_legend(global_scales, selection, chart_width):
         ],
     )
 
-    # Calculate circle size from radius
-    entries_circle_size = Legend.circle_radius * math.pi ** 2
-
-    # Draw color squares for each group
+    # Draw colored symbols for each group
     entries_circles = (
         alt.Chart(legend_df)
-        .mark_point(filled=True, opacity=1, size=entries_circle_size)
+        .mark_point(filled=True, opacity=1, size=Legend.symbol_size)
         .encode(
             x=alt.value(entries_circles_x_position),
             y=alt.Y("attribute_value:N", scale=y_scale, axis=no_axis()),
