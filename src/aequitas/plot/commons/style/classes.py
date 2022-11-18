@@ -93,6 +93,7 @@ class Legend:
     font_weight = Text.FONT_WEIGHT_REGULAR
     vertical_spacing = 10
     horizontal_spacing = 4
+    title_font_color = Color.BLACK
     title_font_size = Text.FONT_SIZE_REGULAR
     title_font_weight = Text.FONT_WEIGHT_REGULAR
     title_margin_bottom = 5

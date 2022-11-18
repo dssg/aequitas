@@ -35,7 +35,7 @@ def draw_legend(global_scales, selection, chart_width):
         .mark_text(
             align="left",
             baseline="middle",
-            color=Legend.font_color,
+            color=Legend.title_font_color,
             fontSize=Legend.title_font_size,
             font=FONT,
             fontWeight=Legend.title_font_weight,
