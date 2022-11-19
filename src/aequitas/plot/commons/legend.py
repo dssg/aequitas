@@ -22,18 +22,17 @@ def draw_legend(global_scales, selection, chart_width):
 
     title_text_x_position = chart_width
     title_text_height = Legend.title_font_size + Legend.row_padding
-    subtitle_text_height = Legend.font_size + Legend.vertical_spacing
 
-    entries_circles_x_position = title_text_x_position + Legend.horizontal_spacing
-    entries_text_x_position = (
-        title_text_x_position + 2 * Legend.circle_radius + Legend.horizontal_spacing
-    )
+    radius = math.sqrt(Legend.symbol_size / math.pi)
+    entries_circles_x_position = title_text_x_position + radius + Legend.offset
+    entries_text_x_position = title_text_x_position + radius * 2 + Legend.offset * 2 + Legend.row_padding
 
     # Title of the legend.
     title_text = (
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
+            baseline=Legend.title_baseline,
             color=Legend.title_font_color,
             fontSize=Legend.title_font_size,
             font=FONT,
@@ -51,6 +50,7 @@ def draw_legend(global_scales, selection, chart_width):
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
+            baseline=Legend.title_baseline,
             color=Legend.title_font_color,
             fontSize=Legend.title_font_size,
             font=FONT,
@@ -72,9 +72,7 @@ def draw_legend(global_scales, selection, chart_width):
     )
 
     # Offset the positioning of the legend items after the subtitle text
-    legend_start_y_position = (
-        Legend.margin + title_text_height + subtitle_text_height
-    )
+    legend_start_y_position = Legend.margin + title_text_height + Legend.font_size + Legend.title_padding
 
     y_scale = alt.Scale(
         domain=groups,
@@ -83,8 +81,8 @@ def draw_legend(global_scales, selection, chart_width):
             legend_start_y_position
             # number of legend elements x text size
             + (len(groups) * Legend.font_size)
-            # (number of "spacings" + start and end "spacings") x spacing
-            + ((len(groups) + 1) * Legend.vertical_spacing),
+            # number of legend elements x spacing
+            + (len(groups) * Legend.offset),
         ],
     )
 

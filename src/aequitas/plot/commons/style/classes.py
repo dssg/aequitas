@@ -91,14 +91,13 @@ class Legend:
     font_color = Color.GRAY
     font_size = Text.FONT_SIZE_SMALL
     font_weight = Text.FONT_WEIGHT_REGULAR
-    horizontal_spacing = 4
+    offset = 4
     title_font_color = Color.BLACK
     title_font_size = Text.FONT_SIZE_SMALL
     title_font_weight = Text.FONT_WEIGHT_BOLD
     title_padding = 8
+    title_baseline = "top"
     row_padding = 2
-    vertical_spacing = 10
-    circle_radius = 4
     symbol_size = 40
 
 
