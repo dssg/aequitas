@@ -389,7 +389,6 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
     attribute_df[f"tooltip_parity_test_explanation_{metric}"] = attribute_df.apply(
         lambda row: get_tooltip_text_parity_test_explanation(
             row[f"{metric}_parity_result"],
-            metric,
             fairness_threshold,
         ),
         axis=1,

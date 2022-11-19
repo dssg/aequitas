@@ -25,7 +25,7 @@ def draw_legend(global_scales, selection, chart_width):
 
     radius = math.sqrt(Legend.symbol_size / math.pi)
     entries_circles_x_position = title_text_x_position + radius + Legend.offset
-    entries_text_x_position = title_text_x_position + radius * 2 + Legend.offset * 2 + Legend.row_padding
+    entries_text_x_position = title_text_x_position + radius * 2 + Legend.offset * 3 - 1
 
     # Title of the legend.
     title_text = (
