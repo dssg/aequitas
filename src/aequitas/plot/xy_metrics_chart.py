@@ -74,11 +74,11 @@ def __draw_threshold_bands(
         stroke=stroke_color,
         strokeWidth=Threshold_Rule.stroke_width,
         opacity=Threshold_Rule.opacity,
-        tooltip="",
+        tooltip=None,
     )
 
     band_base = alt.Chart(threshold_df).mark_rect(
-        fill=fill_color, opacity=Threshold_Band.opacity, tooltip=""
+        fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None
     )
 
     # PARAMS
@@ -144,7 +144,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         alt.Chart(axis_df)
         .mark_text(
             yOffset=Scatter_Axis.label_font_size * 1.5,
-            tooltip="",
+            tooltip=None,
             align="center",
             fontSize=Scatter_Axis.label_font_size,
             color=Scatter_Axis.label_color,
@@ -163,7 +163,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         .mark_text(
             baseline="middle",
             xOffset=-Scatter_Axis.label_font_size * 1.5,
-            tooltip="",
+            tooltip=None,
             align="center",
             fontSize=Scatter_Axis.label_font_size,
             fontWeight=Scatter_Axis.label_font_weight,
@@ -207,7 +207,7 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # X AXIS
     x_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=""
+        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=bottom_axis),
         x2="end:Q",
@@ -216,7 +216,7 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # Y AXIS
     y_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=""
+        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=no_axis()),
         y=alt.Y("start:Q", scale=scales["y"], axis=left_axis),

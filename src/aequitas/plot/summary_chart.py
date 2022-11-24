@@ -23,6 +23,7 @@ from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons import labels as Label
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -210,7 +211,7 @@ def __draw_parity_result_text(parity_result, color_scale):
                 "parity_result:O",
                 scale=color_scale,
                 legend=alt.Legend(
-                    title="Parity Test", 
+                    title=Label.TEST, 
                     padding=Legend.margin,
                     offset=0,
                 ),
@@ -261,7 +262,7 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
         alt.Tooltip(
             field=f"tooltip_parity_test_explanation_{metric}",
             type="nominal",
-            title="Parity Test",
+            title=Label.TEST,
         ),
         alt.Tooltip(
             field=f"tooltip_disparity_explanation_{metric}",

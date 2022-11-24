@@ -5,6 +5,7 @@ import math
 from aequitas.plot.commons.style.classes import Legend
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons import labels as Label
 
 
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
@@ -15,7 +16,7 @@ def draw_legend(global_scales, selection, chart_width):
 
     groups = global_scales["color"].domain
     labels = groups.copy()
-    labels[0] = f"{labels[0]} [REF]"
+    labels[0] = f"{labels[0]} {Label.REF_INDICATOR}"
     legend_df = pd.DataFrame({"attribute_value": groups, "label": labels})
 
     # Position the legend to the right of the chart
@@ -59,7 +60,7 @@ def draw_legend(global_scales, selection, chart_width):
         .encode(
             x=alt.value(title_text_x_position),
             y=alt.value(Legend.margin + title_text_height),
-            text=alt.value("(click to highlight)"),
+            text=alt.value(Label.CLICK_HIGHLIGHT),
         )
     )
 
@@ -89,7 +90,7 @@ def draw_legend(global_scales, selection, chart_width):
     # Draw colored symbols for each group
     entries_circles = (
         alt.Chart(legend_df)
-        .mark_point(filled=True, opacity=1, size=Legend.symbol_size)
+        .mark_point(filled=True, opacity=1, size=Legend.symbol_size, cursor=Legend.cursor)
         .encode(
             x=alt.value(entries_circles_x_position),
             y=alt.Y("attribute_value:N", scale=y_scale, axis=no_axis()),
@@ -111,6 +112,7 @@ def draw_legend(global_scales, selection, chart_width):
             font=FONT,
             fontSize=Legend.font_size,
             fontWeight=Legend.font_weight,
+            cursor=Legend.cursor,
         )
         .encode(
             x=alt.value(entries_text_x_position),

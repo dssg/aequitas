@@ -99,6 +99,7 @@ class Legend:
     title_baseline = "top"
     row_padding = 2
     symbol_size = 40
+    cursor = "pointer"
 
 
 class Parity_Result:
