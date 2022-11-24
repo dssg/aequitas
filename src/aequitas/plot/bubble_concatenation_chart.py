@@ -38,7 +38,7 @@ def draw_chart_title(chart_title, chart_width):
             fontSize=Title.font_size,
             fontWeight=Title.font_weight,
             font=FONT,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(chart_width / 2),

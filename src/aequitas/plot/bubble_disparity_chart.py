@@ -106,7 +106,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         .mark_rule(
             strokeWidth=Metric_Axis.stroke_width,
             stroke=Metric_Axis.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.Y("metric:N", scale=scales["y"], axis=metrics_axis),
@@ -154,7 +154,7 @@ def __draw_x_ticks_labels(scales, chart_height):
     tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            tooltip="",
+            tooltip=None,
             align="center",
             font=FONT,
             fontSize=Axis.label_font_size,
@@ -181,7 +181,7 @@ def __draw_text_annotations(ref_group, chart_height, x_range):
     annotation_text_params = dict(
         font=FONT,
         fontWeight=Annotation.font_weight,
-        tooltip="",
+        tooltip=None,
     )
 
     # TIMES LARGER TEXT
@@ -272,7 +272,7 @@ def __draw_threshold_rules(
             stroke=stroke_color,
             opacity=Threshold_Rule.opacity,
             strokeWidth=Threshold_Rule.stroke_width,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.value(Disparity_Chart.padding_y * chart_height),
@@ -304,7 +304,7 @@ def __draw_threshold_bands(
 
     threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.value(Disparity_Chart.padding_y * chart_height),
             y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
@@ -340,7 +340,7 @@ def __draw_threshold_text(
             fill=font_color,
             fontSize=Annotation.font_size,
             fontWeight=Annotation.font_weight,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(0),

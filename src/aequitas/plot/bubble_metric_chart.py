@@ -71,7 +71,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         .mark_rule(
             strokeWidth=Metric_Axis.stroke_width,
             stroke=Metric_Axis.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.Y("y_position:N", scale=scales["y"], axis=y_axis),
@@ -94,7 +94,7 @@ def __draw_domain_rules(scales):
         .mark_rule(
             strokeWidth=Rule.stroke_width,
             stroke=Rule.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.X("x_position:Q", scale=scales["x"]),
@@ -116,7 +116,7 @@ def __draw_x_ticks_labels(scales, chart_height):
     x_ticks_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            tooltip="",
+            tooltip=None,
             align="center",
             fontSize=Axis.label_font_size,
             font=FONT,
@@ -150,7 +150,7 @@ def __draw_threshold_rules(threshold_df, scales, position, accessibility_mode=Fa
             stroke=stroke_color,
             opacity=Threshold_Rule.opacity,
             strokeWidth=Threshold_Rule.stroke_width,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.X(
@@ -174,7 +174,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
     lower_threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("lower_threshold_value:Q", scale=scales["x"]),
@@ -184,7 +184,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
     upper_threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("upper_threshold_value:Q", scale=scales["x"]),
@@ -214,7 +214,7 @@ def __draw_threshold_text(
             fill=font_color,
             fontSize=Annotation.font_size,
             fontWeight=Annotation.font_weight,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(0),

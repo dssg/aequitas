@@ -442,7 +442,7 @@ def plot_xy_metrics_chart(
             titleColor=Scatter_Axis.title_color,
             titleFontSize=Scatter_Axis.title_font_size,
             titleFontWeight=Scatter_Axis.title_font_weight,
-            titleAngle=0,
+            titleAngle=Scatter_Axis.title_angle,
         )
         .configure_axisLeft(
             titlePadding=Scatter_Axis.title_padding,

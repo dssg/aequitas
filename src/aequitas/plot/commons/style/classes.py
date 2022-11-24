@@ -77,6 +77,7 @@ class Scatter_Axis(Axis):
     title_padding = 30
     title_font_size = Text.FONT_SIZE_LARGE
     title_font_weight = Text.FONT_WEIGHT_REGULAR
+    title_angle = 0
 
 
 class Threshold_Band:
