@@ -209,7 +209,7 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # X AXIS
     x_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=None
+        strokeWidth=1, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=bottom_axis),
         x2="end:Q",
@@ -218,7 +218,7 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # Y AXIS
     y_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=None
+        strokeWidth=1, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=no_axis()),
         y=alt.Y("start:Q", scale=scales["y"], axis=left_axis),

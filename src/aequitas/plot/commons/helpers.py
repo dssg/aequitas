@@ -4,7 +4,7 @@ from millify import millify, prettify
 
 def no_axis():
     """Returns an invisible Altair axis."""
-    return alt.Axis(domain=False, grid=False, ticks=False, labels=False, title=" ")
+    return alt.Axis(domain=False, grid=False, ticks=False, labels=False, title=None)
 
 
 def format_number(value):
