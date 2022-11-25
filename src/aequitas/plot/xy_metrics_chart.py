@@ -19,6 +19,7 @@ from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import XY_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons import labels as Label
 
 
 def __get_position_scales(chart_height, chart_width):
@@ -278,8 +279,8 @@ def __draw_bubbles(
 
     # TOOLTIP ENCODING
     bubble_tooltip_encoding = [
-        alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+        alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+        alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
         alt.Tooltip(
             field=x_metric, type="quantitative", format=".2f", title=x_metric.upper()
         ),

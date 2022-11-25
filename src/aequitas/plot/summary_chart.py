@@ -132,7 +132,7 @@ def __draw_metric_line_titles(metrics, size_constants):
             )
             .encode(
                 alt.Y("y_position:Q", scale=alt.Scale(domain=[3, 1]), axis=no_axis()),
-                text=alt.value("Groups"),
+                text=alt.value(Label.MULTIPLE_GROUPS),
             )
         )
 
@@ -230,7 +230,7 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             type="nominal",
             title="Size",
         ),
-        alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title="Groups"),
+        alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title=Label.MULTIPLE_GROUPS),
     ]
 
     population_bar = (
@@ -257,8 +257,8 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
     The groups are spread around the central reference group according to their disparity."""
 
     circle_tooltip_encoding = [
-        alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+        alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+        alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
         alt.Tooltip(
             field=f"tooltip_parity_test_explanation_{metric}",
             type="nominal",
@@ -267,7 +267,7 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
         alt.Tooltip(
             field=f"tooltip_disparity_explanation_{metric}",
             type="nominal",
-            title="Disparity",
+            title=Label.DISPARITY,
         ),
         alt.Tooltip(
             field=f"{metric}",

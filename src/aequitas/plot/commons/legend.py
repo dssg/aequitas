@@ -42,7 +42,7 @@ def draw_legend(global_scales, selection, chart_width):
         .encode(
             x=alt.value(title_text_x_position),
             y=alt.value(Legend.margin),
-            text=alt.value("Groups"),
+            text=alt.value(Label.MULTIPLE_GROUPS),
         )
     )
 

@@ -27,7 +27,7 @@ from aequitas.plot.commons.style.classes import (
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
-
+from aequitas.plot.commons import labels as Label
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -445,12 +445,12 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-            alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+            alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+            alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
-                title="Disparity",
+                title=Label.DISPARITY,
             ),
             alt.Tooltip(
                 field=f"{metric}",
