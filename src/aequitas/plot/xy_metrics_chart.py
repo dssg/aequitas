@@ -188,37 +188,37 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # BASE CHART
     base = alt.Chart(pd.DataFrame({"start": 0, "end": 1}, index=[0]))
-    
+
     axis_values = [0, 0.25, 0.5, 0.75, 1]
     
-    grid_expr = "(datum.value === 0 || datum.value === 1) ? 0 : 1"
-
-    # AXIS ENCODING
-    bottom_axis = alt.Axis(
+    # SHARED PARAMETERS
+    grid_expr = f"(datum.value === {axis_values[0]} || datum.value === {axis_values[-1]}) ? 0 : 1"
+    shared_axis_params = dict(
         values=axis_values,
-        orient="bottom",
         domain=False,
         labels=False,
         ticks=False,
-        title=x_metric.upper(),
         grid=True,
         gridColor=Axis.grid_color,
         gridCap="round",
         gridDash=[2, 4],
         gridWidth={"expr": grid_expr},
     )
+
+    # AXIS ENCODING
+    bottom_axis = alt.Axis(
+        **shared_axis_params,
+        orient="bottom",
+        title=x_metric.upper(),
+        titleBaseline="bottom",
+        titlePadding=-Scatter_Axis.title_font_size + Scatter_Axis.title_padding,
+    )
     left_axis = alt.Axis(
-        values=axis_values,
+        **shared_axis_params,
         orient="left",
-        domain=False,
-        labels=False,
-        ticks=False,
         title=y_metric.upper(),
-        grid=True,
-        gridColor=Axis.grid_color,
-        gridCap="round",
-        gridDash=[2, 4],
-        gridWidth={"expr": grid_expr},
+        titleAlign="left",
+        titlePadding=Scatter_Axis.title_font_size / 2 + Scatter_Axis.title_padding,
     )
 
     # X AXIS
@@ -459,9 +459,6 @@ def plot_xy_metrics_chart(
             titleFontSize=Scatter_Axis.title_font_size,
             titleFontWeight=Scatter_Axis.title_font_weight,
             titleAngle=Scatter_Axis.title_angle,
-        )
-        .configure_axisLeft(
-            titlePadding=Scatter_Axis.title_padding,
         )
         .resolve_scale(y="independent", x="independent", size="independent")
         .resolve_axis(x="shared", y="shared")
