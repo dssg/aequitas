@@ -12,6 +12,7 @@ from aequitas.plot.commons.style.classes import (
     Bubble,
     Scatter_Axis,
     Chart_Title,
+    Axis,
 )
 
 from aequitas.plot.commons.style.text import FONT
@@ -139,7 +140,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
     axis_values = [0, 0.25, 0.5, 0.75, 1]
     axis_df = pd.DataFrame({"main_axis_values": axis_values, "aux_axis_position": 0})
 
-    labelAlignExpr = f"datum.main_axis_values === {axis_values[0]} ? 'left' : datum.main_axis_values === {axis_values[-1]} ? 'right' : 'center'"
+    x_labels_align_expr = f"datum.main_axis_values === {axis_values[0]} ? 'left' : datum.main_axis_values === {axis_values[-1]} ? 'right' : 'center'"
 
     x_tick_labels = (
         alt.Chart(axis_df)
@@ -147,7 +148,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
             baseline="top",
             yOffset=6,
             tooltip=None,
-            align={"expr": labelAlignExpr},
+            align={"expr": x_labels_align_expr},
             fontSize=Scatter_Axis.label_font_size,
             fontWeight=Scatter_Axis.label_font_weight,
             font=FONT,
@@ -187,9 +188,12 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # BASE CHART
     base = alt.Chart(pd.DataFrame({"start": 0, "end": 1}, index=[0]))
+    
+    axis_values = [0, 0.25, 0.5, 0.75, 1]
+    
+    grid_expr = "(datum.value === 0 || datum.value === 1) ? 0 : 1"
 
     # AXIS ENCODING
-    axis_values = [0.0, 0.25, 0.5, 0.75, 1]
     bottom_axis = alt.Axis(
         values=axis_values,
         orient="bottom",
@@ -197,6 +201,11 @@ def __draw_axis_rules(x_metric, y_metric, scales):
         labels=False,
         ticks=False,
         title=x_metric.upper(),
+        grid=True,
+        gridColor=Axis.grid_color,
+        gridCap="round",
+        gridDash=[2, 4],
+        gridWidth={"expr": grid_expr},
     )
     left_axis = alt.Axis(
         values=axis_values,
@@ -205,6 +214,11 @@ def __draw_axis_rules(x_metric, y_metric, scales):
         labels=False,
         ticks=False,
         title=y_metric.upper(),
+        grid=True,
+        gridColor=Axis.grid_color,
+        gridCap="round",
+        gridDash=[2, 4],
+        gridWidth={"expr": grid_expr},
     )
 
     # X AXIS
