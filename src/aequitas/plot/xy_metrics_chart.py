@@ -147,7 +147,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         alt.Chart(axis_df)
         .mark_text(
             baseline="top",
-            yOffset=6,
+            yOffset=Scatter_Axis.offset,
             tooltip=None,
             align={"expr": x_labels_align_expr},
             fontSize=Scatter_Axis.label_font_size,
@@ -166,7 +166,7 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         alt.Chart(axis_df)
         .mark_text(
             baseline="middle",
-            xOffset=-6,
+            xOffset=-Scatter_Axis.offset,
             tooltip=None,
             align="right",
             fontSize=Scatter_Axis.label_font_size,
