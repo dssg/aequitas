@@ -137,19 +137,21 @@ def __draw_tick_labels(scales, chart_height, chart_width):
     """Draws the numbers in both axes."""
 
     axis_values = [0, 0.25, 0.5, 0.75, 1]
-
     axis_df = pd.DataFrame({"main_axis_values": axis_values, "aux_axis_position": 0})
+
+    labelAlignExpr = f"datum.main_axis_values === {axis_values[0]} ? 'left' : datum.main_axis_values === {axis_values[-1]} ? 'right' : 'center'"
 
     x_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            yOffset=Scatter_Axis.label_font_size * 1.5,
+            baseline="top",
+            yOffset=6,
             tooltip=None,
-            align="center",
+            align={"expr": labelAlignExpr},
             fontSize=Scatter_Axis.label_font_size,
-            color=Scatter_Axis.label_color,
             fontWeight=Scatter_Axis.label_font_weight,
             font=FONT,
+            color=Scatter_Axis.label_color,
         )
         .encode(
             text=alt.Text("main_axis_values:Q"),
@@ -162,13 +164,13 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         alt.Chart(axis_df)
         .mark_text(
             baseline="middle",
-            xOffset=-Scatter_Axis.label_font_size * 1.5,
+            xOffset=-6,
             tooltip=None,
-            align="center",
+            align="right",
             fontSize=Scatter_Axis.label_font_size,
             fontWeight=Scatter_Axis.label_font_weight,
-            color=Scatter_Axis.label_color,
             font=FONT,
+            color=Scatter_Axis.label_color,
         )
         .encode(
             text=alt.Text("main_axis_values:Q"),
