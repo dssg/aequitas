@@ -1,3 +1,5 @@
+from aequitas.plot.commons.style import text as Text
+
 class Chart:
     full_chart_padding = {"top": 15, "bottom": 10}
     padding_x = 0.05
@@ -18,6 +20,7 @@ class Summary_Chart(Chart):
 
 
 class Disparity_Chart(Chart):
+    full_chart_padding = {"top": 15, "bottom": -Text.FONT_SIZE_SMALL * 2 + 15, "left": 15, "right": 15}
     vertical_header_height = 100
     line_height = 150
     min_line_height = 80
@@ -26,6 +29,7 @@ class Disparity_Chart(Chart):
 
 
 class Metric_Chart(Chart):
+    full_chart_padding = {"top": 15, "bottom": -Text.FONT_SIZE_SMALL * 1.25 + 15, "left": 15, "right": 15}
     vertical_header_height = 50
     line_height = 125
     min_line_height = 80
@@ -34,6 +38,7 @@ class Metric_Chart(Chart):
 
 
 class Concat_Chart(Chart):
+    full_chart_padding = {"top": 15, "bottom": -Text.FONT_SIZE_SMALL * 0.75 + 15, "left": 15, "right": 15}
     vertical_header_height = 110
     line_height = 75
     min_line_height = 50
@@ -43,6 +48,7 @@ class Concat_Chart(Chart):
 
 
 class XY_Chart(Chart):
+    full_chart_padding = 15
     full_side = 450
     min_side = 200
     padding_y = 0.05
