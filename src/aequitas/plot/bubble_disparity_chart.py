@@ -24,7 +24,7 @@ from aequitas.plot.commons.style.classes import (
     Chart_Title,
 )
 
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import labels as Label
@@ -669,7 +669,12 @@ def plot_disparity_bubble_chart(
             height=chart_height,
             width=chart_width,
             title=f"Disparities on {attribute.title()}",
-            padding=Disparity_Chart.full_chart_padding,
+            padding={
+                "top": Disparity_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 2/3 * len(metrics_list) + Disparity_Chart.full_chart_padding,
+                "left": Disparity_Chart.full_chart_padding,
+                "right": Disparity_Chart.full_chart_padding,
+            },
             usermeta=get_chart_metadata("disparity_chart"),
         )
         .resolve_scale(y="independent", size="independent")

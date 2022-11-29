@@ -8,7 +8,7 @@ from aequitas.plot.commons.helpers import get_chart_metadata
 from aequitas.plot.commons.legend import draw_legend
 
 from aequitas.plot.commons.style.classes import Title, Metric_Axis, Chart_Title
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons.style.sizes import Concat_Chart
 from aequitas.plot.commons import initializers as Initializer
 
@@ -171,7 +171,12 @@ def plot_concatenated_bubble_charts(
         )
         .properties(
             title=attribute.title(), 
-            padding=Concat_Chart.full_chart_padding,
+            padding={
+                "top": Concat_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 0.75/3 * len(metrics_list) + Concat_Chart.full_chart_padding,
+                "left": Concat_Chart.full_chart_padding,
+                "right": Concat_Chart.full_chart_padding,
+            },
             usermeta=get_chart_metadata("disparity_absolute_chart"),
         )
     )

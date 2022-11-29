@@ -23,7 +23,7 @@ from aequitas.plot.commons.style.classes import (
     Chart_Title,
 )
 from aequitas.plot.commons.style.sizes import Metric_Chart
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import labels as Label
 
@@ -541,7 +541,13 @@ def plot_metric_bubble_chart(
             height=chart_height,
             width=chart_width,
             title=f"Absolute values by {attribute.title()}",
-            padding=Metric_Chart.full_chart_padding,
+            # padding=Metric_Chart.full_chart_padding,
+            padding={
+                "top": Metric_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 1.25/3 * len(metrics_list) + Metric_Chart.full_chart_padding,
+                "left": Metric_Chart.full_chart_padding,
+                "right": Metric_Chart.full_chart_padding,
+            },
             usermeta=get_chart_metadata("absolute_chart"),
         )
         .configure_title(
