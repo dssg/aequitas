@@ -292,7 +292,7 @@ def __draw_bubbles(
     # BUBBLE CENTERS
     bubbles_centers = (
         alt.Chart(metric_plot_table)
-        .mark_point(filled=True, size=Bubble.center_size)
+        .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
         .encode(
             x=alt.X(f"{x_metric}:Q", scale=scales["x"], axis=no_axis()),
             y=alt.Y(f"{y_metric}:Q", scale=scales["y"], axis=no_axis()),
@@ -305,7 +305,7 @@ def __draw_bubbles(
     # BUBBLE AREAS
     bubbles_areas = (
         alt.Chart(metric_plot_table)
-        .mark_circle(opacity=Bubble.opacity)
+        .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
         .encode(
             size=alt.Size("group_size:Q", legend=None, scale=scales["bubble_size"]),
             x=alt.X(f"{x_metric}:Q", scale=scales["x"], axis=no_axis()),

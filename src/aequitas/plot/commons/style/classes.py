@@ -8,6 +8,7 @@ class Bubble:
     center_size = 60
     # From bubble size scale: (1 - 2 * chart_padding) / 4
     max_bubble_ratio = 0.2
+    cursor = "pointer"
 
 
 class Title:

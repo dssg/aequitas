@@ -363,7 +363,7 @@ def __draw_bubbles(
         bubble_centers += (
             alt.Chart(plot_table)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
-            .mark_point(filled=True, size=Bubble.center_size)
+            .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
                 y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
@@ -381,7 +381,7 @@ def __draw_bubbles(
 
         bubble_areas += (
             alt.Chart(plot_table)
-            .mark_circle(opacity=Bubble.opacity)
+            .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
