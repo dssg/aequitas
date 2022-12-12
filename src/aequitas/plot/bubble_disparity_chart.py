@@ -5,6 +5,7 @@ import pandas as pd
 from aequitas.plot.commons.helpers import (
     no_axis,
     transform_ratio,
+    get_chart_metadata,
 )
 from aequitas.plot.commons.legend import draw_legend
 from aequitas.plot.commons.scales import get_chart_size_range
@@ -23,10 +24,10 @@ from aequitas.plot.commons.style.classes import (
     Chart_Title,
 )
 
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
-
+from aequitas.plot.commons import labels as Label
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -89,7 +90,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         labelPadding=Metric_Axis.label_padding
         if not concat_chart
         else Metric_Axis.label_padding_concat_chart,
-        title="",
+        title=None,
     )
 
     rules_df = pd.DataFrame(
@@ -105,7 +106,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         .mark_rule(
             strokeWidth=Metric_Axis.stroke_width,
             stroke=Metric_Axis.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.Y("metric:N", scale=scales["y"], axis=metrics_axis),
@@ -153,7 +154,7 @@ def __draw_x_ticks_labels(scales, chart_height):
     tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            tooltip="",
+            tooltip=None,
             align="center",
             font=FONT,
             fontSize=Axis.label_font_size,
@@ -180,7 +181,7 @@ def __draw_text_annotations(ref_group, chart_height, x_range):
     annotation_text_params = dict(
         font=FONT,
         fontWeight=Annotation.font_weight,
-        tooltip="",
+        tooltip=None,
     )
 
     # TIMES LARGER TEXT
@@ -271,7 +272,7 @@ def __draw_threshold_rules(
             stroke=stroke_color,
             opacity=Threshold_Rule.opacity,
             strokeWidth=Threshold_Rule.stroke_width,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.value(Disparity_Chart.padding_y * chart_height),
@@ -303,7 +304,7 @@ def __draw_threshold_bands(
 
     threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.value(Disparity_Chart.padding_y * chart_height),
             y2=alt.value((1 - Disparity_Chart.padding_y) * chart_height),
@@ -339,7 +340,7 @@ def __draw_threshold_text(
             fill=font_color,
             fontSize=Annotation.font_size,
             fontWeight=Annotation.font_weight,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(0),
@@ -409,7 +410,7 @@ def __draw_bubbles(
     axis_values = __get_x_axis_values(scales["x"].domain, zero=False)
 
     x_axis = alt.Axis(
-        values=axis_values, ticks=False, domain=False, labels=False, title=None
+        values=axis_values, ticks=False, domain=False, labels=False, title=None, gridColor=Axis.grid_color
     )
 
     # COLOR
@@ -432,7 +433,6 @@ def __draw_bubbles(
 
     # LAYERING THE METRICS
     for metric in metrics:
-
         plot_table[f"tooltip_disparity_explanation_{metric}"] = plot_table.apply(
             lambda row: get_tooltip_text_disparity_explanation(
                 row[f"{metric}_disparity_scaled"],
@@ -444,12 +444,12 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-            alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+            alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+            alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
-                title="Disparity",
+                title=Label.DISPARITY,
             ),
             alt.Tooltip(
                 field=f"{metric}",
@@ -465,7 +465,7 @@ def __draw_bubbles(
         bubble_centers += (
             alt.Chart(plot_table)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
-            .mark_point(filled=True, size=Bubble.center_size)
+            .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
             .encode(
                 x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
                 y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
@@ -483,7 +483,7 @@ def __draw_bubbles(
 
         bubble_areas += (
             alt.Chart(plot_table)
-            .mark_circle(opacity=Bubble.opacity)
+            .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .encode(
                 x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
@@ -658,18 +658,24 @@ def plot_disparity_bubble_chart(
             labelFont=FONT,
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
+            offset=Chart_Title.offset,
         )
         .properties(
             height=chart_height,
             width=chart_width,
             title=f"Disparities on {attribute.title()}",
-            padding=Disparity_Chart.full_chart_padding,
+            padding={
+                "top": Disparity_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 2/3 * len(metrics_list) + Disparity_Chart.full_chart_padding,
+                "left": Disparity_Chart.full_chart_padding,
+                "right": Disparity_Chart.full_chart_padding,
+            },
+            usermeta=get_chart_metadata("disparity_chart"),
         )
         .resolve_scale(y="independent", size="independent")
     )

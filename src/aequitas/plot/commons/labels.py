@@ -1,0 +1,7 @@
+CLICK_HIGHLIGHT = "(click to highlight)"
+DISPARITY = "Disparity"
+GROUP_SIZE = "Group Size"
+MULTIPLE_GROUPS = "Groups"
+REF_INDICATOR = "[REF]"
+SINGLE_GROUP = "Group"
+TEST = "Parity Test"

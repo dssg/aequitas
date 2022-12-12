@@ -1,15 +1,9 @@
-import math
 import altair as alt
 import pandas as pd
 
-from aequitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons.helpers import no_axis, get_chart_metadata
 from aequitas.plot.commons.legend import draw_legend
-from aequitas.plot.commons.scales import (
-    get_chart_size_range,
-    get_color_scale,
-    get_bubble_size_scale,
-    get_shape_scale,
-)
+from aequitas.plot.commons.scales import get_chart_size_range
 from aequitas.plot.commons.tooltips import get_tooltip_text_group_size
 from aequitas.plot.commons.style.classes import (
     Threshold_Band,
@@ -18,12 +12,14 @@ from aequitas.plot.commons.style.classes import (
     Bubble,
     Scatter_Axis,
     Chart_Title,
+    Axis,
 )
 
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import XY_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons import labels as Label
 
 
 def __get_position_scales(chart_height, chart_width):
@@ -80,11 +76,11 @@ def __draw_threshold_bands(
         stroke=stroke_color,
         strokeWidth=Threshold_Rule.stroke_width,
         opacity=Threshold_Rule.opacity,
-        tooltip="",
+        tooltip=None,
     )
 
     band_base = alt.Chart(threshold_df).mark_rect(
-        fill=fill_color, opacity=Threshold_Band.opacity, tooltip=""
+        fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None
     )
 
     # PARAMS
@@ -143,19 +139,21 @@ def __draw_tick_labels(scales, chart_height, chart_width):
     """Draws the numbers in both axes."""
 
     axis_values = [0, 0.25, 0.5, 0.75, 1]
-
     axis_df = pd.DataFrame({"main_axis_values": axis_values, "aux_axis_position": 0})
+
+    x_labels_align_expr = f"datum.main_axis_values === {axis_values[0]} ? 'left' : datum.main_axis_values === {axis_values[-1]} ? 'right' : 'center'"
 
     x_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            yOffset=Scatter_Axis.label_font_size * 1.5,
-            tooltip="",
-            align="center",
+            baseline="top",
+            yOffset=Scatter_Axis.offset,
+            tooltip=None,
+            align={"expr": x_labels_align_expr},
             fontSize=Scatter_Axis.label_font_size,
-            color=Scatter_Axis.label_color,
             fontWeight=Scatter_Axis.label_font_weight,
             font=FONT,
+            color=Scatter_Axis.label_color,
         )
         .encode(
             text=alt.Text("main_axis_values:Q"),
@@ -164,19 +162,17 @@ def __draw_tick_labels(scales, chart_height, chart_width):
         )
     )
 
-    axis_df.drop(0, inplace=True)
-
     y_tick_labels = (
         alt.Chart(axis_df)
         .mark_text(
             baseline="middle",
-            xOffset=-Scatter_Axis.label_font_size * 1.5,
-            tooltip="",
-            align="center",
+            xOffset=-Scatter_Axis.offset,
+            tooltip=None,
+            align="right",
             fontSize=Scatter_Axis.label_font_size,
             fontWeight=Scatter_Axis.label_font_weight,
-            color=Scatter_Axis.label_color,
             font=FONT,
+            color=Scatter_Axis.label_color,
         )
         .encode(
             text=alt.Text("main_axis_values:Q"),
@@ -194,28 +190,41 @@ def __draw_axis_rules(x_metric, y_metric, scales):
     # BASE CHART
     base = alt.Chart(pd.DataFrame({"start": 0, "end": 1}, index=[0]))
 
-    # AXIS ENCODING
-    axis_values = [0.0, 0.25, 0.5, 0.75, 1]
-    bottom_axis = alt.Axis(
+    axis_values = [0, 0.25, 0.5, 0.75, 1]
+    
+    # SHARED PARAMETERS
+    grid_expr = f"(datum.value === {axis_values[0]} || datum.value === {axis_values[-1]}) ? 0 : 1"
+    shared_axis_params = dict(
         values=axis_values,
-        orient="bottom",
         domain=False,
         labels=False,
         ticks=False,
+        grid=True,
+        gridColor=Axis.grid_color,
+        gridCap="round",
+        gridDash=[2, 4],
+        gridWidth={"expr": grid_expr},
+    )
+
+    # AXIS ENCODING
+    bottom_axis = alt.Axis(
+        **shared_axis_params,
+        orient="bottom",
         title=x_metric.upper(),
+        titleBaseline="bottom",
+        titlePadding=-Scatter_Axis.title_font_size + Scatter_Axis.title_padding,
     )
     left_axis = alt.Axis(
-        values=axis_values,
+        **shared_axis_params,
         orient="left",
-        domain=False,
-        labels=False,
-        ticks=False,
         title=y_metric.upper(),
+        titleAlign="left",
+        titlePadding=Scatter_Axis.title_font_size / 2 + Scatter_Axis.title_padding,
     )
 
     # X AXIS
     x_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=""
+        strokeWidth=1, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=bottom_axis),
         x2="end:Q",
@@ -224,7 +233,7 @@ def __draw_axis_rules(x_metric, y_metric, scales):
 
     # Y AXIS
     y_rule = base.mark_rule(
-        strokeWidth=Rule.stroke_width, stroke=Rule.stroke, tooltip=""
+        strokeWidth=1, stroke=Rule.stroke, tooltip=None
     ).encode(
         x=alt.X("start:Q", scale=scales["x"], axis=no_axis()),
         y=alt.Y("start:Q", scale=scales["y"], axis=left_axis),
@@ -270,8 +279,8 @@ def __draw_bubbles(
 
     # TOOLTIP ENCODING
     bubble_tooltip_encoding = [
-        alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+        alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+        alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
         alt.Tooltip(
             field=x_metric, type="quantitative", format=".2f", title=x_metric.upper()
         ),
@@ -283,7 +292,7 @@ def __draw_bubbles(
     # BUBBLE CENTERS
     bubbles_centers = (
         alt.Chart(metric_plot_table)
-        .mark_point(filled=True, size=Bubble.center_size)
+        .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
         .encode(
             x=alt.X(f"{x_metric}:Q", scale=scales["x"], axis=no_axis()),
             y=alt.Y(f"{y_metric}:Q", scale=scales["y"], axis=no_axis()),
@@ -296,7 +305,7 @@ def __draw_bubbles(
     # BUBBLE AREAS
     bubbles_areas = (
         alt.Chart(metric_plot_table)
-        .mark_circle(opacity=Bubble.opacity)
+        .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
         .encode(
             size=alt.Size("group_size:Q", legend=None, scale=scales["bubble_size"]),
             x=alt.X(f"{x_metric}:Q", scale=scales["x"], axis=no_axis()),
@@ -436,24 +445,21 @@ def plot_xy_metrics_chart(
             width=chart_width,
             title=f"{y_metric.upper()} by {x_metric.upper()} on {attribute.title()}",
             padding=XY_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("scatter_chart"),
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
         )
         .configure_axis(
             titleFont=FONT,
             titleColor=Scatter_Axis.title_color,
             titleFontSize=Scatter_Axis.title_font_size,
             titleFontWeight=Scatter_Axis.title_font_weight,
-            titleAngle=0,
-        )
-        .configure_axisLeft(
-            titlePadding=Scatter_Axis.title_padding,
+            titleAngle=Scatter_Axis.title_angle,
         )
         .resolve_scale(y="independent", x="independent", size="independent")
         .resolve_axis(x="shared", y="shared")

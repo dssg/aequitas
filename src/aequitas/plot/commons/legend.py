@@ -5,6 +5,7 @@ import math
 from aequitas.plot.commons.style.classes import Legend
 from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.helpers import no_axis
+from aequitas.plot.commons import labels as Label
 
 
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
@@ -15,35 +16,33 @@ def draw_legend(global_scales, selection, chart_width):
 
     groups = global_scales["color"].domain
     labels = groups.copy()
-    labels[0] = labels[0] + " [REF]"
+    labels[0] = f"{labels[0]} {Label.REF_INDICATOR}"
     legend_df = pd.DataFrame({"attribute_value": groups, "label": labels})
 
     # Position the legend to the right of the chart
 
     title_text_x_position = chart_width
-    title_text_height = Legend.title_font_size + Legend.title_margin_bottom
-    subtitle_text_height = Legend.font_size + Legend.vertical_spacing
+    title_text_height = Legend.title_font_size + Legend.row_padding
 
-    entries_circles_x_position = title_text_x_position + Legend.horizontal_spacing
-    entries_text_x_position = (
-        title_text_x_position + 2 * Legend.circle_radius + Legend.horizontal_spacing
-    )
+    radius = math.sqrt(Legend.symbol_size / math.pi)
+    entries_circles_x_position = title_text_x_position + radius + Legend.offset
+    entries_text_x_position = title_text_x_position + radius * 2 + Legend.offset * 3 - 1
 
     # Title of the legend.
     title_text = (
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
-            baseline="middle",
-            color=Legend.font_color,
+            baseline=Legend.title_baseline,
+            color=Legend.title_font_color,
             fontSize=Legend.title_font_size,
             font=FONT,
             fontWeight=Legend.title_font_weight,
         )
         .encode(
             x=alt.value(title_text_x_position),
-            y=alt.value(Legend.margin_top),
-            text=alt.value("Groups"),
+            y=alt.value(Legend.margin),
+            text=alt.value(Label.MULTIPLE_GROUPS),
         )
     )
 
@@ -52,16 +51,16 @@ def draw_legend(global_scales, selection, chart_width):
         alt.Chart(DUMMY_DF)
         .mark_text(
             align="left",
-            baseline="middle",
-            color=Legend.font_color,
-            fontSize=Legend.font_size,
+            baseline=Legend.title_baseline,
+            color=Legend.title_font_color,
+            fontSize=Legend.title_font_size,
             font=FONT,
-            fontWeight=Legend.font_weight,
+            fontWeight=Legend.title_font_weight,
         )
         .encode(
             x=alt.value(title_text_x_position),
-            y=alt.value(Legend.margin_top + title_text_height),
-            text=alt.value("Click to highlight a group."),
+            y=alt.value(Legend.margin + title_text_height),
+            text=alt.value(Label.CLICK_HIGHLIGHT),
         )
     )
 
@@ -73,10 +72,8 @@ def draw_legend(global_scales, selection, chart_width):
         alt.value(Legend.color_faded),
     )
 
-    # Offset the positioning of the legend items after the subitlr text
-    legend_start_y_position = (
-        Legend.margin_top + title_text_height + subtitle_text_height
-    )
+    # Offset the positioning of the legend items after the subtitle text
+    legend_start_y_position = Legend.margin + title_text_height + Legend.font_size + Legend.title_padding
 
     y_scale = alt.Scale(
         domain=groups,
@@ -85,18 +82,15 @@ def draw_legend(global_scales, selection, chart_width):
             legend_start_y_position
             # number of legend elements x text size
             + (len(groups) * Legend.font_size)
-            # (number of "spacings" + start and end "spacings") x spacing
-            + ((len(groups) + 1) * Legend.vertical_spacing),
+            # number of legend elements x spacing
+            + (len(groups) * Legend.offset),
         ],
     )
 
-    # Calculate circle size from radius
-    entries_circle_size = Legend.circle_radius * math.pi ** 2
-
-    # Draw color squares for each group
+    # Draw colored symbols for each group
     entries_circles = (
         alt.Chart(legend_df)
-        .mark_point(filled=True, opacity=1, size=entries_circle_size)
+        .mark_point(filled=True, opacity=1, size=Legend.symbol_size, cursor=Legend.cursor)
         .encode(
             x=alt.value(entries_circles_x_position),
             y=alt.Y("attribute_value:N", scale=y_scale, axis=no_axis()),
@@ -118,6 +112,7 @@ def draw_legend(global_scales, selection, chart_width):
             font=FONT,
             fontSize=Legend.font_size,
             fontWeight=Legend.font_weight,
+            cursor=Legend.cursor,
         )
         .encode(
             x=alt.value(entries_text_x_position),

@@ -29,7 +29,7 @@ def get_tooltip_text_disparity_explanation(
         return f"Same {metric.upper()} as the reference group"
 
 
-def get_tooltip_text_parity_test_explanation(parity_result, metric, fairness_threshold):
+def get_tooltip_text_parity_test_explanation(parity_result, fairness_threshold):
     if parity_result == "Reference":
         return "Reference group"
     if parity_result == "Pass":
