@@ -1,13 +1,11 @@
-import math
 import altair as alt
 import pandas as pd
 
 from aequitas.plot.commons.helpers import (
     no_axis,
     transform_ratio,
-    calculate_chart_size_from_elements,
-    to_list,
     format_number,
+    get_chart_metadata,
 )
 from aequitas.plot.commons.tooltips import (
     get_tooltip_text_group_size,
@@ -25,6 +23,7 @@ from aequitas.plot.commons.style.text import FONT
 from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
+from aequitas.plot.commons import labels as Label
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -133,7 +132,7 @@ def __draw_metric_line_titles(metrics, size_constants):
             )
             .encode(
                 alt.Y("y_position:Q", scale=alt.Scale(domain=[3, 1]), axis=no_axis()),
-                text=alt.value("Groups"),
+                text=alt.value(Label.MULTIPLE_GROUPS),
             )
         )
 
@@ -209,7 +208,13 @@ def __draw_parity_result_text(parity_result, color_scale):
         .encode(
             alt.Y("y_position:Q", scale=alt.Scale(domain=[3, 1]), axis=no_axis()),
             alt.Color(
-                "parity_result:O", scale=color_scale, legend=alt.Legend(title="")
+                "parity_result:O",
+                scale=color_scale,
+                legend=alt.Legend(
+                    title=Label.TEST, 
+                    padding=Legend.margin,
+                    offset=0,
+                ),
             ),
             text=alt.value(parity_result.upper()),
         )
@@ -225,7 +230,7 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             type="nominal",
             title="Size",
         ),
-        alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title="Groups"),
+        alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title=Label.MULTIPLE_GROUPS),
     ]
 
     population_bar = (
@@ -238,10 +243,7 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             alt.Color(
                 f"{metric}_parity_result:O",
                 scale=color_scale,
-                legend=alt.Legend(
-                    title="Parity Test",
-                    padding=20,
-                ),
+                legend=None,
             ),
             tooltip=population_bar_tooltips,
         )
@@ -255,17 +257,17 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
     The groups are spread around the central reference group according to their disparity."""
 
     circle_tooltip_encoding = [
-        alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-        alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+        alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+        alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
         alt.Tooltip(
             field=f"tooltip_parity_test_explanation_{metric}",
             type="nominal",
-            title="Parity Test",
+            title=Label.TEST,
         ),
         alt.Tooltip(
             field=f"tooltip_disparity_explanation_{metric}",
             type="nominal",
-            title="Disparity",
+            title=Label.DISPARITY,
         ),
         alt.Tooltip(
             field=f"{metric}",
@@ -287,7 +289,7 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
             alt.Color(
                 f"{metric}_parity_result:O",
                 scale=scales["color"],
-                legend=alt.Legend(title=""),
+                legend=None,
             ),
             size=alt.value(size_constants["group_circle_size"]),
             tooltip=circle_tooltip_encoding,
@@ -388,7 +390,6 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
     attribute_df[f"tooltip_parity_test_explanation_{metric}"] = attribute_df.apply(
         lambda row: get_tooltip_text_parity_test_explanation(
             row[f"{metric}_parity_result"],
-            metric,
             fairness_threshold,
         ),
         axis=1,
@@ -613,16 +614,22 @@ def plot_summary_chart(
 
     full_summary_chart = (
         alt.vconcat(summary_chart_table, summary_chart_explanation)
-        .properties(padding=Summary_Chart.full_chart_padding)
+        .properties(
+            padding=Summary_Chart.full_chart_padding,
+            usermeta=get_chart_metadata("summary_chart"),
+        )
         .configure_legend(
-            labelFont=FONT,
             labelColor=Legend.font_color,
+            labelFont=FONT,
             labelFontSize=Legend.font_size,
+            rowPadding=Legend.offset,
+            symbolSize=Legend.symbol_size,
+            titleBaseline=Legend.title_baseline,
+            titleColor=Legend.title_font_color,
             titleFont=FONT,
-            titleColor=Legend.font_color,
             titleFontSize=Legend.title_font_size,
             titleFontWeight=Legend.title_font_weight,
-            titlePadding=Legend.title_margin_bottom + Legend.vertical_spacing,
+            titlePadding=Legend.title_padding,
         )
         .configure_view(strokeWidth=0)
     )

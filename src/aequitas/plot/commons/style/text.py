@@ -1,4 +1,4 @@
-FONT = "Arial"
+FONT = "Roboto, Arial, sans-serif"
 
 FONT_SIZE_TINY = 8
 FONT_SIZE_SMALL = 12

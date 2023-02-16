@@ -1,8 +1,11 @@
-import math
 import altair as alt
 import pandas as pd
 
-from aequitas.plot.commons.helpers import no_axis, transform_ratio
+from aequitas.plot.commons.helpers import (
+    no_axis,
+    transform_ratio,
+    get_chart_metadata,
+)
 from aequitas.plot.commons.legend import draw_legend
 from aequitas.plot.commons.scales import get_chart_size_range
 from aequitas.plot.commons.tooltips import (
@@ -20,8 +23,9 @@ from aequitas.plot.commons.style.classes import (
     Chart_Title,
 )
 from aequitas.plot.commons.style.sizes import Metric_Chart
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons import initializers as Initializer
+from aequitas.plot.commons import labels as Label
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
 # (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
@@ -60,7 +64,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
             orient="left",
             labelAngle=Metric_Axis.label_angle,
             labelPadding=Metric_Axis.label_padding,
-            title="",
+            title=None,
         )
 
     horizontal_rules = (
@@ -68,7 +72,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         .mark_rule(
             strokeWidth=Metric_Axis.stroke_width,
             stroke=Metric_Axis.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             y=alt.Y("y_position:N", scale=scales["y"], axis=y_axis),
@@ -91,7 +95,7 @@ def __draw_domain_rules(scales):
         .mark_rule(
             strokeWidth=Rule.stroke_width,
             stroke=Rule.stroke,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.X("x_position:Q", scale=scales["x"]),
@@ -113,7 +117,7 @@ def __draw_x_ticks_labels(scales, chart_height):
     x_ticks_labels = (
         alt.Chart(axis_df)
         .mark_text(
-            tooltip="",
+            tooltip=None,
             align="center",
             fontSize=Axis.label_font_size,
             font=FONT,
@@ -147,7 +151,7 @@ def __draw_threshold_rules(threshold_df, scales, position, accessibility_mode=Fa
             stroke=stroke_color,
             opacity=Threshold_Rule.opacity,
             strokeWidth=Threshold_Rule.stroke_width,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.X(
@@ -171,7 +175,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
     lower_threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("lower_threshold_value:Q", scale=scales["x"]),
@@ -181,7 +185,7 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
     upper_threshold_band = (
         alt.Chart(threshold_df)
-        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip="")
+        .mark_rect(fill=fill_color, opacity=Threshold_Band.opacity, tooltip=None)
         .encode(
             y=alt.Y(field="metric", type="nominal", scale=scales["y"], axis=no_axis()),
             x=alt.X("upper_threshold_value:Q", scale=scales["x"]),
@@ -211,7 +215,7 @@ def __draw_threshold_text(
             fill=font_color,
             fontSize=Annotation.font_size,
             fontWeight=Annotation.font_weight,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(0),
@@ -304,7 +308,7 @@ def __draw_bubbles(
     # X AXIS GRIDLINES
     axis_values = [0.25, 0.5, 0.75]
     x_axis = alt.Axis(
-        values=axis_values, ticks=False, domain=False, labels=False, title=None
+        values=axis_values, ticks=False, domain=False, labels=False, title=None, gridColor=Axis.grid_color
     )
 
     # COLOR
@@ -338,12 +342,12 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value", type="nominal", title="Group"),
-            alt.Tooltip(field="tooltip_group_size", type="nominal", title="Group Size"),
+            alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
+            alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
-                title="Disparity",
+                title=Label.DISPARITY,
             ),
             alt.Tooltip(
                 field=f"{metric}",
@@ -359,7 +363,7 @@ def __draw_bubbles(
         bubble_centers += (
             alt.Chart(plot_table)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
-            .mark_point(filled=True, size=Bubble.center_size)
+            .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
                 y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
@@ -377,7 +381,7 @@ def __draw_bubbles(
 
         bubble_areas += (
             alt.Chart(plot_table)
-            .mark_circle(opacity=Bubble.opacity)
+            .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
             .transform_calculate(metric_variable=f"'{metric.upper()}'")
             .encode(
                 x=alt.X(f"{metric}:Q", scale=scales["x"], axis=x_axis),
@@ -537,15 +541,21 @@ def plot_metric_bubble_chart(
             height=chart_height,
             width=chart_width,
             title=f"Absolute values by {attribute.title()}",
-            padding=Metric_Chart.full_chart_padding,
+            # padding=Metric_Chart.full_chart_padding,
+            padding={
+                "top": Metric_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 1.25/3 * len(metrics_list) + Metric_Chart.full_chart_padding,
+                "left": Metric_Chart.full_chart_padding,
+                "right": Metric_Chart.full_chart_padding,
+            },
+            usermeta=get_chart_metadata("absolute_chart"),
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
+            anchor=Chart_Title.anchor,
         )
         .resolve_scale(y="independent", size="independent")
     )

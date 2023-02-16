@@ -8,19 +8,21 @@ class Bubble:
     center_size = 60
     # From bubble size scale: (1 - 2 * chart_padding) / 4
     max_bubble_ratio = 0.2
+    cursor = "pointer"
 
 
 class Title:
     font_size = Text.FONT_SIZE_REGULAR
     font_weight = Text.FONT_WEIGHT_BOLD
-    font_color = Color.GRAY
+    font_color = Color.BLACK
     margin_top = -15
 
 
 class Chart_Title(Title):
     font_size = Text.FONT_SIZE_EXTRA_LARGE
     font_weight = Text.FONT_WEIGHT_BOLD
-    margin_top = -10
+    anchor = "start"
+    offset = 20
 
 
 class Subtitle:
@@ -61,6 +63,7 @@ class Axis(Rule):
     label_color = Color.GRAY
     label_font_size = Text.FONT_SIZE_SMALL
     label_font_weight = Text.FONT_WEIGHT_REGULAR
+    grid_color = Color.LIGHT_GRAY
 
 
 class Metric_Axis(Axis):
@@ -75,6 +78,8 @@ class Scatter_Axis(Axis):
     title_padding = 30
     title_font_size = Text.FONT_SIZE_LARGE
     title_font_weight = Text.FONT_WEIGHT_REGULAR
+    title_angle = 0
+    offset = 6
 
 
 class Threshold_Band:
@@ -84,17 +89,20 @@ class Threshold_Band:
 
 
 class Legend:
-    margin_top = 30
+    margin = 20
     color_faded = Color.FADED
     font_color = Color.GRAY
     font_size = Text.FONT_SIZE_SMALL
     font_weight = Text.FONT_WEIGHT_REGULAR
-    vertical_spacing = 10
-    horizontal_spacing = 4
-    title_font_size = Text.FONT_SIZE_REGULAR
-    title_font_weight = Text.FONT_WEIGHT_REGULAR
-    title_margin_bottom = 5
-    circle_radius = 4
+    offset = 4
+    title_font_color = Color.BLACK
+    title_font_size = Text.FONT_SIZE_SMALL
+    title_font_weight = Text.FONT_WEIGHT_BOLD
+    title_padding = 8
+    title_baseline = "top"
+    row_padding = 2
+    symbol_size = 40
+    cursor = "pointer"
 
 
 class Parity_Result:

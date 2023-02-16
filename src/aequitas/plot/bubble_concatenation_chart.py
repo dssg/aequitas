@@ -1,14 +1,14 @@
-import math
 import altair as alt
 import pandas as pd
 
 from aequitas.plot.bubble_disparity_chart import get_disparity_bubble_chart_components
 from aequitas.plot.bubble_metric_chart import get_metric_bubble_chart_components
 
+from aequitas.plot.commons.helpers import get_chart_metadata
 from aequitas.plot.commons.legend import draw_legend
 
 from aequitas.plot.commons.style.classes import Title, Metric_Axis, Chart_Title
-from aequitas.plot.commons.style.text import FONT
+from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons.style.sizes import Concat_Chart
 from aequitas.plot.commons import initializers as Initializer
 
@@ -38,7 +38,7 @@ def draw_chart_title(chart_title, chart_width):
             fontSize=Title.font_size,
             fontWeight=Title.font_weight,
             font=FONT,
-            tooltip="",
+            tooltip=None,
         )
         .encode(
             x=alt.value(chart_width / 2),
@@ -162,16 +162,22 @@ def plot_concatenated_bubble_charts(
             labelFont=FONT,
         )
         .configure_title(
-            align="center",
-            baseline="middle",
             font=FONT,
             fontWeight=Chart_Title.font_weight,
             fontSize=Chart_Title.font_size,
             color=Chart_Title.font_color,
-            dx=chart_width / 2,
+            anchor=Chart_Title.anchor,
+            offset=Chart_Title.offset,
         )
         .properties(
-            title=f"{attribute.title()}", padding=Concat_Chart.full_chart_padding
+            title=attribute.title(), 
+            padding={
+                "top": Concat_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 0.75/3 * len(metrics_list) + Concat_Chart.full_chart_padding,
+                "left": Concat_Chart.full_chart_padding,
+                "right": Concat_Chart.full_chart_padding,
+            },
+            usermeta=get_chart_metadata("disparity_absolute_chart"),
         )
     )
 

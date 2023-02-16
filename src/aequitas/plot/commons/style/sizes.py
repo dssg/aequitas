@@ -1,5 +1,8 @@
+from aequitas.plot.commons.style import text as Text
+
 class Chart:
-    full_chart_padding = {"top": 15, "bottom": 10}
+    # full_chart_padding = {"top": 15, "bottom": 10}
+    full_chart_padding = 15
     padding_x = 0.05
     padding_y = 0.1
 
