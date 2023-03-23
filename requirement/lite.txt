@@ -1,5 +1,6 @@
 matplotlib>=3.0.3
 pandas>=0.24.1
 seaborn>=0.9.0
-altair==4.1.0
+altair>=4.1.0
 millify==0.1.1
+scipy>=0.18.1

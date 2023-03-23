@@ -333,7 +333,7 @@ class Group(object):
         if not attr_cols:
             non_attr_cols = ["id", "model_id", "entity_id", score_col, label_col]
             # index of the columns that are protected attributes.
-            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
+            attr_cols = df.columns[~df.columns.isin(non_attr_cols)].tolist()
 
         necessary_cols = list(attr_cols) + [score_col, label_col]
         for col in ["id", "model_id", "entity_id"]:
