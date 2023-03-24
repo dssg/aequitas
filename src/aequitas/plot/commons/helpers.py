@@ -1,4 +1,6 @@
 import altair as alt
+import numpy as np
+
 from millify import millify, prettify
 
 
@@ -21,6 +23,8 @@ def transform_ratio(value):
     Read: 'how many times larger or smaller than reference disparity'."""
     if value >= 1:
         return value - 1
+    elif value == 0:
+        return np.nan
     else:
         return 1 - 1 / value
 
