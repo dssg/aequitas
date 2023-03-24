@@ -199,13 +199,35 @@ def __draw_threshold_bands(threshold_df, scales, accessibility_mode=False):
 
 
 def __draw_threshold_text(
-    fairness_threshold, ref_group, chart_height, accessibility_mode=False
+    fairness_threshold, ref_group, chart_height, accessibility_mode=False, warnings=()
 ):
     """Draw text that helps to read the fairness threshold elements of the chart."""
     font_color = (
         Annotation.font_color if accessibility_mode else Annotation.font_color_threshold
     )
-
+    warn_text = alt.Chart(DUMMY_DF).mark_text(
+        baseline="top",
+        align="left",
+        font=FONT,
+        fill=font_color,
+        fontSize=Annotation.font_size,
+        fontWeight=Annotation.font_weight,
+    )
+    n_warnings = 0
+    text_explanation = []
+    for group, metric in warnings:
+        y_size = chart_height * (1 - 2 / 3 * Metric_Chart.padding_y) + Annotation.font_size * Annotation.line_spacing * (n_warnings + 1)
+        explanation_text_warning = warn_text.encode(
+            x=alt.value(0),
+            y=alt.value(y_size),
+            text=alt.value(
+                f"Groups {group} have {metric} of 0 (zero). This "
+                "does not allow for the calculation of relative disparities. "
+                "The tooltip for these groups in this plot does not have relative disparities.",
+            )
+        )
+        n_warnings +=1
+        text_explanation.append(explanation_text_warning)
     threshold_text = (
         alt.Chart(DUMMY_DF)
         .mark_text(
@@ -226,7 +248,9 @@ def __draw_threshold_text(
         )
     )
 
-    return threshold_text
+    text_explanation.append(threshold_text)
+
+    return alt.layer(*(chart for chart in text_explanation))
 
 
 def __get_threshold_elements(
@@ -238,6 +262,7 @@ def __get_threshold_elements(
     chart_height,
     concat_chart,
     accessibility_mode=False,
+    warnings=(),
 ):
     """Gets fairness threshold elements (rules, bands and text) for the chart."""
 
@@ -285,7 +310,7 @@ def __get_threshold_elements(
         return lower_threshold_rules + upper_threshold_rules + threshold_bands
     else:
         threshold_text = __draw_threshold_text(
-            fairness_threshold, ref_group, chart_height, accessibility_mode
+            fairness_threshold, ref_group, chart_height, accessibility_mode, warnings
         )
 
         return (
@@ -410,8 +435,15 @@ def get_metric_bubble_chart_components(
 ):
     """Creates the components necessary to plot the metric chart."""
 
+    # Check for warnings in plot
+    metric_warnings = []
     # COMPUTE SCALED DISPARITIES
     for metric in metrics:
+        zero_metric_groups = plot_table[plot_table[f"{metric}_disparity"] == 0]
+        zero_values = zero_metric_groups["attribute_value"].values
+        if zero_values.any():
+            metric_warnings.append([zero_values, metric])
+
         plot_table[f"{metric}_disparity_scaled"] = plot_table.apply(
             lambda row: transform_ratio(row[f"{metric}_disparity"]), axis=1
         )
@@ -449,6 +481,7 @@ def get_metric_bubble_chart_components(
             chart_height,
             concat_chart,
             accessibility_mode,
+            metric_warnings
         )
         # ASSEMBLE CHART WITH THRESHOLD
         main_chart = (

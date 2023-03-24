@@ -297,8 +297,18 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
     )
 
 
-def __draw_parity_test_explanation(fairness_threshold, x_position):
+def __draw_parity_test_explanation(fairness_threshold, x_position, warnings=()):
     """Draw text that explains what does pass/fail mean in the parity test results."""
+    text_explanation = []
+    
+    warn_text = alt.Chart(DUMMY_DF).mark_text(
+        baseline="top",
+        align="left",
+        font=FONT,
+        fill='rgb(211, 47, 47)',
+        fontSize=Annotation.font_size,
+        fontWeight=Annotation.font_weight,
+    )
 
     explanation_text = alt.Chart(DUMMY_DF).mark_text(
         baseline="top",
@@ -308,6 +318,22 @@ def __draw_parity_test_explanation(fairness_threshold, x_position):
         fontSize=Annotation.font_size,
         fontWeight=Annotation.font_weight,
     )
+
+    n_warnings = 0
+    for metric_warnings in warnings:
+        if metric_warnings:        
+            for group, metric in metric_warnings:
+                explanation_text_warning = warn_text.encode(
+                    x=alt.value(x_position),
+                    y=alt.value(Annotation.font_size * Annotation.line_spacing * (n_warnings + 2)),
+                    text=alt.value(
+                        f"Groups {group} have {metric} of 0 (zero). This "
+                        "does not allow for the calculation of relative disparities. "
+                        "The groups will be absent in respective visualizations.",
+                    )
+                )
+                n_warnings +=1
+                text_explanation.append(explanation_text_warning)
 
     explanation_text_group = explanation_text.encode(
         x=alt.value(x_position),
@@ -324,8 +350,9 @@ def __draw_parity_test_explanation(fairness_threshold, x_position):
             f"An attribute passes the parity test for a given metric if all its groups pass the test."
         ),
     )
-
-    return explanation_text_group + explanation_text_attribute
+    text_explanation.append(explanation_text_group)
+    text_explanation.append(explanation_text_attribute)
+    return alt.layer(*(chart for chart in text_explanation))
 
 
 def __create_population_bar_df(attribute_df, metric):
@@ -419,7 +446,14 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
 
 def __create_disparity_variables(attribute_df, metric, fairness_threshold):
     """ Creates scaled disparity, parity test result & disparity explanation tooltip variables. """
-
+    # Check if any group has a disparity of 0.
+    # These values would potentially break the plots, and will raise warnings to the user.
+    zero_metric_groups = attribute_df[attribute_df[f"{metric}_disparity"] == 0]
+    zero_values = zero_metric_groups["attribute_value"].values
+    warning = None
+    if zero_values.any():
+        # If we check any disparities with value of 0, we send them as warnings.
+        warning = [zero_values, metric]
     # SCALED DISPARITY VALUE
     attribute_df[f"{metric}_disparity_scaled"] = attribute_df.apply(
         lambda row: transform_ratio(row[f"{metric}_disparity"]), axis=1
@@ -432,7 +466,7 @@ def __create_disparity_variables(attribute_df, metric, fairness_threshold):
         fairness_threshold=fairness_threshold,
         axis=1,
     )
-
+    return warning
 
 def __get_attribute_column(
     attribute_df, metrics, scales, attribute, size_constants, fairness_threshold
@@ -440,10 +474,12 @@ def __get_attribute_column(
     """ Returns a vertical concatenation of all elements of all metrics for each attribute's column."""
 
     metric_summary = []
-
+    metric_warnings = []
     for metric in metrics:
         # CREATE VARIABLES IN DF
-        __create_disparity_variables(attribute_df, metric, fairness_threshold)
+        warnings = __create_disparity_variables(attribute_df, metric, fairness_threshold)
+        if warnings:
+            metric_warnings.append(warnings)
         __create_tooltip_variables(attribute_df, metric, fairness_threshold)
         __create_group_rank_variable(attribute_df, metric)
 
@@ -487,7 +523,7 @@ def __get_attribute_column(
         *metric_summary,
         bounds="flush",
         spacing=size_constants["line_spacing"],
-    )
+    ), metric_warnings
 
 
 def plot_summary_chart(
@@ -568,7 +604,7 @@ def plot_summary_chart(
     viz_fields += [f"{metric}_disparity" for metric in metrics]
 
     attribute_columns = []
-
+    attribute_warnings = []
     for attribute in attributes:
         # CREATE ATTRIBUTE DF
         attribute_df = (
@@ -582,7 +618,7 @@ def plot_summary_chart(
         )
 
         # ATTRIBUTE COLUMN
-        attribute_column = __get_attribute_column(
+        attribute_column, metric_warning = __get_attribute_column(
             attribute_df,
             metrics,
             scales,
@@ -590,7 +626,8 @@ def plot_summary_chart(
             size_constants,
             fairness_threshold,
         )
-
+        if metric_warning:
+            attribute_warnings.append(metric_warning)
         attribute_columns.append((attribute_column))
 
     # CONCATENATE ATTRIBUTE COLUMNS
@@ -609,7 +646,7 @@ def plot_summary_chart(
     )
 
     summary_chart_explanation = __draw_parity_test_explanation(
-        fairness_threshold, size_constants["column_spacing"] / 2
+        fairness_threshold, size_constants["column_spacing"] / 2, attribute_warnings
     )
 
     full_summary_chart = (
