@@ -66,7 +66,9 @@ def preprocess_input_df(df: pd.DataFrame, required_cols: List[str] = None) -> Tu
         required_cols = ['score']
     try:
         check_required_cols(df, required_cols)
-    except ValueError as e:
+    except ValueError:
+        logging.exception('input dataframe does not have all the required columns')
+        raise
         logging.error(f'preprocessing.preprocess_input_df: {e}')
         raise
 
