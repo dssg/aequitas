@@ -44,7 +44,7 @@ def discretize(df: pd.DataFrame, target_cols: List[str]) -> pd.DataFrame:
             try:
                 df[col] = bins.map(lambda x: '%0.2f' % values[x] + '-' + '%0.2f' % values[x + 1])
             except Exception as e:
-                logging.info(f'Something strange with a column in the input_df: {e}')
+                logging.info('Something strange with a column in the input_df: %s', e)
                 df = df.drop(col)
         else:
             try:
