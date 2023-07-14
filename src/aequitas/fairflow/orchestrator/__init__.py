@@ -183,7 +183,7 @@ class Orchestrator:
                     tuner.optimize(
                         n_trials=self.config.optimization.n_trials,
                         n_jobs=self.config.optimization.n_jobs,
-                        sampler=sampler(**self.config.optimization.sampler_args),
+                        sampler=self.sampler,
                     )
 
                     if "results" in self.artifacts:

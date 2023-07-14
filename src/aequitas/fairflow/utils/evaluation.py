@@ -1,20 +1,75 @@
-from typing import Union
+from typing import Literal, Union
 
 import numpy as np
 import pandas as pd
 
+from ..evaluation import Result
 
-def create_bootstrap_estimates(
+
+def _prepare_results(
     results: list[Result],
-    configs_per_trial: Union[float, list[int]],
-    alpha_definition: Union[float, list[float]],
-    evaluate_on: str,
+    dataset_split: Literal["train", "validation", "test"],
+) -> pd.DataFrame:
+    """Method to prepare the results object for the creation of bootstrap estimates.
+
+    Parameters
+    ----------
+    results : list[Result]
+        List of results objects.
+    dataset_split : Literal["train", "validation", "test"]
+        Dataset split to use for the bootstrap estimates.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with the results for the given dataset split.
+    """
+    # Validate the dataset_split argument
+    if dataset_split not in ["train", "validation", "test"]:
+        raise AttributeError("Invalid split definition for prepare_results")
+
+    results_property = f"{dataset_split}_results"
+    metrics = getattr(results[0], results_property).keys()
+    data = {
+        metric: [getattr(result, results_property)[metric] for result in results]
+        for metric in metrics
+    }
+    return pd.DataFrame(data)
+
+
+def _calculate_alpha_weighted_metric(
+    models: pd.DataFrame,
+    alpha_points: list[float],
+    performance_metric: str,
+    fairness_metric: str,
+) -> pd.DataFrame:
+    def calculate_alpha_weighted_score(row, alpha, performance_metric, fairness_metric):
+        return row[performance_metric] * alpha + row[fairness_metric] * (1 - alpha)
+
+    models = models.copy()
+    for alpha in alpha_points:
+        models[f"alpha_{alpha}"] = models.apply(
+            calculate_alpha_weighted_score,
+            axis=1,
+            alpha=alpha,
+            performance_metric=performance_metric,
+            fairness_metric=fairness_metric,
+        )
+    return models
+
+
+def bootstrap_hyperparameters(
+    results: list[Result],
+    bootstrap_size: Union[float, list[int]],
+    alpha_points: Union[float, list[float]],
+    evaluate_on: Literal["train", "validation", "test"],
     performance_metric: str,
     fairness_metric: str,
     n_trials: int = 100,
     seed: int = 42,
 ):
-    """Method to create bootstrap estimates for the performance and fairness metrics.
+    """Method to create bootstrap estimates for the performance and fairness metrics on
+    a random search trial.
 
     Works both for the creation of samples over the different alpha values with the same
     sample size and for over different sample sizes for the same alpha value.
@@ -27,11 +82,11 @@ def create_bootstrap_estimates(
         Number of bootstrap samples.
     seed : int
         Seed for the random number generator and sampling.
-    configs_per_trial : Union[float, list[int]]
+    bootstrap_size : Union[float, list[int]]
         Number of configurations to sample per trial. If float, it is interpreted as a
         percentage of the total number of configurations. If list, it is interpreted as
         the number of configurations to sample for each trial.
-    alpha_definition : Union[float, list[float]]
+    alpha_points : Union[float, list[float]]
         Alpha values to use for the bootstrap samples. If float, it is interpreted as a
         single alpha value. If list, it is interpreted as a list of alpha values.
     evaluate_on : str
@@ -41,56 +96,32 @@ def create_bootstrap_estimates(
     fairness_metric : str
         Name of the fairness metric to use.
     """
-    if isinstance(alpha_definition, list) and isinstance(configs_per_trial, list):
-        raise ValueError(
-            "Only one of alpha_definition and configs_per_trial can be a list"
-        )
+    # Check if only one of alpha_points and bootstrap_size is a list
+    # Note: This can be generalizable so both are lists, but it is not needed for now.
+    if isinstance(alpha_points, list) ^ isinstance(bootstrap_size, list):
+        raise ValueError("Only one of alpha_points and bootstrap_size can be a list")
 
     # prepare the results object
-    if evaluate_on == "validation":
-        results_property = "validation_results"
-    elif evaluate_on == "test":
-        results_property = "test_results"
-    else:
-        raise ValueError("EVALUATE_ON must be either 'validation' or 'test'")
+    models = _prepare_results(results, evaluate_on)
 
-    # for each result in results, get the results_property
-    results_dict = {}
-    for index, result in enumerate(results):
-        results_dict[index] = getattr(result, results_property)
+    # Create a list to iterate over the alphas
+    alphas = [alpha_points] if isinstance(alpha_points, float) else alpha_points
 
-    index = []
-    df_data = {}
-    for key, value in results_dict.items():
-        index.append(key)
-        for k, v in value.items():
-            values = df_data.get(k, [])
-            values.append(v)
-            df_data[k] = values
+    samples = [bootstrap_size] if isinstance(bootstrap_size, float) else bootstrap_size
 
-    models = pd.DataFrame(df_data, index=index)
-
-    # create the alpha weighted column
-    if isinstance(alpha_definition, float):
-        alphas = [alpha_definition]
-    else:
-        alphas = alpha_definition
-
-    if isinstance(configs_per_trial, float):
-        n_configs = [configs_per_trial]
-    else:
-        n_configs = configs_per_trial
-
-    for alpha in alphas:
-        models[f"alpha_{alpha}"] = models[performance_metric] * alpha + models[
-            fairness_metric
-        ] * (1 - alpha)
+    # Add alpha metrics to the metrics DataFrame
+    models = _calculate_alpha_weighted_metric(
+        models,
+        alphas,
+        performance_metric,
+        fairness_metric,
+    )
 
     np.random.seed(seed)
     sampling_seeds = np.random.choice(n_trials * 1000, n_trials, replace=False)
 
     final_results = {}
-    if isinstance(configs_per_trial, float):
+    if isinstance(bootstrap_size, float):
         for alpha in alphas:
             final_results[alpha] = {
                 "performance": [],
@@ -98,15 +129,15 @@ def create_bootstrap_estimates(
                 "alpha_weighted": [],
             }
     else:
-        for n in n_configs:
+        for n in samples:
             final_results[n] = {"performance": [], "fairness": [], "alpha_weighted": []}
 
     # If we are iterating over alphas:
-    if isinstance(configs_per_trial, float):
-        for index, seed in enumerate(sampling_seeds):
-            n_models_to_sample = int(round(configs_per_trial * models.shape[0], 0))
+    if isinstance(bootstrap_size, float):
+        for seed in sampling_seeds:
+            n_models_to_sample = int(round(bootstrap_size * models.shape[0], 0))
             indexes_to_sample = np.random.choice(
-                list(results_dict.keys()), n_models_to_sample, replace=True
+                list(models.index), n_models_to_sample, replace=True
             )
             sampled_models = models.loc[indexes_to_sample]
             for alpha in alphas:
@@ -127,14 +158,14 @@ def create_bootstrap_estimates(
     # If we are iterating over trials:
     else:
         for index, seed in enumerate(sampling_seeds):
-            for n in n_configs:
+            for n in bootstrap_size:
                 indexes_to_sample = np.random.choice(
-                    list(results_dict.keys()), n, replace=True
+                    list(models.index), n, replace=True
                 )
                 sampled_models = models.loc[indexes_to_sample]
                 selected_model = sampled_models[
-                    sampled_models[f"alpha_{alpha_definition}"]
-                    == sampled_models[f"alpha_{alpha_definition}"].max()
+                    sampled_models[f"alpha_{alpha_points}"]
+                    == sampled_models[f"alpha_{alpha_points}"].max()
                 ]
                 final_results[n]["performance"].append(
                     selected_model[performance_metric].values[0]
@@ -143,7 +174,7 @@ def create_bootstrap_estimates(
                     selected_model[fairness_metric].values[0]
                 )
                 final_results[n]["alpha_weighted"].append(
-                    selected_model[f"alpha_{alpha_definition}"].values[0]
+                    selected_model[f"alpha_{alpha_points}"].values[0]
                 )
 
     return final_results

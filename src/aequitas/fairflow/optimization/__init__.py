@@ -11,15 +11,27 @@ from omegaconf import OmegaConf, DictConfig
 from optuna.trial import BaseTrial
 
 from hpt.suggest import suggest_callable_hyperparams
-from hpt.evaluation import evaluate_performance, evaluate_fairness
 
 from ..methods import PreProcessing, InProcessing, PostProcessing
 from ..methods.postprocessing.threshold import Threshold
+from ..evaluation import evaluate_fairness, evaluate_performance
+
+
+@dataclasses.dataclass
+class Result:
+    id: int
+    hyperparameters: dict
+    validation_results: dict
+    test_results: dict = None
+    train_results: dict = None
+    fit_time: float = None
+    validation_time: float = None
+    test_time: float = None
+    algorithm: str = None
 
 
 class ObjectiveFunction:
     """Callable objective function to be used with optuna."""
-
     @dataclasses.dataclass
     class TrialResults:
         id: int
@@ -195,7 +207,7 @@ class ObjectiveFunction:
 
         # Store trial's results
         self._models_results.append(
-            self.TrialResults(
+            Result(
                 id=trial.number,
                 hyperparameters=hyperparams,
                 validation_results=val_results,
@@ -245,7 +257,7 @@ class ObjectiveFunction:
         results = evaluate_performance(y, y_pred)
 
         if s is not None:
-            results.update(evaluate_fairness(y.values, y_pred.values, s.values, True))
+            results.update(evaluate_fairness(y, y_pred, s, True))
 
         return results
 
