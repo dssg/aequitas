@@ -7,6 +7,8 @@ from uuid import uuid4
 import numpy as np
 import pkg_resources
 
+from .wrapper import ParetoWrapper
+
 
 # NumPy data types are not JSON serializable. This custom JSON encoder will
 # transform them to standard Python types.
@@ -43,9 +45,7 @@ def _generate_filename(tuner_type, alpha, performance_metric, fairness_metric):
 def _make_html(payload):
     div_id = _id_generator()
     template_path = pkg_resources.resource_filename(__name__, "template.html")
-    pareto_js_path = pkg_resources.resource_filename(
-        __name__, "js/dist/fairAutoML.js"
-    )
+    pareto_js_path = pkg_resources.resource_filename(__name__, "js/dist/fairAutoML.js")
 
     with open(pareto_js_path, "r") as file:
         pareto_js_bundle = file.read()
@@ -61,44 +61,43 @@ def _make_html(payload):
     )
 
 
-def visualize(tuner, mode="display", save_path=None):
-    """Render interactive application to explore results of hyperparameter optimization search.
-    Tuner parameter must have a fairness metric set.
+def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
+    """Render interactive application to explore results of hyperparameter optimization
+    search.
 
     Parameters
     ----------
-    tuner : BaseTuner
-        A tuner instance of one of the fairautoml.tuners.
+    wrapper : ParetoWrapper
+        An interface between the method and results.
     mode : str, optional, default "display"
-       The mode can be "display" to render the visualization in a notebook, or "save" to export
-       the visualization to an .html file.
+       The mode can be "display" to render the visualization in a notebook, or "save"
+       to export the visualization to an .html file.
     save_path : str, optional
         The save path for the exported .html of the application.
 
     """
-    if tuner.fairness_metric is None:
+    if wrapper.fairness_metric is None:
         raise NameError(
             """No fairness metric was used in the hyperparameter optimization process.
             The visualization requires a fairness metric to be set."""
         )
 
-    if "is_pareto" not in tuner.results.columns:
-        tuner._compute_pareto_models()  # noqa
+    if "is_pareto" not in wrapper.results.columns:
+        wrapper._compute_pareto_models()  # noqa
 
     try:
-        tuner_results_flat = tuner.results.reset_index()
+        wrapper_results_flat = wrapper.results.reset_index()
     except TypeError:
         print(
             """tuner.results is not a valid Pandas DataFrame.
             'visualize' must be run after the hyperparameter search has been completed."""
         )
+        raise
 
-    fairness_metrics = list(tuner.available_fairness_metrics)
-    performance_metrics = list(
-        tuner.available_performance_metrics - {"pp", "money_pp", "pn", "money_pn"}
-    )
+    fairness_metrics = list(wrapper.available_fairness_metrics)
+    performance_metrics = list(wrapper.available_performance_metrics)
 
-    filtered_results = tuner_results_flat[
+    filtered_results = wrapper_results_flat[
         fairness_metrics
         + performance_metrics
         + ["model_id", "hyperparams", "is_pareto"]
@@ -110,23 +109,23 @@ def visualize(tuner, mode="display", save_path=None):
 
     payload = {
         "models": models_json,
-        "recommended_model": tuner.best_model_details,
-        "optimized_fairness_metric": tuner.fairness_metric,
-        "optimized_performance_metric": tuner.performance_metric,
+        "recommended_model": wrapper.best_model_details,
+        "optimized_fairness_metric": wrapper.fairness_metric,
+        "optimized_performance_metric": wrapper.performance_metric,
         "fairness_metrics": fairness_metrics,
         "performance_metrics": performance_metrics,
-        "tuner_type": tuner.__class__.__qualname__,
-        "alpha": tuner.alpha,
+        "tuner_type": "Random Search",  # Hardcoded for now
+        "alpha": wrapper.alpha,
     }
 
     app_html = _make_html(payload)
 
     if mode == "save":
         path = save_path or _generate_filename(
-            tuner.__class__.__qualname__,
-            tuner.alpha,
-            tuner.performance_metric,
-            tuner.fairness_metric,
+            "Random Search",  # Hardcoded for now
+            wrapper.alpha,
+            wrapper.performance_metric,
+            wrapper.fairness_metric,
         )
 
         with open(path, "w") as file:
