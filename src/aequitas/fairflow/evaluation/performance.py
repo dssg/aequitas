@@ -25,12 +25,12 @@ def evaluate_performance(
     """
     result = {}
 
-    sensitive_attribute = pd.Series([1] * len(y_true))
+    sensitive_attribute = pd.Series([1] * len(y_true), index=y_true.index).astype(str)
     fairness_results = evaluate_fairness(
         y_true,
         y_pred,
         sensitive_attribute,
-        return_groupwise_metrics=False,
+        return_groupwise_metrics=True,
     )
 
     for metric in METRICS:

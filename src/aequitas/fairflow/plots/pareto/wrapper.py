@@ -3,6 +3,8 @@ import pandas as pd
 
 from typing import Any, Literal
 
+from ...evaluation.fairness import METRICS
+
 
 class ParetoWrapper:
     """Wrapper class for the visualization of Pareto models.
@@ -24,6 +26,12 @@ class ParetoWrapper:
         self.performance_metric = performance_metric
         self.alpha = alpha
         self.direction = direction
+        self.available_fairness_metrics = {
+            "Predictive Equality",
+            "Equal Opportunity",
+            "Demographic Parity",
+        }  # Hardcoded for now
+        self.available_performance_metrics = METRICS
         self._best_model_idx: int = 0
 
     @property

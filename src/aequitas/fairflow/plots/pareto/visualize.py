@@ -85,14 +85,7 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
     if "is_pareto" not in wrapper.results.columns:
         wrapper._compute_pareto_models()  # noqa
 
-    try:
-        wrapper_results_flat = wrapper.results.reset_index()
-    except TypeError:
-        print(
-            """tuner.results is not a valid Pandas DataFrame.
-            'visualize' must be run after the hyperparameter search has been completed."""
-        )
-        raise
+    wrapper_results_flat = wrapper.results.reset_index()
 
     fairness_metrics = list(wrapper.available_fairness_metrics)
     performance_metrics = list(wrapper.available_performance_metrics)

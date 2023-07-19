@@ -1,17 +1,22 @@
 import pandas as pd
 
 from typing import Optional
-from ...group import Group, COLUMN_ORDER
+from ...group import Group
 
 
-METRICS = COLUMN_ORDER[5:-9]  # TODO: This is a hack, find a better way to define them.
+METRICS = list(Group.all_group_metrics) + [
+    "fp",
+    "fn",
+    "tn",
+    "tp",
+]
 
 
 def evaluate_fairness(
-        y_true: pd.Series,
-        y_pred: pd.Series,
-        sensitive_attribute: pd.Series,
-        return_groupwise_metrics: Optional[bool] = False,
+    y_true: pd.Series,
+    y_pred: pd.Series,
+    sensitive_attribute: pd.Series,
+    return_groupwise_metrics: Optional[bool] = False,
 ) -> dict:
     """Evaluates fairness as the ratios or differences between group-wise performance
     metrics.
@@ -34,7 +39,7 @@ def evaluate_fairness(
 
     group = Group()
 
-    df = pd.concat([y_true, y_pred, sensitive_attribute], axis=1).copy()
+    df = pd.concat([y_true, y_pred, sensitive_attribute.astype(str)], axis=1).copy()
     df.columns = ["label_value", "score", "sensitive_attribute"]
 
     metrics_df, _ = group.get_crosstabs(df)
@@ -48,7 +53,7 @@ def evaluate_fairness(
     if return_groupwise_metrics:
         unique_groups = sensitive_attribute.unique()
         for group in unique_groups:
-            group_df = metrics_df[metrics_df["attribute_value"] == group]
+            group_df = metrics_df[metrics_df["attribute_value"] == str(group)]
             for metric in METRICS:
                 result[f"{metric}_{group}"] = group_df[metric].values[0]
 

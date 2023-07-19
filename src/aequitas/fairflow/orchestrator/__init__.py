@@ -10,13 +10,12 @@ from optuna.samplers import BaseSampler
 
 from hpt import OptunaTuner
 
-from fairbench.utils import create_logger, ConfigReader, import_object
-from fairbench.optimization import ObjectiveFunction
-from fairbench.methods.postprocessing.threshold import Threshold
+from ..utils import create_logger, ConfigReader, import_object
+from ..optimization import ObjectiveFunction
+from ..methods.postprocessing.threshold import Threshold
 
 
 class Orchestrator:
-
     SAMPLERS_MODULE = "optuna.samplers."
 
     POSSIBLE_ARTIFACTS = (
@@ -178,12 +177,11 @@ class Orchestrator:
                         artifacts_folder=method_folder,
                     )
 
-                    tuner = OptunaTuner(objective)
+                    tuner = OptunaTuner(objective, sampler=self.sampler)
 
                     tuner.optimize(
                         n_trials=self.config.optimization.n_trials,
                         n_jobs=self.config.optimization.n_jobs,
-                        sampler=self.sampler,
                     )
 
                     if "results" in self.artifacts:

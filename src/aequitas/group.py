@@ -8,9 +8,7 @@ import pandas as pd
 
 logging.getLogger(__name__)
 
-__author__ = (
-    "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson, Sérgio Jesus"
-)
+__author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson, Sérgio Jesus"
 
 
 class Group(object):
@@ -128,11 +126,15 @@ class Group(object):
             # Create confusion matrix for each group in the form of dictionary.
             # This is for pd.DataFrames only.
             grouped_data = (
-                df.groupby(by=[attribute_name, score, label]).size().to_dict(into=OrderedDict)
+                df.groupby(by=[attribute_name, score, label])
+                .size()
+                .to_dict(into=OrderedDict)
             )
             # Select the possible (unique) values of the protected attributes (groups).
             # list(OrderedDict.fromkeys()) works like an ordered set.
-            attribute_values = list(OrderedDict.fromkeys([key[0] for key in grouped_data]))
+            attribute_values = list(
+                OrderedDict.fromkeys([key[0] for key in grouped_data])
+            )
 
             for attribute_value in attribute_values:
                 # Get confusion matrix from the dictionary.
@@ -314,7 +316,7 @@ class Group(object):
         if not attr_cols:
             non_attr_cols = ["id", "model_id", "entity_id", score_col, label_col]
             # index of the columns that are protected attributes.
-            attr_cols = df.columns[~df.columns.isin(non_attr_cols)]
+            attr_cols = list(df.columns[~df.columns.isin(non_attr_cols)])
 
         necessary_cols = attr_cols + [score_col, label_col]
         for col in ["id", "model_id", "entity_id"]:
