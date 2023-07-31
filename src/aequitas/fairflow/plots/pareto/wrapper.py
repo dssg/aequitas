@@ -3,8 +3,6 @@ import pandas as pd
 
 from typing import Any, Literal
 
-from ...evaluation.fairness import METRICS
-
 
 class ParetoWrapper:
     """Wrapper class for the visualization of Pareto models.
@@ -16,12 +14,17 @@ class ParetoWrapper:
     def __init__(
         self,
         results: list[dict[str, list[Any]]],
-        fairness_metric,
+        fairness_metric: Literal[
+            "Predictive Equality", "Equal Opportunity", "Demographic Parity"
+        ],
         performance_metric,
+        method,
         alpha: float = 0.5,
-        direction: Literal["minimize", "maximize"] = "minimize",
+        direction: Literal["minimize", "maximize"] = "maximize",
     ):
-        self._results = results
+        self.method = method
+        # Cast the results to the desired format
+        self._results = [self._dataclass_to_dict(res, method) for res in results]
         self.fairness_metric = fairness_metric
         self.performance_metric = performance_metric
         self.alpha = alpha
@@ -31,7 +34,13 @@ class ParetoWrapper:
             "Equal Opportunity",
             "Demographic Parity",
         }  # Hardcoded for now
-        self.available_performance_metrics = METRICS
+        self.available_performance_metrics = [
+            "TPR",
+            "FPR",
+            "FNR",
+            "Accuracy",
+            "Precision",
+        ]
         self._best_model_idx: int = 0
 
     @property
@@ -111,22 +120,3 @@ class ParetoWrapper:
             "algorithm": hyperparameters["classpath"],
             "hyperparams": hyperparameters,
         }
-
-
-# tuner.fairness_metric = "Predictive Equality"
-# tuner.performance_metric = "TPR"
-# tuner.direction = "maximize"
-# tuner.available_fairness_metrics = {
-#     "Predictive Equality",
-#     "Equal Opportunity",
-#     "Demographic Parity",
-# }
-# tuner.available_performance_metrics = {"TPR", "FPR", "FNR", "Accuracy", "Precision"}
-# tuner.alpha = 0.5
-
-
-# tuner._results = [
-#     dataclass_to_dict(res, method)
-#     for method in results["baf_base"].keys()
-#     for res in results["baf_base"][method]
-# ]
