@@ -1,5 +1,5 @@
 
-<img src="images/aequitas_fairflow_header.png">
+<img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/aequitas_fairflow_header.png">
 
 # Comparison of Fair ML Methods
 

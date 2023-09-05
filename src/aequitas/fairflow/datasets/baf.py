@@ -6,7 +6,7 @@ from typing import Any
 from ..utils import create_logger
 
 
-VARIANTS = ["Debug", "Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV", "iid"]
+VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV"]
 
 CATEGORICAL_COLUMNS = [
     "payment_type",
@@ -25,7 +25,9 @@ DEFAULT_SPLIT = {
     "test": (7,),
 }
 
-DEFAULT_PATH = (Path(__file__).parent / "../../../datasets/BankAccountFraud").resolve()
+DEFAULT_PATH = (
+    Path(__file__).parent / "../../../../datasets/BankAccountFraud"
+).resolve()
 
 
 class BankAccountFraud:

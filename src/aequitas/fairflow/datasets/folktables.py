@@ -21,7 +21,7 @@ SPLIT_VALUES = ["train", "validation", "test"]
 
 DEFAULT_SPLIT = None
 
-DEFAULT_PATH = (Path(__file__).parent / "../../../datasets/FolkTables").resolve()
+DEFAULT_PATH = (Path(__file__).parent / "../../../../datasets/FolkTables").resolve()
 
 
 class FolkTables:
