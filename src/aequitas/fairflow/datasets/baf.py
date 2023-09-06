@@ -26,9 +26,7 @@ DEFAULT_SPLIT = {
     "test": (7,),
 }
 
-DEFAULT_PATH = (
-    Path(__file__).parent / "../../../../datasets/BankAccountFraud"
-).resolve()
+DEFAULT_PATH = (Path(__file__).parent / "../../../datasets/BankAccountFraud").resolve()
 
 
 class BankAccountFraud:
