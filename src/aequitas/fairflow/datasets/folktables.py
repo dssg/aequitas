@@ -65,7 +65,7 @@ class FolkTables:
         if url(path) or path.exists():
             self.path = path
         else:
-            raise NotADirectoryError("Specified path does not exist.")
+            raise NotADirectoryError(f"Specified path does not exist: {path}.")
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
