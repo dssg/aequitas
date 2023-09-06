@@ -28,7 +28,8 @@ class Orchestrator:
 
     def __init__(
         self,
-        config_file: Path,
+        config_file: Optional[Path] = None,
+        config: Optional[dict] = None,
         default_fields: Iterable[str] = ("methods", "datasets"),
         save_artifacts: bool = True,
         save_folder: Optional[Path] = Path("artifacts"),
@@ -55,8 +56,15 @@ class Orchestrator:
         self.logger.info("Instantiating Benchmark class.")
 
         # Read config file
-        self.config_reader = ConfigReader(config_file, default_fields=default_fields)
-        self.config = self.config_reader.config
+        if config is not None:
+            self.config = config
+        elif config_file is not None:
+            self.config_reader = ConfigReader(
+                config_file, default_fields=default_fields
+            )
+            self.config = self.config_reader.config
+        else:
+            raise ValueError("Missing configuration file")
 
         # Check if optimization parameters are provided
         if not hasattr(self.config, "optimization"):
