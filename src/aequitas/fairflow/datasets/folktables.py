@@ -106,7 +106,10 @@ class FolkTables:
         if self.split_type == "predefined":
             path = []
             for split in ["train", "validation", "test"]:
-                path.append(self.path / f"{self.variant}.{split}.{self.extension}")
+                if isinstance(self.path, str):
+                    path.append(self.path + f"/{self.variant}.{split}.{self.extension}")
+                else:
+                    path.append(self.path / f"{self.variant}.{split}.{self.extension}")
         else:
             path = self.path / f"{self.variant}.{split}.{self.extension}"
         self.logger.info(f"Loading data from {path}")

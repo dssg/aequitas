@@ -113,7 +113,10 @@ class BankAccountFraud:
 
     def load_data(self):
         """Load the defined BankAccountFraud dataset."""
-        path = self.path / f"{self.variant}.{self.extension}"
+        if isinstance(self.path, str):
+            path = self.path + f"/{self.variant}.{self.extension}"
+        else:
+            path = self.path / f"{self.variant}.{self.extension}"
         self.logger.info(f"Loading data from {path}")
         if self.extension == "parquet":
             self.data = pd.read_parquet(path)
