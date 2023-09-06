@@ -1,7 +1,8 @@
 import pandas as pd
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
+from validators import url
 
 from ..utils import create_logger
 
@@ -36,7 +37,7 @@ class BankAccountFraud:
         variant: str,
         split_type: str = "month",
         splits: dict[str, list[Any]] = DEFAULT_SPLIT,
-        path: Path = DEFAULT_PATH,
+        path: Union[str, Path] = DEFAULT_PATH,
         seed: int = 42,
         extension: str = "parquet",
     ):
@@ -67,11 +68,10 @@ class BankAccountFraud:
         else:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
-        if not path.exists():
-            print(path.absolute())
-            raise NotADirectoryError("Specified path does not exist.")
-        else:
+        if url(path) or path.exists():
             self.path = path
+        else:
+            raise NotADirectoryError("Specified path does not exist.")
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type vale. Try one of: {SPLIT_TYPES}")
         else:

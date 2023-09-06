@@ -1,11 +1,15 @@
 from pathlib import Path
 from typing import Union
+from validators import url
 
 import pandas as pd
 
 
 class GenericDataset:
-    def __init__(self, train_path: Union[str, Path], validation_path: Union[str, Path],
+    def __init__(
+        self,
+        train_path: Union[str, Path],
+        validation_path: Union[str, Path],
         test_path: Union[str, Path],
         categorical_columns: list[str],
         target_column: str,
@@ -16,11 +20,11 @@ class GenericDataset:
         Parameters
         ----------
         train_path : Union[str, Path]
-            The path to the training data.
+            The path to the training data. May be URL.
         validation_path : Union[str, Path]
-            The path to the validation data.
+            The path to the validation data. May be URL.
         test_path : Union[str, Path]
-            The path to the test data.
+            The path to the test data. May be URL.
         categorical_columns : list[str]
             The names of the categorical columns in the dataset.
         target_column : str
@@ -32,17 +36,18 @@ class GenericDataset:
         ------
         ValueError
             If any of the paths are invalid.
-         """
+        """
         self.target_column = target_column
         self.categorical_columns = categorical_columns
 
         paths = [train_path, validation_path, test_path]
         self.paths = []
         for path in paths:
-            if not Path(path).exists():
-                raise ValueError(f"Invalid path: {path}")
-            else:
+            # Check if it is an URL or a directory
+            if url(path) or Path(path).exists():
                 self.paths.append(path)
+            else:
+                raise ValueError(f"Invalid path: {path}")
 
         self.extension = extension
 
