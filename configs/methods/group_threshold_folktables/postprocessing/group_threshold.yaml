@@ -1,0 +1,5 @@
+group_thresholding:
+  classpath: aequitas.fairflow.methods.postprocessing.group_threshold.GroupThreshold
+  args: 
+    threshold_type: tpr
+    threshold_value: 0.8

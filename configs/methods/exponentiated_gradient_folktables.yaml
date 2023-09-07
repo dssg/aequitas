@@ -1,0 +1,7 @@
+exponentiated_gradient_folktables:
+  type: inprocessing
+
+defaults:
+  - exponentiated_gradient_folktables/preprocessing: identity
+  - exponentiated_gradient_folktables/inprocessing: exponentiated_gradient
+  - exponentiated_gradient_folktables/postprocessing: identity

@@ -1,0 +1,7 @@
+group_threshold_baf:
+  type: postprocessing
+
+defaults:
+  - group_threshold_baf/preprocessing: identity
+  - group_threshold_baf/inprocessing: lightgbm
+  - group_threshold_baf/postprocessing: group_threshold

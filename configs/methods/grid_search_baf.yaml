@@ -1,0 +1,7 @@
+grid_search_baf:
+  type: inprocessing
+
+defaults:
+  - grid_search_baf/preprocessing: identity
+  - grid_search_baf/inprocessing: grid_search
+  - grid_search_baf/postprocessing: identity

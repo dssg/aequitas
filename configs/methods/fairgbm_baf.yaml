@@ -1,0 +1,7 @@
+fairgbm_baf:
+  type: inprocessing
+
+defaults:
+  - fairgbm_baf/preprocessing: identity
+  - fairgbm_baf/inprocessing: fairgbm
+  - fairgbm_baf/postprocessing: identity

@@ -1,0 +1,28 @@
+lightgbm:
+  classpath: aequitas.fairflow.methods.inprocessing.lightgbm.LightGBM
+  args:
+    boosting_type:
+      - dart  #  Running DART for all algos
+
+    enable_bundle:
+      - False
+
+    n_estimators:
+      type: int
+      range: [100, 1000]
+
+    num_leaves:
+      type: int
+      range: [10, 1000]
+
+    min_child_samples:
+      type: int
+      range: [1, 500]
+      log: True
+
+    learning_rate:
+      type: float
+      range: [0.001, 0.1]
+
+    n_jobs:
+      - 1

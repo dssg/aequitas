@@ -1,0 +1,7 @@
+prevalence_undersampling:
+  type: preprocessing
+
+defaults:
+  - prevalence_undersampling/preprocessing: prevalence_sampling
+  - prevalence_undersampling/inprocessing: lightgbm
+  - prevalence_undersampling/postprocessing: identity
