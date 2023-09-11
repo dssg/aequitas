@@ -52,7 +52,7 @@ class Orchestrator:
             Artifacts to save, by default ("results", "methods", "predictions").
         """
         # Initialize logger
-        self.logger = create_logger("fairbench.Benchmark")
+        self.logger = create_logger("Benchmark")
         self.logger.info("Instantiating Benchmark class.")
 
         # Read config file

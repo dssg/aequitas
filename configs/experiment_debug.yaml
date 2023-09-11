@@ -1,6 +1,7 @@
 methods:
  - lightgbm_baseline
  - prevalence_undersampling
+ - fairgbm_folktables
  - group_threshold_folktables
 datasets:
   - FolkTables_ACSIncome
