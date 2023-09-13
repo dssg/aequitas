@@ -12,7 +12,9 @@ from hpt import OptunaTuner
 
 from ..utils import create_logger, ConfigReader, import_object
 from ..optimization import ObjectiveFunction
+from ..methods.preprocessing.identity import Identity as PreIdentity
 from ..methods.postprocessing.threshold import Threshold
+from ..methods.postprocessing.identity import Identity as PostIdentity
 
 
 class Orchestrator:
@@ -143,14 +145,24 @@ class Orchestrator:
 
                     # Instantiate one random search optimizer
                     # The objective function is doing the heavy lifting in HPTs code.
-                    pre_name, pre_configs = list(method_items.preprocessing.items())[0]
-                    inp_name, inp_configs = list(method_items.inprocessing.items())[0]
-                    post_name, post_configs = list(method_items.postprocessing.items())[
-                        0
-                    ]
-                    pre = import_object(pre_configs.classpath)
+
+                    # Validate if we received pre-processing techniques.
+                    if hasattr(method_items, "preprocessing"):
+                        _, pre_configs = list(method_items.preprocessing.items())[0]
+                        pre = import_object(pre_configs.classpath)
+                    else:
+                        pre_configs = DictConfig({"args": None})
+                        pre = PreIdentity
+                    # Validate in the same way the post-processing technique.
+                    if hasattr(method_items, "postprocessing"):
+                        _, post_configs = list(method_items.postprocessing.items())[0]
+                        post = import_object(post_configs.classpath)
+                    else:
+                        post_configs = DictConfig({"args": None})
+                        post = PostIdentity
+
+                    _, inp_configs = list(method_items.inprocessing.items())[0]
                     inp = import_object(inp_configs.classpath)
-                    post = import_object(post_configs.classpath)
 
                     # Kinda big line to get the threshold parameters...
                     threshold_configs = self.config.datasets[dataset_id][
