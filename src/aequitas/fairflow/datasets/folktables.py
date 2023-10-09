@@ -1,4 +1,6 @@
+import os
 import pandas as pd
+import requests
 
 from pathlib import Path
 from typing import Any, Union
@@ -23,6 +25,8 @@ SPLIT_VALUES = ["train", "validation", "test"]
 DEFAULT_SPLIT = None
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
+
+DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/fairflow-release/datasets/FolkTables/"
 
 
 class FolkTables:
@@ -103,6 +107,18 @@ class FolkTables:
 
     def load_data(self):
         """Load the defined FolkTables dataset."""
+        # Check if data is in directory.
+        for split in ["train", "validation", "test"]:
+            check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
+            if not check_path.exists():
+                # Download dataset
+                self.logger.info(f"Downloading {self.variant} {split} data.")
+                dataset_url = DEFAULT_URL + f"{self.variant}.{split}.{self.extension}"
+                r = requests.get(dataset_url)
+                os.makedirs(check_path.parent, exist_ok=True)
+                with open(check_path, 'wb') as f:
+                    f.write(r.content)
+
         if self.split_type == "predefined":
             path = []
             for split in ["train", "validation", "test"]:
