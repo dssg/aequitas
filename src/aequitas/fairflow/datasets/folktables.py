@@ -70,6 +70,7 @@ class FolkTables:
             self.path = path
         else:
             # Download if path does not exist and data not in path
+            self.path = path
             self._download_data()
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
