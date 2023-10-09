@@ -67,11 +67,12 @@ class FolkTables:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
         if url(path) or path.exists():
-            self.path = path
             self.download = False
         else:
             # Download if path does not exist and data not in path
             self.download = True
+        self.path = path
+
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
