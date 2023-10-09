@@ -68,10 +68,10 @@ class FolkTables:
             self.logger.debug(f"Variant: {self.variant}")
         if url(path) or path.exists():
             self.path = path
+            self.download = False
         else:
             # Download if path does not exist and data not in path
-            self.path = path
-            self._download_data()
+            self.download = True
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
@@ -109,6 +109,9 @@ class FolkTables:
 
     def load_data(self):
         """Load the defined FolkTables dataset."""
+        if self.download:
+            self._download_data()
+
         if self.split_type == "predefined":
             path = []
             for split in ["train", "validation", "test"]:
