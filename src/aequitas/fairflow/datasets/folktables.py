@@ -69,7 +69,8 @@ class FolkTables:
         if url(path) or path.exists():
             self.path = path
         else:
-            raise NotADirectoryError(f"Specified path does not exist: {path}.")
+            # Download if path does not exist and data not in path
+            self._download_data()
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
@@ -107,18 +108,6 @@ class FolkTables:
 
     def load_data(self):
         """Load the defined FolkTables dataset."""
-        # Check if data is in directory.
-        for split in ["train", "validation", "test"]:
-            check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
-            if not check_path.exists():
-                # Download dataset
-                self.logger.info(f"Downloading {self.variant} {split} data.")
-                dataset_url = DEFAULT_URL + f"{self.variant}.{split}.{self.extension}"
-                r = requests.get(dataset_url)
-                os.makedirs(check_path.parent, exist_ok=True)
-                with open(check_path, 'wb') as f:
-                    f.write(r.content)
-
         if self.split_type == "predefined":
             path = []
             for split in ["train", "validation", "test"]:
@@ -167,3 +156,15 @@ class FolkTables:
                 splits[key] = value
 
         return splits
+
+    def _download_data(self) -> None:
+        for split in ["train", "validation", "test"]:
+            check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
+            if not check_path.exists():
+                # Download dataset
+                self.logger.info(f"Downloading {self.variant} {split} data.")
+                dataset_url = DEFAULT_URL + f"{self.variant}.{split}.{self.extension}"
+                r = requests.get(dataset_url)
+                os.makedirs(check_path.parent, exist_ok=True)
+                with open(check_path, "wb") as f:
+                    f.write(r.content)
