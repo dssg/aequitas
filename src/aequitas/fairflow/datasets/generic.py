@@ -4,6 +4,8 @@ from validators import url
 
 import pandas as pd
 
+from ..utils import create_logger
+
 
 class GenericDataset:
     def __init__(
@@ -37,6 +39,9 @@ class GenericDataset:
         ValueError
             If any of the paths are invalid.
         """
+        self.logger = create_logger("datasets.GenericDataset")
+        self.logger.info("Instantiating a Generic dataset.")
+
         self.target_column = target_column
         self.categorical_columns = categorical_columns
 
@@ -53,6 +58,7 @@ class GenericDataset:
 
     def load_data(self) -> None:
         """Load the dataset from disk."""
+        self.logger.info("Loading data from disk.")
         if self.extension == "parquet":
             train = pd.read_parquet(self.paths[0])
             validation = pd.read_parquet(self.paths[1])
@@ -66,5 +72,6 @@ class GenericDataset:
 
     def create_splits(self) -> dict[str, pd.DataFrame]:
         """Split the data into train, validation, and test sets."""
+        self.logger.info("Creating data splits.")
         train, validation, test = self.data
         return {"train": train, "validation": validation, "test": test}
