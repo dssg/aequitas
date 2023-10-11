@@ -98,7 +98,7 @@ class FolkTables:
         self._data: LabeledFrame = None
         self._train: LabeledFrame = None
         self._validation: LabeledFrame = None
-        self.test: LabeledFrame = None
+        self._test: LabeledFrame = None
         self.target = (
             TARGET_FEATURES[self.variant] if target_label is None else target_label
         )
