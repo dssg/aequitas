@@ -1,11 +1,10 @@
-import pandas as pd
-
 from pathlib import Path
 from typing import Any, Union
+
+import pandas as pd
 from validators import url
 
 from ..utils import create_logger
-
 
 VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV"]
 

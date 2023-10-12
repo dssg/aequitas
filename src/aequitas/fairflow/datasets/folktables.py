@@ -1,13 +1,13 @@
 import os
-import pandas as pd
-import requests
-
 from pathlib import Path
 from typing import Any, Optional, Union
+
+import pandas as pd
+import requests
 from validators import url
 
+from ..utils import LabeledFrame, create_logger
 from .dataset import Dataset
-from ..utils import create_logger, LabeledFrame
 
 VARIANTS = [
     "ACSIncome",
@@ -27,7 +27,7 @@ TARGET_FEATURES = {
 
 SENSITIVE_FEATURE = "RAC1P"
 
-CATEGORICAL_COLUMNS = []
+CATEGORICAL_FEATURES = []  # To do later
 
 SPLIT_TYPES = ["predefined", "random"]  # Add more if wanted.
 SPLIT_VALUES = ["train", "validation", "test"]
@@ -51,7 +51,8 @@ class FolkTables(Dataset):
         path: Union[str, Path] = DEFAULT_PATH,
         seed: int = 42,
         extension: str = "parquet",
-        target_label: Optional[str] = None,
+        target_feature: Optional[str] = None,
+        sensitive_feature: Optional[str] = None,
     ):
         """Instantiate a FolkTables dataset.
 
@@ -71,6 +72,8 @@ class FolkTables(Dataset):
         extension : str, optional
             Extension type of the dataset files. Defaults to "parquet".
         """
+        super.__init__()
+
         self.logger = create_logger("datasets.FolkTables")
         self.logger.info("Instantiating a FolkTables dataset.")
 
@@ -100,10 +103,12 @@ class FolkTables(Dataset):
         self._train: LabeledFrame = None
         self._validation: LabeledFrame = None
         self._test: LabeledFrame = None
-        self.target = (
-            TARGET_FEATURES[self.variant] if target_label is None else target_label
+        self.target_feature = (
+            TARGET_FEATURES[self.variant] if target_feature is None else target_feature
         )
-        self.sensitive_feature = SENSITIVE_FEATURE
+        self.sensitive_feature = (
+            SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
+        )
         self._indexes = None  # Store indexes of predefined splits
 
     def _validate_splits(self) -> None:
@@ -132,6 +137,7 @@ class FolkTables(Dataset):
 
     def load_data(self):
         """Load the defined FolkTables dataset."""
+        self.logger.info("Loading data.")
         if self._download:
             self._download_data()
 
@@ -144,7 +150,7 @@ class FolkTables(Dataset):
                     path.append(self.path / f"{self.variant}.{split}.{self.extension}")
         else:
             path = self.path / f"{self.variant}.{self.extension}"
-        self.logger.info(f"Loading data from {path}")
+
         if self.extension == "parquet":
             if self.split_type == "predefined":
                 datasets = [pd.read_parquet(p) for p in path]
@@ -159,14 +165,15 @@ class FolkTables(Dataset):
                 self.data = pd.concat(datasets)
             else:
                 self.data = pd.read_csv(path)
-        for col in CATEGORICAL_COLUMNS:
+        for col in CATEGORICAL_FEATURES:
             self.data[col] = self.data[col].astype("category")
+        self.logger.info("Loaded data successfully.")
+        self.logger.debug("Data shape: {self.data.shape}.")
+        self.logger.info("Data loaded successfully.")
 
     def create_splits(self) -> None:
         """Create train, validation, and test splits from the FolkTables dataset."""
-        if self.data is None:
-            raise ValueError('Data is not loaded yet. run "FolkTables.load_data"')
-        splits = {}
+        self.logger.info("Creating data splits.")
         if self.split_type == "random":
             remainder_df = self.data.copy()
             original_size = remainder_df.shape[0]
@@ -180,18 +187,18 @@ class FolkTables(Dataset):
         elif self.split_type == "predefined":
             for key, value in zip(["train", "validation", "test"], self._indexes):
                 setattr(self, key, self.data.loc[value])
-
-        return splits
+        self.logger.info("Data splits created successfully.")
 
     def _download_data(self) -> None:
         """Obtains the data from Aequitas repository."""
+        self.logger.info("Downloading folktables data from repository.")
         for split in ["train", "validation", "test"]:
             check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
             if not check_path.exists():
-                # Download dataset
-                self.logger.info(f"Downloading {self.variant} {split} data.")
                 dataset_url = DEFAULT_URL + f"{self.variant}.{split}.{self.extension}"
+                self.logger.debug(f"Downloading from {dataset_url}.")
                 r = requests.get(dataset_url)
                 os.makedirs(check_path.parent, exist_ok=True)
                 with open(check_path, "wb") as f:
                     f.write(r.content)
+        self.logger.info("Downloaded data successfully.")
