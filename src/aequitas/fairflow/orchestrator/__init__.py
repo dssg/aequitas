@@ -1,20 +1,20 @@
 import datetime
 import hashlib
-import pickle
 import json
-
-from typing import Iterable, Optional
+import pickle
 from pathlib import Path
+from typing import Iterable, Optional, Union
+
+from hpt import OptunaTuner
 from omegaconf import DictConfig, ListConfig
 from optuna.samplers import BaseSampler
 
-from hpt import OptunaTuner
-
-from ..utils import create_logger, ConfigReader, import_object
-from ..optimization import ObjectiveFunction
-from ..methods.preprocessing.identity import Identity as PreIdentity
-from ..methods.postprocessing.threshold import Threshold
+from ..datasets import Dataset
 from ..methods.postprocessing.identity import Identity as PostIdentity
+from ..methods.postprocessing.threshold import Threshold
+from ..methods.preprocessing.identity import Identity as PreIdentity
+from ..optimization import ObjectiveFunction
+from ..utils import ConfigReader, create_logger, import_object
 
 
 class Orchestrator:
@@ -45,7 +45,8 @@ class Orchestrator:
         config_file : pathlib.Path
             Path to the configuration file.
         default_fields : Iterable[str], optional
-            Default fields to include in the configuration, by default ("methods", "datasets").
+            Default fields to include in the configuration, by default ("methods",
+            "datasets").
         save_artifacts : bool, optional
             Whether to save artifacts, by default True.
         save_folder : numpy.ndarray, optional
@@ -95,13 +96,21 @@ class Orchestrator:
         sampler = import_object(sampler_path)(**self.config.optimization.sampler_args)  # type: ignore
         return sampler
 
+    @classmethod
+    def read_dataset(config: Union[dict, DictConfig]) -> Dataset:
+        """Read a dataset from a configuration object."""
+        if isinstance(config, dict):
+            config = DictConfig(config)
+        dataset_class = import_object(config.classpath)
+        dataset_object = dataset_class(**config.args)
+        return dataset_object
+
     def _read_datasets(self):
         self.logger.debug("Reading datasets from configuration.")
         for dataset in self.config.datasets:
             for name, configs in dataset.items():  # This iterates once.
                 self.logger.debug(f"Reading '{name}'. Configurations: {configs}.")
-                dataset_class = import_object(configs.classpath)
-                dataset_object = dataset_class(**configs.args)
+                dataset_object = self.read_dataset(configs)
                 dataset_object.load_data()
                 splits = dataset_object.create_splits()
                 self.logger.debug(f"Dataset {name} successfully read.")
