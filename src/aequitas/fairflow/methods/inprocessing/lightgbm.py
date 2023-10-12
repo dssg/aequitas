@@ -18,7 +18,7 @@ class LightGBM(InProcessing):
         """
         self.logger = create_logger("methods.inprocessing.LightGBM")
         self.logger.info("Instantiating LightGBM model.")
-        self.model = LGBMClassifier(**kwargs, verbose=False)
+        self.model = LGBMClassifier(**kwargs, verbose=-1)
         self.logger.debug(f"Instantiating LightGBM with following kwargs: {kwargs}")
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None) -> None:
