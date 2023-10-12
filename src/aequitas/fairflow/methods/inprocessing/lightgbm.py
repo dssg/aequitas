@@ -1,11 +1,10 @@
 from typing import Optional
 
 import pandas as pd
-
 from lightgbm import LGBMClassifier
 
-from . import InProcessing
 from ...utils import create_logger
+from . import InProcessing
 
 
 class LightGBM(InProcessing):
@@ -18,7 +17,8 @@ class LightGBM(InProcessing):
             A dictionary containing the hyperparameters for the FairGBM model.
         """
         self.logger = create_logger("methods.inprocessing.LightGBM")
-        self.model = LGBMClassifier(**kwargs)
+        self.logger.info("Instantiating LightGBM model.")
+        self.model = LGBMClassifier(**kwargs, verbose=False)
         self.logger.debug(f"Instantiating LightGBM with following kwargs: {kwargs}")
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None) -> None:
@@ -33,11 +33,16 @@ class LightGBM(InProcessing):
         s : pandas.Series, optional
             The sensitive attribute values.
         """
+        self.logger.info("Fitting LightGBM model.")
         self.logger.debug(
             f"Input size for model training: {X.shape[0]} rows, "
             f"{X.shape[1]} columns."
         )
-        self.model.fit(X=X, y=y)
+        self.model.fit(
+            X=X,
+            y=y,
+        )
+        self.logger.info("Finished fitting LightGBM model.")
 
     def predict_proba(
         self, X: pd.DataFrame, s: Optional[pd.Series] = None
@@ -56,7 +61,10 @@ class LightGBM(InProcessing):
         pandas.Series
             The predicted class probabilities.
         """
+        self.logger.info("Predicting with LightGBM model.")
         self.logger.debug(f"Input size for model prediction: {X.shape[0]} rows")
-        return pd.Series(
+        preds = pd.Series(
             data=self.model.predict_proba(X=X)[:, 1], name="predictions", index=X.index
         )
+        self.logger.info("Finished predicting with LightGBM model.")
+        return preds

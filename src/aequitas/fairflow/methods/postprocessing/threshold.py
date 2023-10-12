@@ -3,10 +3,8 @@ from typing import Optional, Union
 import numpy as np
 import pandas as pd
 
-
-from ..postprocessing import PostProcessing
 from ...utils import create_logger
-
+from ..postprocessing import PostProcessing
 
 THRESHOLD_TYPES = ["fixed", "fpr", "tpr", "top_pct", "top_k"]
 
@@ -88,6 +86,8 @@ class Threshold(PostProcessing):
         s : pd.Series, optional
             The protected attribute.
         """
+        self.logger.info("Computing threshold.")
+
         if self.threshold_type in [
             "fixed",
             "top_pct",
@@ -104,6 +104,8 @@ class Threshold(PostProcessing):
             lp_scores = y_hat[y == 1].values
             self.threshold = np.quantile(lp_scores, 1 - self.threshold_value)
             self.logger.debug(f"Threshold of value {self.threshold}")
+
+        self.logger.info("Finished computing threshold.")
 
     def transform(
         self,
@@ -127,6 +129,8 @@ class Threshold(PostProcessing):
         pd.Series
             Transformed predicted scores.
         """
+        self.logger.info("Transforming predictions.")
+
         if self.threshold_type == "fixed":
             y_pred = (y_hat >= self.threshold_value).astype(int)
         elif self.threshold_type in ["fpr", "tpr"]:
@@ -136,6 +140,8 @@ class Threshold(PostProcessing):
             y_pred = (y_hat >= y_hat.nlargest(n_top).min()).astype(int)
         elif self.threshold_type == "top_k":
             y_pred = (y_hat >= y_hat.nlargest(self.threshold_value).min()).astype(int)
+
+        self.logger.info("Finished transforming predictions.")
         return y_pred
 
 
