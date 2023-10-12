@@ -41,6 +41,8 @@ class GenericDataset(Dataset):
         ValueError
             If any of the paths are invalid.
         """
+        super().__init__()
+
         self.logger = create_logger("datasets.GenericDataset")
         self.logger.info("Instantiating a Generic dataset.")
 

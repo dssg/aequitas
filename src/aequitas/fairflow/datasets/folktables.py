@@ -72,7 +72,7 @@ class FolkTables(Dataset):
         extension : str, optional
             Extension type of the dataset files. Defaults to "parquet".
         """
-        super.__init__()
+        super().__init__()
 
         self.logger = create_logger("datasets.FolkTables")
         self.logger.info("Instantiating a FolkTables dataset.")
