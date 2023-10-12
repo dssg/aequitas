@@ -9,7 +9,7 @@ from hpt import OptunaTuner
 from omegaconf import DictConfig, ListConfig
 from optuna.samplers import BaseSampler
 
-from ..datasets import Dataset
+from ..datasets.dataset import Dataset
 from ..methods.postprocessing.identity import Identity as PostIdentity
 from ..methods.postprocessing.threshold import Threshold
 from ..methods.preprocessing.identity import Identity as PreIdentity
