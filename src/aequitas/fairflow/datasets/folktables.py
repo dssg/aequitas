@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 from validators import url
 
+from .dataset import Dataset
 from ..utils import create_logger, LabeledFrame
 
 VARIANTS = [
@@ -41,7 +42,7 @@ DEFAULT_URL = (
 )
 
 
-class FolkTables:
+class FolkTables(Dataset):
     def __init__(
         self,
         variant: str,
@@ -194,63 +195,3 @@ class FolkTables:
                 os.makedirs(check_path.parent, exist_ok=True)
                 with open(check_path, "wb") as f:
                     f.write(r.content)
-
-    @property
-    def data(self) -> LabeledFrame:
-        """Return the dataset."""
-        if self._data is not None:
-            return self._data
-        else:
-            raise ValueError("Data is not loaded yet. Run FolkTables.load_data.")
-
-    @data.setter
-    def data(self, value: pd.DataFrame):
-        """Set the dataset."""
-        self._data = LabeledFrame(
-            value, y_col=self.target, s_col=self.sensitive_feature
-        )
-
-    @property
-    def train(self) -> LabeledFrame:
-        """Return the training split of the dataset."""
-        if self._train is not None:
-            return self._train
-        else:
-            raise ValueError("Data is not loaded yet. Run FolkTables.split_data.")
-
-    @train.setter
-    def train(self, value: pd.DataFrame):
-        """Set the training split of the dataset."""
-        self._train = LabeledFrame(
-            value, y_col=self.target, s_col=self.sensitive_feature
-        )
-
-    @property
-    def validation(self) -> LabeledFrame:
-        """Return the validation split of the dataset."""
-        if self._validation is not None:
-            return self._validation
-        else:
-            raise ValueError("Data is not loaded yet. Run FolkTables.split_data.")
-
-    @validation.setter
-    def validation(self, value: pd.DataFrame):
-        """Set the validation split of the dataset."""
-        self._validation = LabeledFrame(
-            value, y_col=self.target, s_col=self.sensitive_feature
-        )
-
-    @property
-    def test(self) -> LabeledFrame:
-        """Return the test split of the dataset."""
-        if self._test is not None:
-            return self._test
-        else:
-            raise ValueError("Data is not loaded yet. Run FolkTables.split_data.")
-
-    @test.setter
-    def test(self, value: pd.DataFrame):
-        """Set the test split of the dataset."""
-        self._test = LabeledFrame(
-            value, y_col=self.target, s_col=self.sensitive_feature
-        )
