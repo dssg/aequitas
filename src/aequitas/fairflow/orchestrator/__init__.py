@@ -96,7 +96,7 @@ class Orchestrator:
         sampler = import_object(sampler_path)(**self.config.optimization.sampler_args)  # type: ignore
         return sampler
 
-    @classmethod
+    @staticmethod
     def read_dataset(config: Union[dict, DictConfig]) -> Dataset:
         """Read a dataset from a configuration object."""
         if isinstance(config, dict):
