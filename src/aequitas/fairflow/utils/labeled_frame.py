@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 
 
@@ -16,11 +18,14 @@ class LabeledFrame(pd.DataFrame):
         A list of column names to ignore. Defaults to [].
 
     """
+
     def __init__(self, *args, y_col=None, s_col=None, ignore_cols=[], **kwargs):
         super().__init__(*args, **kwargs)
-        self.y_col = y_col
-        self.s_col = s_col
-        self.ignore_cols = ignore_cols
+        with warnings.catch_warnings():
+            warnings.simplefilter(action="ignore")
+            self.y_col = y_col
+            self.s_col = s_col
+            self.ignore_cols = ignore_cols
 
     @property
     def X(self):
