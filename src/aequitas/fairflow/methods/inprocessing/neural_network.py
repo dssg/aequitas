@@ -6,8 +6,8 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from . import InProcessing
-from ...utils import import_object, create_logger
+from ...utils import create_logger, import_object
+from .inprocessing import InProcessing
 
 
 class NeuralNetwork(InProcessing):

@@ -1,15 +1,13 @@
-from typing import Any, Callable, Optional, Union
 from copy import deepcopy
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import pandas as pd
-
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 from fairlearn.reductions._grid_search._grid_generator import _GridGenerator
 
-from . import InProcessing
-from ...utils import import_object, create_logger
-
+from ...utils import create_logger, import_object
+from .inprocessing import InProcessing
 
 DEFAULT_GRID_SIZE = 10
 

@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-from . import PostProcessing
+from .postprocessing import PostProcessing
 
 
 class Identity(PostProcessing):

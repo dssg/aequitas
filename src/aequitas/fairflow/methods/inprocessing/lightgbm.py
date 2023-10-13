@@ -4,7 +4,7 @@ import pandas as pd
 from lightgbm import LGBMClassifier
 
 from ...utils import create_logger
-from . import InProcessing
+from .inprocessing import InProcessing
 
 
 class LightGBM(InProcessing):

@@ -3,7 +3,7 @@ from typing import Any, Optional
 import pandas as pd
 
 from ...utils import create_logger
-from ..preprocessing import PreProcessing
+from .preprocessing import PreProcessing
 
 STRATEGIES = ["undersample", "oversample"]
 
@@ -41,8 +41,8 @@ class PrevalenceSampling(PreProcessing):
         self.strategy = strategy
         self.s_ref = s_ref
         self.alpha = alpha
-        self.or_prevalence: dict[Any, float] = None
-        self.ref_prevalence: float = None
+        self.or_prevalence: dict[Any, float] = None  # type: ignore
+        self.ref_prevalence: float = None  # type: ignore
         self.used_in_inference = False
         self.seed = seed
 
@@ -62,6 +62,10 @@ class PrevalenceSampling(PreProcessing):
             Protected attribute vector.
         """
         self.logger.info("Fitting sampling method.")
+
+        if s is None:
+            raise ValueError("Sensitive Attribute `s` not passed.")
+
         if self.s_ref is None:  # Get more frequent group.
             self.s_ref = s.mode().values[0]
 
@@ -114,6 +118,8 @@ class PrevalenceSampling(PreProcessing):
             The transformed input, X, y, and s.
         """
         self.logger.info("Transforming data.")
+        if s is None:
+            raise ValueError("Sensitive Attribute `s` not passed.")
 
         final_X = X.copy()
         final_y = y.copy()
@@ -196,3 +202,5 @@ class PrevalenceSampling(PreProcessing):
                 return 0, round((p * (1 - 1 / target)) + n)
             else:
                 return 1, round((p * target + n * target - p) / (target - 1))
+        else:
+            raise ValueError(f"Invalid strategy value. Try one of {STRATEGIES}.")
