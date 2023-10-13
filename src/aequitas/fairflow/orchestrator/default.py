@@ -1,7 +1,11 @@
+# flake8: noqa
+
 from pathlib import Path
 from typing import Union
 
-from . import Orchestrator
+from omegaconf import DictConfig
+
+from .orchestrator import Orchestrator
 
 lightgbm_config = {
     "lightgbm": {
@@ -153,4 +157,4 @@ class DefaultOrchestrator(Orchestrator):
                 "sampler_args": {"seed": 42},
             },
         }
-        super().__init__(config=config)
+        super().__init__(config=DictConfig(config))
