@@ -3,7 +3,7 @@ import hashlib
 import json
 import pickle
 from pathlib import Path
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Iterable, Optional, Tuple, Union
 
 from hpt import OptunaTuner
 from omegaconf import DictConfig, ListConfig
@@ -111,7 +111,7 @@ class Orchestrator:
     @staticmethod
     def read_method_step(
         config: Union[dict, DictConfig],
-    ) -> Tuple[Any[PreProcessing, InProcessing, PostProcessing], DictConfig]:
+    ) -> Tuple[Union[PreProcessing, InProcessing, PostProcessing], DictConfig]:
         """Read a method step from a configuration object."""
         if isinstance(config, dict):
             config = DictConfig(config)
@@ -139,6 +139,8 @@ class Orchestrator:
 
     def run(self) -> None:
         self.logger.info("Beginning Benchmark.")
+        exp_folder: Path = Path()
+        dataset_folder: Path = Path()
         if self.artifacts:
             if self.save_folder is None:
                 raise ValueError("Provide a folder to save artifacts.")
@@ -212,16 +214,16 @@ class Orchestrator:
                         y_test=dataset["test"]["y"],
                         s_test=dataset["test"]["s"],
                         threshold=threshold,
-                        preprocessing_method=pre,
+                        preprocessing_method=pre,  # type: ignore
                         preprocessing_configs=pre_configs.args,
-                        inprocessing_method=inp,
+                        inprocessing_method=inp,  # type: ignore
                         inprocessing_configs=inp_configs.args,
-                        postprocessing_method=post,
+                        postprocessing_method=post,  # type: ignore
                         postprocessing_configs=post_configs.args,
                         eval_metric="tpr",  # TODO Change this
                         alpha=None,
-                        artifacts=self.artifacts,
-                        artifacts_folder=method_folder,
+                        artifacts=self.artifacts,  # type: ignore
+                        artifacts_folder=method_folder,  # type: ignore
                     )
 
                     tuner = OptunaTuner(objective, sampler=self.sampler)
