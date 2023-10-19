@@ -15,6 +15,7 @@ VARIANTS = [
     "ACSMobility",
     "ACSPublicCoverage",
     "ACSTravelTime",
+    "ACSIncome (Sample)"
 ]
 
 TARGET_FEATURES = {
