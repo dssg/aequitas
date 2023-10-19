@@ -5,7 +5,7 @@ from typing import Union
 
 from omegaconf import DictConfig
 
-from .orchestrator import Orchestrator
+from .experiment import Experiment
 
 lightgbm_config = {
     "lightgbm": {
@@ -122,8 +122,8 @@ default_methods = [
 # Because of this we are not including thresholding.
 
 
-# Orchestrator class with default configurations for methods
-class DefaultOrchestrator(Orchestrator):
+# Experiment class with default configurations for methods
+class DefaultExperiment(Experiment):
     def __init__(
         self,
         train_path: Union[str, Path],

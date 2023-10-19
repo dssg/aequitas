@@ -20,7 +20,7 @@ from ..optimization import ObjectiveFunction
 from ..utils import ConfigReader, create_logger, import_object
 
 
-class Orchestrator:
+class Experiment:
     SAMPLERS_MODULE = "optuna.samplers."
 
     POSSIBLE_ARTIFACTS = (
