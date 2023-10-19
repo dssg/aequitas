@@ -15,11 +15,12 @@ VARIANTS = [
     "ACSMobility",
     "ACSPublicCoverage",
     "ACSTravelTime",
-    "ACSIncome (Sample)"
+    "ACSIncome (Sample)",
 ]
 
 TARGET_FEATURES = {
     "ACSIncome": "PINCP",
+    "ACSIncome (Sample)": "PINCP",
     "ACSEmployment": "ESR",
     "ACSMobility": "MIG",
     "ACSPublicCoverage": "PUBCOV",
