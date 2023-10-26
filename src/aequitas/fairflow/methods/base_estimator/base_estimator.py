@@ -4,9 +4,9 @@ from typing import Optional
 import pandas as pd
 
 
-class InProcessing(ABC):
+class BaseEstimator(ABC):
     """
-    Abstract class for a wrapper of an in-processing FairML model.
+    Abstract class for a wrapper of a machine learning model.
 
     Methods
     -------
@@ -39,6 +39,10 @@ class InProcessing(ABC):
     """
 
     @abstractmethod
+    def __init__(self, **kwargs):
+        self._unawareness = kwargs.pop("unawareness", False)
+
+    @abstractmethod
     def fit(
         self,
         X: pd.DataFrame,
@@ -57,7 +61,7 @@ class InProcessing(ABC):
         s : pandas.Series, optional
             The protected attribute.
         """
-        pass
+        self._update_X(X, s)
 
     @abstractmethod
     def predict_proba(
@@ -77,4 +81,11 @@ class InProcessing(ABC):
         pandas.Series
             The predicted values.
         """
-        pass
+        self._update_X(X, s)
+
+    def _update_X(self, X, s):
+        """Inplace update of X with s. Only performed if unawareness is False."""
+        if not self._unawareness:
+            if s is None:
+                raise ValueError("s must be passed.")
+            X[s.name] = s

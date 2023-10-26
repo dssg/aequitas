@@ -7,10 +7,10 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from ...utils import create_logger, import_object
-from .inprocessing import InProcessing
+from .base_estimator import BaseEstimator
 
 
-class NeuralNetwork(InProcessing):
+class NeuralNetwork(BaseEstimator):
     def __init__(
         self,
         optimizer: str,
@@ -44,6 +44,8 @@ class NeuralNetwork(InProcessing):
             A dictionary containing the hyperparameters for the neural network. Every
             parameter will be passed down to the neural network.
         """
+        super().__init__(**kwargs)
+        kwargs.pop("unawareness", None)
         self.logger = create_logger("methods.inprocessing.NeuralNetwork")
         self.optimizer_class = optimizer
         self.loss_class = loss
@@ -68,6 +70,7 @@ class NeuralNetwork(InProcessing):
         s : pd.Series, optional
             The sensitive attribute.
         """
+        super().fit(X=X, y=y, s=s)
         data = [[X.values[i], y.values[i]] for i in range(X.shape[0])]
         loss_function = import_object(self.loss_class)()
         loader = DataLoader(
@@ -109,6 +112,7 @@ class NeuralNetwork(InProcessing):
         pd.Series
             The predicted probabilities.
         """
+        super.predict_proba(X=X, s=s)
         self.model.eval()
         tensor_x = torch.tensor(X.values).float()
         preds = self.model(tensor_x)

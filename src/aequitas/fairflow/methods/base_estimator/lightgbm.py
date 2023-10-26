@@ -4,10 +4,10 @@ import pandas as pd
 from lightgbm import LGBMClassifier
 
 from ...utils import create_logger
-from .inprocessing import InProcessing
+from .base_estimator import BaseEstimator
 
 
-class LightGBM(InProcessing):
+class LightGBM(BaseEstimator):
     def __init__(self, **kwargs):
         """Creates a LightGBM model.
 
@@ -16,7 +16,9 @@ class LightGBM(InProcessing):
         **kwargs : dict, optional
             A dictionary containing the hyperparameters for the FairGBM model.
         """
-        self.logger = create_logger("methods.inprocessing.LightGBM")
+        super().__init__(**kwargs)
+        kwargs.pop("unawareness", None)
+        self.logger = create_logger("methods.base_estimator.LightGBM")
         self.logger.info("Instantiating LightGBM model.")
         self.model = LGBMClassifier(**kwargs, verbose=-1)
         self.logger.debug(f"Instantiating LightGBM with following kwargs: {kwargs}")
@@ -33,6 +35,7 @@ class LightGBM(InProcessing):
         s : pandas.Series, optional
             The sensitive attribute values.
         """
+        super().fit(X=X, y=y, s=s)
         self.logger.info("Fitting LightGBM model.")
         self.logger.debug(
             f"Input size for model training: {X.shape[0]} rows, "
@@ -61,6 +64,7 @@ class LightGBM(InProcessing):
         pandas.Series
             The predicted class probabilities.
         """
+        super().predict_proba(X=X, s=s)
         self.logger.info("Predicting with LightGBM model.")
         self.logger.debug(f"Input size for model prediction: {X.shape[0]} rows")
         preds = pd.Series(
