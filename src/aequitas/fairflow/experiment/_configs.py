@@ -1,8 +1,4 @@
 # Default hyperparameter search spaces for each method
-
-from aequitas.fairflow.methods import inprocessing
-
-
 lightgbm_space = {
     "lightgbm": {
         "classpath": "aequitas.fairflow.methods.base_estimator.LightGBM",
@@ -188,7 +184,6 @@ grid_search_assistive_space = {
 }
 
 # Method configurations
-
 lightgbm_method = {
     "lightgbm_baseline": {
         "inprocessing": lightgbm_space,
@@ -263,7 +258,6 @@ inprocessing_methods = [
 baseline_methods = [
     lightgbm_method,
 ]
-]
 
 # Experiment configurations
 test_experiment = {
@@ -274,7 +268,6 @@ test_experiment = {
         "seed": 42,
     },
 }
-
 
 small_experiment = {
     "n_trials": 10,
