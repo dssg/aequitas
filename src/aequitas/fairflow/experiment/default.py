@@ -1,160 +1,80 @@
 # flake8: noqa
 
 from pathlib import Path
-from typing import Union
+from typing import Literal, Union
 
 from omegaconf import DictConfig
 
+from . import _configs
 from .experiment import Experiment
 
-lightgbm_config = {
-    "lightgbm": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.lightgbm.LightGBM",
-        "args": {
-            "boosting_type": ["dart", "gbdt"],
-            "enable_bundle": [False],
-            "n_estimators": {"type": "int", "range": [100, 1000]},
-            "num_leaves": {"type": "int", "range": [10, 1000]},
-            "min_child_samples": {
-                "type": "int",
-                "range": [1, 500],
-                "log": True,
-            },
-            "learning_rate": {"type": "float", "range": [0.001, 0.1]},
-            "n_jobs": [1],
-        },
-    },
-}
 
-default_methods = [
-    {
-        "undersampling": {
-            "preprocessing": {
-                "undersampling": {
-                    "classpath": "aequitas.fairflow.methods.preprocessing.prevalence_sample.PrevalenceSampling",
-                    "args": {
-                        "alpha": {"type": "float", "range": [0.5, 1]},
-                    },
-                },
-            },
-            "inprocessing": lightgbm_config,
-        },
-    },
-    {
-        "oversampling": {
-            "preprocessing": {
-                "oversampling": {
-                    "classpath": "aequitas.fairflow.methods.preprocessing.prevalence_sample.PrevalenceSampling",
-                    "args": {
-                        "alpha": {"type": "float", "range": [0.5, 1]},
-                        "strategy": ["oversample"],
-                    },
-                },
-            },
-            "inprocessing": lightgbm_config,
-        },
-    },
-    {
-        "lightgbm_baseline": {
-            "inprocessing": lightgbm_config,
-        },
-    },
-    {
-        "fairgbm_punitive": {
-            "inprocessing": {
-                "fairgbm": {
-                    "classpath": "aequitas.fairflow.methods.inprocessing.fairgbm.FairGBM",
-                    "args": {
-                        "boosting_type": ["dart", "gbdt"],
-                        "enable_bundle": [False],
-                        "n_estimators": {"type": "int", "range": [100, 1000]},
-                        "num_leaves": {"type": "int", "range": [10, 1000]},
-                        "min_child_samples": {
-                            "type": "int",
-                            "range": [1, 500],
-                            "log": True,
-                        },
-                        "learning_rate": {"type": "float", "range": [0.001, 0.1]},
-                        "n_jobs": [1],
-                        "constraint_stepwise_proxy": ["cross_entropy"],
-                        "multiplier_learning_rate": {
-                            "type": "float",
-                            "range": [0.01, 0.1],
-                            "log": True,
-                        },
-                        "constraint_type": "fpr",
-                    },
-                },
-            },
-        },
-    },
-    {
-        "fairgbm_assistive": {
-            "inprocessing": {
-                "fairgbm": {
-                    "classpath": "aequitas.fairflow.methods.inprocessing.fairgbm.FairGBM",
-                    "args": {
-                        "boosting_type": ["dart", "gbdt"],
-                        "enable_bundle": [False],
-                        "n_estimators": {"type": "int", "range": [100, 1000]},
-                        "num_leaves": {"type": "int", "range": [10, 1000]},
-                        "min_child_samples": {
-                            "type": "int",
-                            "range": [1, 500],
-                            "log": True,
-                        },
-                        "learning_rate": {"type": "float", "range": [0.001, 0.1]},
-                        "n_jobs": [1],
-                        "constraint_stepwise_proxy": ["cross_entropy"],
-                        "multiplier_learning_rate": {
-                            "type": "float",
-                            "range": [0.01, 0.1],
-                            "log": True,
-                        },
-                        "constraint_type": "fnr",
-                    },
-                },
-            },
-        },
-    },
-]
-# For now, abstaining from other configurations as they are highly dependant on the fairness metric and context.
-# Because of this we are not including thresholding.
-
-
-# Experiment class with default configurations for methods
 class DefaultExperiment(Experiment):
     def __init__(
         self,
-        train_path: Union[str, Path],
-        validation_path: Union[str, Path],
-        test_path: Union[str, Path],
-        categorical_columns: list[str],
-        target_column: str,
-        extension: str = "parquet",
+        dataset_config: Union[DictConfig, dict],
+        methods: Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]] = "all",
+        experiment_size: Literal["test", "small", "medium", "large"] = "small",
+        use_baseline: bool = True,
     ):
-        dataset_config = {
-            "dataset": {
-                "classpath": "aequitas.fairflow.datasets.generic.GenericDataset",
-                "args": {
-                    "train_path": train_path,
-                    "validation_path": validation_path,
-                    "test_path": test_path,
-                    "categorical_columns": categorical_columns,
-                    "target_column": target_column,
-                    "extension": extension,
-                },
-            }
-        }
+        """Default experiment configuration.
 
+        Allows for a quick setup of a fairflow experiment. The user can choose between
+        different experiment sizes, and select which methods to include in the experiment.
+
+        Parameters
+        ----------
+        dataset_config : Union[DictConfig, dict]
+            Dataset configuration.
+        methods : Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]], optional
+            Methods to include in the experiment. If "all", all methods will be included.
+            Defaults to "all".
+        experiment_size : Literal["test", "small", "medium", "large"], optional
+            Experiment size. Defaults to "small".
+
+        Raises
+        ------
+        ValueError
+            If the methods or experiment size are not valid.
+        """
+        # Validate methods:
+        if methods == "all":
+            default_methods = [
+                "preprocessing",
+                "inprocessing",
+            ]
+        elif isinstance(methods, list):
+            default_methods = methods
+        else:
+            raise ValueError(
+                f"Invalid methods value. Try one of {['all', ['preprocessing', 'inprocessing']]}."
+            )
+        method_configs = []
+        for method in default_methods:
+            if use_baseline:
+                method_configs.extend(_configs.baseline_methods)
+            if method == "preprocessing":
+                method_configs.extend(_configs.preprocessing_methods)
+            elif method == "inprocessing":
+                method_configs.extend(_configs.inprocessing_methods)
+
+        # Validate experiment size:
+        if experiment_size == "test":
+            experiment_config = _configs.test_experiment
+        elif experiment_size == "small":
+            experiment_config = _configs.small_experiment
+        elif experiment_size == "medium":
+            experiment_config = _configs.medium_experiment
+        elif experiment_size == "large":
+            experiment_config = _configs.large_experiment
+        else:
+            raise ValueError(
+                f"Invalid experiment_size value. Try one of {['test', 'small', 'medium', 'large']}."
+            )
+        # Update experiment config:
         config = {
             "methods": default_methods,
             "datasets": dataset_config,
-            "optimization": {
-                "n_trials": 100,
-                "n_jobs": 1,
-                "sampler": "RandomSampler",
-                "sampler_args": {"seed": 42},
-            },
+            "optimization": experiment_config,
         }
         super().__init__(config=DictConfig(config))
