@@ -1,12 +1,17 @@
 import pandas as pd
 import ohio.ext.pandas  # noqa
 import logging
+import polars as pl
+import pyarrow
+import time
+
 from datetime import datetime
 from os import path
 from sys import exit
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from xhtml2pdf import pisa
+
 
 logging.getLogger(__name__)
 
@@ -38,7 +43,15 @@ def get_csv_data(input_file):
     """
     logging.info('loading csv data...')
     try:
-        df = pd.read_csv(input_file)
+        #df = pd.read_csv(input_file)
+        # load with polars to make it faster 
+        start = time.time()
+        logging.debug(f"load {input_file} with polars")
+        df_pl = pl.read_csv(input_file, infer_schema_length=0).with_columns(pl.all().exclude(
+            ['entity_id', 'as_of_date']).cast(pl.Float32, strict=False))
+        df = df_pl.to_pandas()
+        end = time.time()
+
     except IOError:
         logging.error('run_csv: could not load csv provided as input.')
         exit(1)
