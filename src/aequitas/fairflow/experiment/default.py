@@ -74,7 +74,7 @@ class DefaultExperiment(Experiment):
         # Update experiment config:
         config = {
             "methods": default_methods,
-            "datasets": dataset_config,
+            "datasets": [dataset_config],
             "optimization": experiment_config,
         }
         super().__init__(config=DictConfig(config))
