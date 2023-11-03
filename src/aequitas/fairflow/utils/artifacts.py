@@ -58,7 +58,6 @@ def read_results(
         result_paths = glob.glob(str(result_path / "*" / "*.pickle"))
     else:
         result_paths = glob.glob(str(result_path / "*" / "*" / "results.pickle"))
-    print(result_paths)
     for result_file in result_paths:
         if structured:
             dataset = result_file.split("/")[-2]
