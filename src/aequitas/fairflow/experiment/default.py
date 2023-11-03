@@ -73,7 +73,7 @@ class DefaultExperiment(Experiment):
             )
         # Update experiment config:
         config = {
-            "methods": default_methods,
+            "methods": method_configs,
             "datasets": [dataset_config],
             "optimization": experiment_config,
         }
