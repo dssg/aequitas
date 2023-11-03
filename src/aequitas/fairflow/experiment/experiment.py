@@ -58,8 +58,8 @@ class Experiment:
             Artifacts to save, by default ("results", "methods", "predictions").
         """
         # Initialize logger
-        self.logger = create_logger("Benchmark")
-        self.logger.info("Instantiating Benchmark class.")
+        self.logger = create_logger("Experiment")
+        self.logger.info("Instantiating Experiment class.")
 
         # Read config file
         if config is not None:
@@ -77,7 +77,7 @@ class Experiment:
             raise ValueError("Provide optimization parameters in the config file.")
 
         # Debug log the benchmark config
-        self.logger.debug(f"Benchmark config: {self.config}")
+        self.logger.debug(f"Experiment config: {self.config}")
 
         # Initialize dataset storage for the experiment
         self.datasets: dict = {}
@@ -138,7 +138,7 @@ class Experiment:
                 self.datasets[name] = splits
 
     def run(self) -> None:
-        self.logger.info("Beginning Benchmark.")
+        self.logger.info("Beginning Experiment.")
         exp_folder: Path = Path()
         dataset_folder: Path = Path()
         if self.artifacts:
@@ -152,7 +152,7 @@ class Experiment:
             self.logger.info(f"Saving objects to '{exp_folder.resolve()}'.")
         self._read_datasets()
         for dataset_id, (dataset_name, dataset) in enumerate(self.datasets.items()):
-            self.logger.info(f"Benchmarking in '{dataset_name}'.")
+            self.logger.info(f"Using '{dataset_name}'.")
             if self.artifacts:
                 dataset_folder: Path = exp_folder / dataset_name
                 dataset_folder.mkdir(parents=True, exist_ok=True)
@@ -162,7 +162,7 @@ class Experiment:
             for method in self.config.methods:
                 for method_name, method_items in method.items():
                     self.logger.info(
-                        f"Benchmarking '{method_name}' in '{dataset_folder.resolve()}'."
+                        f"Testing '{method_name}', saved in '{dataset_folder.resolve()}'."
                     )
                     if self.artifacts:
                         method_folder: Path = dataset_folder / method_name
