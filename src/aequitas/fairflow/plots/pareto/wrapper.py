@@ -1,30 +1,96 @@
 import numpy as np
 import pandas as pd
 
-from typing import Any, Literal
+from typing import Literal, Optional
+
+from aequitas.fairflow.evaluation import Result
 
 
-class ParetoWrapper:
-    """Wrapper class for the visualization of Pareto models.
+_names = {
+    "exponentiated_gradient_baf": "EG",
+    "exponentiated_gradient_folktables": "EG",
+    "grid_search_baf": "GS",
+    "grid_search_folktables": "GS",
+    "fairgbm_baf": "FairGBM",
+    "fairgbm_folktables": "FairGBM",
+    "group_threshold_baf": "Thresholding",
+    "group_threshold_folktables": "Thresholding",
+    "lightgbm_baseline": "LightGBM",
+    "prevalence_oversampling": "Oversampling",
+    "prevalence_under_sampling": "Undersampling",
+}
+
+
+def _prettify_names(method_name: str) -> str:
+    """Prettifies the method name for plotting.
 
     Parameters
     ----------
+    method_name : str
+        The name of the method.
+
+    Returns
+    -------
+    str
+        The prettified name of the method.
+    """
+    return _names.get(method_name, method_name)
+
+
+class ParetoWrapper:
+    """Wrapper class for the visualization of Pareto models. Serves as intermediary step
+    between having the results and visualizing them.
+
+    Parameters
+    ----------
+    results : dict[str, dict[str, Result]]
+        A dictionary of results, obtained from aequitas.fairflow.utils.artifacts.read_results.
+    dataset : str
+        Name of the dataset to be used in the Pareto plot.
+    method : str, optional
+        Name of the method to plot. If none, all methods will be plotted.
+    fairness_metric : Literal["Predictive Equality", "Equal Opportunity", "Demographic Parity"]
+        The default fairness metric to use in the Pareto plot.
+    performance_metric : Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"]
+        The default performance metric to use in the Pareto plot.
+    alpha : float, optional
+        The alpha value to use in the Pareto plot.
+    direction : Literal["minimize", "maximize"], optional
+        The direction to use in the Pareto plot.
     """
 
     def __init__(
         self,
-        results: list[dict[str, list[Any]]],
+        results: dict[str, dict[str, Result]],
+        dataset: str,
         fairness_metric: Literal[
             "Predictive Equality", "Equal Opportunity", "Demographic Parity"
         ],
-        performance_metric,
-        method,
+        performance_metric: Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"],
+        method: Optional[str] = None,
         alpha: float = 0.5,
         direction: Literal["minimize", "maximize"] = "maximize",
     ):
         self.method = method
+        if dataset in results:
+            self.dataset = dataset
+        else:
+            raise ValueError(
+                f"Dataset {dataset} not found in results. Use one of {list(self.results.keys())}"
+            )
+
+        if method:
+            # Keeping the data format consistent
+            raw_results = {method: results[dataset][method]}
+        else:
+            raw_results = results[dataset]
+
         # Cast the results to the desired format
-        self._results = [self._dataclass_to_dict(res, method) for res in results]
+        self._results = [
+            self._dataclass_to_dict(res, _prettify_names(method))
+            for method, results in raw_results.items()
+            for res in results
+        ]
         self.fairness_metric = fairness_metric
         self.performance_metric = performance_metric
         self.alpha = alpha
