@@ -169,7 +169,6 @@ class FolkTables(Dataset):
                 self.data = pd.read_csv(path)
         for col in CATEGORICAL_FEATURES:
             self.data[col] = self.data[col].astype("category")
-        self.logger.info("Loaded data successfully.")
         self.logger.debug("Data shape: {self.data.shape}.")
         self.logger.info("Data loaded successfully.")
 
