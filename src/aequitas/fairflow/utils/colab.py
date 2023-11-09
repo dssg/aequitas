@@ -17,6 +17,9 @@ def get_examples(
 ) -> None:
     """Downloads the examples from the fairflow repository.
 
+    Note that this should not be used outside Google Colab, as it clutters the directory
+    with with the git files from Aequitas repository.
+
     Parameters
     ----------
     directory : Literal["configs", "examples/data_repair", "experiment_results"]
