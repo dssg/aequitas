@@ -5,6 +5,8 @@ from pathlib import Path
 
 from typing import Literal
 
+from aequitas.fairflow.utils import create_logger
+
 
 def get_examples(
     directory: Literal[
@@ -20,6 +22,8 @@ def get_examples(
     directory : Literal["configs", "examples/data_repair", "experiment_results"]
         The directory to download from the fairflow repository.
     """
+    logger = create_logger("utils.colab")
+    logger.info("Downloading examples from fairflow repository.")
     # Create directory if it doesn't exist
     Path(directory).mkdir(parents=True, exist_ok=True)
     # Check if git repository already exists in folder
@@ -29,6 +33,7 @@ def get_examples(
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+    logger.debug("Git repository initialized.")
     # Check the remote of the git repository
     remote = subprocess.run(
         ["git", "config", "--get", "remote.origin.url"], capture_output=True
@@ -46,6 +51,7 @@ def get_examples(
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
+    logger.debug("Git remote checked.")
     # Check if sparse checkout is enabled
     sparse_checkout = subprocess.run(
         ["git", "config", "--get", "core.sparseCheckout"], capture_output=True
@@ -60,6 +66,7 @@ def get_examples(
         )
         Path(".git/info/sparse-checkout").touch()
         first_run = True
+    logger.debug("Git sparse checkout checked.")
 
     # Check if file in sparse checkout
     with open(".git/info/sparse-checkout", "r") as f:
@@ -86,3 +93,4 @@ def get_examples(
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    logger.info("Examples downloaded.")
