@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_group_distributions(
+def get_quantiles(
     features: pd.DataFrame, sensitive_attribute: pd.Series, definition: int
 ) -> tuple[dict, dict]:
     """
@@ -29,38 +29,10 @@ def get_group_distributions(
         global_quantiles[column] = features[column].quantile(quantiles).values
 
         # Get the quantiles for each group.
-        group_quantiles[column] = get_group_quantiles(
+        group_quantiles[column] = _get_group_quantiles(
             features[column], sensitive_attribute, quantiles
         )
     return group_quantiles, global_quantiles
-
-
-def get_group_quantiles(
-    feature: pd.Series,
-    sensitive_attribute: pd.Series,
-    quantiles: np.ndarray,
-) -> dict[str, np.ndarray]:
-    """
-    Transforms the quantiles to a more digested value.
-
-    The original method of pandas creates a dictionary with a two-level
-    index, which is harder to query. This transforms the two level index in
-    dictionaries within a single dictionary.
-
-    Parameters
-    ----------
-    feature : pd.Series
-        The feature to obtain the quantiles.
-    sensitive_attribute : pd.Series
-        The sensitive attribute.
-    quantiles : np.ndarray
-        The quantiles to calculate.
-    """
-    quantile_dict = feature.groupby(sensitive_attribute).quantile(quantiles)
-    transformed_quantile_dict = {}
-    for group in quantile_dict.index.get_level_values(0).unique():
-        transformed_quantile_dict[group] = quantile_dict[group].values
-    return transformed_quantile_dict
 
 
 def repair_features(
@@ -128,3 +100,31 @@ def repair_features(
         ]
         features_repaired[column] = repaired_column
     return features_repaired
+
+
+def _get_group_quantiles(
+    feature: pd.Series,
+    sensitive_attribute: pd.Series,
+    quantiles: np.ndarray,
+) -> dict[str, np.ndarray]:
+    """
+    Transforms the quantiles to a more digested value.
+
+    The original method of pandas creates a dictionary with a two-level
+    index, which is harder to query. This transforms the two level index in
+    dictionaries within a single dictionary.
+
+    Parameters
+    ----------
+    feature : pd.Series
+        The feature to obtain the quantiles.
+    sensitive_attribute : pd.Series
+        The sensitive attribute.
+    quantiles : np.ndarray
+        The quantiles to calculate.
+    """
+    quantile_dict = feature.groupby(sensitive_attribute).quantile(quantiles)
+    transformed_quantile_dict = {}
+    for group in quantile_dict.index.get_level_values(0).unique():
+        transformed_quantile_dict[group] = quantile_dict[group].values
+    return transformed_quantile_dict
