@@ -11,7 +11,7 @@ from aequitas.fairflow.utils import create_logger
 def get_examples(
     directory: Literal[
         "configs",
-        "examples/data_repair",
+        "methods/data_repair",
         "experiment_results",
     ]
 ) -> None:
@@ -25,6 +25,7 @@ def get_examples(
     directory : Literal["configs", "examples/data_repair", "experiment_results"]
         The directory to download from the fairflow repository.
     """
+    directory = "examples/" + directory
     logger = create_logger("utils.colab")
     logger.info("Downloading examples from fairflow repository.")
     # Create directory if it doesn't exist
