@@ -60,12 +60,12 @@ def read_results(
     if isinstance(result_path, str):
         result_path = Path(result_path)
     results = {}
-    if structured:
+    if restructured:
         result_paths = glob.glob(str(result_path / "*" / "*.pickle"))
     else:
         result_paths = glob.glob(str(result_path / "*" / "*" / "results.pickle"))
     for result_file in result_paths:
-        if structured:
+        if restructured:
             dataset = result_file.split("/")[-2]
             method = result_file.split("/")[-1].split(".")[0]
         else:
