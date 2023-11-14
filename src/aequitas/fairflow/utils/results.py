@@ -40,7 +40,7 @@ def restructure_results(
 
 def read_results(
     result_path: Union[Path, str],
-    structured: bool = False,
+    restructured: bool = False,
 ) -> dict[str, dict[str, Result]]:
     """Reads results from a given path.
 
