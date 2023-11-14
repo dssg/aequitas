@@ -1,20 +1,19 @@
-import time
-import logging
 import dataclasses
+import logging
 import pickle
-from typing import Optional, Union
+import time
 from pathlib import Path
+from typing import Optional, Union
 
-import pandas as pd
 import numpy as np
-from omegaconf import OmegaConf, DictConfig
+import pandas as pd
+from hpt.suggest import suggest_callable_hyperparams
+from omegaconf import DictConfig, OmegaConf
 from optuna.trial import BaseTrial
 
-from hpt.suggest import suggest_callable_hyperparams
-
-from ..methods import PreProcessing, InProcessing, PostProcessing
-from ..methods.postprocessing.threshold import Threshold
 from ..evaluation import evaluate_fairness, evaluate_performance
+from ..methods import InProcessing, PostProcessing, PreProcessing
+from ..methods.postprocessing.threshold import Threshold
 
 
 @dataclasses.dataclass

@@ -1,8 +1,6 @@
 # Helper file to help download some objects to Google Colab environment.
 import subprocess
-
 from pathlib import Path
-
 from typing import Literal
 
 from aequitas.fairflow.utils import create_logger

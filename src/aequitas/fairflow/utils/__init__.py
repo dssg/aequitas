@@ -1,8 +1,7 @@
 from .config import ConfigReader
+from .imports import import_object
 from .labeled_frame import LabeledFrame
 from .logging import create_logger
-from .imports import import_object
-
 
 __all__ = [
     "ConfigReader",

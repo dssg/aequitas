@@ -1,6 +1,6 @@
-from matplotlib import pyplot as plt
-import seaborn as sns
 import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
 
 sns.set()
 sns.set_style("whitegrid", {"grid.linestyle": "--"})
@@ -52,9 +52,8 @@ order = [
 
 
 def plot(
-    dataset,
-    samples,
-
+    dataset: str,
+    samples: ,
 ):
     # define the name of the metrics for plot
     if "baf" in dataset:

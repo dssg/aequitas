@@ -7,7 +7,6 @@ from validators import url
 from ..utils import create_logger
 from .dataset import Dataset
 
-
 SPLIT_VALUES = ["train", "validation", "test"]
 
 DEFAULT_SPLIT = {

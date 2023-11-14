@@ -1,8 +1,7 @@
 import glob
 import pickle
-from typing import Union
-
 from pathlib import Path
+from typing import Union
 
 from aequitas.fairflow.evaluation import Result
 

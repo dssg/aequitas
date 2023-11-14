@@ -1,10 +1,9 @@
+from typing import Literal, Optional
+
 import numpy as np
 import pandas as pd
 
-from typing import Literal, Optional
-
 from aequitas.fairflow.evaluation import Result
-
 
 _names = {
     "exponentiated_gradient_baf": "EG",

@@ -4,8 +4,8 @@ from typing import Any, Optional, Union
 import pandas as pd
 from validators import url
 
-from .dataset import Dataset
 from ..utils import create_logger
+from .dataset import Dataset
 
 VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV"]
 
