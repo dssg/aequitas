@@ -73,8 +73,7 @@ class FairlearnClassifier(InProcessing):
         self.constraint = constraint(**self.constraint_kwargs)
 
         self.logger.info(
-            f"Instantiating reduction '{reduction}' with parameters:"
-            f" {self.kwargs}."
+            f"Instantiating reduction '{reduction}' with parameters:" f" {self.kwargs}."
         )
         self.reduction = reduction(
             estimator=self.estimator,

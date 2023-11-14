@@ -31,6 +31,7 @@ class Result:
 
 class ObjectiveFunction:
     """Callable objective function to be used with optuna."""
+
     @dataclasses.dataclass
     class TrialResults:
         id: int

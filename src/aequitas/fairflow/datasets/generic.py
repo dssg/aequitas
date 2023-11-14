@@ -128,9 +128,7 @@ class GenericDataset(Dataset):
                         "Split feature must be specified when using feature split."
                     )
                 if self.split_feature not in self.data.columns:
-                    raise ValueError(
-                        "Split feature must be a column in the dataset."
-                    )
+                    raise ValueError("Split feature must be a column in the dataset.")
                 for value in self.splits.values():
                     if value not in self.data[self.split_feature].unique():
                         raise ValueError(
@@ -164,13 +162,17 @@ class GenericDataset(Dataset):
                 original_size = remainder_df.shape[0]
                 for key, value in self.splits.items():
                     adjusted_frac = (original_size / remainder_df.shape[0]) * value
-                    sample = remainder_df.sample(frac=adjusted_frac, random_state=self.seed)
+                    sample = remainder_df.sample(
+                        frac=adjusted_frac, random_state=self.seed
+                    )
                     setattr(self, key, sample)
                     sample_indexes = sample.index
                     remainder_df = remainder_df.drop(sample_indexes)
             elif self.split == "feature":
                 for key, value in self.splits.items():
-                    setattr(self, key, self.data[self.data[self.split_feature].isin(value)])
+                    setattr(
+                        self, key, self.data[self.data[self.split_feature].isin(value)]
+                    )
         else:
             self.train = self.data.loc[self._indexes[0]]
             self.validation = self.data.loc[self._indexes[1]]

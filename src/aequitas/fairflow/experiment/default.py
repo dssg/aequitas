@@ -13,7 +13,9 @@ class DefaultExperiment(Experiment):
     def __init__(
         self,
         dataset_config: Union[DictConfig, dict],
-        methods: Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]] = "all",
+        methods: Union[
+            list[Literal["preprocessing", "inprocessing"]], Literal["all"]
+        ] = "all",
         experiment_size: Literal["test", "small", "medium", "large"] = "small",
         use_baseline: bool = True,
     ):
