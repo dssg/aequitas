@@ -1,5 +1,6 @@
 import glob
 import pickle
+from typing import Union
 
 from pathlib import Path
 
@@ -7,8 +8,8 @@ from aequitas.fairflow.evaluation import Result
 
 
 def restructure_results(
-    result_path: Path,
-    target_path: Path = Path("structured_results"),
+    result_path: Union[Path, str],
+    target_path: Union[Path, str] = Path("structured_results"),
 ) -> None:
     """Restructures results from a given path.
 
@@ -22,6 +23,10 @@ def restructure_results(
     target_path : Path, optional
         Path to save the restructured results, by default Path("structured_results").
     """
+    if isinstance(result_path, str):
+        result_path = Path(result_path)
+    if isinstance(target_path, str):
+        target_path = Path(target_path)
     result_paths = glob.glob(str(result_path / "*" / "*" / "results.pickle"))
     for result_file in result_paths:
         dataset = result_file.split("/")[-3]
@@ -35,7 +40,7 @@ def restructure_results(
 
 
 def read_results(
-    result_path: Path,
+    result_path: Union[Path, str],
     structured: bool = False,
 ) -> dict[str, dict[str, Result]]:
     """Reads results from a given path.
@@ -53,6 +58,8 @@ def read_results(
         Dictionary of results, where the first key is the dataset and the second key is
         the method.
     """
+    if isinstance(result_path, str):
+        result_path = Path(result_path)
     results = {}
     if structured:
         result_paths = glob.glob(str(result_path / "*" / "*.pickle"))
