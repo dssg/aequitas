@@ -128,7 +128,7 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
 
     if mode == "display":
         try:
-            from IPython.display import IFrame, display
+            from IPython.display import display
         except ImportError as e:
             msg = """IPython is not available.
             The `visualize` in mode 'display' must be used in JupyterLab."""
@@ -137,7 +137,7 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
         with open("pareto-viz.html", "w") as file:
             file.write(app_html)
 
-        return display(IFrame(src="pareto-viz.html", width="100%", height=640))
+        return display.HTML(filename="pareto-viz.html")
 
     else:
         raise ValueError(

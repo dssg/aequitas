@@ -75,7 +75,7 @@ class ParetoWrapper:
             self.dataset = dataset
         else:
             raise ValueError(
-                f"Dataset {dataset} not found in results. Use one of {list(self.results.keys())}"
+                f"Dataset {dataset} not found in results. Use one of {list(results.keys())}"
             )
 
         if method:
