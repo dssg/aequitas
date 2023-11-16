@@ -194,3 +194,7 @@ class Plot:
         from .visualize import visualize
 
         visualize(self, **kwargs)
+
+        if kwargs.get("mode", "display") == "display":
+            import IPython
+            IPython.display.HTML(filename="pareto-viz.html")
