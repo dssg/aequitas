@@ -7,7 +7,7 @@ from uuid import uuid4
 import numpy as np
 import pkg_resources
 
-from .wrapper import ParetoWrapper
+from .plot import Plot
 
 
 # NumPy data types are not JSON serializable. This custom JSON encoder will
@@ -61,7 +61,7 @@ def _make_html(payload):
     )
 
 
-def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
+def visualize(wrapper: Plot, mode="display", save_path=None):
     """Render interactive application to explore results of hyperparameter optimization
     search.
 

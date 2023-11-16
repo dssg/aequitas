@@ -36,9 +36,9 @@ def _prettify_names(method_name: str) -> str:
     return _names.get(method_name, method_name)
 
 
-class ParetoWrapper:
-    """Wrapper class for the visualization of Pareto models. Serves as intermediary step
-    between having the results and visualizing them.
+class Plot:
+    """Class for the visualization of Pareto models. Handles the intermediary steps
+    between having the results and creating the plot.
 
     Parameters
     ----------
@@ -185,3 +185,12 @@ class ParetoWrapper:
             "algorithm": hyperparameters["classpath"],
             "hyperparams": hyperparameters,
         }
+
+    def visualize(self, **kwargs):
+        """Render interactive application to explore results of hyperparameter optimization
+        search.
+        """
+
+        from .visualize import visualize
+
+        visualize(self, **kwargs)
