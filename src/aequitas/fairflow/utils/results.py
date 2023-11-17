@@ -75,4 +75,10 @@ def read_results(
             results[dataset] = {}
         with open(result_file, "rb") as f:
             results[dataset][method] = pickle.load(f)
+    # Sort the results according to their ID
+    for dataset in results:
+        for method in results[dataset]:
+            results[dataset][method] = sorted(
+                results[dataset][method], key=lambda x: x.id
+            )
     return results

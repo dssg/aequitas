@@ -174,6 +174,7 @@ class Plot:
         hyperparameters.update({"classpath": method})
         return {
             "model_id": dataclass.id,
+            "internal_id": dataclass.id,
             "TPR": dataclass.test_results["tpr"],
             "FPR": dataclass.test_results["fpr"],
             "FNR": dataclass.test_results["fnr"],
