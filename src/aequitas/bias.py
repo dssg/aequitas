@@ -78,7 +78,6 @@ class Bias(object):
             for each metric.
         """
 
-        print('get_disparity_min_metric()')
         # record df column order
         original_cols = df.columns
 
@@ -213,7 +212,6 @@ class Bias(object):
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
-        print('get_disparity_major_group()')
         # record df column order
         original_cols = df.columns
 
@@ -356,7 +354,6 @@ class Bias(object):
             with additional disparity metrics columns and ref_group_values
             for each metric.
         """
-        print('get_disparity_predefined_group()')
         # record df column order
         original_cols = df.columns
 

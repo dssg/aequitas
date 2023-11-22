@@ -267,7 +267,7 @@ class Plot:
             reference_groups = {
                 attr: dataset[attr].mode().values[0] for attr in sensitive_attribute
             }
-        print(reference_groups)
+
         disparity_metrics = b.get_disparity_predefined_groups(
             cm_metrics, dataset, ref_groups_dict=reference_groups
         )
