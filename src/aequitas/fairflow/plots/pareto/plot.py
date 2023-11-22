@@ -229,7 +229,11 @@ class Plot:
         method_id = self.results.iloc[model_id]["internal_id"]
 
         predictions_path = (
-            results_path / self.dataset / method_name / method_id / "test_bin.parquet"
+            results_path
+            / self.dataset
+            / method_name
+            / str(method_id)
+            / "test_bin.parquet"
         )
 
         # Check if predictions path exists
