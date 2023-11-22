@@ -1,9 +1,14 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional, Union
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from ...evaluation import Result
+from ....bias import Bias
+from ....group import Group
+from ....plot import summary
+
 
 _names = {
     "exponentiated_gradient_baf": "EG",
@@ -86,7 +91,7 @@ class Plot:
 
         # Cast the results to the desired format
         self._results = [
-            self._dataclass_to_dict(res, _prettify_names(method))
+            self._dataclass_to_dict(res, _prettify_names(method), method)
             for method, results in raw_results.items()
             for res in results
         ]
@@ -169,12 +174,13 @@ class Plot:
         return is_efficient
 
     @staticmethod
-    def _dataclass_to_dict(dataclass, method):
+    def _dataclass_to_dict(dataclass, method, original_method_name):
         hyperparameters = dataclass.hyperparameters
         hyperparameters.update({"classpath": method})
         return {
             "model_id": dataclass.id,
             "internal_id": dataclass.id,
+            "internal_method_name": original_method_name,
             "TPR": dataclass.test_results["tpr"],
             "FPR": dataclass.test_results["fpr"],
             "FNR": dataclass.test_results["fnr"],
@@ -195,3 +201,73 @@ class Plot:
         from .visualize import visualize
 
         return visualize(self, **kwargs)
+
+    def bias_audit(
+        self,
+        model_id: int,
+        dataset: Any,
+        sensitive_attribute: Union[str, list[str]],
+        metrics: list[str] = ["tpr", "fpr"],
+        fairness_threshold: float = 1.2,
+        results_path: Union[Path, str] = "examples/experiment_results",
+        reference_groups: Optional[dict[str, str]] = None,
+    ):
+        """Render interactive application to audit bias of a given model.
+
+        Parameters
+        ----------
+        model_id : int
+            The id of the model to audit.
+        """
+        if isinstance(results_path, str):
+            results_path = Path(results_path)
+
+        if isinstance(sensitive_attribute, str):
+            sensitive_attribute = [sensitive_attribute]
+
+        method_name = self.results.iloc[model_id]["internal_method_name"]
+        method_id = self.results.iloc[model_id]["internal_id"]
+
+        predictions_path = (
+            results_path / self.dataset / method_name / method_id / "test_bin.parquet"
+        )
+
+        # Check if predictions path exists
+        if not predictions_path.exists():
+            raise FileNotFoundError(
+                f"Predictions for model {method_name} with id {method_id} not found. "
+                "Please make sure that the predictions are stored in the correct path."
+            )
+
+        # Read the predictions
+        predictions = pd.read_parquet(predictions_path)
+
+        # Add the predictions to the DataFrame
+        label = dataset.Y.name
+        dataset = dataset.copy()
+        dataset["predictions"] = predictions
+
+        dataset[sensitive_attribute] = dataset[sensitive_attribute].astype(str)
+
+        g = Group()
+        b = Bias()
+
+        cm_metrics, _ = g.get_crosstabs(
+            df=dataset,
+            score_col="predictions",
+            label_col=label,
+            attr_cols=[sensitive_attribute],
+        )
+
+        if not reference_groups:
+            reference_groups = {
+                attr: dataset[attr].mode() for attr in sensitive_attribute
+            }
+
+        disparity_metrics = b.get_disparity_predefined_groups(
+            cm_metrics, dataset, ref_groups_dict=reference_groups
+        )
+
+        return summary(
+            disparity_metrics, metrics, fairness_threshold=fairness_threshold
+        )
