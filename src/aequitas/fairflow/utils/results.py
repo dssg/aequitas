@@ -83,7 +83,7 @@ def read_results(
             )
     # Sort the results according to the method name
     for dataset in results:
-        methods = list(results["dataset"].keys())
+        methods = list(results[dataset].keys())
         methods.sort()
         results[dataset] = {method: results[dataset][method] for method in methods}
     return results
