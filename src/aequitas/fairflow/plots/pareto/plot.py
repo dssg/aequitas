@@ -247,7 +247,7 @@ class Plot:
         predictions = pd.read_parquet(predictions_path)
 
         # Add the predictions to the DataFrame
-        label = dataset.Y.name
+        label = dataset.y.name
         dataset = dataset.copy()
         dataset["predictions"] = predictions
 
@@ -260,14 +260,14 @@ class Plot:
             df=dataset,
             score_col="predictions",
             label_col=label,
-            attr_cols=[sensitive_attribute],
+            attr_cols=sensitive_attribute,
         )
 
         if not reference_groups:
             reference_groups = {
-                attr: dataset[attr].mode() for attr in sensitive_attribute
+                attr: dataset[attr].mode().values[0] for attr in sensitive_attribute
             }
-
+        print(reference_groups)
         disparity_metrics = b.get_disparity_predefined_groups(
             cm_metrics, dataset, ref_groups_dict=reference_groups
         )
