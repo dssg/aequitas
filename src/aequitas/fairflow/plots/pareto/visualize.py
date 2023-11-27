@@ -61,7 +61,7 @@ def _make_html(payload):
     )
 
 
-def visualize(wrapper: Plot, mode="display", save_path=None):
+def visualize(wrapper: Plot, mode="display", save_path=None, pareto_only=False):
     """Render interactive application to explore results of hyperparameter optimization
     search.
 
@@ -86,6 +86,9 @@ def visualize(wrapper: Plot, mode="display", save_path=None):
         wrapper._compute_pareto_models()  # noqa
 
     wrapper_results_flat = wrapper.results.reset_index()
+
+    if pareto_only:
+        wrapper_results_flat = wrapper_results_flat[wrapper_results_flat["is_pareto"]]
 
     fairness_metrics = list(wrapper.available_fairness_metrics)
     performance_metrics = list(wrapper.available_performance_metrics)
