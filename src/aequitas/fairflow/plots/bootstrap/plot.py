@@ -43,7 +43,8 @@ class Plot:
             self.dataset = dataset
         else:
             raise ValueError(
-                f"Dataset {dataset} not found in results. Use one of {list(results.keys())}"
+                f"Dataset {dataset} not found in results. "
+                f"Use one of {list(results.keys())}"
             )
 
         if method:
@@ -64,6 +65,12 @@ class Plot:
         self.kwargs["fairness_metric"] = metrics[fairness_metric]
         self.kwargs["performance_metric"] = metrics[performance_metric]
         self.bootstrap_results = {}
+        if isinstance(self.kwargs["alpha_points"], np.ndarray):
+            self.x = self.kwargs["alpha_points"]
+            self.plot_type = "alpha"
+        else:
+            self.x = self.kwargs["bootstrap_size"]
+            self.plot_type = "bootstrap"
 
     def _generate_bootstrap_samples(self):
         if self.method:

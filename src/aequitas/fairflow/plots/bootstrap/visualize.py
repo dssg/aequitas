@@ -52,34 +52,42 @@ order = [
     "grid_search_folktables",
 ]
 
+metrics_names = {
+    "Predictive Equality": "Pred. Eq.",
+    "Equal Opportunity": "Eq. Opp.",
+    "Demographic Parity": "Dem. Par.",
+    "TPR": "TPR",
+    "FPR": "FPR",
+    "FNR": "FNR",
+    "Accuracy": "Acc.",
+    "Precision": "Prec.",
+}
+
 
 def visualize(plot: Plot):
     # define the name of the metrics for plot
-    if "baf" in plot.dataset:
-        perf_metric_plot = "TPR"
-        fair_metric_plot = "Pred. Eq."
-    else:
-        perf_metric_plot = "Acc."
-        fair_metric_plot = "Dem. Par."
+    perf_metric_plot = metrics_names[plot.performance_metric]
+    fair_metric_plot = metrics_names[plot.fairness_metric]
 
-    alphas = np.linspace(0.0, 1, 101)
-    alpha_metric_mean = {}
+    x = plot.x
+
+    x_metric_mean = {}
     ci_ub = {}
     ci_lb = {}
 
     for method in plot.bootstrap_results.keys():
-        alpha_metric_mean[method] = {}
+        x_metric_mean[method] = {}
         ci_ub[method] = {}
         ci_lb[method] = {}
-        for alpha in alphas:
-            alpha_metric_mean[method][alpha] = np.mean(
-                plot.bootstrap_results[method][alpha]["alpha_weighted"]
+        for x_point in x:
+            x_metric_mean[method][x_point] = np.mean(
+                plot.bootstrap_results[method][x_point]["alpha_weighted"]
             )
-            ci_ub[method][alpha] = np.quantile(
-                plot.bootstrap_results[method][alpha]["alpha_weighted"], 0.975
+            ci_ub[method][x_point] = np.quantile(
+                plot.bootstrap_results[method][x_point]["alpha_weighted"], 0.975
             )
-            ci_lb[method][alpha] = np.quantile(
-                plot.bootstrap_results[method][alpha]["alpha_weighted"], 0.025
+            ci_lb[method][x_point] = np.quantile(
+                plot.bootstrap_results[method][x_point]["alpha_weighted"], 0.025
             )
 
     fig, axs = plt.subplots(1, 1, figsize=(6.4 * 1, 4.8 * 1), dpi=200)
@@ -89,8 +97,8 @@ def visualize(plot: Plot):
         if method not in plot.bootstrap_results:
             continue
         (line,) = axs.plot(
-            alpha_metric_mean[method].keys(),
-            alpha_metric_mean[method].values(),
+            x_metric_mean[method].keys(),
+            x_metric_mean[method].values(),
             label=methods_names[method],
         )
         axs.fill_between(
@@ -100,10 +108,14 @@ def visualize(plot: Plot):
             alpha=0.1,
         )
     axs.set_ylim([-0.05, 1.05])
-    axs.set_xlabel("Alpha")
+    if plot.plot_type == "alpha":
+        axs.set_xlabel("Alpha")
+    else:
+        axs.set_xlabel("Bootstrap Size")
     axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
-    plt.text(-0.04, -0.19, f"({fair_metric_plot})", fontdict={"fontsize": 5})
-    plt.text(0.98, -0.19, f"({perf_metric_plot})", fontdict={"fontsize": 5})
+    if plot.plot_type == "alpha":
+        plt.text(-0.04, -0.19, f"({fair_metric_plot})", fontdict={"fontsize": 5})
+        plt.text(0.98, -0.19, f"({perf_metric_plot})", fontdict={"fontsize": 5})
     plt.title(datasets_names[plot.dataset])
 
     plt.legend()

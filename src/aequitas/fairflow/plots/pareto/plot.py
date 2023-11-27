@@ -194,8 +194,8 @@ class Plot:
         }
 
     def visualize(self, **kwargs):
-        """Render interactive application to explore results of hyperparameter optimization
-        search.
+        """Render interactive application to explore results of hyperparameter
+        optimization search.
         """
 
         from .visualize import visualize
