@@ -123,7 +123,6 @@ def visualize(plot: Plot):
             axs.set_ylabel(f"{perf_metric_plot}")
         else:
             axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
-        axs.set_ylabel()
     plt.title(datasets_names[plot.dataset])
 
     plt.legend()
