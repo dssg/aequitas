@@ -109,7 +109,9 @@ def _sample_models(models, n_models_to_sample, seed):
     """
     np.random.seed(seed)
     indexes_to_sample = np.random.choice(
-        list(models.index), n_models_to_sample, replace=True
+        list(models.index),
+        n_models_to_sample,
+        replace=True,
     )
     sampled_models = models.loc[indexes_to_sample]
     return sampled_models
@@ -128,7 +130,17 @@ def _get_max(models, alpha, best_models):
         Dictionary with the indexes of the best models for each alpha value.
     """
     max_index = next(idx for idx in best_models[alpha] if idx in models.index)
-    return models.loc[max_index]
+    return_val = models.loc[[max_index]].iloc[0]
+    if isinstance(return_val, pd.DataFrame):
+        print(models.index)
+        print(models)
+        print(alpha)
+        print(max_index)
+        print(return_val)
+        raise ValueError()
+    elif isinstance(return_val, pd.Series):
+        pass
+    return return_val
 
 
 def _get_best_models_ordered(models, alpha_points):
@@ -238,11 +250,10 @@ def bootstrap_hyperparameters(
                 n_models_to_sample = int(round(n * models.shape[0], 0))
                 if n_models_to_sample == 0:
                     n_models_to_sample = 1
-                print(sampled_models[:n_models_to_sample].shape[0])
                 selected_model = _get_max(
                     sampled_models[:n_models_to_sample], alpha_points, best_models
                 )
-
+                perf = selected_model[performance_metric]
                 final_results[n]["performance"].append(
                     selected_model[performance_metric]
                 )
@@ -250,5 +261,10 @@ def bootstrap_hyperparameters(
                 final_results[n]["alpha_weighted"].append(
                     selected_model[f"alpha_{alpha_points}"]
                 )
-
+                if not isinstance(perf, float):
+                    print(selected_model)
+                    print(type(selected_model))
+                    raise ValueError(
+                        f"Performance metric {performance_metric} is not a float"
+                    )
     return final_results
