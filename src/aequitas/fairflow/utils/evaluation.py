@@ -135,6 +135,8 @@ def bootstrap_hyperparameters(
     # If we are iterating over alphas:
     if isinstance(bootstrap_size, float):
         n_models_to_sample = int(round(bootstrap_size * models.shape[0], 0))
+        if n_models_to_sample == 0:
+            n_models_to_sample = 1
 
         for seed in sampling_seeds:
             indexes_to_sample = np.random.choice(
@@ -161,6 +163,8 @@ def bootstrap_hyperparameters(
         for _, seed in enumerate(sampling_seeds):
             for n in bootstrap_size:
                 n_models_to_sample = int(round(n * models.shape[0], 0))
+                if n_models_to_sample == 0:
+                    n_models_to_sample = 1
                 indexes_to_sample = np.random.choice(
                     list(models.index), n_models_to_sample, replace=True
                 )

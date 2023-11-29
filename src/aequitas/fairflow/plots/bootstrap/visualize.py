@@ -117,9 +117,9 @@ def visualize(plot: Plot):
         plt.text(0.98, -0.19, f"({perf_metric_plot})", fontdict={"fontsize": 5})
     else:
         axs.set_xlabel("Bootstrap Size")
-        if plot.kwargs["alpha"] == 0:
+        if plot.kwargs["alpha_points"] == 0.0:
             axs.set_ylabel(f"{fair_metric_plot}")
-        elif plot.kwargs["alpha"] == 1:
+        elif plot.kwargs["alpha_points"] == 1.0:
             axs.set_ylabel(f"{perf_metric_plot}")
         else:
             axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
