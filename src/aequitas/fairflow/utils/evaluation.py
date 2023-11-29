@@ -55,12 +55,13 @@ def _calculate_alpha_weighted_metric(
             performance_metric=performance_metric,
             fairness_metric=fairness_metric,
         )
-    return models
+        models = models.copy()
+    return models.copy()
 
 
 def bootstrap_hyperparameters(
     results: list[Result],
-    bootstrap_size: Union[float, list[int]],
+    bootstrap_size: Union[float, list[float]],
     alpha_points: Union[float, list[float]],
     evaluate_on: Literal["train", "validation", "test"],
     performance_metric: str,
@@ -82,10 +83,10 @@ def bootstrap_hyperparameters(
         Number of bootstrap samples.
     seed : int
         Seed for the random number generator and sampling.
-    bootstrap_size : Union[float, list[int]]
+    bootstrap_size : Union[float, list[float]]
         Number of configurations to sample per trial. If float, it is interpreted as a
         percentage of the total number of configurations. If list, it is interpreted as
-        the number of configurations to sample for each trial.
+        the percentage of configurations to sample for each trial.
     alpha_points : Union[float, list[float]]
         Alpha values to use for the bootstrap samples. If float, it is interpreted as a
         single alpha value. If list, it is interpreted as a list of alpha values.
@@ -116,7 +117,6 @@ def bootstrap_hyperparameters(
         performance_metric,
         fairness_metric,
     )
-
     np.random.seed(seed)
     sampling_seeds = np.random.choice(n_trials * 1000, n_trials, replace=False)
 
@@ -134,8 +134,9 @@ def bootstrap_hyperparameters(
 
     # If we are iterating over alphas:
     if isinstance(bootstrap_size, float):
+        n_models_to_sample = int(round(bootstrap_size * models.shape[0], 0))
+
         for seed in sampling_seeds:
-            n_models_to_sample = int(round(bootstrap_size * models.shape[0], 0))
             indexes_to_sample = np.random.choice(
                 list(models.index), n_models_to_sample, replace=True
             )
@@ -155,12 +156,13 @@ def bootstrap_hyperparameters(
                     selected_model[f"alpha_{alpha}"].values[0]
                 )
 
-    # If we are iterating over trials:
+    # If we are iterating over bootstraps:
     else:
-        for index, seed in enumerate(sampling_seeds):
+        for _, seed in enumerate(sampling_seeds):
             for n in bootstrap_size:
+                n_models_to_sample = int(round(n * models.shape[0], 0))
                 indexes_to_sample = np.random.choice(
-                    list(models.index), n, replace=True
+                    list(models.index), n_models_to_sample, replace=True
                 )
                 sampled_models = models.loc[indexes_to_sample]
                 selected_model = sampled_models[
