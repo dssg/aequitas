@@ -75,6 +75,8 @@ def visualize(plot: Plot):
     ci_ub = {}
     ci_lb = {}
 
+    ub = 1 - ((1 - plot.confidence_intervals) / 2)
+    lb = (1 - plot.confidence_intervals) / 2
     for method in plot.bootstrap_results.keys():
         x_metric_mean[method] = {}
         ci_ub[method] = {}
@@ -84,10 +86,10 @@ def visualize(plot: Plot):
                 plot.bootstrap_results[method][x_point]["alpha_weighted"]
             )
             ci_ub[method][x_point] = np.quantile(
-                plot.bootstrap_results[method][x_point]["alpha_weighted"], 0.975
+                plot.bootstrap_results[method][x_point]["alpha_weighted"], ub
             )
             ci_lb[method][x_point] = np.quantile(
-                plot.bootstrap_results[method][x_point]["alpha_weighted"], 0.025
+                plot.bootstrap_results[method][x_point]["alpha_weighted"], lb
             )
 
     fig, axs = plt.subplots(1, 1, figsize=(6.4 * 1, 4.8 * 1), dpi=200)
@@ -110,12 +112,18 @@ def visualize(plot: Plot):
     axs.set_ylim([-0.05, 1.05])
     if plot.plot_type == "alpha":
         axs.set_xlabel("Alpha")
-    else:
-        axs.set_xlabel("Bootstrap Size")
-    axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
-    if plot.plot_type == "alpha":
+        axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
         plt.text(-0.04, -0.19, f"({fair_metric_plot})", fontdict={"fontsize": 5})
         plt.text(0.98, -0.19, f"({perf_metric_plot})", fontdict={"fontsize": 5})
+    else:
+        axs.set_xlabel("Bootstrap Size")
+        if plot.kwargs["alpha"] == 0:
+            axs.set_ylabel(f"{fair_metric_plot}")
+        elif plot.kwargs["alpha"] == 1:
+            axs.set_ylabel(f"{perf_metric_plot}")
+        else:
+            axs.set_ylabel(f"α * {perf_metric_plot} + (1-α) * {fair_metric_plot}")
+        axs.set_ylabel()
     plt.title(datasets_names[plot.dataset])
 
     plt.legend()

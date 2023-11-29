@@ -36,6 +36,7 @@ class Plot:
         ],
         performance_metric: Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"],
         method: Optional[str] = None,
+        confidence_intervals: float = 0.95,
         **kwargs,
     ):
         self.method = method
@@ -57,6 +58,7 @@ class Plot:
         self.method = method
         self.fairness_metric = fairness_metric
         self.performance_metric = performance_metric
+        self.confidence_intervals = confidence_intervals
         self.kwargs = kwargs
         # Update self.kwargs with default values if not populated
         for key, value in DEFAULT_KWARGS.items():
