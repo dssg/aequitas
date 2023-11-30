@@ -113,7 +113,33 @@ def _sample_models(models, n_models_to_sample, seed):
         n_models_to_sample,
         replace=True,
     )
-    sampled_models = models.loc[indexes_to_sample]
+    sampled_models = models.loc[list(set(indexes_to_sample))]
+    return sampled_models
+
+
+def _sample_models_bootstrap(models, n_models_to_sample, seed):
+    """Method to sample models from the given DataFrame.
+
+    Parameters
+    ----------
+    models : pd.DataFrame
+        DataFrame with the results for the given dataset split.
+    n_models_to_sample : int
+        Number of models to sample.
+    seed : int
+        Seed for the random number generator and sampling.
+    """
+    np.random.seed(seed)
+    indexes_to_sample = np.random.choice(
+        list(models.index),
+        n_models_to_sample,
+        replace=True,
+    )
+
+    sampled_models = {}
+    for i in range(n_models_to_sample):
+        sampled_models[n_models_to_sample-i] = models.loc[list(set(indexes_to_sample))]
+        indexes_to_sample = indexes_to_sample[:-1]
     return sampled_models
 
 
@@ -130,16 +156,7 @@ def _get_max(models, alpha, best_models):
         Dictionary with the indexes of the best models for each alpha value.
     """
     max_index = next(idx for idx in best_models[alpha] if idx in models.index)
-    return_val = models.loc[[max_index]].iloc[0]
-    if isinstance(return_val, pd.DataFrame):
-        print(models.index)
-        print(models)
-        print(alpha)
-        print(max_index)
-        print(return_val)
-        raise ValueError()
-    elif isinstance(return_val, pd.Series):
-        pass
+    return_val = models.loc[max_index]
     return return_val
 
 
@@ -233,7 +250,7 @@ def bootstrap_hyperparameters(
             sampled_models = _sample_models(models, n_models_to_sample, seed)
             for alpha in alpha_points:
                 selected_model = _get_max(sampled_models, alpha, best_models)
-
+                perf = selected_model[performance_metric]
                 final_results[alpha]["performance"].append(
                     selected_model[performance_metric]
                 )
@@ -241,19 +258,20 @@ def bootstrap_hyperparameters(
                 final_results[alpha]["alpha_weighted"].append(
                     selected_model[f"alpha_{alpha}"]
                 )
+                if not isinstance(perf, float):
+                    raise ValueError()
 
     # If we are iterating over bootstraps:
     else:
         for seed in sampling_seeds:
-            sampled_models = _sample_models(models, models.shape[0], seed)
+            sampled_models = _sample_models_bootstrap(models, models.shape[0], seed)
             for n in bootstrap_size:
                 n_models_to_sample = int(round(n * models.shape[0], 0))
                 if n_models_to_sample == 0:
                     n_models_to_sample = 1
                 selected_model = _get_max(
-                    sampled_models[:n_models_to_sample], alpha_points, best_models
+                    sampled_models[n_models_to_sample], alpha_points, best_models
                 )
-                perf = selected_model[performance_metric]
                 final_results[n]["performance"].append(
                     selected_model[performance_metric]
                 )
@@ -261,10 +279,4 @@ def bootstrap_hyperparameters(
                 final_results[n]["alpha_weighted"].append(
                     selected_model[f"alpha_{alpha_points}"]
                 )
-                if not isinstance(perf, float):
-                    print(selected_model)
-                    print(type(selected_model))
-                    raise ValueError(
-                        f"Performance metric {performance_metric} is not a float"
-                    )
     return final_results
