@@ -1,5 +1,4 @@
 import logging
-import warnings
 from aequitas.plotting import assemble_ref_groups
 import numpy as np
 import pandas as pd
@@ -9,6 +8,7 @@ logging.getLogger(__name__)
 
 __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
+
 
 class Bias(object):
     """
@@ -43,8 +43,8 @@ class Bias(object):
 
     def get_disparity_min_metric(self, df, original_df, key_columns=None,
                                  input_group_metrics=None, fill_divbyzero=None,
-                                 check_significance=False,  alpha = 5e-2,
-                                 mask_significance = True, label_score_ref='fpr',
+                                 check_significance=False,  alpha=5e-2,
+                                 mask_significance=True, label_score_ref='fpr',
                                  selected_significance=False):
         """
         Calculates disparities between groups for the predefined list of
@@ -107,7 +107,7 @@ class Bias(object):
                         )['index'].values
                     else:
                         raise Exception(f"A minimum value for group_metric "
-                                      f"{group_metric} could not be calculated.")
+                                        f"{group_metric} could not be calculated.")
 
                 df_min_idx = df.loc[idxmin]
 
@@ -447,15 +447,13 @@ class Bias(object):
 
             # check what new disparity columns are and order as disparity,
             # ref_group, significance for each
-            base_sig=['label_value_significance', 'score_significance']
+            base_sig = ['label_value_significance', 'score_significance']
 
             new_cols = sorted(
                 list(set(df.columns) - set(original_cols) - set(base_sig))
             )
 
             return df[original_cols.tolist() + base_sig + new_cols]
-
-
 
     @staticmethod
     def _get_measure_sample(original_df, attribute, measure):
@@ -475,7 +473,6 @@ class Bias(object):
         """
         return original_df.groupby(attribute).apply(
             lambda f: f.loc[f[measure].notnull(), measure].values.tolist()).to_dict()
-
 
     @staticmethod
     def _check_equal_variance(sample_dict, ref_group, alpha=5e-2):
@@ -522,7 +519,6 @@ class Bias(object):
 
                         eq_variance[group] = equal_variance_p >= alpha
 
-
                     return eq_variance
 
                 # if a non-ref group is not normal, can't use f-test or bartlett
@@ -545,10 +541,9 @@ class Bias(object):
 
         return eq_variance
 
-
     @classmethod
     def _calculate_significance(cls, original_df, disparity_df, attribute,
-                               measure, ref_dict, alpha=5e-2):
+                                measure, ref_dict, alpha=5e-2):
         """
         Helper function for _get_statistical_significance. Pulls samples from
         original df, checks for equal variance between population groups and
@@ -578,8 +573,7 @@ class Bias(object):
                            'binary_fnr': 'fnr', 'binary_score': 'score',
                            'binary_precision': 'precision', 'binary_npv': 'npv',
                            'binary_for': 'for', 'binary_fdr': 'fdr',
-                           'binary_ppr': 'ppr', 'binary_pprev': 'pprev'
-                            }
+                           'binary_ppr': 'ppr', 'binary_pprev': 'pprev'}
 
         ref_group = ref_dict[attribute][binaries_lookup.get(measure)]
 
@@ -588,13 +582,12 @@ class Bias(object):
         sample_dict = cls._get_measure_sample(original_df=original_df,
                                               attribute=attribute, measure=measure)
 
-
         # run SciPy equal variance tests between each group and a given
         # reference group, store results in dictionary to pass to statistical
         # significance tests
         eq_variance_dict = cls._check_equal_variance(sample_dict=sample_dict,
-                                                    ref_group=ref_group,
-                                                    alpha=alpha)
+                                                     ref_group=ref_group,
+                                                     alpha=alpha)
         # run SciPy statistical significance test between each group and
         # reference group
         for attr_val, eq_var in sample_dict.items():
@@ -614,13 +607,11 @@ class Bias(object):
 
         return disparity_df
 
-
-
     @classmethod
     def _get_statistical_significance(cls, original_df, disparity_df, ref_dict,
-                                     score_thresholds=None,
-                                     attr_cols=None, alpha=5e-2,
-                                     selected_significance=False):
+                                      score_thresholds=None,
+                                      attr_cols=None, alpha=5e-2,
+                                      selected_significance=False):
         """
 
         :param original_df: a dataframe containing a required raw 'score' column
@@ -630,7 +621,7 @@ class Bias(object):
             which significance must be added
         :param ref_dict: Dictionary indicating reference group for each
             attribute/ measure combination
-        :param score_thresholds: a dictionary { 'rank_abs':[] , 'rank_pct':[], 'score':[] }
+        :param score_thresholds: a dictionary {'rank_abs':[], 'rank_pct':[], 'score':[]}
         :param model_id: (Future functionality) ID(s) of models for which to check
             statistical significance
         :param attr_cols: Columns indicating attribute values in original_df
@@ -679,7 +670,6 @@ class Bias(object):
                 raise ValueError(
                     'get_statistical_significance: statistical significance was '
                     'not calculated. There are non-string cols within attr_cols.')
-
 
             # skip binary column creation if all necessary columns already created
             elif not binary_inclusions - set(non_string_cols):
@@ -785,7 +775,6 @@ class Bias(object):
                                                 alpha=alpha)
         return disparity_df
 
-
     def list_disparities(self, df):
         """
         View list of all calculated disparities in df
@@ -794,9 +783,8 @@ class Bias(object):
             return list(df.columns[df.columns.str.contains('_disparity')])
         except KeyError:
             raise KeyError("No disparity columns found in dataframe. Tip: "
-                            "make sure you have already passed the dataframe "
-                            "through a 'get_disparity_' method.")
-
+                           "make sure you have already passed the dataframe "
+                           "through a 'get_disparity_' method.")
 
     def list_significance(self, df):
         """
@@ -806,9 +794,8 @@ class Bias(object):
             return list(df.columns[df.columns.str.contains('_significance')])
         except KeyError:
             raise KeyError("No significance columns found in dataframe. Tip: "
-                            "make sure you set the 'check_significance' parameter"
-                            " to True in 'get_disparity_' method(s).")
-
+                           "make sure you set the 'check_significance' parameter"
+                           " to True in 'get_disparity_' method(s).")
 
     def list_absolute_metrics(self, df):
         """
