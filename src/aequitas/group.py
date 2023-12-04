@@ -100,6 +100,7 @@ class Group(object):
             "k",
             "attribute_name",
             "attribute_value",
+            "accuracy",
             "tpr",
             "tnr",
             "fomr",
@@ -147,6 +148,7 @@ class Group(object):
                 fp = grouped_data.get((attribute_value, 1, 0), 0)
                 fn = grouped_data.get((attribute_value, 0, 1), 0)
                 # Calculate all metrics from confusion matrix.
+                accuracy = divide(tp + tn, tp + tn + fp + fn)
                 tpr = divide(tp, fn + tp)
                 tnr = divide(tn, fp + tn)
                 # We can't have variables named 'for', this is changed in return
