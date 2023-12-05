@@ -171,7 +171,7 @@ class GenericDataset(Dataset):
                     setattr(self, key, sample)
                     sample_indexes = sample.index
                     remainder_df = remainder_df.drop(sample_indexes)
-            elif self.split == "feature":
+            elif self.split_type == "feature":
                 for key, value in self.splits.items():
                     setattr(
                         self, key, self.data[self.data[self.split_feature].isin(value)]
