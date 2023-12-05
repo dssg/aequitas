@@ -121,7 +121,7 @@ class GenericDataset(Dataset):
                 self.logger.warning(f"Using only {split_sum} of the dataset.")
         elif self.split_type == "feature":
             # We can only validate after reading the dataset.
-            if not hasattr(self, "_data"):
+            if self._data is None:
                 pass
             else:
                 if self.split_feature is None:
