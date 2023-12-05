@@ -43,7 +43,7 @@ class GenericDataset(Dataset):
             The path to the validation data. May be URL.
         test_path : Union[str, Path]
             The path to the test data. May be URL.
-        categorical_columns : list[str]
+        categorical_features : list[str]
             The names of the categorical columns in the dataset.
         target_column : str
             The name of the target column in the dataset.
@@ -52,7 +52,7 @@ class GenericDataset(Dataset):
 
         Raises
         ------
-        ValueError
+        ValueErrorLiteral
             If any of the paths are invalid.
         """
         super().__init__()
@@ -76,7 +76,8 @@ class GenericDataset(Dataset):
             # Validate if other paths exist
             if not (train_path and validation_path and test_path):
                 raise ValueError(
-                    "If multiple dataset paths are passed, the single path must be None."
+                    "If multiple dataset paths are passed, the single path must be"
+                    "`None`."
                 )
             paths = [train_path, validation_path, test_path]
             self.paths = []
@@ -120,7 +121,7 @@ class GenericDataset(Dataset):
                 self.logger.warning(f"Using only {split_sum} of the dataset.")
         elif self.split_type == "feature":
             # We can only validate after reading the dataset.
-            if not hasattr(self, "data"):
+            if not hasattr(self, "_data"):
                 pass
             else:
                 if self.split_feature is None:
@@ -144,6 +145,8 @@ class GenericDataset(Dataset):
             read_method = pd.read_csv
         if len(self.paths) == 1:
             self.data = read_method(self.paths[0])
+            if self.split_type == "feature":
+                self._validate_splits()
         else:
             train = read_method(self.paths[0])
             validation = read_method(self.paths[1])
