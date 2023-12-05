@@ -19,9 +19,9 @@ DEFAULT_SPLIT = {
 class GenericDataset(Dataset):
     def __init__(
         self,
-        categorical_features: list[str],
         target_feature: str,
         sensitive_feature: str,
+        categorical_features: list[str] = [],
         dataset_path: Optional[Union[str, Path]] = None,
         train_path: Optional[Union[str, Path]] = None,
         validation_path: Optional[Union[str, Path]] = None,
