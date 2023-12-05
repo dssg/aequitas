@@ -9,8 +9,9 @@ from aequitas.fairflow.utils import create_logger
 def get_examples(
     directory: Literal[
         "configs",
-        "methods/data_repair",
+        "data",
         "experiment_results",
+        "methods/data_repair",
     ]
 ) -> None:
     """Downloads the examples from the fairflow repository.
