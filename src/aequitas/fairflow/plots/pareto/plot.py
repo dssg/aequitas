@@ -48,18 +48,19 @@ class Plot:
     Parameters
     ----------
     results : dict[str, dict[str, Result]]
-        A dictionary of results, obtained from aequitas.fairflow.utils.artifacts.read_results.
+        A dictionary of results, obtained from
+        aequitas.fairflow.utils.artifacts.read_results.
     dataset : str
         Name of the dataset to be used in the Pareto plot.
     method : str, optional
         Name of the method to plot. If none, all methods will be plotted.
-    fairness_metric : Literal["Predictive Equality", "Equal Opportunity", "Demographic Parity"]
+    fairness_metric : {"Predictive Equality", "Equal Opportunity", "Demographic Parity"}
         The default fairness metric to use in the Pareto plot.
-    performance_metric : Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"]
+    performance_metric : {"TPR", "FPR", "FNR", "Accuracy", "Precision"}
         The default performance metric to use in the Pareto plot.
     alpha : float, optional
         The alpha value to use in the Pareto plot.
-    direction : Literal["minimize", "maximize"], optional
+    direction : {"minimize", "maximize"}, optional
         The direction to use in the Pareto plot.
     """
 
@@ -80,7 +81,8 @@ class Plot:
             self.dataset = dataset
         else:
             raise ValueError(
-                f"Dataset {dataset} not found in results. Use one of {list(results.keys())}"
+                f"Dataset {dataset} not found in results."
+                f"Use one of {list(results.keys())}"
             )
 
         if method:
@@ -188,7 +190,7 @@ class Plot:
             "Precision": dataclass.test_results["precision"],
             "Equal Opportunity": dataclass.test_results["tpr_ratio"],
             "Predictive Equality": dataclass.test_results["fpr_ratio"],
-            "Demographic Parity": dataclass.test_results["ppr_ratio"],
+            "Demographic Parity": dataclass.test_results["pprev_ratio"],
             "algorithm": hyperparameters["classpath"],
             "hyperparams": hyperparameters,
         }

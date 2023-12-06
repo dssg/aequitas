@@ -17,7 +17,7 @@ DEFAULT_KWARGS = {
 metrics = {
     "Predictive Equality": "fpr_ratio",
     "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "ppr_ratio",
+    "Demographic Parity": "pprev_ratio",
     "TPR": "tpr",
     "FPR": "fpr",
     "FNR": "fnr",
