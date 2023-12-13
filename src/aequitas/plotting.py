@@ -44,8 +44,9 @@ def assemble_ref_groups(disparities_table, ref_group_flag='_ref_group_value',
         if len(specific_measures) < 1:
             raise ValueError("At least one metric must be passed for which to "
                              "find refrence group.")
-
-        specific_measures = specific_measures.union({label_score_ref})
+        if label_score_ref:
+            specific_measures = specific_measures.union({label_score_ref})
+        
         ref_group_cols = {measure + ref_group_flag for measure in specific_measures if
              measure + ref_group_flag in ref_group_cols}
 
