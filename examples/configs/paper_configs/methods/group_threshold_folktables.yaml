@@ -1,0 +1,7 @@
+group_threshold_folktables:
+  type: postprocessing
+
+defaults:
+  - group_threshold_folktables/preprocessing: identity
+  - group_threshold_folktables/inprocessing: lightgbm
+  - group_threshold_folktables/postprocessing: group_threshold

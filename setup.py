@@ -45,6 +45,7 @@ setup(
     packages=find_packages('src', exclude=['tests', 'tests.*']),
     package_dir={'': 'src'},
     include_package_data=True,
+    package_data={"": ["fairflow/plots/pareto/template.html", "fairflow/plots/pareto/js/dist/fairAutoML.js"]},
     install_requires=REQUIREMENTS,
     license='https://github.com/dssg/aequitas/blob/master/LICENSE',
     zip_safe=False,

@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-from . import PreProcessing
+from .preprocessing import PreProcessing
 
 
 class Identity(PreProcessing):
@@ -18,5 +18,5 @@ class Identity(PreProcessing):
         X: pd.DataFrame,
         y: pd.Series,
         s: Optional[pd.Series] = None,
-    ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+    ) -> tuple[pd.DataFrame, pd.Series, Optional[pd.Series]]:
         return X, y, s

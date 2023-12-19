@@ -1,6 +1,6 @@
 import pandas as pd
 
-from .fairness import evaluate_fairness, METRICS
+from .fairness import METRICS, evaluate_fairness
 
 
 def evaluate_performance(

@@ -7,7 +7,7 @@ from uuid import uuid4
 import numpy as np
 import pkg_resources
 
-from .wrapper import ParetoWrapper
+from .plot import Plot
 
 
 # NumPy data types are not JSON serializable. This custom JSON encoder will
@@ -61,7 +61,7 @@ def _make_html(payload):
     )
 
 
-def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
+def visualize(wrapper: Plot, mode="display", save_path=None, pareto_only=False):
     """Render interactive application to explore results of hyperparameter optimization
     search.
 
@@ -86,6 +86,9 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
         wrapper._compute_pareto_models()  # noqa
 
     wrapper_results_flat = wrapper.results.reset_index()
+
+    if pareto_only:
+        wrapper_results_flat = wrapper_results_flat[wrapper_results_flat["is_pareto"]]
 
     fairness_metrics = list(wrapper.available_fairness_metrics)
     performance_metrics = list(wrapper.available_performance_metrics)
@@ -128,7 +131,7 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
 
     if mode == "display":
         try:
-            from IPython.display import IFrame, display
+            import IPython
         except ImportError as e:
             msg = """IPython is not available.
             The `visualize` in mode 'display' must be used in JupyterLab."""
@@ -137,7 +140,7 @@ def visualize(wrapper: ParetoWrapper, mode="display", save_path=None):
         with open("pareto-viz.html", "w") as file:
             file.write(app_html)
 
-        return display(IFrame(src="pareto-viz.html", width="100%", height=640))
+        return IPython.display.HTML(filename="pareto-viz.html")
 
     else:
         raise ValueError(

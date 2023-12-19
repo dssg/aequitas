@@ -1,0 +1,7 @@
+fairgbm_folktables:
+  type: inprocessing
+
+defaults:
+  - fairgbm_folktables/preprocessing: identity
+  - fairgbm_folktables/inprocessing: fairgbm
+  - fairgbm_folktables/postprocessing: identity

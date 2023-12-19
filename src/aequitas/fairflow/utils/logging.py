@@ -1,6 +1,5 @@
 import logging
 import sys
-
 from pathlib import Path
 from typing import Optional
 
@@ -110,6 +109,17 @@ def create_logger(
         logger.addHandler(file_handler)
 
     return logger
+
+
+def clean_handlers() -> None:
+    """
+    Cleans the handlers of the root logger.
+
+    Used in Google Colab, as it has one default handler set, and propagates logs from
+    our package.
+    """
+    root = logging.getLogger()
+    root.handlers = []
 
 
 defaults = Defaults()

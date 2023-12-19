@@ -1,0 +1,9 @@
+baf_variant_4:
+  classpath: aequitas.fairflow.datasets.BankAccountFraud
+  sensitive_attribute: customer_age_bin
+  label: fraud_bool
+  threshold:
+    threshold_type: fpr
+    threshold_value: 0.05
+  args: 
+    variant: TypeIV

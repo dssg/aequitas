@@ -1,20 +1,25 @@
-import pandas as pd
-
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional, Union
+
+import pandas as pd
+from validators import url
 
 from ..utils import create_logger
+from .dataset import Dataset
 
+VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV"]
 
-VARIANTS = ["Debug", "Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV", "iid"]
-
-CATEGORICAL_COLUMNS = [
+CATEGORICAL_FEATURES = [
     "payment_type",
     "employment_status",
     "housing_status",
     "source",
     "device_os",
 ]
+
+TARGET_FEATURE = "fraud_bool"
+
+SENSITIVE_FEATURE = "customer_age_bin"
 
 SPLIT_TYPES = ["random", "month"]  # Add more if wanted.
 SPLIT_VALUES = ["train", "validation", "test"]
@@ -25,18 +30,20 @@ DEFAULT_SPLIT = {
     "test": (7,),
 }
 
-DEFAULT_PATH = (Path(__file__).parent / "../../../datasets/BankAccountFraud").resolve()
+DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
 
 
-class BankAccountFraud:
+class BankAccountFraud(Dataset):
     def __init__(
         self,
         variant: str,
         split_type: str = "month",
         splits: dict[str, list[Any]] = DEFAULT_SPLIT,
-        path: Path = DEFAULT_PATH,
+        path: Union[str, Path] = DEFAULT_PATH,
         seed: int = 42,
         extension: str = "parquet",
+        target_feature: Optional[str] = None,
+        sensitive_feature: Optional[str] = None,
     ):
         """Instantiate the BankAccountFraud dataset.
 
@@ -56,6 +63,15 @@ class BankAccountFraud:
         extension : str, optional
             Extension type of the dataset files. Defaults to "parquet".
         """
+        super().__init__()
+
+        self.target_feature = (
+            TARGET_FEATURE if target_feature is None else target_feature
+        )
+        self.sensitive_feature = (
+            SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
+        )
+
         self.logger = create_logger("datasets.BankAccountFraud")
         self.logger.info("Instantiating a BankAccountFraud dataset.")
 
@@ -65,13 +81,12 @@ class BankAccountFraud:
         else:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
-        if not path.exists():
-            print(path.absolute())
-            raise NotADirectoryError("Specified path does not exist.")
-        else:
+        if url(path) or path.exists():
             self.path = path
+        else:
+            raise NotADirectoryError("Specified path does not exist.")
         if split_type not in SPLIT_TYPES:
-            raise ValueError(f"Invalid split_type vale. Try one of: {SPLIT_TYPES}")
+            raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
             self.split_type = split_type
             self.splits = splits
@@ -111,37 +126,32 @@ class BankAccountFraud:
 
     def load_data(self):
         """Load the defined BankAccountFraud dataset."""
-        path = self.path / f"{self.variant}.{self.extension}"
+        if isinstance(self.path, str):
+            path = self.path + f"/{self.variant}.{self.extension}"
+        else:
+            path = self.path / f"{self.variant}.{self.extension}"
         self.logger.info(f"Loading data from {path}")
         if self.extension == "parquet":
             self.data = pd.read_parquet(path)
         else:
             self.data = pd.read_csv(path)
-        for col in CATEGORICAL_COLUMNS:
+        for col in CATEGORICAL_FEATURES:
             self.data[col] = self.data[col].astype("category")
 
-    def create_splits(self) -> dict[str, pd.DataFrame]:
-        """Create train, validation, and test splits from the BankAccountFraud dataset.
-
-        Returns:
-            dict[str, pd.DataFrame]: A dictionary with keys "train", "validation", and
-            "test", and values that correspond to the respective splits of the dataset.
-        """
+    def create_splits(self) -> None:
+        """Create train, validation, and test splits for the dataset."""
         if self.data is None:
             raise ValueError('Data is not loaded yet. run "BankAccountFraud.load_data"')
-        splits = {}
         if self.split_type == "random":
             remainder_df = self.data.copy()
             original_size = remainder_df.shape[0]
             for key, value in self.splits.items():
                 adjusted_frac = (original_size / remainder_df.shape[0]) * value
                 sample = remainder_df.sample(frac=adjusted_frac, random_state=self.seed)
-                splits[key] = sample
+                setattr(self, key, sample)
                 sample_indexes = sample.index
                 remainder_df = remainder_df.drop(sample_indexes)
 
         elif self.split_type == "month":
             for key, value in self.splits.items():
-                splits[key] = self.data[self.data["month"].isin(value)]
-
-        return splits
+                setattr(self, key, self.data[self.data["month"].isin(value)])

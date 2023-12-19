@@ -17,5 +17,6 @@ class Result:
     performance_metrics : dict
         Dictionary with performance metrics.
     """
+
     fairness_metrics: dict[str, float]
     performance_metrics: dict[str, float]

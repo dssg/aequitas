@@ -2,9 +2,8 @@ from typing import Any, Optional
 
 import pandas as pd
 
-from ..preprocessing import PreProcessing
 from ...utils import create_logger
-
+from .preprocessing import PreProcessing
 
 STRATEGIES = ["undersample", "oversample"]
 
@@ -12,7 +11,7 @@ STRATEGIES = ["undersample", "oversample"]
 class PrevalenceSampling(PreProcessing):
     def __init__(
         self,
-        s_ref: Optional[Any] = 'global',
+        s_ref: Optional[Any] = "global",
         alpha: float = 1,
         strategy: str = "undersample",
         seed: int = 42,
@@ -42,8 +41,8 @@ class PrevalenceSampling(PreProcessing):
         self.strategy = strategy
         self.s_ref = s_ref
         self.alpha = alpha
-        self.or_prevalence: dict[Any, float] = None
-        self.ref_prevalence: float = None
+        self.or_prevalence: dict[Any, float] = None  # type: ignore
+        self.ref_prevalence: float = None  # type: ignore
         self.used_in_inference = False
         self.seed = seed
 
@@ -62,6 +61,11 @@ class PrevalenceSampling(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
+        self.logger.info("Fitting sampling method.")
+
+        if s is None:
+            raise ValueError("Sensitive Attribute `s` not passed.")
+
         if self.s_ref is None:  # Get more frequent group.
             self.s_ref = s.mode().values[0]
 
@@ -92,6 +96,7 @@ class PrevalenceSampling(PreProcessing):
             self.logger.debug(
                 f"Sampling for group {group}: {self.sampling_rate[group]}"
             )
+        self.logger.info("Sampling method fitted.")
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
@@ -112,6 +117,10 @@ class PrevalenceSampling(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
+        self.logger.info("Transforming data.")
+        if s is None:
+            raise ValueError("Sensitive Attribute `s` not passed.")
+
         final_X = X.copy()
         final_y = y.copy()
         final_s = s.copy()
@@ -150,6 +159,7 @@ class PrevalenceSampling(PreProcessing):
                 f"Final group {group} size: {final_s[(final_s == group)].shape[0]}"
             )
 
+        self.logger.info("Data transformed.")
         return final_X.copy(), final_y.copy(), final_s.copy()
 
     def calculate_sample_sizes(
@@ -192,3 +202,5 @@ class PrevalenceSampling(PreProcessing):
                 return 0, round((p * (1 - 1 / target)) + n)
             else:
                 return 1, round((p * target + n * target - p) / (target - 1))
+        else:
+            raise ValueError(f"Invalid strategy value. Try one of {STRATEGIES}.")

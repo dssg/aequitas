@@ -1,0 +1,7 @@
+exponentiated_gradient_baf:
+  type: inprocessing
+
+defaults:
+  - exponentiated_gradient_baf/preprocessing: identity
+  - exponentiated_gradient_baf/inprocessing: exponentiated_gradient
+  - exponentiated_gradient_baf/postprocessing: identity

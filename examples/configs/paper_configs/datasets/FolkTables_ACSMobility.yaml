@@ -1,0 +1,9 @@
+folktables_acsmobility:
+  classpath: aequitas.fairflow.datasets.FolkTables
+  sensitive_attribute: RAC1P
+  label: MIG
+  threshold:
+    threshold_type: fixed
+    threshold_value: 0.5
+  args: 
+    variant: ACSMobility

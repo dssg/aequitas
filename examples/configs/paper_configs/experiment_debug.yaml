@@ -1,0 +1,14 @@
+methods:
+ - lightgbm_baseline
+ - prevalence_undersampling
+ - fairgbm_folktables
+ - group_threshold_folktables
+datasets:
+  - FolkTables_ACSIncome
+
+optimization:
+  n_trials: 2
+  n_jobs: 1
+  sampler: RandomSampler
+  sampler_args:
+    seed: 42

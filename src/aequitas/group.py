@@ -6,6 +6,10 @@ from collections import OrderedDict
 import numpy as np
 import pandas as pd
 
+from .bias import Bias
+from .plot import summary, disparity, absolute
+
+
 logging.getLogger(__name__)
 
 __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Benedict Kuester, Loren Hinkson, Sérgio Jesus"
@@ -96,6 +100,7 @@ class Group(object):
             "k",
             "attribute_name",
             "attribute_value",
+            "accuracy",
             "tpr",
             "tnr",
             "fomr",
@@ -143,6 +148,7 @@ class Group(object):
                 fp = grouped_data.get((attribute_value, 1, 0), 0)
                 fn = grouped_data.get((attribute_value, 0, 1), 0)
                 # Calculate all metrics from confusion matrix.
+                accuracy = divide(tp + tn, tp + tn + fp + fn)
                 tpr = divide(tp, fn + tp)
                 tnr = divide(tn, fp + tn)
                 # We can't have variables named 'for', this is changed in return
@@ -402,3 +408,114 @@ class Group(object):
             Absolute bias metrics.
         """
         return df.columns.intersection(self.absolute_metrics).tolist()
+
+    def calculate_disparities(
+        self,
+        df: pd.DataFrame,
+        score_col: str,
+        label_col: str,
+        attr_cols: List[str],
+        reference_groups: dict[str, str] = None,
+        **kwargs,
+    ):
+        """
+        Creates a summary plot of the fairness metrics.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Results of model classification. Must contain:
+            [score_col, label_col, attr_cols].
+        score_col : str
+            Column of the dataframe that represents classification result.
+            Must be numeric / binary.
+        label_col : str
+            Column of the dataframe that represents label of instance.
+            Values in the column must be binary.
+        attr_cols : List[str]
+            Columns with protected attributes. If not specified, all
+            columns except 'id', 'model_id', 'entity_id', 'score', 'label_value'
+            are used. The values in these columns must be categorical.
+        reference_groups : dict[str, str], optional
+            Dictionary with the reference groups for each attribute. Defaults
+            to None.
+        **kwargs
+            Keyword arguments to pass to the `get_crosstabs` method.
+        """
+        cm_metrics, _ = self.get_crosstabs(
+            df=df,
+            score_col=score_col,
+            label_col=label_col,
+            attr_cols=attr_cols,
+            **kwargs,
+        )
+
+        if not reference_groups:
+            reference_groups = {attr: df[attr].mode().values[0] for attr in attr_cols}
+
+        b = Bias()
+
+        disparity_metrics = b.get_disparity_predefined_groups(
+            cm_metrics, df, ref_groups_dict=reference_groups
+        )
+
+        return disparity_metrics
+
+    def plot_summary(
+        disparities: pd.DataFrame,
+        metrics: list[str] = ["fpr", "tpr"],
+        fairness_threshold: float = 1.25,
+    ):
+        """
+        Creates a summary plot of the fairness metrics.
+
+        Parameters
+        ----------
+        disparities : pandas.DataFrame
+            Disparities for each group.
+        metrics : list[str], optional
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
+        fairness_threshold : float, optional
+            Threshold to use to determine fairness. Defaults to 1.2.
+        """
+        return summary(disparities, metrics, fairness_threshold)
+
+    def plot_disparity(
+        disparities: pd.DataFrame,
+        attribute: str,
+        metrics: list[str] = ["fpr", "tpr"],
+        fairness_threshold: float = 1.25,
+    ):
+        """
+        Creates a plot of the fairness metrics.
+
+        Parameters
+        ----------
+        disparities : pandas.DataFrame
+            Disparities for each group.
+        metrics : list[str], optional
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
+        fairness_threshold : float, optional
+            Threshold to use to determine fairness. Defaults to 1.2.
+        """
+        return disparity(disparities, metrics, attribute, fairness_threshold)
+
+    def plot_absolute(
+        disparities: pd.DataFrame,
+        attribute: str,
+        metrics: list[str] = ["fpr", "tpr"],
+        fairness_threshold: float = 1.25,
+    ):
+        """
+        Creates a plot of the fairness metrics.
+
+        Parameters
+        ----------
+        disparities : pandas.DataFrame
+            Disparities for each group.
+        metrics : list[str], optional
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
+        fairness_threshold : float, optional
+            Threshold to use to determine fairness. Defaults to 1.2.
+        """
+        return absolute(disparities, metrics, attribute, fairness_threshold)

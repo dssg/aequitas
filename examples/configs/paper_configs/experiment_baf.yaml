@@ -1,0 +1,23 @@
+methods:
+  - lightgbm_baseline
+  - prevalence_undersampling
+  - prevalence_oversampling
+  - fairgbm_baf
+  - group_threshold_baf
+  - grid_search_baf
+  - exponentiated_gradient_baf
+
+datasets:
+  - baf_base
+  - baf_variant_1
+  - baf_variant_2
+  - baf_variant_3
+  - baf_variant_4
+  - baf_variant_5
+
+optimization:
+  n_trials: 100
+  n_jobs: 1
+  sampler: RandomSampler
+  sampler_args:
+    seed: 42

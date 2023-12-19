@@ -1,0 +1,7 @@
+lightgbm_baseline:
+  type: inprocessing
+
+defaults:
+  - lightgbm_baseline/preprocessing: identity
+  - lightgbm_baseline/inprocessing: lightgbm
+  - lightgbm_baseline/postprocessing: identity

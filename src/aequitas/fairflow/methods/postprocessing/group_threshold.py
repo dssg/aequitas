@@ -1,8 +1,9 @@
-import pandas as pd
 from typing import Optional, Union
 
-from .threshold import Threshold
+import pandas as pd
+
 from ...utils import create_logger
+from .threshold import Threshold
 
 
 class GroupThreshold(Threshold):
@@ -84,6 +85,8 @@ class GroupThreshold(Threshold):
         s : pd.Series, optional
             The sensitive attribute used to group the samples.
         """
+        if s is None:
+            raise ValueError("`s` must be provided to fit a GroupThreshold.")
         for group in s.unique():
             self.thresholds[group] = Threshold(
                 self.threshold_type, self.threshold_value
@@ -118,6 +121,8 @@ class GroupThreshold(Threshold):
         pd.Series
             Transformed predicted scores.
         """
+        if s is None:
+            raise ValueError("`s` must be provided to transform with a GroupThreshold.")
         predictions = []
         for group in s.unique():
             predictions.append(

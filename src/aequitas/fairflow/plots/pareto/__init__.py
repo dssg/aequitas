@@ -1,4 +1,3 @@
-"""Fair-AutoML's visualization module."""
-from .visualize import visualize
+from .plot import Plot
 
-__all__ = ["visualize"]
+__all__ = ["Plot"]

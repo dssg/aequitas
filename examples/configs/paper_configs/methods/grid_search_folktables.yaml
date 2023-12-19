@@ -1,0 +1,7 @@
+grid_search_folktables:
+  type: inprocessing
+
+defaults:
+  - grid_search_folktables/preprocessing: identity
+  - grid_search_folktables/inprocessing: grid_search
+  - grid_search_folktables/postprocessing: identity
