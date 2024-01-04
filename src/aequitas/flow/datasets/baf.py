@@ -34,6 +34,25 @@ DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resol
 
 
 class BankAccountFraud(Dataset):
+    """Instantiate a BankAccountFraud dataset.
+
+    Parameters
+    ----------
+    variant : str
+        The variant of the dataset to load.
+    split_type : str, optional
+        The type of data split to use. Defaults to "month".
+    splits : dict[str, list[Any]], optional
+        The proportions of data to use for each split. Defaults to original splits.
+    path : Path, optional
+        The path to the dataset directory. Defaults to ../datasets/BankAccountFraud.
+    seed : int, optional
+        Sampling seed for the dataset. Only required in "split_type" == "random".
+        Defaults to 42.
+    extension : str, optional
+        Extension type of the dataset files. Defaults to "parquet".
+    """
+
     def __init__(
         self,
         variant: str,
@@ -45,24 +64,6 @@ class BankAccountFraud(Dataset):
         target_feature: Optional[str] = None,
         sensitive_feature: Optional[str] = None,
     ):
-        """Instantiate the BankAccountFraud dataset.
-
-        Parameters
-        ----------
-        variant : str
-            The variant of the dataset to load.
-        split_type : str, optional
-            The type of data split to use. Defaults to "month".
-        splits : dict[str, list[Any]], optional
-            The proportions of data to use for each split. Defaults to DEFAULT_SPLIT.
-        path : Path, optional
-            The path to the dataset directory. Defaults to ../datasets/BankAccountFraud.
-        seed : int, optional
-            Sampling seed for the dataset. Only required in "split_type" == "random".
-            Defaults to 42.
-        extension : str, optional
-            Extension type of the dataset files. Defaults to "parquet".
-        """
         super().__init__()
 
         self.target_feature = (

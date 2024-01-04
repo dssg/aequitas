@@ -3,7 +3,7 @@ import subprocess
 from pathlib import Path
 from typing import Literal
 
-from aequitas.fairflow.utils import create_logger
+from aequitas.flow.utils import create_logger
 
 
 def get_examples(

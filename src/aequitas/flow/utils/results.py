@@ -3,7 +3,7 @@ import pickle
 from pathlib import Path
 from typing import Union
 
-from aequitas.fairflow.evaluation import Result
+from aequitas.flow.evaluation import Result
 
 
 def restructure_results(

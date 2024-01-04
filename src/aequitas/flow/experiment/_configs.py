@@ -1,7 +1,7 @@
 # Default hyperparameter search spaces for each method
 lightgbm_space = {
     "lightgbm": {
-        "classpath": "aequitas.fairflow.methods.base_estimator.LightGBM",
+        "classpath": "aequitas.flow.methods.base_estimator.LightGBM",
         "args": {
             "boosting_type": ["dart", "gbdt"],
             "enable_bundle": [False],
@@ -20,7 +20,7 @@ lightgbm_space = {
 
 undersampling_space = {
     "undersampling": {
-        "classpath": "aequitas.fairflow.methods.preprocessing.PrevalenceSampling",
+        "classpath": "aequitas.flow.methods.preprocessing.PrevalenceSampling",
         "args": {
             "alpha": {"type": "float", "range": [0.5, 1]},
         },
@@ -29,7 +29,7 @@ undersampling_space = {
 
 oversampling_space = {
     "oversampling": {
-        "classpath": "aequitas.fairflow.methods.preprocessing.PrevalenceSampling",
+        "classpath": "aequitas.flow.methods.preprocessing.PrevalenceSampling",
         "args": {
             "alpha": {"type": "float", "range": [0.5, 1]},
             "strategy": ["oversample"],
@@ -39,7 +39,7 @@ oversampling_space = {
 
 fairgbm_punitive_space = {
     "fairgbm_punitive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.fairgbm.FairGBM",
+        "classpath": "aequitas.flow.methods.inprocessing.fairgbm.FairGBM",
         "args": {
             "boosting_type": ["dart", "gbdt"],
             "enable_bundle": [False],
@@ -65,7 +65,7 @@ fairgbm_punitive_space = {
 
 fairgbm_assistive_space = {
     "fairgbm_assistive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.FairGBM",
+        "classpath": "aequitas.flow.methods.inprocessing.FairGBM",
         "args": {
             "boosting_type": ["dart", "gbdt"],
             "enable_bundle": [False],
@@ -91,7 +91,7 @@ fairgbm_assistive_space = {
 
 exponentiated_gradient_punitive_space = {
     "exponentiated_gradient_punitive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.FairlearnClassifier",
+        "classpath": "aequitas.flow.methods.inprocessing.FairlearnClassifier",
         "args": {
             "reduction": ["fairlearn.reductions.ExponentiatedGradient"],
             "estimator": ["lightgbm.LGBMClassifier"],
@@ -115,7 +115,7 @@ exponentiated_gradient_punitive_space = {
 
 exponentiated_gradient_assistive_space = {
     "exponentiated_gradient_assistive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.FairlearnClassifier",
+        "classpath": "aequitas.flow.methods.inprocessing.FairlearnClassifier",
         "args": {
             "reduction": ["fairlearn.reductions.ExponentiatedGradient"],
             "estimator": ["lightgbm.LGBMClassifier"],
@@ -139,7 +139,7 @@ exponentiated_gradient_assistive_space = {
 
 grid_search_punitive_space = {
     "grid_search_punitive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.FairlearnClassifier",
+        "classpath": "aequitas.flow.methods.inprocessing.FairlearnClassifier",
         "args": {
             "reduction": ["fairlearn.reductions.GridSearch"],
             "estimator": ["lightgbm.LGBMClassifier"],
@@ -162,7 +162,7 @@ grid_search_punitive_space = {
 
 grid_search_assistive_space = {
     "grid_search_assistive": {
-        "classpath": "aequitas.fairflow.methods.inprocessing.FairlearnClassifier",
+        "classpath": "aequitas.flow.methods.inprocessing.FairlearnClassifier",
         "args": {
             "reduction": ["fairlearn.reductions.GridSearch"],
             "estimator": ["lightgbm.LGBMClassifier"],

@@ -21,6 +21,23 @@ from ..utils import ConfigReader, create_logger, import_object
 
 
 class Experiment:
+    """Class to run a FairML Experiment.
+
+    Parameters
+    ----------
+    config_file : pathlib.Path
+        Path to the configuration file.
+    default_fields : Iterable[str], optional
+        Default fields to include in the configuration, by default ("methods",
+        "datasets").
+    save_artifacts : bool, optional
+        Whether to save artifacts, by default True.
+    save_folder : pathlib.Path, optional
+        Path to the folder where artifacts will be saved, by default "artifacts".
+    artifacts : Iterable[str], optional
+        Artifacts to save, by default ("results", "methods", "predictions").
+    """
+
     SAMPLERS_MODULE = "optuna.samplers."
 
     POSSIBLE_ARTIFACTS = (
@@ -40,23 +57,6 @@ class Experiment:
         save_folder: Optional[Path] = Path("artifacts"),
         artifacts: Iterable[str] = ("results", "methods", "predictions"),
     ):
-        """
-        Initialize the Orchestrator of an experiment.
-
-        Parameters
-        ----------
-        config_file : pathlib.Path
-            Path to the configuration file.
-        default_fields : Iterable[str], optional
-            Default fields to include in the configuration, by default ("methods",
-            "datasets").
-        save_artifacts : bool, optional
-            Whether to save artifacts, by default True.
-        save_folder : numpy.ndarray, optional
-            Path to the folder where artifacts will be saved, by default None.
-        artifacts : numpy.ndarray, optional
-            Artifacts to save, by default ("results", "methods", "predictions").
-        """
         # Initialize logger
         self.logger = create_logger("Experiment")
         self.logger.info("Instantiating Experiment class.")

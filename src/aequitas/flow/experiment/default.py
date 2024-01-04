@@ -1,6 +1,3 @@
-# flake8: noqa
-
-from pathlib import Path
 from typing import Literal, Union
 
 from omegaconf import DictConfig
@@ -21,8 +18,9 @@ class DefaultExperiment(Experiment):
     ):
         """Default experiment configuration.
 
-        Allows for a quick setup of a fairflow experiment. The user can choose between
-        different experiment sizes, and select which methods to include in the experiment.
+        Allows for a quick setup of an aequitas flow experiment. The user can choose
+        between different experiment sizes, and select which methods to include in the
+        experiment.
 
         Parameters
         ----------
@@ -49,7 +47,8 @@ class DefaultExperiment(Experiment):
             default_methods = methods
         else:
             raise ValueError(
-                f"Invalid methods value. Try one of {['all', ['preprocessing', 'inprocessing']]}."
+                "Invalid methods value. Try one of "
+                f"{['all', ['preprocessing', 'inprocessing']]}."
             )
         method_configs = []
         for method in default_methods:
@@ -71,7 +70,8 @@ class DefaultExperiment(Experiment):
             experiment_config = _configs.large_experiment
         else:
             raise ValueError(
-                f"Invalid experiment_size value. Try one of {['test', 'small', 'medium', 'large']}."
+                "Invalid experiment_size value. Try one of "
+                f"{['test', 'small', 'medium', 'large']}."
             )
         # Update experiment config:
         config = {
