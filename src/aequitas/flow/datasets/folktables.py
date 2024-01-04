@@ -25,6 +25,7 @@ TARGET_FEATURES = {
     "ACSEmployment": "ESR",
     "ACSMobility": "MIG",
     "ACSPublicCoverage": "PUBCOV",
+    "ACSPublicCoverage (Sample)": "PUBCOV",
     "ACSTravelTime": "JWMNP",
 }
 
