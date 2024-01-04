@@ -1,0 +1,6 @@
+﻿aequitas.fairflow.datasets.GenericDataset
+=========================================
+
+.. currentmodule:: aequitas.fairflow.datasets
+
+.. autoclass:: GenericDataset

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aequitas Flow API &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="Aequitas API" href="aequitas.html" />
+<link href="../ _static/default.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Docs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html">Aequitas API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Aequitas Flow API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.aequitas.fairflow.experiment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Experiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.experiment.DefaultExperiment"><code class="docutils literal notranslate"><span class="pre">DefaultExperiment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.experiment.Experiment"><code class="docutils literal notranslate"><span class="pre">Experiment</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.aequitas.fairflow.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Dataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.datasets.BankAccountFraud"><code class="docutils literal notranslate"><span class="pre">BankAccountFraud</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.datasets.FolkTables"><code class="docutils literal notranslate"><span class="pre">FolkTables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.datasets.GenericDataset"><code class="docutils literal notranslate"><span class="pre">GenericDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.aequitas.fairflow.methods.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Pre-Processing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.Identity"><code class="docutils literal notranslate"><span class="pre">Identity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling"><code class="docutils literal notranslate"><span class="pre">PrevalenceSampling</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.aequitas.fairflow.methods.inprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.In-Processing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM"><code class="docutils literal notranslate"><span class="pre">FairGBM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier"><code class="docutils literal notranslate"><span class="pre">FairlearnClassifier</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.aequitas.fairflow.methods.postprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Post-Processing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.postprocessing.GroupThreshold"><code class="docutils literal notranslate"><span class="pre">GroupThreshold</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.postprocessing.Identity"><code class="docutils literal notranslate"><span class="pre">Identity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src.aequitas.fairflow.methods.postprocessing.Threshold"><code class="docutils literal notranslate"><span class="pre">Threshold</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Docs</a></li>
+      <li class="breadcrumb-item active">Aequitas Flow API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/flow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aequitas-flow-api">
+<h1>Aequitas Flow API<a class="headerlink" href="#aequitas-flow-api" title="Link to this heading"></a></h1>
+<!DOCTYPE html>
+<html lang="en">
+
+
+<style>
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(to right, #dae2f8, #d8c4d8);
+    /* Updated gradient with less pink */
+    color: #333;
+    margin: 0;
+    padding: 40px;
+  }
+
+  .logo-container {
+    background-color: #f7f7f7;
+    /* Light grey background */
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    padding: 20px 40px;
+    margin-top: 1px;
+    transition: transform 0.3s ease;
+    /* Animation */
+  }
+
+
+  .logo-title {
+    color: #004d40;
+    /* Dark teal */
+    font-size: 70px;
+    font-weight: bold;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    /* Adjusted spacing */
+  }
+
+  .logo-subtitle {
+    color: #00a69f;
+    /* Lighter teal */
+    font-size: 30px;
+    font-weight: 500;
+    /* Slightly bolder */
+  }
+</style>
+<div class="logo-container">
+  <div class="logo-title">Aequitas Flow</div>
+  <div class="logo-subtitle"> Fairness Auditing & FairML Toolkit</div>
+</div>
+
+</body>
+
+</html>
+<section id="module-src.aequitas.fairflow.experiment">
+<span id="experiment"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Experiment</span></code><a class="headerlink" href="#module-src.aequitas.fairflow.experiment" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.experiment.DefaultExperiment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.experiment.</span></span><span class="sig-name descname"><span class="pre">DefaultExperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'preprocessing'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'inprocessing'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'test'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'small'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'medium'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'large'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'small'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_baseline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/experiment/default.html#DefaultExperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.experiment.DefaultExperiment" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dataset</span></code>(config)</p></td>
+<td><p>Read a dataset from a configuration object.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_method_step</span></code>(config)</p></td>
+<td><p>Read a method step from a configuration object.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>generate_hash</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>run</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.experiment.Experiment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.experiment.</span></span><span class="sig-name descname"><span class="pre">Experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('methods',</span> <span class="pre">'datasets')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_artifacts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('artifacts')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifacts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('results',</span> <span class="pre">'methods',</span> <span class="pre">'predictions')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/experiment/experiment.html#Experiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.experiment.Experiment" title="Link to this definition"></a></dt>
+<dd><p>Class to run a FairML Experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>config_file</strong><span class="classifier">pathlib.Path</span></dt><dd><p>Path to the configuration file.</p>
+</dd>
+<dt><strong>default_fields</strong><span class="classifier">Iterable[str], optional</span></dt><dd><p>Default fields to include in the configuration, by default (“methods”,
+“datasets”).</p>
+</dd>
+<dt><strong>save_artifacts</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to save artifacts, by default True.</p>
+</dd>
+<dt><strong>save_folder</strong><span class="classifier">pathlib.Path, optional</span></dt><dd><p>Path to the folder where artifacts will be saved, by default “artifacts”.</p>
+</dd>
+<dt><strong>artifacts</strong><span class="classifier">Iterable[str], optional</span></dt><dd><p>Artifacts to save, by default (“results”, “methods”, “predictions”).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.experiment.Experiment.read_dataset" title="src.aequitas.fairflow.experiment.Experiment.read_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_dataset</span></code></a>(config)</p></td>
+<td><p>Read a dataset from a configuration object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.experiment.Experiment.read_method_step" title="src.aequitas.fairflow.experiment.Experiment.read_method_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_method_step</span></code></a>(config)</p></td>
+<td><p>Read a method step from a configuration object.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>generate_hash</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>run</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.experiment.Experiment.read_dataset">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dataset</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/experiment/experiment.html#Experiment.read_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.experiment.Experiment.read_dataset" title="Link to this definition"></a></dt>
+<dd><p>Read a dataset from a configuration object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.experiment.Experiment.read_method_step">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_method_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">PreProcessing</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InProcessing</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PostProcessing</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">DictConfig</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/experiment/experiment.html#Experiment.read_method_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.experiment.Experiment.read_method_step" title="Link to this definition"></a></dt>
+<dd><p>Read a method step from a configuration object.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.aequitas.fairflow.datasets">
+<span id="dataset"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Dataset</span></code><a class="headerlink" href="#module-src.aequitas.fairflow.datasets" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.BankAccountFraud">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.datasets.</span></span><span class="sig-name descname"><span class="pre">BankAccountFraud</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'month'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">(7,),</span> <span class="pre">'train':</span> <span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5),</span> <span class="pre">'validation':</span> <span class="pre">(6,)}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/sergio.jesus/Documents/Projects/research/aequitas/src/aequitas/datasets/BankAccountFraud')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'parquet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/baf.html#BankAccountFraud"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.BankAccountFraud" title="Link to this definition"></a></dt>
+<dd><p>Instantiate a BankAccountFraud dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>variant</strong><span class="classifier">str</span></dt><dd><p>The variant of the dataset to load.</p>
+</dd>
+<dt><strong>split_type</strong><span class="classifier">str, optional</span></dt><dd><p>The type of data split to use. Defaults to “month”.</p>
+</dd>
+<dt><strong>splits</strong><span class="classifier">dict[str, list[Any]], optional</span></dt><dd><p>The proportions of data to use for each split. Defaults to original splits.</p>
+</dd>
+<dt><strong>path</strong><span class="classifier">Path, optional</span></dt><dd><p>The path to the dataset directory. Defaults to ../datasets/BankAccountFraud.</p>
+</dd>
+<dt><strong>seed</strong><span class="classifier">int, optional</span></dt><dd><p>Sampling seed for the dataset. Only required in “split_type” == “random”.
+Defaults to 42.</p>
+</dd>
+<dt><strong>extension</strong><span class="classifier">str, optional</span></dt><dd><p>Extension type of the dataset files. Defaults to “parquet”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></dt><dd><p>Return the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></dt><dd><p>Return the test split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></dt><dd><p>Return the training split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">validation</span></code></dt><dd><p>Return the validation split of the dataset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.BankAccountFraud.create_splits" title="src.aequitas.fairflow.datasets.BankAccountFraud.create_splits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_splits</span></code></a>()</p></td>
+<td><p>Create train, validation, and test splits for the dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.BankAccountFraud.load_data" title="src.aequitas.fairflow.datasets.BankAccountFraud.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>()</p></td>
+<td><p>Load the defined BankAccountFraud dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.BankAccountFraud.create_splits">
+<span class="sig-name descname"><span class="pre">create_splits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/baf.html#BankAccountFraud.create_splits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.BankAccountFraud.create_splits" title="Link to this definition"></a></dt>
+<dd><p>Create train, validation, and test splits for the dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.BankAccountFraud.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/baf.html#BankAccountFraud.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.BankAccountFraud.load_data" title="Link to this definition"></a></dt>
+<dd><p>Load the defined BankAccountFraud dataset.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.FolkTables">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.datasets.</span></span><span class="sig-name descname"><span class="pre">FolkTables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'predefined'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/sergio.jesus/Documents/Projects/research/aequitas/src/aequitas/datasets/FolkTables')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'parquet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/folktables.html#FolkTables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.FolkTables" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></dt><dd><p>Return the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></dt><dd><p>Return the test split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></dt><dd><p>Return the training split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">validation</span></code></dt><dd><p>Return the validation split of the dataset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.FolkTables.create_splits" title="src.aequitas.fairflow.datasets.FolkTables.create_splits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_splits</span></code></a>()</p></td>
+<td><p>Create train, validation, and test splits from the FolkTables dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.FolkTables.load_data" title="src.aequitas.fairflow.datasets.FolkTables.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>()</p></td>
+<td><p>Load the defined FolkTables dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.FolkTables.create_splits">
+<span class="sig-name descname"><span class="pre">create_splits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/folktables.html#FolkTables.create_splits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.FolkTables.create_splits" title="Link to this definition"></a></dt>
+<dd><p>Create train, validation, and test splits from the FolkTables dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.FolkTables.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/folktables.html#FolkTables.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.FolkTables.load_data" title="Link to this definition"></a></dt>
+<dd><p>Load the defined FolkTables dataset.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.GenericDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.datasets.</span></span><span class="sig-name descname"><span class="pre">GenericDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitive_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categorical_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'random'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'feature'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'train'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'validation'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'test'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{'test':</span> <span class="pre">0.15,</span> <span class="pre">'train':</span> <span class="pre">0.7,</span> <span class="pre">'validation':</span> <span class="pre">0.15}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_feature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'parquet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/generic.html#GenericDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.GenericDataset" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></dt><dd><p>Return the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">test</span></code></dt><dd><p>Return the test split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></dt><dd><p>Return the training split of the dataset.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">validation</span></code></dt><dd><p>Return the validation split of the dataset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.GenericDataset.create_splits" title="src.aequitas.fairflow.datasets.GenericDataset.create_splits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_splits</span></code></a>()</p></td>
+<td><p>Split the data into train, validation, and test sets.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.datasets.GenericDataset.load_data" title="src.aequitas.fairflow.datasets.GenericDataset.load_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_data</span></code></a>()</p></td>
+<td><p>Load the dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.GenericDataset.create_splits">
+<span class="sig-name descname"><span class="pre">create_splits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/generic.html#GenericDataset.create_splits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.GenericDataset.create_splits" title="Link to this definition"></a></dt>
+<dd><p>Split the data into train, validation, and test sets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.datasets.GenericDataset.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/datasets/generic.html#GenericDataset.load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.datasets.GenericDataset.load_data" title="Link to this definition"></a></dt>
+<dd><p>Load the dataset.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.aequitas.fairflow.methods.preprocessing">
+<span id="methods-pre-processing"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Pre-Processing</span></code><a class="headerlink" href="#module-src.aequitas.fairflow.methods.preprocessing" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.Identity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.preprocessing.</span></span><span class="sig-name descname"><span class="pre">Identity</span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/identity.html#Identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.Identity" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.Identity.fit" title="src.aequitas.fairflow.methods.preprocessing.Identity.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, s])</p></td>
+<td><p>Fit the preprocessing method to the data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.Identity.transform" title="src.aequitas.fairflow.methods.preprocessing.Identity.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X, y[, s])</p></td>
+<td><p>Transform the data according to the preprocessing method.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.Identity.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/identity.html#Identity.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.Identity.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit the preprocessing method to the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pd.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.Identity.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/identity.html#Identity.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.Identity.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform the data according to the preprocessing method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">Optional[pd.Series], optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.DataFrame</dt><dd><p>The transformed data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.preprocessing.</span></span><span class="sig-name descname"><span class="pre">PrevalenceSampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'global'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'undersample'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/prevalence_sample.html#PrevalenceSampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.calculate_sample_sizes" title="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.calculate_sample_sizes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_sample_sizes</span></code></a>(p, n, target, ...)</p></td>
+<td><p>Calculate sample sizes, for both under and oversampling.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.fit" title="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y, s)</p></td>
+<td><p>Fits the sampler to the data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.transform" title="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X, y[, s])</p></td>
+<td><p>Samples the input DataFrame and Series to</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.calculate_sample_sizes">
+<span class="sig-name descname"><span class="pre">calculate_sample_sizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/prevalence_sample.html#PrevalenceSampling.calculate_sample_sizes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.calculate_sample_sizes" title="Link to this definition"></a></dt>
+<dd><p>Calculate sample sizes, for both under and oversampling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>p</strong><span class="classifier">int</span></dt><dd><p>Number of positive instances in a group.</p>
+</dd>
+<dt><strong>n</strong><span class="classifier">int</span></dt><dd><p>Number of negative instances in a group.</p>
+</dd>
+<dt><strong>target</strong><span class="classifier">float</span></dt><dd><p>Target prevalence for the group.</p>
+</dd>
+<dt><strong>strategy</strong><span class="classifier">str</span></dt><dd><p>Strategy to obtain the desired prevalence.
+Either “undersample” or “oversample”.</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">float</span></dt><dd><p>Parameter that controls the new prevalence values. A value of 0 keeps
+original prevalence, and a value of 1 equalizes the prevalence.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple(int, int)</dt><dd><p>The label to sample (negative or positive) and the number of samples
+to remove (undersampling) or add (oversampling).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/prevalence_sample.html#PrevalenceSampling.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.fit" title="Link to this definition"></a></dt>
+<dd><p>Fits the sampler to the data.</p>
+<p>Updates observed prevalence in the reference group and calculates sampling rates
+for every group in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>Feature matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pandas.Series</span></dt><dd><p>Label vector.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series</span></dt><dd><p>Protected attribute vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/preprocessing/prevalence_sample.html#PrevalenceSampling.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.transform" title="Link to this definition"></a></dt>
+<dd><p>Samples the input DataFrame and Series to</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>Feature matrix.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>Label vector.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pd.Series, optional</span></dt><dd><p>Protected attribute vector.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple[pd.DataFrame, pd.Series, pd.Series]</dt><dd><p>The transformed input, X, y, and s.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.aequitas.fairflow.methods.inprocessing">
+<span id="methods-in-processing"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.In-Processing</span></code><a class="headerlink" href="#module-src.aequitas.fairflow.methods.inprocessing" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairGBM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.inprocessing.</span></span><span class="sig-name descname"><span class="pre">FairGBM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairgbm.html#FairGBM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM.fit" title="src.aequitas.fairflow.methods.inprocessing.FairGBM.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, s])</p></td>
+<td><p>Fit the FairGBM model to the training data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM.predict_proba" title="src.aequitas.fairflow.methods.inprocessing.FairGBM.predict_proba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_proba</span></code></a>(X[, s])</p></td>
+<td><p>Predict class probabilities for the input data.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairGBM.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairgbm.html#FairGBM.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit the FairGBM model to the training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>The training input samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pandas.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The sensitive attribute values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairGBM.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairgbm.html#FairGBM.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairGBM.predict_proba" title="Link to this definition"></a></dt>
+<dd><p>Predict class probabilities for the input data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>The input samples to predict.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The sensitive attribute values.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pandas.Series</dt><dd><p>The predicted class probabilities.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.inprocessing.</span></span><span class="sig-name descname"><span class="pre">FairlearnClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairlearn_classifier.html#FairlearnClassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.fit" title="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y, s)</p></td>
+<td><p>Fits the fairlearn classifier to the data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.parse_kwargs" title="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.parse_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_kwargs</span></code></a>(kwargs)</p></td>
+<td><p>Parses the keyword arguments for the FairlearnClassifier.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.predict_proba" title="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.predict_proba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_proba</span></code></a>(X[, s])</p></td>
+<td><p>Use the machine learning model to make predictions on new data.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairlearn_classifier.html#FairlearnClassifier.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.fit" title="Link to this definition"></a></dt>
+<dd><p>Fits the fairlearn classifier to the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pd.Series</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.parse_kwargs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairlearn_classifier.html#FairlearnClassifier.parse_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.parse_kwargs" title="Link to this definition"></a></dt>
+<dd><p>Parses the keyword arguments for the FairlearnClassifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kwargs</strong><span class="classifier">dict[str, Any]</span></dt><dd><p>A dictionary containing the hyperparameters for the reduction method, base
+estimator and constraint. Parameters for the base estimator should be
+included with the prefix <cite>model__</cite>, and for the constraint with the prefix
+<cite>constraint__</cite>. Every other parameter will be passed down to the reductions
+method.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>tuple[dict, dict, dict]</dt><dd><p>The parameters for the base estimator, constraint, and reductions method, in
+this order.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/inprocessing/fairlearn_classifier.html#FairlearnClassifier.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.predict_proba" title="Link to this definition"></a></dt>
+<dd><p>Use the machine learning model to make predictions on new data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">Optional[pd.Series], optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.aequitas.fairflow.methods.postprocessing">
+<span id="methods-post-processing"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Post-Processing</span></code><a class="headerlink" href="#module-src.aequitas.fairflow.methods.postprocessing" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.GroupThreshold">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.postprocessing.</span></span><span class="sig-name descname"><span class="pre">GroupThreshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/group_threshold.html#GroupThreshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.GroupThreshold" title="Link to this definition"></a></dt>
+<dd><p>A post-processing class to adjust the prediction scores based on a threshold for
+multiple groups in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold_type</strong><span class="classifier">str</span></dt><dd><dl class="simple">
+<dt>The type of threshold to apply. It can be one of the following:</dt><dd><ul class="simple">
+<li><p>fixed: applies a fixed threshold for all samples.</p></li>
+<li><p>fpr: applies a threshold to obtain a specific false positive rate.</p></li>
+<li><p>tpr: applies a threshold to obtain a specific true positive rate.</p></li>
+<li><dl class="simple">
+<dt>top_pct: applies a threshold to obtain the top percentage of predicted</dt><dd><p>scores.</p>
+</dd>
+</dl>
+</li>
+<li><p>top_k: applies a threshold to obtain the top k predicted scores.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt><strong>threshold_value</strong><span class="classifier">Union[float, int]</span></dt><dd><p>The value to use for the threshold, depending on the threshold_type parameter.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>thresholds</strong><span class="classifier">dict[str, Threshold]</span></dt><dd><p>A dictionary of Threshold objects, one for each group in the dataset.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>fit(X, y_hat, y, s=None)</strong></p></td>
+<td><p>Fit the threshold for each group in the dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>transform(X, y_hat, s=None)</strong></p></td>
+<td><p>Transform the prediction scores based on the threshold for each group in the dataset.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.GroupThreshold.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/group_threshold.html#GroupThreshold.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.GroupThreshold.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit a threshold for each group in the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The feature matrix.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pd.Series</span></dt><dd><p>The predicted scores.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>The true labels.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pd.Series, optional</span></dt><dd><p>The sensitive attribute used to group the samples.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.GroupThreshold.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/group_threshold.html#GroupThreshold.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.GroupThreshold.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform the prediction scores based on the threshold for each group in the
+dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pandas.Series</span></dt><dd><p>The pre-transformed predictions.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.Series</dt><dd><p>Transformed predicted scores.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Identity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.postprocessing.</span></span><span class="sig-name descname"><span class="pre">Identity</span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/identity.html#Identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Identity" title="Link to this definition"></a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.postprocessing.Identity.fit" title="src.aequitas.fairflow.methods.postprocessing.Identity.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y_hat, y[, s])</p></td>
+<td><p>Fit the post-processing technique to the validation data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.aequitas.fairflow.methods.postprocessing.Identity.transform" title="src.aequitas.fairflow.methods.postprocessing.Identity.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X, y_hat[, s])</p></td>
+<td><p>Transform the predictions according to the technique.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Identity.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/identity.html#Identity.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Identity.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit the post-processing technique to the validation data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pandas.Series</span></dt><dd><p>The pre-transformed predictions.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pandas.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Identity.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/identity.html#Identity.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Identity.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform the predictions according to the technique.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pandas.Series</span></dt><dd><p>The pre-transformed predictions.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pandas.Series</dt><dd><p>The transformed predicted values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Threshold">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.aequitas.fairflow.methods.postprocessing.</span></span><span class="sig-name descname"><span class="pre">Threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/threshold.html#Threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Threshold" title="Link to this definition"></a></dt>
+<dd><p>A postprocessing class that applies thresholding to the model’s predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>threshold_type</strong><span class="classifier">str</span></dt><dd><p>Type of threshold to apply to the model’s predictions. Must be one of:
+‘fixed’, ‘fpr’, ‘tpr’, ‘top_pct’, ‘top_k’.</p>
+</dd>
+<dt><strong>threshold_value</strong><span class="classifier">Union[float, int]</span></dt><dd><p>Threshold value to apply. The meaning of the threshold value depends on
+the threshold_type. Must be between 0 and 1 for ‘fixed’, ‘fpr’, and
+‘tpr’ threshold types. Must be an integer for ‘top_k’ threshold type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>fit(X, y_hat, y, s=None)</strong></p></td>
+<td><p>Compute the threshold based on the given threshold_type and threshold_value.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Threshold.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/threshold.html#Threshold.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Threshold.fit" title="Link to this definition"></a></dt>
+<dd><p>Compute the threshold based on the given threshold_type and threshold_value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pd.Series</span></dt><dd><p>The pre-transformed predictions.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>The target values.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pd.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.aequitas.fairflow.methods.postprocessing.Threshold.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="../_modules/src/aequitas/fairflow/methods/postprocessing/threshold.html#Threshold.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.aequitas.fairflow.methods.postprocessing.Threshold.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform predicted scores using threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>The input data.</p>
+</dd>
+<dt><strong>y_hat</strong><span class="classifier">pandas.Series</span></dt><dd><p>The pre-transformed predictions.</p>
+</dd>
+<dt><strong>s</strong><span class="classifier">pandas.Series, optional</span></dt><dd><p>The protected attribute.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pd.Series</dt><dd><p>Transformed predicted scores.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aequitas.html" class="btn btn-neutral float-left" title="Aequitas API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../examples/index.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

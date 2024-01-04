@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Aequitas &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Demo" href="index.html" />
+<link href=" _static/default.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to Aequitas</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Getting-started">Getting started</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to Aequitas</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/30_seconds_aequitas.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Welcome-to-Aequitas">
+<h1>Welcome to Aequitas<a class="headerlink" href="#Welcome-to-Aequitas" title="Link to this heading"></a></h1>
+<p>The Aequitas toolkit is a flexible bias-audit utility for algorithmic decision-making models, accessible via Python API, command line interface (CLI), and through our <a class="reference external" href="http://aequitas.dssg.io/">web application</a>.</p>
+<p>Use Aequitas to evaluate model performance across several bias and fairness metrics, and utilize the <a class="reference external" href="https://dsapp.uchicago.edu/wp-content/uploads/2018/05/metrictree-1200x750.png">most relevant metrics</a> to your process in model selection.</p>
+<p>Aequitas will help you:</p>
+<ul class="simple">
+<li><p>Understand where biases exist in your model(s)</p></li>
+<li><p>Compare the level of bias between groups in your sample population (bias disparity)</p></li>
+<li><p>Visualize absolute bias metrics and their related disparities for rapid comprehension and decision-making</p></li>
+</ul>
+<p>Our goal is to support informed and equitable action for both machine learnining practitioners and the decision-makers who rely on them.</p>
+<p>Aequitas is compatible with: <strong>Python 3.6+</strong></p>
+<section id="Getting-started">
+<h2>Getting started<a class="headerlink" href="#Getting-started" title="Link to this heading"></a></h2>
+<p>You can audit your risk assessment system for two types of biases:</p>
+<ul class="simple">
+<li><p>Biased actions or interventions that are not allocated in a way that’s representative of the population.</p></li>
+<li><p>Biased outcomes through actions or interventions that are a result of your system being wrong about certain groups of people.</p></li>
+</ul>
+<p>For both audits, you need the following data:</p>
+<ul class="simple">
+<li><p>Data about the specific attributes (race, gender, age, income, etc.) you want to audit for the the overall population considered for interventions</p></li>
+<li><p>The set of individuals in the above population that your risk assessment system recommended/ selected for intervention or action. <em>It’s important t this set come from the assessments made after the system has been built, and not from the data the machine learning system was “trained” on if you’re using the audit as a factor in model selection.</em></p></li>
+</ul>
+<p>If you want to audit for biases due to model or system errors, you also need to include actual outcomes (label values) for all individuals in the overall population.</p>
+<p>Input data has slightly different requirements depending on whether you are using Aequitas via the webapp, CLI or Python package. In general, input data is a single table with the following columns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">score</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label_value</span></code> (for error-based metrics only)</p></li>
+<li><p>at least one attribute e.g. <code class="docutils literal notranslate"><span class="pre">race</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">age_cat</span></code> (attribute categories defined by user)</p></li>
+</ul>
+</section>
+</section>
+<section id="Bias-measures-tailored-to-your-problem">
+<h1>Bias measures tailored to your problem<a class="headerlink" href="#Bias-measures-tailored-to-your-problem" title="Link to this heading"></a></h1>
+<p>After <a class="reference external" href="./installation.html">installing on your computer</a></p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">aequitas-report</span></code> on <a class="reference external" href="https://github.com/dssg/aequitas/tree/master/examples">COMPAS data</a>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">compas_for_aequitas.csv</span></code> excerpt:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age_cat</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>African-American</p></td>
+<td><p>Male</p></td>
+<td><p>25 - 45</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>Native American</p></td>
+<td><p>Female</p></td>
+<td><p>Less than 25</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aequitas-report --input compas_for_aequitas.csv
+</pre></div>
+</div>
+<p><strong>Note:</strong> Disparites are always defined in relation to a reference group. By default, Aequitas uses the majority group within each attribute as the reference group. <a class="reference external" href="./config.html">Defining a reference group</a></p>
+<p>The Bias Report produces a pdf that returns descriptive interpretation of the results along with three sets of tables.</p>
+<ul class="simple">
+<li><p>Fairness Measures Results</p></li>
+<li><p>Bias Metrics Results</p></li>
+<li><p>Group Metrics Results</p></li>
+</ul>
+<p>Additionally, a csv is produced that contains the relevant data. More information about output <a class="reference external" href="./output_data.html">here</a>.</p>
+<p>In the command line you will see The Bias Report, which returns counts for each attribute by group and then computes various fairness metrics. This is the same information that is captured in the csv output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>                    ___                    _ __
+                   /   | ___  ____ ___  __(_) /_____ ______
+                  / /| |/ _ \/ __ `/ / / / / __/ __ `/ ___/
+                 / ___ /  __/ /_/ / /_/ / / /_/ /_/ (__  )
+                /_/  |_\___/\__, /\__,_/_/\__/\__,_/____/
+                              /_/
+____________________________________________________________________________
+
+                      Bias and Fairness Audit Tool
+____________________________________________________________________________
+
+Welcome to Aequitas-Audit
+Fairness measures requested: Statistical Parity,Impact Parity,FDR Parity,FPR Parity,FNR Parity,FOR Parity
+model_id, score_thresholds 1 {&#39;rank_abs&#39;: [3317]}
+COUNTS::: race
+African-American    3696
+Asian                 32
+Caucasian           2454
+Hispanic             637
+Native American       18
+Other                377
+dtype: int64
+COUNTS::: sex
+Female    1395
+Male      5819
+dtype: int64
+COUNTS::: age_cat
+25 - 45            4109
+Greater than 45    1576
+Less than 25       1529
+dtype: int64
+audit: df shape from the crosstabs: (11, 26)
+get_disparity_major_group()
+number of rows after bias majority ref group: 11
+Any NaN?:  False
+bias_df shape: (11, 38)
+Fairness Threshold: 0.8
+Fairness Measures: [&#39;Statistical Parity&#39;, &#39;Impact Parity&#39;, &#39;FDR Parity&#39;, &#39;FPR Parity&#39;, &#39;FNR Parity&#39;, &#39;FOR Parity&#39;]
+
+...
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Demo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

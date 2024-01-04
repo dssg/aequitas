@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.aequitas.group &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/flow.html">Aequitas-Flow API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.aequitas.group</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.aequitas.group</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">.bias</span> <span class="kn">import</span> <span class="n">Bias</span>
+<span class="kn">from</span> <span class="nn">.plot</span> <span class="kn">import</span> <span class="n">summary</span><span class="p">,</span> <span class="n">disparity</span><span class="p">,</span> <span class="n">absolute</span>
+
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Rayid Ghani, Pedro Saleiro &lt;saleiro@uchicago.edu&gt;, Benedict Kuester, Loren Hinkson, Sérgio Jesus&quot;</span>
+
+
+<div class="viewcode-block" id="Group">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group">[docs]</a>
+<span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates absolute metrics for a given dataframe with model scores and</span>
+<span class="sd">    labels, divided by different values on protected attributes.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    absolute_metrics : List[str]</span>
+<span class="sd">        Calculated bias metrics.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_crosstabs(df, score_thresholds=None, attr_cols=None, score_col=&quot;score&quot;, label_col=&quot;label_value&quot;)</span>
+<span class="sd">        Calculates metrics for a given dataframe.</span>
+<span class="sd">    get_multimodel_crosstabs(df, score_thresholds=None, attr_cols=None, score_col=&quot;score&quot;, label_col=&quot;label_value&quot;)</span>
+<span class="sd">        Calculates metrics for a given dataframe with multiple models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_group_metrics</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;ppr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pprev&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precision&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fdr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;for&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fpr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fnr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tpr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tnr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;npv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;prev&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_group_metrics</span><span class="o">=</span><span class="n">all_group_metrics</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absolute_metrics</span> <span class="o">=</span> <span class="n">input_group_metrics</span>
+
+<div class="viewcode-block" id="Group.gen_metrics_df">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.gen_metrics_df">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">gen_metrics_df</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">attr_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">score</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">score_threshold</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates metrics for a given dataframe.</span>
+
+<span class="sd">        Generates the confusion matrix given the scores in the `score` column</span>
+<span class="sd">        and the &quot;label_value&quot; for each unique value in each of the `attr_cols`.</span>
+<span class="sd">        Then, the metrics that are derived from the confusion matrix are</span>
+<span class="sd">        calculated.</span>
+
+<span class="sd">        To add a different metric, add the name of the metric in the `columns`</span>
+<span class="sd">        variable and calculate it in the inner for cycle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            Classification, label and protected attributes on a given dataset.</span>
+<span class="sd">            The classification column must already be binary, and in</span>
+<span class="sd">            column `score`. The label column must be in the column</span>
+<span class="sd">            &quot;label_value&quot;.</span>
+<span class="sd">        attr_cols : List[str]</span>
+<span class="sd">            Columns of the dataframe that represent protected attributes.</span>
+<span class="sd">        score : str</span>
+<span class="sd">            Column of the dataframe that represents classification result.</span>
+<span class="sd">            Values in the column must be binary.</span>
+<span class="sd">        label : str</span>
+<span class="sd">            Column of the dataframe that represents label of instance.</span>
+<span class="sd">            Values in the column must be binary.</span>
+<span class="sd">        score_threshold : str</span>
+<span class="sd">            Type of threshold used to binarize score.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            Metrics for each group in the protected attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Method to handle divisions by 0.</span>
+        <span class="n">divide</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="k">if</span> <span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">model_id</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">_check_model_id</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;df&quot;</span><span class="p">)</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>  <span class="c1"># Columns in the resulting dataframe</span>
+            <span class="s2">&quot;model_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;score_threshold&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attribute_name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;attribute_value&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;accuracy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tpr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tnr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fomr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fdr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fpr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fnr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;npv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;precision&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ppr&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pprev&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tn&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;group_label_pos&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;group_label_neg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;group_size&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;total_entities&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;prev&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">final_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">}</span>
+        <span class="c1"># k = Total number of predicted positives in sample.</span>
+        <span class="c1"># This is for pd.DataFrames only.</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">score</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attribute_name</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="c1"># Create confusion matrix for each group in the form of dictionary.</span>
+            <span class="c1"># This is for pd.DataFrames only.</span>
+            <span class="n">grouped_data</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">label</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">into</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># Select the possible (unique) values of the protected attributes (groups).</span>
+            <span class="c1"># list(OrderedDict.fromkeys()) works like an ordered set.</span>
+            <span class="n">attribute_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">])</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">attribute_value</span> <span class="ow">in</span> <span class="n">attribute_values</span><span class="p">:</span>
+                <span class="c1"># Get confusion matrix from the dictionary.</span>
+                <span class="n">tp</span> <span class="o">=</span> <span class="n">grouped_data</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">attribute_value</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">tn</span> <span class="o">=</span> <span class="n">grouped_data</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">attribute_value</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="n">grouped_data</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">attribute_value</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="n">grouped_data</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">attribute_value</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Calculate all metrics from confusion matrix.</span>
+                <span class="n">accuracy</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">tn</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">fn</span><span class="p">)</span>
+                <span class="n">tpr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tp</span><span class="p">)</span>
+                <span class="n">tnr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tn</span><span class="p">,</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span>
+                <span class="c1"># We can&#39;t have variables named &#39;for&#39;, this is changed in return</span>
+                <span class="n">fomr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span>
+                <span class="n">fdr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span>
+                <span class="n">fpr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span>
+                <span class="n">fnr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tp</span><span class="p">)</span>
+                <span class="n">npv</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tn</span><span class="p">,</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tn</span><span class="p">)</span>
+                <span class="n">precision</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span> <span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span>
+                <span class="n">pp</span> <span class="o">=</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">tp</span>
+                <span class="n">pn</span> <span class="o">=</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tn</span>
+                <span class="n">ppr</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="n">pprev</span> <span class="o">=</span> <span class="n">divide</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">pp</span> <span class="o">+</span> <span class="n">pn</span><span class="p">)</span>
+                <span class="n">group_label_pos</span> <span class="o">=</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">tp</span>
+                <span class="n">group_label_neg</span> <span class="o">=</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">tn</span>
+                <span class="n">group_size</span> <span class="o">=</span> <span class="n">group_label_pos</span> <span class="o">+</span> <span class="n">group_label_neg</span>
+                <span class="n">total_entities</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">prev</span> <span class="o">=</span> <span class="p">(</span><span class="n">fn</span> <span class="o">+</span> <span class="n">tp</span><span class="p">)</span> <span class="o">/</span> <span class="n">group_size</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">final_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="c1"># Maybe using locals is not the best, but it is the least</span>
+                    <span class="c1"># messy solution in terms of code.</span>
+                    <span class="n">final_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">locals</span><span class="p">()[</span><span class="n">key</span><span class="p">])</span>
+        <span class="c1"># Rename column fomr -&gt; for (impossible to have variable named for).</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">final_dict</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fomr&quot;</span><span class="p">:</span> <span class="s2">&quot;for&quot;</span><span class="p">})</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_model_id</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">method_table_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;df&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the model id in a dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            Predictions of a model. Might have or not the column &quot;model_id&quot;.</span>
+<span class="sd">        method_table_name: str</span>
+<span class="sd">            Reference name of the dataframe for error message.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The model id. 0 if no model id column exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;model_id&quot;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">df_models</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_models</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;This method requires one and only one model_id in the &quot;</span>
+                    <span class="s2">&quot;dataframe. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Tip: Check that </span><span class="si">{</span><span class="n">method_table_name</span><span class="si">}</span><span class="s2">.model_id.unique() &quot;</span>
+                    <span class="s2">&quot;only returns an one-element array. &quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">df_models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Group.get_multimodel_crosstabs">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_multimodel_crosstabs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_multimodel_crosstabs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">score_thresholds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attr_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">score_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+        <span class="n">label_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;label_value&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs `get_crosstabs()` and calculates group metrics for results</span>
+<span class="sd">        from multiple models.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df: pandas.DataFrame</span>
+<span class="sd">            Results of model classification. Must contain:</span>
+<span class="sd">            [score_col,  label_col, &quot;model_id&quot;].</span>
+<span class="sd">        score_thresholds: Dict[str, List[Union[int, float]]]</span>
+<span class="sd">            The possible thresholds of the models.</span>
+<span class="sd">            Accepted keys:</span>
+<span class="sd">                - &#39;rank_abs&#39; for absolute ranking (top k scores classified as</span>
+<span class="sd">                   positive).</span>
+<span class="sd">                - &#39;rank_pct&#39; for percentage ranking (top X% classified as</span>
+<span class="sd">                   positive).</span>
+<span class="sd">                - &#39;score_val&#39; for value threshold (Scores above Y classified as</span>
+<span class="sd">                   positive).</span>
+<span class="sd">            The values for each key represent the different tested thresholds.</span>
+<span class="sd">            These must be inside a list.</span>
+<span class="sd">            If not specified, it is assumed the scores are already in binary</span>
+<span class="sd">            form.</span>
+<span class="sd">        attr_cols: List[str]</span>
+<span class="sd">            Columns with protected attributes. If not specified, all</span>
+<span class="sd">            columns except &#39;id&#39;, &#39;model_id&#39;, &#39;entity_id&#39;, &#39;score&#39;, &#39;label_value&#39;</span>
+<span class="sd">            are used. The values in these columns must be categorical.</span>
+<span class="sd">        score_col : str</span>
+<span class="sd">            Column of the dataframe that represents classification result.</span>
+<span class="sd">            Must be numeric / binary.</span>
+<span class="sd">        label_col : str</span>
+<span class="sd">            Column of the dataframe that represents label of instance.</span>
+<span class="sd">            Values in the column must be binary.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            Metrics for each group in the protected attribute, for combination</span>
+<span class="sd">            of model and threshold. List of protected attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;model_id&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;The method expects a column named &quot;model_id&quot; in the &#39;</span> <span class="s2">&quot;dataframe.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">df_models</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="n">crosstab_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">model_attr_cols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">df_models</span><span class="p">:</span>
+            <span class="n">model_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;model_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">model</span><span class="p">]</span>
+            <span class="n">model_crosstab</span><span class="p">,</span> <span class="n">model_attr_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crosstabs</span><span class="p">(</span>
+                <span class="n">model_df</span><span class="p">,</span>
+                <span class="n">score_thresholds</span><span class="o">=</span><span class="n">score_thresholds</span><span class="p">,</span>
+                <span class="n">attr_cols</span><span class="o">=</span><span class="n">attr_cols</span><span class="p">,</span>
+                <span class="n">score_col</span><span class="o">=</span><span class="n">score_col</span><span class="p">,</span>
+                <span class="n">label_col</span><span class="o">=</span><span class="n">label_col</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">crosstab_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model_crosstab</span><span class="p">)</span>
+        <span class="c1"># Note: only returns model_attr_cols from the last iteration, as they</span>
+        <span class="c1"># all are the same</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">crosstab_list</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">model_attr_cols</span></div>
+
+
+<div class="viewcode-block" id="Group.get_crosstabs">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.get_crosstabs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_crosstabs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">score_thresholds</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attr_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">score_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;score&quot;</span><span class="p">,</span>
+        <span class="n">label_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;label_value&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Creates univariate groups and calculates group metrics for results</span>
+<span class="sd">         from a single model.</span>
+
+<span class="sd">         Parameters</span>
+<span class="sd">         ----------</span>
+<span class="sd">         df : pandas.DataFrame</span>
+<span class="sd">             Results of model classification. Must contain:</span>
+<span class="sd">             [score_column,  label_column].</span>
+<span class="sd">         score_thresholds : Dict[str, List[Union[int, float]]]</span>
+<span class="sd">             The possible thresholds of the model.</span>
+<span class="sd">             Accepted keys:</span>
+<span class="sd">                 - &#39;rank_abs&#39; for absolute ranking (top k scores classified as</span>
+<span class="sd">                    positive).</span>
+<span class="sd">                 - &#39;rank_pct&#39; for percentage ranking (top X% classified as</span>
+<span class="sd">                    positive).</span>
+<span class="sd">                 - &#39;score_val&#39; for value threshold (Scores above Y classified as</span>
+<span class="sd">                    positive).</span>
+<span class="sd">             The values for each key represent the different tested thresholds.</span>
+<span class="sd">             These must be inside a list.</span>
+<span class="sd">             If not specified, it is assumed the scores are already in binary</span>
+<span class="sd">             form.</span>
+<span class="sd">         attr_cols: List[str]</span>
+<span class="sd">             Columns with protected attributes. If not specified, all</span>
+<span class="sd">             columns except &#39;id&#39;, &#39;model_id&#39;, &#39;entity_id&#39;, &#39;score&#39;, &#39;label_value&#39;</span>
+<span class="sd">             are used. The values in these columns must be categorical.</span>
+<span class="sd">         score_col : str</span>
+<span class="sd">             Column of the dataframe that represents classification result.</span>
+<span class="sd">             Must be numeric / binary.</span>
+<span class="sd">         label_col : str</span>
+<span class="sd">             Column of the dataframe that represents label of instance.</span>
+<span class="sd">             Values in the column must be binary.</span>
+<span class="sd">         Returns</span>
+<span class="sd">         -------</span>
+<span class="sd">        Tuple[pd.DataFrame, List[str]]</span>
+<span class="sd">             Metrics for each group in the protected attribute, each specified</span>
+<span class="sd">             threshold. List of protected attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="n">non_attr_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;model_id&quot;</span><span class="p">,</span> <span class="s2">&quot;entity_id&quot;</span><span class="p">,</span> <span class="n">score_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">]</span>
+            <span class="c1"># index of the columns that are protected attributes.</span>
+            <span class="n">attr_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">non_attr_cols</span><span class="p">)])</span>
+
+        <span class="n">necessary_cols</span> <span class="o">=</span> <span class="n">attr_cols</span> <span class="o">+</span> <span class="p">[</span><span class="n">score_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;model_id&quot;</span><span class="p">,</span> <span class="s2">&quot;entity_id&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">necessary_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="c1"># Copy only the necessary columns</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">necessary_cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># To not transform original dataframe.</span>
+
+        <span class="c1"># Validation step.</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="n">score_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">]:</span>
+            <span class="c1"># Validate if column is in dataframe.</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The column &quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&quot; is not on the dataframe.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Labels are not binarized.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">label_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">:</span>
+            <span class="c1"># Validate if column is in dataframe.</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The attribute column &quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&quot; is not on the dataframe.&#39;</span><span class="p">)</span>
+            <span class="c1"># Validate if column has correct datatype.</span>
+            <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;The attribute column &quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">&quot; has in invalid datatype.&#39;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># In case no threshold is provided.</span>
+        <span class="n">metrics_matrices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">score_thresholds</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">score_col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scores are not binarized. Provide a threshold.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">score_thresholds</span><span class="p">:</span>  <span class="c1"># No thresholds given and binarized</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">score_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">score_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">metrics_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gen_metrics_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">attr_cols</span><span class="p">,</span> <span class="n">score_col</span><span class="p">,</span> <span class="n">label_col</span><span class="p">,</span> <span class="s2">&quot;binary 0/1&quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">score_thresholds</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># In case a threshold is provided.</span>
+        <span class="n">binarized_column</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>  <span class="c1"># Add a column with binary scores.</span>
+        <span class="c1"># This is done to maintain the score for future iterations in threshold.</span>
+        <span class="n">sorted_df</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Flag to sort the dataframe in the first run.</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">score_thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sorted_df</span><span class="p">:</span>
+                    <span class="c1"># Sort df only once, at the first iteration.</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">score_col</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                        <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="n">sorted_df</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># Cast scores as ints in the dataframe</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;rank_abs&quot;</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">binarized_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;rank_pct&quot;</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">binarized_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">value</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;score_val&quot;</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">binarized_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">score_col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Invalid keys&quot;</span><span class="p">)</span>
+                <span class="n">metrics_matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gen_metrics_df</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">,</span>
+                        <span class="n">attr_cols</span><span class="p">,</span>
+                        <span class="n">binarized_column</span><span class="p">,</span>
+                        <span class="n">label_col</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">key</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">metrics_matrices</span><span class="p">),</span> <span class="n">attr_cols</span></div>
+
+
+<div class="viewcode-block" id="Group.list_absolute_metrics">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.list_absolute_metrics">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_absolute_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View list of all calculated absolute bias metrics in df.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            The result of the `get_crosstabs` methods.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List[Any]</span>
+<span class="sd">            Absolute bias metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absolute_metrics</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Group.calculate_disparities">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.calculate_disparities">[docs]</a>
+    <span class="k">def</span> <span class="nf">calculate_disparities</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">score_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">label_col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">attr_cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">reference_groups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a summary plot of the fairness metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df : pandas.DataFrame</span>
+<span class="sd">            Results of model classification. Must contain:</span>
+<span class="sd">            [score_col, label_col, attr_cols].</span>
+<span class="sd">        score_col : str</span>
+<span class="sd">            Column of the dataframe that represents classification result.</span>
+<span class="sd">            Must be numeric / binary.</span>
+<span class="sd">        label_col : str</span>
+<span class="sd">            Column of the dataframe that represents label of instance.</span>
+<span class="sd">            Values in the column must be binary.</span>
+<span class="sd">        attr_cols : List[str]</span>
+<span class="sd">            Columns with protected attributes. If not specified, all</span>
+<span class="sd">            columns except &#39;id&#39;, &#39;model_id&#39;, &#39;entity_id&#39;, &#39;score&#39;, &#39;label_value&#39;</span>
+<span class="sd">            are used. The values in these columns must be categorical.</span>
+<span class="sd">        reference_groups : dict[str, str], optional</span>
+<span class="sd">            Dictionary with the reference groups for each attribute. Defaults</span>
+<span class="sd">            to None.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Keyword arguments to pass to the `get_crosstabs` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cm_metrics</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crosstabs</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">score_col</span><span class="o">=</span><span class="n">score_col</span><span class="p">,</span>
+            <span class="n">label_col</span><span class="o">=</span><span class="n">label_col</span><span class="p">,</span>
+            <span class="n">attr_cols</span><span class="o">=</span><span class="n">attr_cols</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">reference_groups</span><span class="p">:</span>
+            <span class="n">reference_groups</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attr_cols</span><span class="p">}</span>
+
+        <span class="n">b</span> <span class="o">=</span> <span class="n">Bias</span><span class="p">()</span>
+
+        <span class="n">disparity_metrics</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">get_disparity_predefined_groups</span><span class="p">(</span>
+            <span class="n">cm_metrics</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">ref_groups_dict</span><span class="o">=</span><span class="n">reference_groups</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">disparity_metrics</span></div>
+
+
+<div class="viewcode-block" id="Group.plot_summary">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.plot_summary">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_summary</span><span class="p">(</span>
+        <span class="n">disparities</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">],</span>
+        <span class="n">fairness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a summary plot of the fairness metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        disparities : pandas.DataFrame</span>
+<span class="sd">            Disparities for each group.</span>
+<span class="sd">        metrics : list[str], optional</span>
+<span class="sd">            List of metrics to plot. Defaults to [&quot;fpr&quot;, &quot;tpr&quot;].</span>
+<span class="sd">        fairness_threshold : float, optional</span>
+<span class="sd">            Threshold to use to determine fairness. Defaults to 1.2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">summary</span><span class="p">(</span><span class="n">disparities</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">fairness_threshold</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Group.plot_disparity">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.plot_disparity">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_disparity</span><span class="p">(</span>
+        <span class="n">disparities</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">attribute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">],</span>
+        <span class="n">fairness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a plot of the fairness metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        disparities : pandas.DataFrame</span>
+<span class="sd">            Disparities for each group.</span>
+<span class="sd">        metrics : list[str], optional</span>
+<span class="sd">            List of metrics to plot. Defaults to [&quot;fpr&quot;, &quot;tpr&quot;].</span>
+<span class="sd">        fairness_threshold : float, optional</span>
+<span class="sd">            Threshold to use to determine fairness. Defaults to 1.2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">disparity</span><span class="p">(</span><span class="n">disparities</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">fairness_threshold</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Group.plot_absolute">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.group.Group.plot_absolute">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_absolute</span><span class="p">(</span>
+        <span class="n">disparities</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">attribute</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">],</span>
+        <span class="n">fairness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a plot of the fairness metrics.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        disparities : pandas.DataFrame</span>
+<span class="sd">            Disparities for each group.</span>
+<span class="sd">        metrics : list[str], optional</span>
+<span class="sd">            List of metrics to plot. Defaults to [&quot;fpr&quot;, &quot;tpr&quot;].</span>
+<span class="sd">        fairness_threshold : float, optional</span>
+<span class="sd">            Threshold to use to determine fairness. Defaults to 1.2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">absolute</span><span class="p">(</span><span class="n">disparities</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">fairness_threshold</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

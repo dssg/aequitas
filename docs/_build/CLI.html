@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using the CLI &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configurations" href="config.html" />
+    <link rel="prev" title="Understanding the Metrics" href="metrics.html" />
+<link href=" _static/default.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using the CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#CLI-use-cases">CLI use cases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Use-with-binary-scores-and-csv">Use with binary scores and csv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Use-with-continuous-scores-or-risk-scores">Use with continuous scores or risk scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Use-with-binary-scores-from-a-database">Use with binary scores from a database</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CLI-flags">CLI flags</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#--input---&lt;-path-to-.csv-file-&gt;"><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#--config---&lt;-path-to-config.yaml-&gt;"><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#--output-folder-&lt;path-to-folder&gt;"><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#--create-tables"><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Using the CLI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/CLI.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Using-the-CLI">
+<h1>Using the CLI<a class="headerlink" href="#Using-the-CLI" title="Link to this heading"></a></h1>
+<p>Aequitas command line interface (CLI) allows you to generate ‘The Bias Report’ with one line in the terminal. At minimum enter:</p>
+<p><code class="docutils literal notranslate"><span class="pre">aequitas-report</span> <span class="pre">--input</span> <span class="pre">&lt;file&gt;</span></code></p>
+<p>The command line interface allows the user to produce reports with more flexability than the webapp without coding in Python. Here we detail the command and provide use cases with different types of data inputs.</p>
+<section id="CLI-use-cases">
+<h2>CLI use cases<a class="headerlink" href="#CLI-use-cases" title="Link to this heading"></a></h2>
+<section id="Use-with-binary-scores-and-csv">
+<h3>Use with binary scores and csv<a class="headerlink" href="#Use-with-binary-scores-and-csv" title="Link to this heading"></a></h3>
+<p>This use case is presented in <a class="reference external" href="./30_seconds_aequitas.html">getting started with aequitas-report</a>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aequitas-report --input &lt;csv with binary scores&gt;
+</pre></div>
+</div>
+<p><strong>Input data</strong>: Use when the input data has binary 0/1 scores.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age</p></th>
+<th class="head"><p>income</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>1</p></td>
+<td><p>African-American</p></td>
+<td><p>Female</p></td>
+<td><p>55</p></td>
+<td><p>78000</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>Caucasian</p></td>
+<td><p>Female</p></td>
+<td><p>43</p></td>
+<td><p>34000</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Configs</strong>: With no configs, the reference group would be determined automatically based on the majority group for a given attribute and all metrics will be calculated.</p>
+</section>
+<section id="Use-with-continuous-scores-or-risk-scores">
+<h3>Use with continuous scores or risk scores<a class="headerlink" href="#Use-with-continuous-scores-or-risk-scores" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aequitas-report --input &lt;csv with continuous scores&gt; --config configs_example.yaml
+</pre></div>
+</div>
+<p><strong>Input data</strong>:</p>
+<p>Use when the input data has continuous scores.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>.35</p></td>
+<td><p>1</p></td>
+<td><p>Asian-American</p></td>
+<td><p>Male</p></td>
+<td><p>&lt;30</p></td>
+</tr>
+<tr class="row-odd"><td><p>.68</p></td>
+<td><p>0</p></td>
+<td><p>Native American</p></td>
+<td><p>Female</p></td>
+<td><p>30-50</p></td>
+</tr>
+</tbody>
+</table>
+<p>or the input data has risk scores.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>score</p></th>
+<th class="head"><p>label_value</p></th>
+<th class="head"><p>race</p></th>
+<th class="head"><p>sex</p></th>
+<th class="head"><p>age</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>1</p></td>
+<td><p>Asian-American</p></td>
+<td><p>Male</p></td>
+<td><p>&lt;30</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>0</p></td>
+<td><p>Native American</p></td>
+<td><p>Female</p></td>
+<td><p>30-50</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Configs</strong>: When scores are continuous, we have flexibility in who is classified in the positive or negative class based on a thresholds. (Described <a class="reference external" href="config.html">here</a> or see <a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_example.yaml">example</a>).</p>
+</section>
+<section id="Use-with-binary-scores-from-a-database">
+<h3>Use with binary scores from a database<a class="headerlink" href="#Use-with-binary-scores-from-a-database" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aequitas-report --config configs_database_example.yaml --create-tables
+</pre></div>
+</div>
+<p><strong>Input data</strong>: Pulled from database based on command in config file.</p>
+<p><strong>Configs</strong>: In the configuration file, you must provide database credentials and a SQL query. Described <a class="reference external" href="config.html">here</a> or see <a class="reference external" href="https://github.com/dssg/aequitas/blob/master/src/aequitas_cli/configs_database_example.yaml">example</a>.</p>
+</section>
+</section>
+<section id="CLI-flags">
+<h2>CLI flags<a class="headerlink" href="#CLI-flags" title="Link to this heading"></a></h2>
+<section id="--input---&lt;-path-to-.csv-file-&gt;">
+<h3><code class="docutils literal notranslate"><span class="pre">--input</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">.csv</span> <span class="pre">file</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--input---<-path-to-.csv-file->" title="Link to this heading"></a></h3>
+<p>Absolute filepath for input dataset in csv format. If no input is provided we assume there is a db configuration in the configs.yaml file.</p>
+</section>
+<section id="--config---&lt;-path-to-config.yaml-&gt;">
+<h3><code class="docutils literal notranslate"><span class="pre">--config</span>&#160;&#160; <span class="pre">&lt;</span> <span class="pre">path</span> <span class="pre">to</span> <span class="pre">config.yaml</span> <span class="pre">&gt;</span></code><a class="headerlink" href="#--config---<-path-to-config.yaml->" title="Link to this heading"></a></h3>
+<p>To change default behavior uniformly across applications use a configuration file.</p>
+</section>
+<section id="--output-folder-&lt;path-to-folder&gt;">
+<h3><code class="docutils literal notranslate"><span class="pre">--output-folder</span> <span class="pre">&lt;path</span> <span class="pre">to</span> <span class="pre">folder&gt;</span></code><a class="headerlink" href="#--output-folder-<path-to-folder>" title="Link to this heading"></a></h3>
+<p>Folder name to be created inside aequitas.</p>
+</section>
+<section id="--create-tables">
+<h3><code class="docutils literal notranslate"><span class="pre">--create-tables</span></code><a class="headerlink" href="#--create-tables" title="Link to this heading"></a></h3>
+<p>If you are working with a database, the flag tells aequitas to create table from scratch and drop existing tables. Otherwise, it will append aequitas output. Note, database functionality must be configured in the config.yaml file.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metrics.html" class="btn btn-neutral float-left" title="Understanding the Metrics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configurations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

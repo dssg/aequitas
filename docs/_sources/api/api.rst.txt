@@ -1,5 +1,0 @@
-API
-
-.. toctree::
-
-    aequitas

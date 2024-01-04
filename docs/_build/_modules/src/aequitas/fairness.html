@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.aequitas.fairness &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/flow.html">Aequitas-Flow API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.aequitas.fairness</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.aequitas.fairness</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Rayid Ghani, Pedro Saleiro &lt;saleiro@uchicago.edu&gt;, Loren Hinkson&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright </span><span class="se">\xa9</span><span class="s2"> 2018. The University of Chicago. All Rights Reserved.&quot;</span>
+
+
+<div class="viewcode-block" id="Fairness">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness">[docs]</a>
+<span class="k">class</span> <span class="nc">Fairness</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fair_eval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fair_measures_depend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">type_parity_depend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high_level_fairness_depend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param fair_eval: a lambda function that is used to assess fairness</span>
+<span class="sd">            (e.g. 80% rule)</span>
+<span class="sd">        :param tau: the threshold for fair/unfair evaluation</span>
+<span class="sd">        :param fair_measures_depend: a dictionary containing fairness measures</span>
+<span class="sd">            as keys and the corresponding input bias disparity as values</span>
+<span class="sd">        :param type_parity_depend: a dictionary with Type I, Type II, and</span>
+<span class="sd">            Equalized Odds fairness measures as keys and lists of their</span>
+<span class="sd">            underlying bias metric parities as values</span>
+<span class="sd">        :param high_level_fairness_depend: a dictionary with supervised and</span>
+<span class="sd">            unsupervised fairness as keys and lists of their underlying metric</span>
+<span class="sd">            parities as values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fair_eval</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_eval</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tau</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> \
+                <span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">tau</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">tau</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_eval</span> <span class="o">=</span> <span class="n">fair_eval</span>
+        <span class="c1"># tau is the fairness_threshold and should be a real ]0.0 and 1.0]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tau</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span>
+
+        <span class="c1"># Set high-level fairness evaluation to NA (undefined) if both</span>
+        <span class="c1"># underlying parity determinations are NA. If only one parity is NA,</span>
+        <span class="c1"># evaluation is determined by the defined parity.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_level_pair_eval</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">col1</span><span class="p">,</span> <span class="n">col2</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">col1</span><span class="p">])</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">col2</span><span class="p">]))</span> \
+            <span class="k">else</span> \
+            <span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">col1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="n">col2</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">col</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="k">else</span> <span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span>
+        <span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># the fair_measures_depend define the bias metrics that serve as input to the fairness evaluation and respective</span>
+        <span class="c1"># fairness measure. basically these are the fairness measures supported by the current version of aequitas.</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fair_measures_depend</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;ppr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;Impact Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;pprev_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;FDR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fdr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;FPR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fpr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;FOR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;for_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;FNR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;fnr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;TPR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;tpr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;TNR Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;tnr_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;NPV Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;npv_disparity&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;Precision Parity&#39;</span><span class="p">:</span> <span class="s1">&#39;precision_disparity&#39;</span>
+                                         <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span> <span class="o">=</span> <span class="n">fair_measures_depend</span>
+
+        <span class="c1"># the self.fair_measures represents the list of fairness_measures to be calculated by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">type_parity_depend</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;TypeI Parity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FDR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FPR Parity&#39;</span><span class="p">],</span>
+                                       <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FOR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;FNR Parity&#39;</span><span class="p">],</span>
+                                       <span class="s1">&#39;Equalized Odds&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;FPR Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TPR Parity&#39;</span><span class="p">]}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="o">=</span> <span class="n">type_parity_depend</span>
+
+        <span class="c1"># high level fairness_depend define which input fairness measures are used to calculate the high level ones</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">high_level_fairness_depend</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Unsupervised Fairness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Impact Parity&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TypeI Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;TypeII Parity&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="o">=</span> <span class="n">high_level_fairness_depend</span>
+
+<div class="viewcode-block" id="Fairness.get_fairness_measures_supported">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_fairness_measures_supported">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_fairness_measures_supported</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine fairness measures supported based on columns in data frame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;label_value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">input_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Statistical Parity&#39;</span><span class="p">,</span> <span class="s1">&#39;Impact Parity&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span></div>
+
+
+
+<div class="viewcode-block" id="Fairness.get_group_value_fairness">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_group_value_fairness">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_group_value_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bias_df</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fair_measures_requested</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the fairness measures defined in fair_measures_requested</span>
+<span class="sd">        dictionary and adds them as columns to the input bias_df.</span>
+
+<span class="sd">        :param bias_df: the output dataframe from bias/ disparity calculation methods.</span>
+<span class="sd">        :param tau: optional, the threshold for fair/ unfair evaluation.</span>
+<span class="sd">        :param fair_measures_requested: optional, a dictionary containing fairness</span>
+<span class="sd">            measures as keys and the corresponding input bias disparity as values.</span>
+
+<span class="sd">        :return: Bias_df dataframe with additional columns for each</span>
+<span class="sd">            of the fairness measures defined in the fair_measures dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tau</span><span class="p">:</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fair_measures_requested</span><span class="p">:</span>
+            <span class="n">fair_measures_requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span>
+
+        <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fair</span> <span class="ow">in</span> <span class="n">fair_measures_requested</span><span class="p">:</span>
+
+                <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="p">[</span><span class="nb">input</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fair_eval</span><span class="p">(</span><span class="n">tau</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_pair_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness: No Parity measure input found on bias_df&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fair</span><span class="p">,</span> <span class="nb">input</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_pair_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">bias_df</span><span class="p">[</span><span class="n">fair</span><span class="p">]</span> <span class="o">=</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high_level_single_eval</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;Unsupervised Fairness&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s1">&#39;Supervised Fairness&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bias_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;get_group_value_fairness: No high level measure input found on bias_df&#39;</span> <span class="o">+</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">bias_df</span></div>
+
+
+
+    <span class="k">def</span> <span class="nf">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupby_obj</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span>
+                                        <span class="n">group_attribute_df</span><span class="p">,</span> <span class="n">measures</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns dataframe with values grouped by attribute_value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;fill_groupby_attribute_fairness&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">group</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">groupby_obj</span><span class="p">:</span>
+                <span class="n">group_df</span> <span class="o">=</span> <span class="n">groupby_obj</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">group_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="n">row</span> <span class="o">=</span> <span class="n">group_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">group_df</span> <span class="o">=</span> <span class="n">group_df</span><span class="p">[</span><span class="n">group_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">notnull</span><span class="p">()][</span><span class="n">key_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+                    <span class="n">row</span> <span class="o">=</span> <span class="n">group_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">group_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()]</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">key_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">key_df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">key_df</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="n">key_columns</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">group_attribute_df</span>
+
+
+<div class="viewcode-block" id="Fairness.get_group_attribute_fairness">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_group_attribute_fairness">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_group_attribute_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_value_df</span><span class="p">,</span> <span class="n">fair_measures_requested</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether the minimum value for each fairness measure in</span>
+<span class="sd">        fair_measures_requested is &#39;False&#39; across all attribute_values defined</span>
+<span class="sd">        by a group attribute_name. If &#39;False&#39; is present, determination for the</span>
+<span class="sd">        attribute is False for given fairness measure.</span>
+
+<span class="sd">        :param group_value_df: output dataframe of get_group_value_fairness() method</span>
+<span class="sd">        :return: A dataframe of fairness measures at the attribute level (no attribute_values)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;get_group_attribute_fairness&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fair_measures_requested</span><span class="p">:</span>
+            <span class="n">fair_measures_requested</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_supported</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="n">key_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span> <span class="s1">&#39;score_threshold&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute_name&#39;</span><span class="p">]</span>
+        <span class="n">groupby_variable</span> <span class="o">=</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">key_columns</span><span class="p">)</span>
+        <span class="c1"># We need to do this because of NaNs. idxmin() on pandas raises keyerror if there is a NaN...</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
+                                                                  <span class="n">fair_measures_requested</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;get_group_attribute_fairness: no fairness measures requested found on input group_value_df columns&#39;</span><span class="p">)</span>
+        <span class="n">parity_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span> <span class="n">parity_cols</span><span class="p">)</span>
+        <span class="n">highlevel_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group_value_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="n">group_attribute_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_groupby_attribute_fairness</span><span class="p">(</span><span class="n">groupby_variable</span><span class="p">,</span> <span class="n">key_columns</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">,</span>
+                                                                  <span class="n">highlevel_cols</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">group_attribute_df</span></div>
+
+
+
+<div class="viewcode-block" id="Fairness.get_overall_fairness">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.get_overall_fairness">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_overall_fairness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_attribute_df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates overall fairness regardless of the group_attributes.</span>
+<span class="sd">        Searches for &#39;False&#39; parity determinations across group_attributes and</span>
+<span class="sd">        outputs &#39;True&#39; determination if all group_attributes are fair.</span>
+
+<span class="sd">        :param group_attribute_df: the output df of the get_group_attributes_fairness</span>
+<span class="sd">        :return: A dictionary of overall, unsupervised, and supervised fairness determinations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">overall_fairness</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s1">&#39;Unsupervised Fairness&#39;</span> <span class="ow">in</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">overall_fairness</span><span class="p">[</span><span class="s1">&#39;Unsupervised Fairness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> \
+                <span class="n">group_attribute_df</span><span class="p">[</span><span class="s1">&#39;Unsupervised Fairness&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Supervised Fairness&#39;</span> <span class="ow">in</span> <span class="n">group_attribute_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">overall_fairness</span><span class="p">[</span><span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">group_attribute_df</span><span class="p">[</span><span class="s1">&#39;Supervised Fairness&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="n">fair_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">overall_fairness</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">fair_vals</span><span class="p">:</span>
+            <span class="n">overall_fairness</span><span class="p">[</span><span class="s1">&#39;Overall Fairness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="kc">True</span> <span class="ow">in</span> <span class="n">fair_vals</span><span class="p">:</span>
+            <span class="n">overall_fairness</span><span class="p">[</span><span class="s1">&#39;Overall Fairness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">overall_fairness</span><span class="p">[</span><span class="s1">&#39;Overall Fairness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Undefined&#39;</span>
+        <span class="k">return</span> <span class="n">overall_fairness</span></div>
+
+
+
+<div class="viewcode-block" id="Fairness.list_parities">
+<a class="viewcode-back" href="../../../api/aequitas.html#src.aequitas.fairness.Fairness.list_parities">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_parities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View list of all parity determinations in df</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_fairness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_parity_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">|</span> \
+                       <span class="bp">self</span><span class="o">.</span><span class="n">high_level_fairness_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">|</span> \
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fair_measures_depend</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_fairness</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

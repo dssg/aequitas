@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.aequitas.fairflow.methods.postprocessing.threshold &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../api/index.html">API Docs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.aequitas.fairflow.methods.postprocessing.threshold</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.aequitas.fairflow.methods.postprocessing.threshold</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">...utils</span> <span class="kn">import</span> <span class="n">create_logger</span>
+<span class="kn">from</span> <span class="nn">.postprocessing</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+
+<span class="n">THRESHOLD_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fixed&quot;</span><span class="p">,</span> <span class="s2">&quot;fpr&quot;</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">,</span> <span class="s2">&quot;top_pct&quot;</span><span class="p">,</span> <span class="s2">&quot;top_k&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Threshold">
+<a class="viewcode-back" href="../../../../../../api/flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold">[docs]</a>
+<span class="k">class</span> <span class="nc">Threshold</span><span class="p">(</span><span class="n">PostProcessing</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A postprocessing class that applies thresholding to the model&#39;s predictions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    threshold_type : str</span>
+<span class="sd">        Type of threshold to apply to the model&#39;s predictions. Must be one of:</span>
+<span class="sd">        &#39;fixed&#39;, &#39;fpr&#39;, &#39;tpr&#39;, &#39;top_pct&#39;, &#39;top_k&#39;.</span>
+<span class="sd">    threshold_value : Union[float, int]</span>
+<span class="sd">        Threshold value to apply. The meaning of the threshold value depends on</span>
+<span class="sd">        the threshold_type. Must be between 0 and 1 for &#39;fixed&#39;, &#39;fpr&#39;, and</span>
+<span class="sd">        &#39;tpr&#39; threshold types. Must be an integer for &#39;top_k&#39; threshold type.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    fit(X, y_hat, y, s=None)</span>
+<span class="sd">        Compute the threshold based on the given threshold_type and threshold_value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">threshold_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new Threshold instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        threshold_type : str</span>
+<span class="sd">            Type of threshold to apply to the model&#39;s predictions. Must be one of:</span>
+<span class="sd">            &#39;fixed&#39;, &#39;fpr&#39;, &#39;tpr&#39;, &#39;top_pct&#39;, &#39;top_k&#39;.</span>
+<span class="sd">        threshold_value : Union[float, int]</span>
+<span class="sd">            Threshold value to apply. The meaning of the threshold value depends on</span>
+<span class="sd">            the threshold_type. Must be between 0 and 1 for &#39;fixed&#39;, &#39;fpr&#39;, and</span>
+<span class="sd">            &#39;tpr&#39; threshold types. Must be an integer for &#39;top_k&#39; threshold type.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If an invalid threshold_type or threshold_value is provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="s2">&quot;methods.postprocessing.Threshold&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Instantiating postprocessing Threshold.&quot;</span><span class="p">)</span>
+        <span class="c1"># Validate type</span>
+        <span class="k">if</span> <span class="n">threshold_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">THRESHOLD_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid threshold type. Select one of </span><span class="si">{</span><span class="n">THRESHOLD_TYPES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">=</span> <span class="n">threshold_type</span>
+        <span class="c1"># Validate value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="ow">in</span> <span class="n">THRESHOLD_TYPES</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># Assuming THRESHOLD_TYPES</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">threshold_value</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid threshold value, must be between 0 and 1.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold_type</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid threshold type, must be integer for top_k.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span> <span class="o">=</span> <span class="n">threshold_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span><span class="si">}</span><span class="s2"> Threshold with value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Threshold.fit">
+<a class="viewcode-back" href="../../../../../../api/flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">y_hat</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the threshold based on the given threshold_type and threshold_value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : pd.DataFrame</span>
+<span class="sd">            The input data.</span>
+<span class="sd">        y_hat : pd.Series</span>
+<span class="sd">            The pre-transformed predictions.</span>
+<span class="sd">        y : pd.Series</span>
+<span class="sd">            The target values.</span>
+<span class="sd">        s : pd.Series, optional</span>
+<span class="sd">            The protected attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Computing threshold.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s2">&quot;fixed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;top_pct&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;top_k&quot;</span><span class="p">,</span>
+        <span class="p">]:</span>  <span class="c1"># Fitted in transformation step</span>
+            <span class="k">pass</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">==</span> <span class="s2">&quot;fpr&quot;</span><span class="p">:</span>
+            <span class="n">ln_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_hat</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">ln_scores</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold of value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">==</span> <span class="s2">&quot;tpr&quot;</span><span class="p">:</span>
+            <span class="n">lp_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_hat</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">lp_scores</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Threshold of value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished computing threshold.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Threshold.transform">
+<a class="viewcode-back" href="../../../../../../api/flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold.transform">[docs]</a>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">y_hat</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform predicted scores using threshold.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">            The input data.</span>
+<span class="sd">        y_hat : pandas.Series</span>
+<span class="sd">            The pre-transformed predictions.</span>
+<span class="sd">        s : pandas.Series, optional</span>
+<span class="sd">            The protected attribute.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.Series</span>
+<span class="sd">            Transformed predicted scores.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Transforming predictions.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">==</span> <span class="s2">&quot;fixed&quot;</span><span class="p">:</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_hat</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">,</span> <span class="s2">&quot;tpr&quot;</span><span class="p">]:</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_hat</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">==</span> <span class="s2">&quot;top_pct&quot;</span><span class="p">:</span>
+            <span class="n">n_top</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_hat</span> <span class="o">&gt;=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">n_top</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span> <span class="o">==</span> <span class="s2">&quot;top_k&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid threshold value for top_k. Must be integer, got &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_hat</span> <span class="o">&gt;=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid threshold type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished transforming predictions.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y_pred</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

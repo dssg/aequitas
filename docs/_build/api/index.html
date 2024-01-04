@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Docs &mdash; aequitas  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Aequitas API" href="aequitas.html" />
+    <link rel="prev" title="Running the webapp locally" href="../30_seconds_webapp.html" />
+<link href="../ _static/default.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aequitas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html">Aequitas API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flow.html">Aequitas Flow API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aequitas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Docs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-docs">
+<h1>API Docs<a class="headerlink" href="#api-docs" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="aequitas.html">Aequitas API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.group"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Group</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group"><code class="docutils literal notranslate"><span class="pre">Group</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.calculate_disparities"><code class="docutils literal notranslate"><span class="pre">Group.calculate_disparities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.gen_metrics_df"><code class="docutils literal notranslate"><span class="pre">Group.gen_metrics_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.get_crosstabs"><code class="docutils literal notranslate"><span class="pre">Group.get_crosstabs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.get_multimodel_crosstabs"><code class="docutils literal notranslate"><span class="pre">Group.get_multimodel_crosstabs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.list_absolute_metrics"><code class="docutils literal notranslate"><span class="pre">Group.list_absolute_metrics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.plot_absolute"><code class="docutils literal notranslate"><span class="pre">Group.plot_absolute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.plot_disparity"><code class="docutils literal notranslate"><span class="pre">Group.plot_disparity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.group.Group.plot_summary"><code class="docutils literal notranslate"><span class="pre">Group.plot_summary()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.bias"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Bias</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias"><code class="docutils literal notranslate"><span class="pre">Bias</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.get_disparity_major_group"><code class="docutils literal notranslate"><span class="pre">Bias.get_disparity_major_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.get_disparity_min_metric"><code class="docutils literal notranslate"><span class="pre">Bias.get_disparity_min_metric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.get_disparity_predefined_groups"><code class="docutils literal notranslate"><span class="pre">Bias.get_disparity_predefined_groups()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.list_absolute_metrics"><code class="docutils literal notranslate"><span class="pre">Bias.list_absolute_metrics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.list_disparities"><code class="docutils literal notranslate"><span class="pre">Bias.list_disparities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.bias.Bias.list_significance"><code class="docutils literal notranslate"><span class="pre">Bias.list_significance()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.fairness"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Fairness</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness"><code class="docutils literal notranslate"><span class="pre">Fairness</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness.get_fairness_measures_supported"><code class="docutils literal notranslate"><span class="pre">Fairness.get_fairness_measures_supported()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness.get_group_attribute_fairness"><code class="docutils literal notranslate"><span class="pre">Fairness.get_group_attribute_fairness()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness.get_group_value_fairness"><code class="docutils literal notranslate"><span class="pre">Fairness.get_group_value_fairness()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness.get_overall_fairness"><code class="docutils literal notranslate"><span class="pre">Fairness.get_overall_fairness()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.fairness.Fairness.list_parities"><code class="docutils literal notranslate"><span class="pre">Fairness.list_parities()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Plotting</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot"><code class="docutils literal notranslate"><span class="pre">Plot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_attribute_comparison"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_attribute_comparison()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_comparison"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_comparison()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_plot_disparity"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_plot_disparity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_plot_fairness_disparity"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_plot_fairness_disparity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_plot_fairness_group"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_plot_fairness_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.multimodel_plot_group_metric"><code class="docutils literal notranslate"><span class="pre">Plot.multimodel_plot_group_metric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_disparity"><code class="docutils literal notranslate"><span class="pre">Plot.plot_disparity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_disparity_all"><code class="docutils literal notranslate"><span class="pre">Plot.plot_disparity_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_fairness_disparity"><code class="docutils literal notranslate"><span class="pre">Plot.plot_fairness_disparity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_fairness_disparity_all"><code class="docutils literal notranslate"><span class="pre">Plot.plot_fairness_disparity_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_fairness_group"><code class="docutils literal notranslate"><span class="pre">Plot.plot_fairness_group()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_fairness_group_all"><code class="docutils literal notranslate"><span class="pre">Plot.plot_fairness_group_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_group_metric"><code class="docutils literal notranslate"><span class="pre">Plot.plot_group_metric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.Plot.plot_group_metric_all"><code class="docutils literal notranslate"><span class="pre">Plot.plot_group_metric_all()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.plotting.assemble_ref_groups"><code class="docutils literal notranslate"><span class="pre">assemble_ref_groups()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="aequitas.html#module-src.aequitas.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Preprocessing</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.preprocessing.check_required_cols"><code class="docutils literal notranslate"><span class="pre">check_required_cols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.preprocessing.discretize"><code class="docutils literal notranslate"><span class="pre">discretize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.preprocessing.get_attr_cols"><code class="docutils literal notranslate"><span class="pre">get_attr_cols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="aequitas.html#src.aequitas.preprocessing.preprocess_input_df"><code class="docutils literal notranslate"><span class="pre">preprocess_input_df()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flow.html">Aequitas Flow API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flow.html#module-src.aequitas.fairflow.experiment"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Experiment</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.experiment.DefaultExperiment"><code class="docutils literal notranslate"><span class="pre">DefaultExperiment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.experiment.Experiment"><code class="docutils literal notranslate"><span class="pre">Experiment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.experiment.Experiment.read_dataset"><code class="docutils literal notranslate"><span class="pre">Experiment.read_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.experiment.Experiment.read_method_step"><code class="docutils literal notranslate"><span class="pre">Experiment.read_method_step()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flow.html#module-src.aequitas.fairflow.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Dataset</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.BankAccountFraud"><code class="docutils literal notranslate"><span class="pre">BankAccountFraud</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.BankAccountFraud.create_splits"><code class="docutils literal notranslate"><span class="pre">BankAccountFraud.create_splits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.BankAccountFraud.load_data"><code class="docutils literal notranslate"><span class="pre">BankAccountFraud.load_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.FolkTables"><code class="docutils literal notranslate"><span class="pre">FolkTables</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.FolkTables.create_splits"><code class="docutils literal notranslate"><span class="pre">FolkTables.create_splits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.FolkTables.load_data"><code class="docutils literal notranslate"><span class="pre">FolkTables.load_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.GenericDataset"><code class="docutils literal notranslate"><span class="pre">GenericDataset</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.GenericDataset.create_splits"><code class="docutils literal notranslate"><span class="pre">GenericDataset.create_splits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.datasets.GenericDataset.load_data"><code class="docutils literal notranslate"><span class="pre">GenericDataset.load_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flow.html#module-src.aequitas.fairflow.methods.preprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Pre-Processing</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.Identity"><code class="docutils literal notranslate"><span class="pre">Identity</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.Identity.fit"><code class="docutils literal notranslate"><span class="pre">Identity.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.Identity.transform"><code class="docutils literal notranslate"><span class="pre">Identity.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling"><code class="docutils literal notranslate"><span class="pre">PrevalenceSampling</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.calculate_sample_sizes"><code class="docutils literal notranslate"><span class="pre">PrevalenceSampling.calculate_sample_sizes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.fit"><code class="docutils literal notranslate"><span class="pre">PrevalenceSampling.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.preprocessing.PrevalenceSampling.transform"><code class="docutils literal notranslate"><span class="pre">PrevalenceSampling.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flow.html#module-src.aequitas.fairflow.methods.inprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.In-Processing</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairGBM"><code class="docutils literal notranslate"><span class="pre">FairGBM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairGBM.fit"><code class="docutils literal notranslate"><span class="pre">FairGBM.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairGBM.predict_proba"><code class="docutils literal notranslate"><span class="pre">FairGBM.predict_proba()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier"><code class="docutils literal notranslate"><span class="pre">FairlearnClassifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.fit"><code class="docutils literal notranslate"><span class="pre">FairlearnClassifier.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.parse_kwargs"><code class="docutils literal notranslate"><span class="pre">FairlearnClassifier.parse_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.inprocessing.FairlearnClassifier.predict_proba"><code class="docutils literal notranslate"><span class="pre">FairlearnClassifier.predict_proba()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flow.html#module-src.aequitas.fairflow.methods.postprocessing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Methods.Post-Processing</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.GroupThreshold"><code class="docutils literal notranslate"><span class="pre">GroupThreshold</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.GroupThreshold.fit"><code class="docutils literal notranslate"><span class="pre">GroupThreshold.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.GroupThreshold.transform"><code class="docutils literal notranslate"><span class="pre">GroupThreshold.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Identity"><code class="docutils literal notranslate"><span class="pre">Identity</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Identity.fit"><code class="docutils literal notranslate"><span class="pre">Identity.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Identity.transform"><code class="docutils literal notranslate"><span class="pre">Identity.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold"><code class="docutils literal notranslate"><span class="pre">Threshold</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold.fit"><code class="docutils literal notranslate"><span class="pre">Threshold.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="flow.html#src.aequitas.fairflow.methods.postprocessing.Threshold.transform"><code class="docutils literal notranslate"><span class="pre">Threshold.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../30_seconds_webapp.html" class="btn btn-neutral float-left" title="Running the webapp locally" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aequitas.html" class="btn btn-neutral float-right" title="Aequitas API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018, Center for Data Science and Public Policy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
