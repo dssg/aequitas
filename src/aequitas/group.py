@@ -45,6 +45,7 @@ class Group(object):
         "tnr",
         "npv",
         "prev",
+        "accuracy",
     )
 
     def __init__(self, input_group_metrics=all_group_metrics):
