@@ -86,7 +86,7 @@ class FolkTables(Dataset):
         else:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
-        if url(path) or path.exists():
+        if url(path) or self._check_paths():
             self._download = False
         else:
             # Download if path does not exist and data not in path
@@ -190,6 +190,14 @@ class FolkTables(Dataset):
             for key, value in zip(["train", "validation", "test"], self._indexes):
                 setattr(self, key, self.data.loc[value])
         self.logger.info("Data splits created successfully.")
+
+    def _check_paths(self) -> bool:
+        """Check if the data is already downloaded."""
+        for split in ["train", "validation", "test"]:
+            check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
+            if not check_path.exists():
+                return False
+        return True
 
     def _download_data(self) -> None:
         """Obtains the data from Aequitas repository."""
