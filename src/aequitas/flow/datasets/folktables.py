@@ -16,7 +16,7 @@ VARIANTS = [
     "ACSPublicCoverage",
     "ACSTravelTime",
     "ACSIncome (Sample)",
-    "ACSPublicCoverage (Sample)",
+    "ACSPublicCoverage_sample",
 ]
 
 TARGET_FEATURES = {
@@ -25,7 +25,7 @@ TARGET_FEATURES = {
     "ACSEmployment": "ESR",
     "ACSMobility": "MIG",
     "ACSPublicCoverage": "PUBCOV",
-    "ACSPublicCoverage (Sample)": "PUBCOV",
+    "ACSPublicCoverage_sample": "PUBCOV",
     "ACSTravelTime": "JWMNP",
 }
 
@@ -40,9 +40,7 @@ DEFAULT_SPLIT = None
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
 
-DEFAULT_URL = (
-    "https://raw.githubusercontent.com//dssg/aequitas/release-fixes/datasets/FolkTables/"
-)
+DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/release-fixes/datasets/FolkTables/"
 
 
 class FolkTables(Dataset):
@@ -86,12 +84,13 @@ class FolkTables(Dataset):
         else:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
+        self.path = path
+        self.extension = extension
         if url(path) or self._check_paths():
             self._download = False
         else:
             # Download if path does not exist and data not in path
             self._download = True
-        self.path = path
 
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
@@ -100,7 +99,6 @@ class FolkTables(Dataset):
             self.splits = splits
             self._validate_splits()
             self.logger.debug("Splits successfully validated.")
-        self.extension = extension
         self.seed = seed
         self._data: LabeledFrame = None
         self._train: LabeledFrame = None
