@@ -41,7 +41,7 @@ DEFAULT_SPLIT = None
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
 
 DEFAULT_URL = (
-    "https://raw.githubusercontent.com//dssg/aequitas/main/datasets/FolkTables/"
+    "https://raw.githubusercontent.com//dssg/aequitas/release-fixes/datasets/FolkTables/"
 )
 
 
