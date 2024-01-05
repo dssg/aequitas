@@ -36,6 +36,9 @@ class Experiment:
         Path to the folder where artifacts will be saved, by default "artifacts".
     artifacts : Iterable[str], optional
         Artifacts to save, by default ("results", "methods", "predictions").
+    name : str, optional
+        Name of the experiment, by default None. If None, the name will be
+        generated as a hash of the configuration file.
     """
 
     SAMPLERS_MODULE = "optuna.samplers."
@@ -56,6 +59,7 @@ class Experiment:
         save_artifacts: bool = True,
         save_folder: Optional[Path] = Path("artifacts"),
         artifacts: Iterable[str] = ("results", "methods", "predictions"),
+        name: Optional[str] = None,
     ):
         # Initialize logger
         self.logger = create_logger("Experiment")
@@ -91,7 +95,7 @@ class Experiment:
         # Instantiate sampler object
         self.sampler = self._instantiate_sampler()
         self.save_folder = save_folder
-        self.hash: str = ""
+        self.hash: str = name if name is not None else ""
 
     def _instantiate_sampler(self) -> BaseSampler:
         self.logger.debug("Instantiating sampling object.")
@@ -145,8 +149,9 @@ class Experiment:
             if self.save_folder is None:
                 raise ValueError("Provide a folder to save artifacts.")
 
-            self.logger.debug("Generating Hash for provided configuration.")
-            self.generate_hash()
+            if not self.hash:
+                self.generate_hash()
+
             exp_folder: Path = self.save_folder / self.hash
             exp_folder.mkdir(parents=True, exist_ok=True)
             self.logger.info(f"Saving objects to '{exp_folder.resolve()}'.")
@@ -238,6 +243,8 @@ class Experiment:
                             pickle.dump(objective._models_results, file)
 
     def generate_hash(self):
+        self.logger.debug("Generating Hash for provided configuration.")
+
         def dt_handler(x):
             if isinstance(x, datetime.datetime) or isinstance(x, datetime.date):
                 return x.isoformat()
