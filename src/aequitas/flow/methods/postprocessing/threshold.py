@@ -59,8 +59,8 @@ class Threshold(PostProcessing):
             else:
                 raise ValueError("Invalid threshold value, must be between 0 and 1.")
         else:
-            if not isinstance(threshold_type, int):
-                raise ValueError("Invalid threshold type, must be integer for top_k.")
+            if not isinstance(threshold_value, int):
+                raise ValueError("Invalid threshold value, must be integer for top_k.")
         self.threshold_value = threshold_value
         self.logger.debug(
             f"{self.threshold_type} Threshold with value {self.threshold_value}"
