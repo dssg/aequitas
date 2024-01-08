@@ -139,10 +139,11 @@ class Threshold(PostProcessing):
             n_top = int(len(y_hat) * self.threshold_value)
             y_pred = (y_hat >= y_hat.nlargest(n_top).min()).astype(int)
         elif self.threshold_type == "top_k":
-            if self.threshold_value is not int:
+            # Check if threshold value is smaller than number of samples
+            if self.threshold_value > len(y_hat):
                 raise ValueError(
-                    f"Invalid threshold value for top_k. Must be integer, got "
-                    f"{type(self.threshold_value)}"
+                    f"Threshold value {self.threshold_value} is larger "
+                    f"than the number of samples {len(y_hat)}."
                 )
             y_pred = (y_hat >= y_hat.nlargest(self.threshold_value).min()).astype(int)
         else:
