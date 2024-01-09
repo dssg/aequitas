@@ -1,13 +1,15 @@
+import os
 from pathlib import Path
 from typing import Any, Optional, Union
 
 import pandas as pd
+import requests
 from validators import url
 
 from ..utils import create_logger
 from .dataset import Dataset
 
-VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV"]
+VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV", "Sample"]
 
 CATEGORICAL_FEATURES = [
     "payment_type",
@@ -31,6 +33,8 @@ DEFAULT_SPLIT = {
 }
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
+
+DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/release-fixes/datasets/BankAccountFraud/"
 
 
 class BankAccountFraud(Dataset):
@@ -85,7 +89,11 @@ class BankAccountFraud(Dataset):
         if url(path) or path.exists():
             self.path = path
         else:
-            raise NotADirectoryError("Specified path does not exist.")
+            if variant == "Sample":
+                self.path = path
+                self._download = True
+            else:
+                raise NotADirectoryError("Specified path does not exist.")
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
@@ -127,6 +135,9 @@ class BankAccountFraud(Dataset):
 
     def load_data(self):
         """Load the defined BankAccountFraud dataset."""
+        if self._download:
+            self._download_data()
+
         if isinstance(self.path, str):
             path = self.path + f"/{self.variant}.{self.extension}"
         else:
@@ -156,3 +167,17 @@ class BankAccountFraud(Dataset):
         elif self.split_type == "month":
             for key, value in self.splits.items():
                 setattr(self, key, self.data[self.data["month"].isin(value)])
+
+    def _download_data(self) -> None:
+        """Obtains the data of the sample dataset from Aequitas repository."""
+        self.logger.info("Downloading sample data from repository.")
+
+        check_path = Path(self.path) / f"{self.variant}.{self.extension}"
+        if not check_path.exists():
+            dataset_url = DEFAULT_URL + f"{self.variant}.{self.extension}"
+            self.logger.debug(f"Downloading from {dataset_url}.")
+            r = requests.get(dataset_url)
+            os.makedirs(check_path.parent, exist_ok=True)
+            with open(check_path, "wb") as f:
+                f.write(r.content)
+        self.logger.info("Downloaded data successfully.")
