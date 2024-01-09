@@ -88,6 +88,7 @@ class BankAccountFraud(Dataset):
             self.logger.debug(f"Variant: {self.variant}")
         if url(path) or path.exists():
             self.path = path
+            self._download = False
         else:
             if variant == "Sample":
                 self.path = path
