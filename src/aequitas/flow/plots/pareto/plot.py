@@ -52,7 +52,7 @@ class Plot:
         aequitas.fairflow.utils.artifacts.read_results.
     dataset : str
         Name of the dataset to be used in the Pareto plot.
-    method : str, optional
+    method : union[str, list], optional
         Name of the method to plot. If none, all methods will be plotted.
     fairness_metric : {"Predictive Equality", "Equal Opportunity", "Demographic Parity"}
         The default fairness metric to use in the Pareto plot.
@@ -72,7 +72,7 @@ class Plot:
             "Predictive Equality", "Equal Opportunity", "Demographic Parity"
         ],
         performance_metric: Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"],
-        method: Optional[str] = None,
+        method: Optional[Union[str, list]] = None,
         alpha: float = 0.5,
         direction: Literal["minimize", "maximize"] = "maximize",
         split: Literal["validation", "test"] = "test",
@@ -86,11 +86,17 @@ class Plot:
                 f"Use one of {list(results.keys())}"
             )
 
-        if method:
-            # Keeping the data format consistent
-            raw_results = {method: results[dataset][method]}
-        else:
+        if method is None:
             raw_results = results[dataset]
+        elif isinstance(method, str):
+            raw_results = {method: results[dataset][method]}
+        elif isinstance(method, list):
+            raw_results = {m: results[dataset][m] for m in method}
+        else:
+            raise ValueError(
+                f"Method {method} not recognized. Please use a string, a list of "
+                f"strings, or leave the field empty."
+            )
 
         self.split = split
         # Cast the results to the desired format
