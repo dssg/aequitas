@@ -1,0 +1,5 @@
+fairgbm:
+  type: inprocessing
+
+defaults:
+  - fairgbm/inprocessing: fairgbm

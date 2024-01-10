@@ -1,0 +1,6 @@
+Logistic Regression + Group Threshold:
+  type: postprocessing
+
+defaults:
+  - Logistic Regression + Group Threshold/inprocessing: Logistic Regression
+  - Logistic Regression + Group Threshold/postprocessing: Group Threshold

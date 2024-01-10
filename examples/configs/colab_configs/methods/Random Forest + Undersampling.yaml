@@ -1,0 +1,6 @@
+Random Forest + Undersampling:
+  type: preprocessing
+
+defaults:
+  - Random Forest + Undersampling/preprocessing: Undersampling
+  - Random Forest + Undersampling/inprocessing: Random Forest

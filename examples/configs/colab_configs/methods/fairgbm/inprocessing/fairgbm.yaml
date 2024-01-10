@@ -1,10 +1,20 @@
 fairgbm:
   classpath: aequitas.fairflow.methods.inprocessing.fairgbm.FairGBM
   args:
-    constraint_type:
-      - fnr
+    global_constraint_type:
+      - FPR,FNR
+    
+    global_target_fpr:
+      - 0.05
+    
+    global_target_fnr:
+      type: float
+      range: [0.4, 0.6]
 
-    constraint_fnr_threshold:
+    constraint_type:
+      - FPR
+
+    constraint_fpr_threshold:
       - 0
     
     proxy_margin:
@@ -12,14 +22,15 @@ fairgbm:
 
     multiplier_learning_rate:
       type: float
-      range: [0.01, 1.0]
+      range: [0.00001, 1.0]
       log: True
     
     constraint_stepwise_proxy:
       - cross_entropy
 
     boosting_type:
-      - dart  #  Running DART for all algos
+      - dart
+      - gbdt
 
     enable_bundle:
       - False
@@ -27,10 +38,6 @@ fairgbm:
     n_estimators:
       type: int
       range: [10, 100]
-
-    num_leaves:
-      type: int
-      range: [10, 1000]
 
     min_child_samples:
       type: int

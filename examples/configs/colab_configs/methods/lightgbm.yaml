@@ -1,0 +1,5 @@
+lightgbm:
+  type: base estimator
+
+defaults:
+  - lightgbm/inprocessing: lightgbm

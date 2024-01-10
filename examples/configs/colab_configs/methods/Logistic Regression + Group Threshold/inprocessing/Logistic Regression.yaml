@@ -1,0 +1,16 @@
+lightgbm:
+  classpath: aequitas.fairflow.methods.base_estimator.LogisticRegression
+  args:
+    penalty:
+      - l2
+      - none
+    
+    C:
+      type: float
+      range: [0.00001, 100]
+      log: True
+    
+    tol:
+      type: float
+      range: [0.00001, 1]
+      log: True

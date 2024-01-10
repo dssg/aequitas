@@ -1,0 +1,3 @@
+Undersampling:
+  classpath: aequitas.fairflow.methods.preprocessing.prevalence_sample.PrevalenceSampling
+  args: {}

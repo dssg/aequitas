@@ -1,3 +1,0 @@
-identity:
-  classpath: aequitas.fairflow.methods.preprocessing.identity.Identity
-  args: null
