@@ -179,6 +179,10 @@ class Plot:
     def _dataclass_to_dict(dataclass, method, original_method_name):
         hyperparameters = dataclass.hyperparameters
         hyperparameters.update({"classpath": method})
+        # if hyperparameter has value of None, change it to string "None"
+        for key, value in hyperparameters.items():
+            if value is None:
+                hyperparameters[key] = "None"
         return {
             "model_id": dataclass.id,
             "internal_id": dataclass.id,
