@@ -167,11 +167,8 @@ class BankAccountFraud(Dataset):
 
         elif self.split_type == "month":
             for key, value in self.splits.items():
-                setattr(
-                    self,
-                    key,
-                    self.data[self.data["month"].isin(value)].drop(columns=["month"]),
-                )
+                setattr(self, key, self.data[self.data["month"].isin(value)].drop(columns=["month"]))
+                
 
     def _download_data(self) -> None:
         """Obtains the data of the sample dataset from Aequitas repository."""

@@ -101,7 +101,7 @@ class Plot:
         self.split = split
         # Cast the results to the desired format
         self._results = [
-            self._dataclass_to_dict(res, _prettify_names(method), method)
+            self._dataclass_to_dict(res, _prettify_names(method), method, self.split)
             for method, results in raw_results.items()
             for res in results
         ]
