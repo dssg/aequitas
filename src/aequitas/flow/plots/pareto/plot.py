@@ -75,6 +75,7 @@ class Plot:
         method: Optional[str] = None,
         alpha: float = 0.5,
         direction: Literal["minimize", "maximize"] = "maximize",
+        split: Literal["validation", "test"] = "test",
     ):
         self.method = method
         if dataset in results:
@@ -91,6 +92,7 @@ class Plot:
         else:
             raw_results = results[dataset]
 
+        self.split = split
         # Cast the results to the desired format
         self._results = [
             self._dataclass_to_dict(res, _prettify_names(method), method)
@@ -176,8 +178,14 @@ class Plot:
         return is_efficient
 
     @staticmethod
-    def _dataclass_to_dict(dataclass, method, original_method_name):
+    def _dataclass_to_dict(dataclass, method, original_method_name, split):
         hyperparameters = dataclass.hyperparameters
+        if split == "validation":
+            results = dataclass.validation_results
+        elif split == "test":
+            results = dataclass.test_results
+        else:
+            raise ValueError(f"Split {split} not recognized.")
         hyperparameters.update({"classpath": method})
         # if hyperparameter has value of None, change it to string "None"
         for key, value in hyperparameters.items():
@@ -187,14 +195,14 @@ class Plot:
             "model_id": dataclass.id,
             "internal_id": dataclass.id,
             "internal_method_name": original_method_name,
-            "TPR": dataclass.test_results["tpr"],
-            "FPR": dataclass.test_results["fpr"],
-            "FNR": dataclass.test_results["fnr"],
-            "Accuracy": dataclass.test_results["accuracy"],
-            "Precision": dataclass.test_results["precision"],
-            "Equal Opportunity": dataclass.test_results["tpr_ratio"],
-            "Predictive Equality": dataclass.test_results["fpr_ratio"],
-            "Demographic Parity": dataclass.test_results["pprev_ratio"],
+            "TPR": results["tpr"],
+            "FPR": results["fpr"],
+            "FNR": results["fnr"],
+            "Accuracy": results["accuracy"],
+            "Precision": results["precision"],
+            "Equal Opportunity": results["tpr_ratio"],
+            "Predictive Equality": results["fpr_ratio"],
+            "Demographic Parity": results["pprev_ratio"],
             "algorithm": hyperparameters["classpath"],
             "hyperparams": hyperparameters,
         }
