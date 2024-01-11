@@ -67,6 +67,7 @@ class BankAccountFraud(Dataset):
         extension: str = "parquet",
         target_feature: Optional[str] = None,
         sensitive_feature: Optional[str] = None,
+        include_month: bool = True,
     ):
         super().__init__()
 
@@ -105,6 +106,7 @@ class BankAccountFraud(Dataset):
         self.extension = extension
         self.seed = seed
         self.data: pd.DataFrame = None
+        self.include_month = include_month
 
     def _validate_splits(self) -> None:
         """Validate the data splits and raise an error if they are invalid.
@@ -167,8 +169,16 @@ class BankAccountFraud(Dataset):
 
         elif self.split_type == "month":
             for key, value in self.splits.items():
-                setattr(self, key, self.data[self.data["month"].isin(value)].drop(columns=["month"]))
-                
+                if self.include_month:
+                    setattr(self, key, self.data[self.data["month"].isin(value)].copy())
+                else:
+                    setattr(
+                        self,
+                        key,
+                        self.data[self.data["month"].isin(value)].drop(
+                            columns=["month"]
+                        ),
+                    )
 
     def _download_data(self) -> None:
         """Obtains the data of the sample dataset from Aequitas repository."""
