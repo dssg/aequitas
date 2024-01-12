@@ -7,7 +7,7 @@ import pandas as pd
 from ...evaluation import Result
 from ....bias import Bias
 from ....group import Group
-from ....plot import summary
+from ....plot import summary, disparity
 
 
 _names = {
@@ -294,4 +294,79 @@ class Plot:
 
         return summary(
             disparity_metrics, metrics, fairness_threshold=fairness_threshold
+        )
+
+
+def disparities(
+        self,
+        model_id: int,
+        dataset: Any,
+        sensitive_attribute: Union[str, list[str]],
+        metrics: list[str] = ["tpr", "fpr"],
+        fairness_threshold: float = 1.2,
+        results_path: Union[Path, str] = "examples/experiment_results",
+        reference_groups: Optional[dict[str, str]] = None,
+    ):
+        """Render interactive application to audit bias of a given model.
+
+        Parameters
+        ----------
+        model_id : int
+            The id of the model to audit.
+        """
+        if isinstance(results_path, str):
+            results_path = Path(results_path)
+
+        if isinstance(sensitive_attribute, str):
+            sensitive_attribute = [sensitive_attribute]
+
+        method_name = self.results.iloc[model_id]["internal_method_name"]
+        method_id = self.results.iloc[model_id]["internal_id"]
+
+        predictions_path = (
+            results_path
+            / self.dataset
+            / method_name
+            / str(method_id)
+            / "test_bin.parquet"
+        )
+
+        # Check if predictions path exists
+        if not predictions_path.exists():
+            raise FileNotFoundError(
+                f"Predictions for model {method_name} with id {method_id} not found. "
+                "Please make sure that the predictions are stored in the correct path."
+            )
+
+        # Read the predictions
+        predictions = pd.read_parquet(predictions_path)
+
+        # Add the predictions to the DataFrame
+        label = dataset.y.name
+        dataset = dataset.copy()
+        dataset["predictions"] = predictions
+
+        dataset[sensitive_attribute] = dataset[sensitive_attribute].astype(str)
+
+        g = Group()
+        b = Bias()
+
+        cm_metrics, _ = g.get_crosstabs(
+            df=dataset,
+            score_col="predictions",
+            label_col=label,
+            attr_cols=sensitive_attribute,
+        )
+
+        if not reference_groups:
+            reference_groups = {
+                attr: dataset[attr].mode().values[0] for attr in sensitive_attribute
+            }
+
+        disparity_metrics = b.get_disparity_predefined_groups(
+            cm_metrics, dataset, ref_groups_dict=reference_groups
+        )
+
+        return disparity(
+            disparity_metrics, metrics, sensitive_attribute, fairness_threshold=fairness_threshold
         )
