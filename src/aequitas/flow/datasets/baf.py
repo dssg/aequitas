@@ -91,11 +91,8 @@ class BankAccountFraud(Dataset):
             self.path = path
             self._download = False
         else:
-            if variant == "Sample":
-                self.path = path
-                self._download = True
-            else:
-                raise NotADirectoryError("Specified path does not exist.")
+            self.path = path
+            self._download = True
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
         else:
