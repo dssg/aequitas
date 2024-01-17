@@ -77,21 +77,14 @@ class LabelFlipping(PreProcessing):
                                     max_samples=self.bagging_max_samples,
                                     random_state=self.seed).fit(X_num, y)
 
-    def _score_instances(self, X, y):
-
+    def _score_instances(self, X:pd.DataFrame, y:pd.Series) -> pd.Series:
         if self.ordering_method == "ensemble_margin":
-            scores = pd.Series(dtype=float)
             y_pred = np.array([clf.predict(X.values) for clf in self.ensemble.estimators_])
-            for i in X.index:
-                v_1 = y_pred[:,i].sum()
-                v_0 = y_pred.shape[0] - v_1
-                if y.loc[i] == 1:
-                    scores.loc[i] = (v_1 - v_0) / self.n_estimators
-                else:    
-                    scores.loc[i] = (v_0 - v_1) / self.n_estimators
-        
+            v_1 = y_pred.sum(axis=0)
+            v_0 = self.n_estimators - v_1
+            scores = pd.Series(np.where(y == 1, (v_1 - v_0) / self.n_estimators, (v_0 - v_1) / self.n_estimators), index=X.index)
         elif self.ordering_method == "residuals":
-            y_pred = np.array([abs(y - clf.predict_proba(X.values)[:,1]) for clf in self.ensemble.estimators_])
+            y_pred = np.array([abs(y - clf.predict_proba(X.values)[:, 1]) for clf in self.ensemble.estimators_])
             scores = pd.Series(y_pred.sum(axis=0) / self.n_estimators, index=X.index)
 
         return scores
