@@ -34,7 +34,7 @@ class LabelFlipping(PreProcessing):
             The number of samples to draw from X to train each base estimator of the 
             bagging classifier (with replacement).
         base_estimator : str, optional
-            The base estimator to fit on random subsets of the dataset. If None, the 
+            The base estimator to fit on random subsets of the dataset. By default, the 
             base estimator is the sklearn implementation of a decision tree.
         base_estimator_args : dict, optional    
             Additional arguments to pass to the base estimator.
