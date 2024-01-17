@@ -110,7 +110,7 @@ class Audit:
         elif self.reference_groups == "min":
             self.disparity_df = b.get_disparity_min_metric(self.metrics_df, self.df)
         else:
-            self.disparity_df = b.get_disparity_predefined_group(
+            self.disparity_df = b.get_disparity_predefined_groups(
                 self.metrics_df, self.df, self.reference_groups
             )
 
