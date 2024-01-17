@@ -3,15 +3,46 @@ from typing import Optional, Union
 import pandas as pd
 
 from ...utils import create_logger
-from .postprocessing import PostProcessing
+from .threshold import Threshold
 
 
-class GroupThreshold(PostProcessing):
+class GroupThreshold(Threshold):
+    """A post-processing class to adjust the prediction scores based on a threshold for
+    multiple groups in the dataset.
+
+    Parameters
+    ----------
+    threshold_type : str
+        The type of threshold to apply. It can be one of the following:
+            - fixed: applies a fixed threshold for all samples.
+            - fpr: applies a threshold to obtain a specific false positive rate.
+            - tpr: applies a threshold to obtain a specific true positive rate.
+            - top_pct: applies a threshold to obtain the top percentage of predicted
+                       scores.
+            - top_k: applies a threshold to obtain the top k predicted scores.
+    threshold_value : Union[float, int]
+        The value to use for the threshold, depending on the threshold_type parameter.
+
+    Attributes
+    ----------
+    thresholds : dict[str, Threshold]
+        A dictionary of Threshold objects, one for each group in the dataset.
+
+    Methods
+    -------
+    fit(X, y_hat, y, s=None)
+        Fit the threshold for each group in the dataset.
+
+    transform(X, y_hat, s=None)
+        Transform the prediction scores based on the threshold for each group in the
+        dataset.
+
+    """
+
     def __init__(
         self,
         threshold_type: str,
         threshold_value: Union[float, int],
-        fairness_metric: str,
     ):
         """Initialize a new instance of the GroupThreshold class.
 
@@ -28,70 +59,77 @@ class GroupThreshold(PostProcessing):
         threshold_value : Union[float, int]
             The value to use for the threshold, depending on the threshold_type
             parameter.
-        fairness_metric : str
-            The metric to use for measurement of fairness. It can be one of the 
-            following:
-                - tpr: true positive rate
-                - fpr: false positive rate
-                - pprev: predicted prevalence
         """
-        self.logger = create_logger("methods.postprocessing.BalancedGroupThreshold")
-        self.threshold_type = threshold_type
-        self.threshold_value = threshold_value
-        self.fairness_metric = fairness_metric
+        super().__init__(threshold_type, threshold_value)
+        self.logger = create_logger("methods.postprocessing.GroupThreshold")
+        self.logger.info("Instantiating postprocessing GroupThreshold.")
+        self.thresholds: dict[str, Threshold] = {}
 
-        self.thresholds = {}
-
-    def fit(self, X, y_hat, y, s=None):
+    def fit(
+        self,
+        X: pd.DataFrame,
+        y_hat: pd.Series,
+        y: pd.Series,
+        s: Optional[pd.Series] = None,
+    ) -> None:
         """Fit a threshold for each group in the dataset.
 
         Parameters
         ----------
-        X : array-like
-            The input samples.
-        y_hat : array-like
+        X : pd.DataFrame
+            The feature matrix.
+        y_hat : pd.Series
             The predicted scores.
-        y : array-like
-            The target values.
-        s : array-like, optional
-            The group identifiers for the samples.
+        y : pd.Series
+            The true labels.
+        s : pd.Series, optional
+            The sensitive attribute used to group the samples.
         """
-        unique_groups = s.unique().values
-
-        weight_fairness = []
-        # We will create a vector of the fairness metric w.r.t. the order of scoring.
-        # This will be used to compute the threshold for each group.
-        for group in unique_groups:
-            group_mask = s == group
-            group_y_hat = y_hat[group_mask]
-            group_y = y[group_mask]
-            group_s = s[group_mask]
-            group_df = pd.DataFrame(
-                {
-                    "y_hat": group_y_hat,
-                    "y": group_y,
-                    "s": group_s,
-                }
+        if s is None:
+            raise ValueError("`s` must be provided to fit a GroupThreshold.")
+        for group in s.unique():
+            self.thresholds[group] = Threshold(
+                self.threshold_type, self.threshold_value
             )
-            group_df.sort_values(by="y_hat", ascending=False, inplace=True)
-            
-            if fairness_metric == "tpr":
-                weight_fairness.append(
-                    
-                )
+            self.thresholds[group].fit(
+                X[s == group],
+                y_hat[s == group],
+                y[s == group],
+                s[s == group],
+            )
 
-
-    def transform(self, X, y_hat, s=None):
+    def transform(
+        self,
+        X: pd.DataFrame,
+        y_hat: pd.Series,
+        s: Optional[pd.Series] = None,
+    ) -> pd.Series:
         """Transform the prediction scores based on the threshold for each group in the
         dataset.
 
         Parameters
         ----------
-        X : array-like
-            The input samples.
-        y_hat : array-like
-            The predicted scores.
-        s : array-like, optional
-            The group identifiers for the samples.
+        X : numpy.ndarray
+            The input data.
+        y_hat : pandas.Series
+            The pre-transformed predictions.
+        s : pandas.Series, optional
+            The protected attribute.
+
+        Returns
+        -------
+        pd.Series
+            Transformed predicted scores.
         """
-        # TODO: Implement the method to adjust the prediction scores.
+        if s is None:
+            raise ValueError("`s` must be provided to transform with a GroupThreshold.")
+        predictions = []
+        for group in s.unique():
+            predictions.append(
+                self.thresholds[group].transform(
+                    X[s == group],
+                    y_hat[s == group],
+                    s[s == group],
+                )
+            )
+        return pd.concat(predictions)
