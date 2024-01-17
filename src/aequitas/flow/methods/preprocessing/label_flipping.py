@@ -5,7 +5,7 @@ from ...utils.imports import import_object
 
 import inspect
 import pandas as pd
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Literal
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
 
@@ -19,7 +19,7 @@ class LabelFlipping(PreProcessing):
             base_estimator: str = "sklearn.tree.DecisionTreeClassifier", 
             n_estimators: int = 10,
             fair_ordering: bool = True,
-            ordering_method: str = "ensemble_margin",
+            ordering_method: Literal["ensemble_margin", "residuals"] = "ensemble_margin",
             seed: int = 42,
             **base_estimator_args
         ):
