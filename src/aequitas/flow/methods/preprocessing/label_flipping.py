@@ -70,13 +70,18 @@ class LabelFlipping(PreProcessing):
         self.seed = seed
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        pass
+        X_num = pd.get_dummies(X)
 
-    def _score_instances(self, X, y, estimators):
+        self.ensemble = BaggingClassifier(estimator=self.base_estimator, 
+                                    n_estimators=self.n_estimators, 
+                                    max_samples=self.bagging_max_samples,
+                                    random_state=self.seed).fit(X_num, y)
+
+    def _score_instances(self, X, y):
 
         if self.ordering_method == "ensemble_margin":
             scores = pd.Series(dtype=float)
-            y_pred = np.array([clf.predict(X.values) for clf in estimators])
+            y_pred = np.array([clf.predict(X.values) for clf in self.ensemble.estimators_])
             for i in X.index:
                 v_1 = y_pred[:,i].sum()
                 v_0 = y_pred.shape[0] - v_1
@@ -86,7 +91,7 @@ class LabelFlipping(PreProcessing):
                     scores.loc[i] = (v_0 - v_1) / self.n_estimators
         
         elif self.ordering_method == "residuals":
-            y_pred = np.array([abs(y - clf.predict_proba(X.values)[:,1]) for clf in estimators])
+            y_pred = np.array([abs(y - clf.predict_proba(X.values)[:,1]) for clf in self.ensemble.estimators_])
             scores = pd.Series(y_pred.sum(axis=0) / self.n_estimators, index=X.index)
 
         return scores
@@ -132,13 +137,8 @@ class LabelFlipping(PreProcessing):
             raise ValueError("Sensitive Attribute `s` not passed. Must be passed if `fair_ordering` is True.")
         
         X_num = pd.get_dummies(X)
-
-        bagging = BaggingClassifier(estimator=self.base_estimator, 
-                                    n_estimators=self.n_estimators, 
-                                    max_samples=self.bagging_max_samples,
-                                    random_state=self.seed).fit(X_num, y)
         
-        scores = self._score_instances(X_num, y, bagging.estimators_)
+        scores = self._score_instances(X_num, y)
         y_flipped = self._label_flipping(y, s, scores)
 
         self.logger.info("Data transformed.")
