@@ -264,9 +264,7 @@ class Audit:
                     " not found in the DataFrame."
                 )
         # Check if values are categorical / object
-        if not pd.api.types.is_categorical_dtype(
-            self.df[self.sensitive_attribute_column]
-        ):
+        if not pd.api.types.is_object_dtype(self.df[self.sensitive_attribute_column]):
             raise ValueError(
                 f"Sensitive attribute column(s) {self.sensitive_attribute_column} must"
                 "be categorical."
