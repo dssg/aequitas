@@ -70,6 +70,22 @@ class LabelFlipping(PreProcessing):
         self.seed = seed
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
+        """
+        Fits a bagging classifier to the data. The estimators' can then be used to 
+        make predictions and calculate the scores to order the instances by.
+        If there are categorical features, they are one-hot encoded.
+
+        Parameters
+        ----------
+        X : pandas.DataFrame
+            Feature matrix.
+        y : pandas.Series
+            Label vector.
+        s : pandas.Series
+            Protected attribute vector.
+        """
+        self.logger.info("Fitting LabelFlipping.")
+
         X_num = pd.get_dummies(X)
 
         self.ensemble = BaggingClassifier(estimator=self.base_estimator, 
@@ -78,6 +94,24 @@ class LabelFlipping(PreProcessing):
                                     random_state=self.seed).fit(X_num, y)
 
     def _score_instances(self, X:pd.DataFrame, y:pd.Series) -> pd.Series:
+        """Scores the instances based on the predictions of the ensemble of classifiers.
+
+        If the ordering method is "ensemble_margin", the scores are the ensemble margins.
+        If the ordering method is "residuals", the scores are the average residuals of the
+        classifiers predictions.
+
+        Parameters
+        ----------
+        X : pandas.DataFrame
+            Feature matrix.
+        y : pandas.Series   
+            Label vector.
+
+        Returns
+        -------
+        scores : pd.Series
+            The scores of the instances.
+        """
         if self.ordering_method == "ensemble_margin":
             y_pred = np.array([clf.predict(X.values) for clf in self.ensemble.estimators_])
             v_1 = y_pred.sum(axis=0)
@@ -90,12 +124,33 @@ class LabelFlipping(PreProcessing):
         return scores
     
     def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
+        # TO DO: general prevalence disparity function
         prevalence_0 = y.loc[s == 0].value_counts()[1] / y.loc[s==0].shape[0]
         prevalence_1 = y.loc[s == 1].value_counts()[1] / y.loc[s==1].shape[0]
 
         return prevalence_0 - prevalence_1
     
     def _label_flipping(self, y: pd.Series, s: Optional[pd.Series], scores: pd.Series):
+        """Flips the labels of the desired fraction of the training data.
+
+        If fair_ordering is True, only flips the labels of the instances that contribute
+        to equalizing the prevalence of the groups.
+        Otherwise, the labels of the instances with the largest score values are flipped.
+
+        Parameters
+        ----------
+        y : pd.Series
+            Label vector.
+        s : pd.Series, optional
+            Protected attribute vector.
+        scores : pd.Series
+            The scores of the instances.
+
+        Returns
+        -------
+        y_flipped : pd.Series
+            The transformed label vector.
+        """
         y_flipped = y.reindex(scores.sort_values(ascending=(self.ordering_method == "ensemble_margin")).index)
         n_flip = int(self.flip_rate*len(y))
 
@@ -124,6 +179,23 @@ class LabelFlipping(PreProcessing):
         return y_flipped.reindex(y.index)
 
     def transform(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> Tuple[pd.DataFrame, pd.Series, Optional[pd.Series]]:
+        """Flips the labels the specified fraction of the training data according to the 
+        defined method.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Feature matrix.
+        y : pd.Series
+            Label vector.
+        s : pd.Series, optional
+            Protected attribute vector.
+
+        Returns
+        -------
+        tuple[pd.DataFrame, pd.Series, pd.Series]
+            The transformed input, X, y, and s.
+        """
         self.logger.info("Transforming data with LabelFlipping.")
 
         if s is None and self.fair_ordering:
