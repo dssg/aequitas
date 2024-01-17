@@ -16,12 +16,12 @@ class LabelFlipping(PreProcessing):
             self,
             flip_rate: float = 0.1,
             bagging_max_samples: float = 0.5,
-            base_estimator: str = "sklearn.tree.DecisionTreeClassifier",
-            base_estimator_args: dict = {}, 
+            base_estimator: str = "sklearn.tree.DecisionTreeClassifier", 
             n_estimators: int = 10,
             fair_ordering: bool = True,
             ordering_method: str = "ensemble_margin",
-            seed: int = 42
+            seed: int = 42,
+            **base_estimator_args
         ):
         """Flips the labels of a fraction of the training data according to the Fair 
         Ordering-Based Noise Correction method.
