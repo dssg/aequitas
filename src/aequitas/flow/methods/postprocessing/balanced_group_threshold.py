@@ -8,14 +8,14 @@ from .postprocessing import PostProcessing
 from .threshold import Threshold
 
 
-class GroupThreshold(PostProcessing):
+class BalancedGroupThreshold(PostProcessing):
     def __init__(
         self,
         threshold_type: str,
         threshold_value: Union[float, int],
         fairness_metric: str,
     ):
-        """Initialize a new instance of the GroupThreshold class.
+        """Initialize a new instance of the BalancedGroupThreshold class.
 
         Parameters
         ----------
