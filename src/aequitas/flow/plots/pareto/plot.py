@@ -285,7 +285,8 @@ class Plot:
 
         if not reference_groups:
             reference_groups = {
-                attr: dataset[attr].mode().values[0] for attr in sensitive_attribute
+                attr: str(dataset[attr].mode().values[0])
+                for attr in sensitive_attribute
             }
 
         disparity_metrics = b.get_disparity_predefined_groups(
@@ -296,8 +297,7 @@ class Plot:
             disparity_metrics, metrics, fairness_threshold=fairness_threshold
         )
 
-
-def disparities(
+    def disparities(
         self,
         model_id: int,
         dataset: Any,
@@ -360,7 +360,8 @@ def disparities(
 
         if not reference_groups:
             reference_groups = {
-                attr: dataset[attr].mode().values[0] for attr in sensitive_attribute
+                attr: str(dataset[attr].mode().values[0])
+                for attr in sensitive_attribute
             }
 
         disparity_metrics = b.get_disparity_predefined_groups(
@@ -368,5 +369,8 @@ def disparities(
         )
 
         return disparity(
-            disparity_metrics, metrics, sensitive_attribute, fairness_threshold=fairness_threshold
+            disparity_metrics,
+            metrics,
+            sensitive_attribute[0],
+            fairness_threshold=fairness_threshold,
         )
