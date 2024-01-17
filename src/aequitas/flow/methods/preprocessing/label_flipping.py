@@ -59,6 +59,7 @@ class LabelFlipping(PreProcessing):
         base_estimator = import_object(base_estimator)
         args = {arg: value for arg, value in base_estimator_args.items() if arg in inspect.signature(base_estimator).parameters}
         self.base_estimator = base_estimator(**args)
+        self.logger.info(f'Created base estimator {self.base_estimator} with params {args}, discarded args: {list(set(base_estimator_args.keys()) - set(args.keys()))}')
         self.n_estimators = n_estimators
 
         self.fair_ordering = fair_ordering
@@ -119,7 +120,7 @@ class LabelFlipping(PreProcessing):
 
         else:
             y_flipped[:n_flip] = 1 - y_flipped[:n_flip]
-            
+
             self.logger.info(f"Flipped {n_flip} instances.")
 
         return y_flipped.reindex(y.index)
