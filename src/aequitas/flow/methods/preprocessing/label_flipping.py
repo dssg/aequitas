@@ -91,29 +91,36 @@ class LabelFlipping(PreProcessing):
         return scores
     
     def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
-        prevalence_0 = y.loc[s == 0].value_counts()[1] / y.shape[0]
-        prevalence_1 = y.loc[s == 1].value_counts()[1] / y.shape[0]
+        prevalence_0 = y.loc[s == 0].value_counts()[1] / y.loc[s==0].shape[0]
+        prevalence_1 = y.loc[s == 1].value_counts()[1] / y.loc[s==1].shape[0]
 
         return prevalence_0 - prevalence_1
     
     def _label_flipping(self, y: pd.Series, s: Optional[pd.Series], scores: pd.Series):
-        y_flipped = y.sort_values(key = lambda x: scores.loc[x], ascending = (self.ordering_method == "ensemble_margin"))
-        n_flip = self.flip_rate*len(y)
+        y_flipped = y.reindex(scores.sort_values(ascending=(self.ordering_method == "ensemble_margin")).index)
+        n_flip = int(self.flip_rate*len(y))
 
-        if self.fair_ordering:
+        if self.fair_ordering: # TO DO: if prevalence disparity equalized/inverts, stop flipping or start iterating the instances that have high margins and weren't flipped?
+            
             disparity = self._calculate_prevalence_disparity(y_flipped, s)
+            flip_index = y_flipped.index if self.ordering_method == "residuals" else y_flipped.loc[scores <= 0].index
+            flip_count = 0
 
-            for i in y_flipped.index:
+            for i in flip_index:
                 if (disparity > 0 and s.loc[i] != y_flipped.loc[i]) or (disparity < 0 and s.loc[i] == y_flipped.loc[i]):
                     y_flipped.loc[i] = 1 - y_flipped.loc[i]
                     disparity = self._calculate_prevalence_disparity(y_flipped, s)
-                    n_flip -= 1
+                    flip_count += 1
 
-                if n_flip == 0:
+                if flip_count == n_flip:
                     break
+
+            self.logger.info(f"Flipped {flip_count} instances.")
 
         else:
             y_flipped[:n_flip] = 1 - y_flipped[:n_flip]
+            
+            self.logger.info(f"Flipped {n_flip} instances.")
 
         return y_flipped.reindex(y.index)
 
