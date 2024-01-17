@@ -65,47 +65,60 @@ class GroupThreshold(PostProcessing):
         """
         unique_groups = s.unique()
 
-        dfs = []
-        for group in unique_groups:
-            group_mask = s == group
-            group_y_hat = y_hat[group_mask]
-            group_y = y[group_mask]
-            group_s = s[group_mask]
-            group_df = pd.DataFrame(
-                {
-                    "y_hat": group_y_hat,
-                    "y": group_y,
-                    "s": group_s,
-                }
-            )
+        def process_group(group_df):
             group_df.sort_values(by="y_hat", ascending=False, inplace=True)
             if self.fairness_metric == "fpr":
                 relevant_labels = [0]
             elif self.fairness_metric == "tpr":
                 relevant_labels = [1]
-            else:
+            elif self.fairness_metric == "pprev":
                 relevant_labels = [0, 1]
-            n_relevants = (group_df["y"].isin(relevant_labels)).sum()
+            else:
+                raise ValueError(
+                    f"Fairness metric {self.fairness_metric} is not supported."
+                )
+
+            n_relevant_labels = (group_df["y"].isin(relevant_labels)).sum()
             relevant_ids = group_df[group_df["y"].isin(relevant_labels)].index
             vals = np.concatenate(
                 [
                     np.linspace(
                         0,
                         1,
-                        n_relevants,
+                        n_relevant_labels,
                         endpoint=False,
                     ),
                     np.array([1]),
                 ]
             )
-            # Iterate the indexes
-            for id in group_df.index:
-                if id in relevant_ids:
-                    vals = vals[1:]
-                group_df.loc[id, "value"] = vals[0]
-            dfs.append(group_df)
 
-        all_groups_df = pd.concat(dfs).sort_values("value")
+            # Create a mask for the DataFrame
+            mask = group_df.index.isin(relevant_ids)
+
+            # Perform operations on the DataFrame using the mask
+            group_df.loc[mask, "value"] = vals[1:]
+            # Forward fill the 'value' column
+            group_df["value"].fillna(method="ffill", inplace=True)
+            group_df["value"].fillna(0, inplace=True)
+            return group_df
+
+        # Create a single DataFrame
+        df = pd.DataFrame(
+            {
+                "y_hat": y_hat,
+                "y": y,
+                "s": s,
+            }
+        )
+        # Add a 'group' column to the DataFrame
+        df["group"] = s
+
+        # Use groupby and apply to process each group
+        all_groups_df = (
+            df.groupby("group", group_keys=False)
+            .apply(process_group)
+            .sort_values("value")
+        )
 
         if self.threshold_type == "top_pct":
             pos_predictions = int(all_groups_df.shape[0] * self.threshold_value)
