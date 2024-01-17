@@ -96,7 +96,7 @@ class Audit:
 
     def audit(self):
         g = Group()
-        self.metrics_df = g.get_crosstabs(
+        self.metrics_df, _ = g.get_crosstabs(
             df=self.df,
             score_thresholds=None,
             attr_cols=self.sensitive_attribute_column,
@@ -126,7 +126,7 @@ class Audit:
         # Create a column in DF with a constant value for group
         self.df["group_performance"] = "all"
         g = Group()
-        self.performance_metrics_df = g.get_crosstabs(
+        self.performance_metrics_df, _ = g.get_crosstabs(
             df=self.df,
             score_thresholds=None,
             attr_cols=["group_performance"],
@@ -264,8 +264,9 @@ class Audit:
                     " not found in the DataFrame."
                 )
         # Check if values are categorical / object
-        if not pd.api.types.is_object_dtype(self.df[self.sensitive_attribute_column]):
-            raise ValueError(
-                f"Sensitive attribute column(s) {self.sensitive_attribute_column} must"
-                "be categorical."
-            )
+        for dtype in self.df[self.sensitive_attribute_column].dtypes:
+            if dtype != "object":
+                raise ValueError(
+                    f"Sensitive attribute column(s) {self.sensitive_attribute_column}"
+                    " must be categorical."
+                )
