@@ -19,9 +19,11 @@ class Audit:
         reference_groups: Optional[Union[Literal["maj", "min"], dict]] = "maj",
     ):
         """
-        Instantiate an Audit. This class allows to audit a model for fairness, and plot
-        the results. The Audit class is a wrapper around the Group and Bias classes.
-        It additionally allows to obtain global metrics.
+        This class allows to audit a model for fairness, and plot the results. The Audit
+        class is a wrapper around the Group and Bias classes.
+
+        It additionally allows to obtain global metrics of performance of your
+        predictions or scores.
 
         Parameters
         ----------
@@ -33,7 +35,8 @@ class Audit:
             'threshold_type' and 'threshold_value'. These are used to construct an
             aequitas.flow.methods.postprocessing.Threshold object.
         score_column : str, optional
-            Name of the column containing the scores. By default, 'score'.
+            Name of the column containing the scores (or predictions). By default,
+            'score'.
         label_column : str, optional
             Name of the column containing the labels. By default, 'label'.
         sensitive_attribute_column : Union[str, list[str]], optional
