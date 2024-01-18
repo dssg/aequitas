@@ -5,7 +5,7 @@ from ...utils.imports import import_object
 
 import inspect
 import pandas as pd
-from typing import Optional, Tuple, Literal
+from typing import Optional, Tuple, Literal, Union, Callable
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
 
@@ -16,11 +16,11 @@ class LabelFlipping(PreProcessing):
             self,
             flip_rate: float = 0.1,
             bagging_max_samples: float = 0.5,
-            base_estimator: str = "sklearn.tree.DecisionTreeClassifier", 
-            n_estimators: int = 10,
+            bagging_base_estimator: Union[str, Callable] = "sklearn.tree.DecisionTreeClassifier", 
+            bagging_n_estimators: int = 10,
             fair_ordering: bool = True,
             ordering_method: Literal["ensemble_margin", "residuals"] = "ensemble_margin",
-            sensitive_attrs: Optional[list] = None,
+            unawareness_features: Optional[list] = None,
             seed: int = 42,
             **base_estimator_args
         ):
@@ -34,10 +34,10 @@ class LabelFlipping(PreProcessing):
         bagging_max_samples : float, optional
             The number of samples to draw from X to train each base estimator of the 
             bagging classifier (with replacement).
-        base_estimator : str, optional
+        bagging_base_estimator : str, optional
             The base estimator to fit on random subsets of the dataset. By default, the 
             base estimator is the sklearn implementation of a decision tree.
-        n_estimators : int, optional
+        bagging_n_estimators : int, optional
             The number of base estimators in the ensemble, by default 10.
         fair_ordering : bool, optional  
             Whether to take additional fairness criteria into account when flipping labels,
@@ -48,12 +48,23 @@ class LabelFlipping(PreProcessing):
             calculates the ensemble margins based on the binary predictions of the classifiers.
             If "residuals", oreders the missclafied instances based on the average residuals of the
             classifiers predictions. By default "ensemble_margin".
-        sensitive_attrs : list, optional
-            The sensitive attributes (or proxies) to ignore when fitting the ensemble.
+        unawareness_features : list, optional
+            The sensitive attributes (or proxies) to ignore when fitting the ensemble to enable fairness
+            through unawareness.
         seed : int, optional
             The seed to use when fitting the ensemble.
         **base_estimator_args
             Additional arguments to instantiate the base estimator.
+
+        Examples
+        --------
+        >>> from aequitas.preprocessing import LabelFlipping
+        >>> from sklearn.tree import DecisionTreeClassifier
+        >>> from sklearn.datasets import make_classification
+        >>> X, y = make_classification(n_samples=1000, n_features=10, n_informative=5, n_redundant=0, random_state=42)
+        >>> lf = LabelFlipping(bagging_base_estimator=DecisionTreeClassifier, flip_rate=0.1, max_depth=3)
+        >>> lf.fit(X, y)
+        >>> X_transformed, y_transformed = lf.transform(X, y)
         """
         self.logger = create_logger("methods.preprocessing.LabelFlipping")
         self.logger.info("Instantiating a LabelFlipping preprocessing method.")
@@ -61,17 +72,22 @@ class LabelFlipping(PreProcessing):
         self.flip_rate = flip_rate
         self.bagging_max_samples = bagging_max_samples
 
-        base_estimator = import_object(base_estimator)
-        args = {arg: value for arg, value in base_estimator_args.items() if arg in inspect.signature(base_estimator).parameters}
-        self.base_estimator = base_estimator(**args)
-        self.logger.info(f'Created base estimator {self.base_estimator} with params {args}, discarded args: {list(set(base_estimator_args.keys()) - set(args.keys()))}')
-        self.n_estimators = n_estimators
+        if isinstance(bagging_base_estimator, str):
+            bagging_base_estimator = import_object(bagging_base_estimator)
+        signature = inspect.signature(bagging_base_estimator)
+        if signature.parameters[list(signature.parameters.keys())[-1]].kind.value == 4:
+            args = base_estimator_args
+        else:
+            args = {arg: value for arg, value in base_estimator_args.items() if arg in signature.parameters}
+        self.bagging_base_estimator = bagging_base_estimator(**args)
+        self.logger.info(f'Created base estimator {self.bagging_base_estimator} with params {args}, discarded args: {list(set(base_estimator_args.keys()) - set(args.keys()))}')
+        self.bagging_n_estimators = bagging_n_estimators
 
         self.fair_ordering = fair_ordering
         if ordering_method not in METHODS:
             raise ValueError(f"Invalid margin method. Try one of {METHODS}.")
         self.ordering_method = ordering_method
-        self.sensitive_attrs = sensitive_attrs
+        self.unawareness_features = unawareness_features
         self.used_in_inference = False
         self.seed = seed
 
@@ -93,13 +109,13 @@ class LabelFlipping(PreProcessing):
         self.logger.info("Fitting LabelFlipping.")
 
         X_transformed = X.copy()
-        if self.sensitive_attrs is not None:
-            X_transformed = X_transformed.drop(columns=self.sensitive_attrs)
+        if self.unawareness_features is not None:
+            X_transformed = X_transformed.drop(columns=self.unawareness_features)
 
         X_transformed = pd.get_dummies(X_transformed)
 
-        self.ensemble = BaggingClassifier(estimator=self.base_estimator, 
-                                    n_estimators=self.n_estimators, 
+        self.ensemble = BaggingClassifier(estimator=self.bagging_base_estimator, 
+                                    n_estimators=self.bagging_n_estimators, 
                                     max_samples=self.bagging_max_samples,
                                     random_state=self.seed).fit(X_transformed, y)
 
@@ -125,16 +141,16 @@ class LabelFlipping(PreProcessing):
         if self.ordering_method == "ensemble_margin":
             y_pred = np.array([clf.predict(X.values) for clf in self.ensemble.estimators_])
             v_1 = y_pred.sum(axis=0)
-            v_0 = self.n_estimators - v_1
-            scores = pd.Series(np.where(y == 1, (v_1 - v_0) / self.n_estimators, (v_0 - v_1) / self.n_estimators), index=X.index)
+            v_0 = self.bagging_n_estimators - v_1
+            scores = pd.Series(np.where(y == 1, (v_1 - v_0) / self.bagging_n_estimators, (v_0 - v_1) / self.bagging_n_estimators), index=X.index)
         elif self.ordering_method == "residuals":
             y_pred = np.array([abs(y - clf.predict_proba(X.values)[:, 1]) for clf in self.ensemble.estimators_])
-            scores = pd.Series(y_pred.sum(axis=0) / self.n_estimators, index=X.index)
+            scores = pd.Series(y_pred.sum(axis=0) / self.bagging_n_estimators, index=X.index)
 
         return scores
     
     def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
-        # TO DO: general prevalence disparity function
+        # TODO: general prevalence disparity function
         prevalence_0 = y.loc[s == 0].value_counts()[1] / y.loc[s==0].shape[0]
         prevalence_1 = y.loc[s == 1].value_counts()[1] / y.loc[s==1].shape[0]
 
@@ -164,7 +180,7 @@ class LabelFlipping(PreProcessing):
         y_flipped = y.reindex(scores.sort_values(ascending=(self.ordering_method == "ensemble_margin")).index)
         n_flip = int(self.flip_rate*len(y))
 
-        if self.fair_ordering: # TO DO: if prevalence disparity equalized/inverts, stop flipping or start iterating the instances that have high margins and weren't flipped?
+        if self.fair_ordering: # TODO: if prevalence disparity equalized/inverts, stop flipping or start iterating the instances that have high margins and weren't flipped?
             
             disparity = self._calculate_prevalence_disparity(y_flipped, s)
             flip_index = y_flipped.index if self.ordering_method == "residuals" else y_flipped.loc[scores <= 0].index
@@ -212,8 +228,8 @@ class LabelFlipping(PreProcessing):
             raise ValueError("Sensitive Attribute `s` not passed. Must be passed if `fair_ordering` is True.")
         
         X_transformed = X.copy()
-        if self.sensitive_attrs is not None:
-            X_transformed = X_transformed.drop(columns=self.sensitive_attrs)
+        if self.unawareness_features is not None:
+            X_transformed = X_transformed.drop(columns=self.unawareness_features)
 
         X_transformed = pd.get_dummies(X_transformed)
         
