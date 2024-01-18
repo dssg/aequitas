@@ -15,6 +15,8 @@ class LabelFlipping(PreProcessing):
     def __init__(
             self,
             flip_rate: float = 0.1,
+            disparity_target: Optional[float] = None, 
+            score_threshold: Optional[float] = None,
             bagging_max_samples: float = 0.5,
             bagging_base_estimator: Union[str, Callable] = "sklearn.tree.DecisionTreeClassifier", 
             bagging_n_estimators: int = 10,
@@ -70,13 +72,28 @@ class LabelFlipping(PreProcessing):
         self.logger.info("Instantiating a LabelFlipping preprocessing method.")
 
         self.flip_rate = flip_rate
+
+        if disparity_target is not None:
+            if disparity_target < 0 or disparity_target > 1:
+                raise ValueError("Disparity target must be a value between 0 and 1.")
+            self.disparity_target = disparity_target
+        else:
+            self.disparity_target = 0
+        
+        if score_threshold is not None:
+            if score_threshold < 0 or score_threshold > 1:
+                raise ValueError("Score threshold must be a value between 0 and 1.")
+            self.score_threshold = score_threshold
+        else:
+            self.score_threshold = 0
+
         self.bagging_max_samples = bagging_max_samples
 
         if isinstance(bagging_base_estimator, str):
             bagging_base_estimator = import_object(bagging_base_estimator)
         signature = inspect.signature(bagging_base_estimator)
-        if signature.parameters[list(signature.parameters.keys())[-1]].kind.value == 4:
-            args = base_estimator_args
+        if signature.parameters[list(signature.parameters.keys())[-1]].kind == inspect.Parameter.VAR_KEYWORD:
+            args = base_estimator_args # Estimator takes **kwargs, so all args are valid
         else:
             args = {arg: value for arg, value in base_estimator_args.items() if arg in signature.parameters}
         self.bagging_base_estimator = bagging_base_estimator(**args)
@@ -151,10 +168,11 @@ class LabelFlipping(PreProcessing):
     
     def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
         # TODO: general prevalence disparity function
-        prevalence_0 = y.loc[s == 0].value_counts()[1] / y.loc[s==0].shape[0]
-        prevalence_1 = y.loc[s == 1].value_counts()[1] / y.loc[s==1].shape[0]
-
-        return prevalence_0 - prevalence_1
+        prevalence = y.mean()
+        group_prevalence = y.groupby(s).mean().to_dict()
+        group_disparity = {k: v - prevalence for k, v in group_prevalence.items()}
+        
+        return group_disparity
     
     def _label_flipping(self, y: pd.Series, s: Optional[pd.Series], scores: pd.Series):
         """Flips the labels of the desired fraction of the training data.
@@ -187,8 +205,11 @@ class LabelFlipping(PreProcessing):
             flip_count = 0
 
             for i in flip_index:
-                if (disparity > 0 and s.loc[i] != y_flipped.loc[i]) or (disparity < 0 and s.loc[i] == y_flipped.loc[i]):
-                    y_flipped.loc[i] = 1 - y_flipped.loc[i]
+                if abs(scores.loc[i]) < self.score_threshold:
+                    break
+
+                if (disparity[s.loc[i]] > self.disparity_target and y.loc[i] == 1) or (disparity[s.loc[i]] < self.disparity_target and y.loc[i] == 0):
+                    y_flipped.loc[i] = 1 - y.loc[i]
                     disparity = self._calculate_prevalence_disparity(y_flipped, s)
                     flip_count += 1
 
@@ -198,7 +219,8 @@ class LabelFlipping(PreProcessing):
             self.logger.info(f"Flipped {flip_count} instances.")
 
         else:
-            y_flipped[:n_flip] = 1 - y_flipped[:n_flip]
+            n_above_threshold = scores.loc[abs(scores) >= self.score_threshold].shape[0]
+            y_flipped[:min(n_flip, n_above_threshold)] = 1 - y_flipped[:min(n_flip, n_above_threshold)]
 
             self.logger.info(f"Flipped {n_flip} instances.")
 
@@ -211,9 +233,7 @@ class LabelFlipping(PreProcessing):
         Parameters
         ----------
         X : pd.DataFrame
-            Feature matrix.
-        y : pd.Series
-            Label vector.
+            Feature[s.loc[i]]ector.
         s : pd.Series, optional
             Protected attribute vector.
 
