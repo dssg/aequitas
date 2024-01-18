@@ -20,6 +20,7 @@ class LabelFlipping(PreProcessing):
             n_estimators: int = 10,
             fair_ordering: bool = True,
             ordering_method: Literal["ensemble_margin", "residuals"] = "ensemble_margin",
+            sensitive_attrs: Optional[list] = None,
             seed: int = 42,
             **base_estimator_args
         ):
@@ -36,8 +37,6 @@ class LabelFlipping(PreProcessing):
         base_estimator : str, optional
             The base estimator to fit on random subsets of the dataset. By default, the 
             base estimator is the sklearn implementation of a decision tree.
-        base_estimator_args : dict, optional    
-            Additional arguments to pass to the base estimator.
         n_estimators : int, optional
             The number of base estimators in the ensemble, by default 10.
         fair_ordering : bool, optional  
@@ -49,6 +48,12 @@ class LabelFlipping(PreProcessing):
             calculates the ensemble margins based on the binary predictions of the classifiers.
             If "residuals", oreders the missclafied instances based on the average residuals of the
             classifiers predictions. By default "ensemble_margin".
+        sensitive_attrs : list, optional
+            The sensitive attributes (or proxies) to ignore when fitting the ensemble.
+        seed : int, optional
+            The seed to use when fitting the ensemble.
+        **base_estimator_args
+            Additional arguments to instantiate the base estimator.
         """
         self.logger = create_logger("methods.preprocessing.LabelFlipping")
         self.logger.info("Instantiating a LabelFlipping preprocessing method.")
@@ -66,6 +71,7 @@ class LabelFlipping(PreProcessing):
         if ordering_method not in METHODS:
             raise ValueError(f"Invalid margin method. Try one of {METHODS}.")
         self.ordering_method = ordering_method
+        self.sensitive_attrs = sensitive_attrs
         self.used_in_inference = False
         self.seed = seed
 
@@ -86,12 +92,16 @@ class LabelFlipping(PreProcessing):
         """
         self.logger.info("Fitting LabelFlipping.")
 
-        X_num = pd.get_dummies(X)
+        X_transformed = X.copy()
+        if self.sensitive_attrs is not None:
+            X_transformed = X_transformed.drop(columns=self.sensitive_attrs)
+
+        X_transformed = pd.get_dummies(X_transformed)
 
         self.ensemble = BaggingClassifier(estimator=self.base_estimator, 
                                     n_estimators=self.n_estimators, 
                                     max_samples=self.bagging_max_samples,
-                                    random_state=self.seed).fit(X_num, y)
+                                    random_state=self.seed).fit(X_transformed, y)
 
     def _score_instances(self, X:pd.DataFrame, y:pd.Series) -> pd.Series:
         """Scores the instances based on the predictions of the ensemble of classifiers.
@@ -201,9 +211,13 @@ class LabelFlipping(PreProcessing):
         if s is None and self.fair_ordering:
             raise ValueError("Sensitive Attribute `s` not passed. Must be passed if `fair_ordering` is True.")
         
-        X_num = pd.get_dummies(X)
+        X_transformed = X.copy()
+        if self.sensitive_attrs is not None:
+            X_transformed = X_transformed.drop(columns=self.sensitive_attrs)
+
+        X_transformed = pd.get_dummies(X_transformed)
         
-        scores = self._score_instances(X_num, y)
+        scores = self._score_instances(X_transformed, y)
         y_flipped = self._label_flipping(y, s, scores)
 
         self.logger.info("Data transformed.")
