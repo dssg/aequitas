@@ -29,7 +29,27 @@ TARGET_FEATURES = {
 
 SENSITIVE_FEATURE = "RAC1P"
 
-CATEGORICAL_FEATURES = []  # To do later
+CATEGORICAL_FEATURES = [
+    "COW",
+    "MAR",
+    "RELP",
+    "SEX",
+    "RAC1P",
+    "DIS",
+    "ESP",
+    "CIT",
+    "MIG",
+    "MIL",
+    "ANC",
+    "ESR",
+    "OCCP",
+    "POBP",
+    "PUMA",
+    "JWTR",
+    "POWPUMA",
+]
+
+BOOL_FEATURES = ["SEX", "DIS", "NATIVITY", "DEAR", "DEYE", "DREM", "FER", "GCL"]
 
 SPLIT_TYPES = ["predefined", "random"]  # Add more if wanted.
 SPLIT_VALUES = ["train", "validation", "test"]
@@ -52,6 +72,7 @@ class FolkTables(Dataset):
         extension: str = "parquet",
         target_feature: Optional[str] = None,
         sensitive_feature: Optional[str] = None,
+        age_cutoff: Optional[int] = None,
     ):
         """Instantiate a FolkTables dataset.
 
@@ -105,9 +126,19 @@ class FolkTables(Dataset):
         self.target_feature = (
             TARGET_FEATURES[self.variant] if target_feature is None else target_feature
         )
-        self.sensitive_feature = (
-            SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
-        )
+        if sensitive_feature == "AGEP":
+            self.sensitive_feature = "AGEP_bin"
+        elif (sensitive_feature is not None) and (
+            sensitive_feature not in CATEGORICAL_FEATURES
+        ):
+            raise ValueError(
+                f"Invalid sensitive feature value. Try one of: {CATEGORICAL_FEATURES}"
+            )
+        else:
+            self.sensitive_feature = (
+                SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
+            )
+        self.age_cutoff = age_cutoff
         self._indexes = None  # Store indexes of predefined splits
 
     def _validate_splits(self) -> None:
@@ -164,8 +195,17 @@ class FolkTables(Dataset):
                 self.data = pd.concat(datasets)
             else:
                 self.data = pd.read_csv(path)
+
         for col in CATEGORICAL_FEATURES:
             self.data[col] = self.data[col].astype("category")
+
+        for col in BOOL_FEATURES:
+            self.data[col] = self.data[col].replace(2, 0).astype(bool)
+
+        if self.sensitive_feature == "AGEP_bin":
+            self.data["AGEP_bin"] = self.data["AGEP"] >= self.age_cutoff
+            self.data["AGEP_bin"] = self.data["AGEP_bin"].astype(int)
+
         self.logger.debug("Data shape: {self.data.shape}.")
         self.logger.info("Data loaded successfully.")
 

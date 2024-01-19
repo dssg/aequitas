@@ -68,15 +68,24 @@ class BankAccountFraud(Dataset):
         target_feature: Optional[str] = None,
         sensitive_feature: Optional[str] = None,
         include_month: bool = True,
+        age_cutoff: int = 50,
     ):
         super().__init__()
 
         self.target_feature = (
             TARGET_FEATURE if target_feature is None else target_feature
         )
-        self.sensitive_feature = (
-            SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
-        )
+
+        if sensitive_feature == "customer_age" or sensitive_feature is None:
+            self.sensitive_feature = SENSITIVE_FEATURE
+        elif sensitive_feature not in CATEGORICAL_FEATURES:
+            raise ValueError(
+                f"Invalid sensitive feature value. Try one of: {CATEGORICAL_FEATURES}"
+            )
+        else:
+            self.sensitive_feature = sensitive_feature
+
+        self.age_cutoff = age_cutoff
 
         self.logger = create_logger("datasets.BankAccountFraud")
         self.logger.info("Instantiating a BankAccountFraud dataset.")
@@ -149,6 +158,10 @@ class BankAccountFraud(Dataset):
             self.data = pd.read_csv(path)
         for col in CATEGORICAL_FEATURES:
             self.data[col] = self.data[col].astype("category")
+
+        if self.sensitive_feature == "customer_age_bin":
+            self.data["customer_age_bin"] = self.data["customer_age"] >= self.age_cutoff
+            self.data["customer_age_bin"] = self.data["customer_age_bin"].astype(int)
 
     def create_splits(self) -> None:
         """Create train, validation, and test splits for the dataset."""
