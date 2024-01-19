@@ -97,24 +97,43 @@ class Audit:
         df = pd.concat([scores, labels, sensitive_attributes], axis=1)
         return cls(df, **kwargs)
 
-    def audit(self):
-        g = Group()
-        self.metrics_df, _ = g.get_crosstabs(
+    def audit(self, group_args: Optional[dict] = {}, bias_args: Optional[dict] = {}):
+        """
+        Audit the model for fairness.
+
+        Parameters
+        ----------
+        group_args : dict, optional
+            Additional arguments to pass to the Group class. Refer to the documentation
+            of the Group class for more information.
+        bias_args : dict, optional
+            Additional arguments to pass to the Bias class. Refer to the documentation
+            of the Bias class for more information.
+        """
+        self.group = Group()
+        self.metrics_df, _ = self.group.get_crosstabs(
             df=self.df,
             score_thresholds=None,
             attr_cols=self.sensitive_attribute_column,
             score_col=self.score_column,
             label_col=self.label_column,
+            **group_args,
         )
 
-        b = Bias()
+        self.bias = Bias()
         if self.reference_groups == "maj":
-            self.disparity_df = b.get_disparity_major_group(self.metrics_df, self.df)
+            self.disparity_df = self.bias.get_disparity_major_group(
+                self.metrics_df,
+                self.df,
+                **bias_args,
+            )
         elif self.reference_groups == "min":
-            self.disparity_df = b.get_disparity_min_metric(self.metrics_df, self.df)
+            self.disparity_df = self.bias.get_disparity_min_metric(
+                self.metrics_df, self.df, **bias_args
+            )
         else:
-            self.disparity_df = b.get_disparity_predefined_groups(
-                self.metrics_df, self.df, self.reference_groups
+            self.disparity_df = self.bias.get_disparity_predefined_groups(
+                self.metrics_df, self.df, self.reference_groups, **bias_args
             )
 
     def performance(self):
@@ -273,3 +292,47 @@ class Audit:
                     f"Sensitive attribute column(s) {self.sensitive_attribute_column}"
                     " must be categorical."
                 )
+
+    @property
+    def confusion_matrix(self) -> pd.DataFrame:
+        """
+        Return the confusion matrix of the model.
+        """
+        absolute_metrics = self.group.list_absolute_metrics(self.metrics_df)
+        remove_columns = ["model_id", "score_threshold", "k"] + absolute_metrics
+
+        return self.metrics_df.drop(columns=remove_columns).set_index(
+            ["attribute_name", "attribute_value"]
+        )
+
+    @property
+    def metrics(self) -> pd.DataFrame:
+        """
+        Return the confusion matrix metrics of the model.
+        """
+        absolute_metrics = self.group.list_absolute_metrics(self.metrics_df)
+        include_columns = ["attribute_name", "attribute_value"] + absolute_metrics
+
+        return self.metrics_df[include_columns].set_index(
+            ["attribute_name", "attribute_value"]
+        )
+
+    @property
+    def disparities(self) -> pd.DataFrame:
+        """
+        Return the disparities of the model.
+        """
+        disparity_metrics = self.bias.list_disparities(self.disparity_df)
+
+        try:
+            # Check if there are statistical tests in df
+            significance_metrics = self.bias.list_significance(self.disparity_df)
+            disparity_metrics += significance_metrics
+        except KeyError:
+            pass
+
+        include_columns = ["attribute_name", "attribute_value"] + disparity_metrics
+
+        return self.disparity_df[include_columns].set_index(
+            ["attribute_name", "attribute_value"]
+        )
