@@ -45,6 +45,7 @@ class Group(object):
         "tnr",
         "npv",
         "prev",
+        "accuracy",
     )
 
     def __init__(self, input_group_metrics=all_group_metrics):
@@ -478,7 +479,7 @@ class Group(object):
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """
-        return summary(disparities, metrics, fairness_threshold)
+        return summary(disparities, metrics, fairness_threshold=fairness_threshold)
 
     def plot_disparity(
         disparities: pd.DataFrame,
@@ -498,7 +499,9 @@ class Group(object):
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """
-        return disparity(disparities, metrics, attribute, fairness_threshold)
+        return disparity(
+            disparities, metrics, attribute, fairness_threshold=fairness_threshold
+        )
 
     def plot_absolute(
         disparities: pd.DataFrame,
@@ -518,4 +521,6 @@ class Group(object):
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """
-        return absolute(disparities, metrics, attribute, fairness_threshold)
+        return absolute(
+            disparities, metrics, attribute, fairness_threshold=fairness_threshold
+        )

@@ -1,6 +1,0 @@
-prevalence_sampling:
-  args:
-    alpha: 
-      type: float
-      range: [0.5, 1]
-  classpath: aequitas.fairflow.methods.preprocessing.prevalence_sample.PrevalenceSampling
