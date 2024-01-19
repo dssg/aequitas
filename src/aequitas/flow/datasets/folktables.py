@@ -29,27 +29,55 @@ TARGET_FEATURES = {
 
 SENSITIVE_FEATURE = "RAC1P"
 
-CATEGORICAL_FEATURES = [
-    "COW",
-    "MAR",
-    "RELP",
-    "SEX",
-    "RAC1P",
-    "DIS",
-    "ESP",
-    "CIT",
-    "MIG",
-    "MIL",
-    "ANC",
-    "ESR",
-    "OCCP",
-    "POBP",
-    "PUMA",
-    "JWTR",
-    "POWPUMA",
-]
+CATEGORICAL_FEATURES = {
+    "ACSIncome": ["COW", "MAR", "OCCP", "POBP", "RELP", "RAC1P"],
+    "ACSEmployment": ["MAR", "ESP", "MIG", "CIT", "MIL", "ANC", "RELP", "RAC1P"],
+    "ACSMobility": ["MAR", "ESP", "CIT", "MIL", "ANC", "RELP", "RAC1P", "COW", "ESR"],
+    "ACSPublicCoverage": ["MAR", "ESP", "CIT", "MIG", "MIL", "ANC", "ESR", "RAC1P"],
+    "ACSTravelTime": [
+        "MAR",
+        "ESP",
+        "MIG",
+        "RELP",
+        "RAC1P",
+        "PUMA",
+        "CIT",
+        "OCCP",
+        "JWTR",
+        "POWPUMA",
+    ],
+    "ACS_sample": [
+        "MAR",
+        "MIL",
+        "CIT",
+        "ANC",
+        "RAC1P",
+        "RELP",
+        "ESP",
+        "POBP",
+        "OCCP",
+        "MIG",
+        "ESR",
+        "COW",
+    ],
+}
 
-BOOL_FEATURES = ["SEX", "DIS", "NATIVITY", "DEAR", "DEYE", "DREM", "FER", "GCL"]
+BOOL_FEATURES = {
+    "ACSIncome": ["SEX"],
+    "ACSEmployment": ["SEX", "DIS", "NATIVTY", "DEAR", "DEYE", "DREM"],
+    "ACSMobility": [
+        "SEX",
+        "DIS",
+        "NATIVITY",
+        "DEAR",
+        "DEYE",
+        "DREM",
+        "GCL",
+    ],
+    "ACSPublicCoverage": ["SEX", "DIS", "NATIVITY", "DEAR", "DEYE", "DREM", "FER"],
+    "ACSTravelTime": ["SEX", "DIS"],
+    "ACS_sample": ["SEX", "DEAR", "DREM", "DIS", "NATIVITY", "FER", "DEYE"],
+}
 
 SPLIT_TYPES = ["predefined", "random"]  # Add more if wanted.
 SPLIT_VALUES = ["train", "validation", "test"]
@@ -126,13 +154,17 @@ class FolkTables(Dataset):
         self.target_feature = (
             TARGET_FEATURES[self.variant] if target_feature is None else target_feature
         )
+
         if sensitive_feature == "AGEP":
             self.sensitive_feature = "AGEP_bin"
-        elif (sensitive_feature is not None) and (
-            sensitive_feature not in CATEGORICAL_FEATURES
+        elif (
+            (sensitive_feature is not None)
+            and (sensitive_feature not in CATEGORICAL_FEATURES[variant])
+            and (sensitive_feature not in BOOL_FEATURES[variant])
         ):
             raise ValueError(
-                f"Invalid sensitive feature value. Try one of: {CATEGORICAL_FEATURES}"
+                f"Invalid sensitive feature value. "
+                f"Try one of: {CATEGORICAL_FEATURES[variant] + BOOL_FEATURES[variant]}"
             )
         else:
             self.sensitive_feature = (
@@ -196,10 +228,10 @@ class FolkTables(Dataset):
             else:
                 self.data = pd.read_csv(path)
 
-        for col in CATEGORICAL_FEATURES:
+        for col in CATEGORICAL_FEATURES[self.variant]:
             self.data[col] = self.data[col].astype("category")
 
-        for col in BOOL_FEATURES:
+        for col in BOOL_FEATURES[self.variant]:
             self.data[col] = self.data[col].replace(2, 0).astype(bool)
 
         if self.sensitive_feature == "AGEP_bin":
