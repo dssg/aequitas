@@ -1,20 +1,83 @@
+# *Aequitas*: Bias Auditing & Fair ML Toolkit
+
+[![PyPI download month](https://img.shields.io/pypi/dm/aequitas.svg)](https://pypi.python.org/pypi/aequitas/)
+[![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+
+[comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
+
+
 <img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/aequitas_header.png">
 
 
-# The Bias and Fairness Audit Toolkit
 
-Aequitas is an open-source bias audit toolkit for data scientists, machine learning researchers, and policymakers to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive tools.
+
+`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting Fair ML methods.
+
 
 
 <img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/use_aequitas.png">
 
 
-[Visit the Aequitas project website](http://dsapp.uchicago.edu/aequitas/) 
+## 📥 Installation
 
-[Try out the Aequitas web application](http://aequitas.dssg.io/) 
+```cmd
+pip install aequitas
+```
+
+or
+
+```cmd
+pip install git+https://github.com/dssg/aequitas.git
+```
+
+### 🔍 Quickstart on Bias Auditing
+
+To perform a bias audit, you need a pandas `DataFrame` with the following format:
+
+|     | label | score | sens_attr_1 | sens_attr_2 | ... | sens_attr_N |
+|-----|-------|-------|-------------|-------------|-----|-------------|
+| 0   | 0     | 0     | A           | F           |     | Y           |
+| 1   | 0     | 1     | C           | F           |     | N           |
+| 2   | 1     | 1     | B           | T           |     | N           |
+| ... |       |       |             |             |     |             |
+| N   | 1     | 0     | E           | T           |     | Y           |
 
 
-[Try out our interact colab notebook using the COMPAS dataset.](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
+Only one sensitive attribute is required, and these must be in `Categorical` format.
+
+```python
+from aequitas import Audit
+
+audit = Audit(df)
+```
+
+To obtain a summary of the bias audit, run:
+```python
+# Select the fairness metric of interest for your dataset
+audit.summary_plot(["pprev", "fpr", "tpr"])
+```
+### 🧪 Quickstart on Fair ML Experimenting
+
+To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.  
+
+```python
+from aequitas.flow import DefaultExperiment
+
+experiment = DefaultExperiment(data, label="label", s="sensitive_attribute")
+experiment.run()
+```
+Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
+
+[comment]: <> (Make default experiment this easy to run)
+
+## 📜 Features of the Toolkit
+- **blah**
+- **Fair ML methods**: Interface and implementation of several Fair ML methods, including pre-, in-, and post-processing methods.
+- **Datasets**: Two "families" of datasets included, named [BankAccountFraud](https://arxiv.org/pdf/2211.13358) and [FolkTables](https://arxiv.org/abs/2108.04884).
+- **Extensibility**: Adapted to receive user-implemented methods, with intuitive interfaces and method signatures.
+- **Modularity**: Fair ML Methods and default datasets can be used individually or integrated in an `Experiment`.
+- **Hyperparameter optimization**: Out of the box integration and abstraction of [Optuna](https://github.com/optuna/optuna)'s hyperparameter optimization capabilities for experimentation.
 
 
 ## Documentation
@@ -24,35 +87,6 @@ You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 For usage examples of the python library, see our [demo notebook](https://colab.research.google.com/github/dssg/fairness_tutorial/blob/master/notebooks/single_model_audit.ipynb) from the KDD 2020 hands-on tutorial. Alternatively, have a look to
 [COMPAS notebook](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb) using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
 
-
-## Installation
-
-
-Aequitas is compatible with: **Python 3.6+**
-
-Install Aequitas using pip:
-
-    pip install aequitas
-
-
-**If pip fails**, try installing master from source:
-
-    git clone https://github.com/dssg/aequitas.git
-    cd aequitas
-    python setup.py install
-(Note: be mindful of the python version you use to run setup.py)
-
-You may then import the ``aequitas`` module from Python:
-
-    import aequitas
-
-...or execute the auditor from the command line:
-
-    aequitas-report
-
-...or launch the Web front-end from the command line (localhost):
-
-    python -m serve
 
 
 ### Containerization
@@ -338,6 +372,15 @@ If you plan to bin or discretize continuous features manually, note that ``get_c
 
 
 [Back to 30 Seconds to Aequitas](#30-seconds-to-aequitas)
+
+
+
+[Visit the Aequitas project website](http://dsapp.uchicago.edu/aequitas/) 
+
+[Try out the Aequitas web application](http://aequitas.dssg.io/) 
+
+
+[Try out our interact colab notebook using the COMPAS dataset.](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
 
 
 
