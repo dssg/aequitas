@@ -72,7 +72,7 @@ Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset sp
 [comment]: <> (Make default experiment this easy to run)
 
 ## 📜 Features of the Toolkit
-- **blah**
+- **Add more!**
 - **Fair ML methods**: Interface and implementation of several Fair ML methods, including pre-, in-, and post-processing methods.
 - **Datasets**: Two "families" of datasets included, named [BankAccountFraud](https://arxiv.org/pdf/2211.13358) and [FolkTables](https://arxiv.org/abs/2108.04884).
 - **Extensibility**: Adapted to receive user-implemented methods, with intuitive interfaces and method signatures.
