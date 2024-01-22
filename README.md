@@ -7,9 +7,9 @@
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
 
 
-<center>
-  <img src="docs/_images/aequitas_logo.svg" width="300">
-</center>
+<p align="center">
+  <img src="docs/_images/aequitas_logo.svg" width="500">
+</p>
 
 
 
