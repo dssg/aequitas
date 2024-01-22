@@ -13,6 +13,10 @@ class Unawareness(PreProcessing):
         self, top_k: Optional[int] = 1, correlation_threshold: Optional[float] = None
     ):
         """Removes features that are highly correlated with the sensitive attribute.
+        Note: For this method, the vector s (protected attribute) is assumed to be
+        categorical.
+
+
 
         Parameters
         ----------
@@ -26,7 +30,7 @@ class Unawareness(PreProcessing):
         """
         self.logger = create_logger("methods.preprocessing.Unawareness")
         self.logger.info("Instantiating an Unawareness preprocessing method.")
-        self.used_in_inference = False
+        self.used_in_inference = True
 
         if top_k is None and correlation_threshold is None:
             raise ValueError(
@@ -39,7 +43,7 @@ class Unawareness(PreProcessing):
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
     ):
-        """This is a measure of the correlation between a categorical column and 
+        """This is a measure of the correlation between a categorical column and
         a numeric column. It measures the variance of the mean of the numeric
         column across different categories of the categorical column. It can
         take values between 0 and 1. A value of 1 indicates that the variance in
@@ -105,7 +109,7 @@ class Unawareness(PreProcessing):
         return statistic
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Calculates the correlations between the features and the sensitive 
+        """Calculates the correlations between the features and the sensitive
         attribute.
 
         Parameters
