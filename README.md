@@ -7,7 +7,9 @@
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
 
 
-<img src="https://github.com/dssg/aequitas/blob/master/src/aequitas_webapp/static/images/aequitas_header.png">
+<center>
+  <img src="docs/_images/aequitas_logo.svg" width="300">
+</center>
 
 
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="46.048828mm"
+   height="17.317326mm"
+   viewBox="0 0 46.048828 17.317326"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#55cdfc;stop-opacity:0.49587622;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#f7a8b8;stop-opacity:0.5;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient4"
+       x1="55.702072"
+       y1="54.877785"
+       x2="101.6627"
+       y2="54.877785"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-55.533595,-46.100927)" />
+  </defs>
+  <g
+     id="layer1"
+     transform="translate(-0.12437852,-0.11819564)">
+    <rect
+       style="mix-blend-mode:normal;fill:#f7f7f7;fill-opacity:0;stroke:url(#linearGradient4);stroke-width:0.352778;stroke-dasharray:none"
+       id="rect3"
+       width="45.696049"
+       height="16.964548"
+       x="0.30076751"
+       y="0.29458463"
+       ry="5.3710089" />
+  </g>
+  <g
+     id="layer2"
+     transform="translate(-0.12437852,-0.11819564)">
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;fill:#004a77;stroke-width:0.265;stroke-dasharray:none"
+       x="10.953275"
+       y="8.7009563"
+       id="text1"><tspan
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05556px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';fill:#004d40;fill-opacity:1;stroke-width:0.265;stroke-dasharray:none"
+         x="10.953275"
+         y="8.7009563">Aequitas</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05556px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';fill:#004d40;fill-opacity:1;stroke-width:0.265;stroke-dasharray:none"
+         x="10.953275"
+         y="17.520407"
+         id="tspan2" /></text>
+  </g>
+  <g
+     id="layer3"
+     transform="translate(-0.12437852,-0.11819564)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';fill:#004d40;fill-opacity:1;stroke-width:0.264583"
+       x="4.5798545"
+       y="14.024839"
+       id="text3"><tspan
+         id="tspan3"
+         style="font-size:3.175px;fill:#00a69f;fill-opacity:1;stroke-width:0.264583"
+         x="4.5798545"
+         y="14.024839">Bias Auditing &amp; Fair ML Toolkit</tspan></text>
+  </g>
+</svg>
