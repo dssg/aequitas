@@ -55,6 +55,15 @@ class BankAccountFraud(Dataset):
         Defaults to 42.
     extension : str, optional
         Extension type of the dataset files. Defaults to "parquet".
+    target_feature : str, optional
+        Name of the target feature. If None, defaults to "fraud_bool".
+    sensitive_feature : str, optional
+        Name of the sensitive feature. If None, defaults to "customer_age_bin".
+    include_month : bool, optional
+        whether to include the month column in the features. Defaults to True.
+    age_cutoff : int, optional
+        Age cutoff for creating the binary age feature, if using age as the
+        sensitive attribute. Defaults to 50.
     """
 
     def __init__(

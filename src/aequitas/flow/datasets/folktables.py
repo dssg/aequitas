@@ -100,7 +100,7 @@ class FolkTables(Dataset):
         extension: str = "parquet",
         target_feature: Optional[str] = None,
         sensitive_feature: Optional[str] = None,
-        age_cutoff: Optional[int] = None,
+        age_cutoff: Optional[int] = 50,
     ):
         """Instantiate a FolkTables dataset.
 
@@ -119,6 +119,13 @@ class FolkTables(Dataset):
             Defaults to 42.
         extension : str, optional
             Extension type of the dataset files. Defaults to "parquet".
+        target_feature : str, optional
+            Name of the target feature. If None, defaults to "fraud_bool".
+        sensitive_feature : str, optional
+            Name of the sensitive feature. If None, defaults to "customer_age_bin".
+        age_cutoff : int, optional
+            Age cutoff for creating the binary age feature, if using age as the
+            sensitive attribute. Defaults to 50.
         """
         super().__init__()
 
