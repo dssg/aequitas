@@ -95,9 +95,7 @@ Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset sp
     .columns {
       display: flex;
       padding: 0px;
-
     }
-
     .column {
       flex: 1;
       padding: 10px;
