@@ -12,9 +12,7 @@
 </p>
 
 
-
-
-`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting Fair ML methods.
+`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods.
 
 
 
@@ -59,6 +57,14 @@ To obtain a summary of the bias audit, run:
 # Select the fairness metric of interest for your dataset
 audit.summary_plot(["pprev", "fpr", "tpr"])
 ```
+<img src="docs/_images/summary_chart.svg" width="900">
+
+We can also observe a single metric and sensitive attribute:
+```python
+audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
+```
+<img src="docs/_images/disparity_chart.svg" width="900">
+
 ### 🧪 Quickstart on Fair ML Experimenting
 
 To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.  
@@ -66,7 +72,7 @@ To perform an experiment, a dataset is required. It must have a label column, a 
 ```python
 from aequitas.flow import DefaultExperiment
 
-experiment = DefaultExperiment(data, label="label", s="sensitive_attribute")
+experiment = DefaultExperiment(dataset, label="label", s="sensitive_attribute")
 experiment.run()
 ```
 Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
