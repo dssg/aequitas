@@ -3,6 +3,7 @@ from typing import Optional, Literal
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
+from sklearn.ensemble import RandomForestClassifier
 
 from ...utils import create_logger
 from .preprocessing import PreProcessing
