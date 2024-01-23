@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Optional, Literal
 
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
+from sklearn.ensemble import RandomForestClassifier
 
 from ...utils import create_logger
 from .preprocessing import PreProcessing
@@ -10,13 +11,13 @@ from .preprocessing import PreProcessing
 
 class Unawareness(PreProcessing):
     def __init__(
-        self, top_k: Optional[int] = 1, correlation_threshold: Optional[float] = None
+        self, top_k: Optional[int] = 1, 
+        correlation_threshold: Optional[float] = None,
+        strategy: Literal["correlation", "mdi"] = "correlation"
     ):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
         categorical.
-
-
 
         Parameters
         ----------
@@ -27,6 +28,12 @@ class Unawareness(PreProcessing):
             Features with a correlation value higher than this thresold are
             removed. If None, the top_k parameter is used to determine how many
             features to remove. Defaults to None.
+        strategy : {"correlation", "mdi"}, optional
+            Strategy to use to calculate how much each feature is related to the
+            sensitive attribute. If "correlation", correlation between features 
+            is used. If "mdi", the mean decrease in impurity (MDI) is used. 
+            Defaults to "correlation".
+
         """
         self.logger = create_logger("methods.preprocessing.Unawareness")
         self.logger.info("Instantiating an Unawareness preprocessing method.")
@@ -39,6 +46,7 @@ class Unawareness(PreProcessing):
             )
         self.top_k = top_k
         self.correlation_threshold = correlation_threshold
+        self.strategy = strategy
 
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
@@ -109,8 +117,7 @@ class Unawareness(PreProcessing):
         return statistic
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Calculates the correlations between the features and the sensitive
-        attribute.
+        """Calculates how related each feature is to the sensitive attribute.
 
         Parameters
         ----------
@@ -121,19 +128,32 @@ class Unawareness(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
-        self.correlations = pd.Series(index=X.columns)
+        
+        if self.strategy == "correlation":
+            self.scores = pd.Series(index=X.columns)
+            for col in X.columns:
+                if X[col].dtype.name == "category":
+                    self.scores[col] = self._cramerv(
+                        s.astype("category").values, X[col].values
+                    )
+                else:
+                    self.scores[col] = self._correlation_ratio(
+                        s.astype("category").values, X[col].values
+                    )
 
-        for col in X.columns:
-            if X[col].dtype.name == "category":
-                self.correlations[col] = self._cramerv(
-                    s.astype("category").values, X[col].values
-                )
-            else:
-                self.correlations[col] = self._correlation_ratio(
-                    s.astype("category").values, X[col].values
-                )
+        elif self.strategy == "mdi":
+            features = pd.concat([X, y], axis=1)
+            features = pd.get_dummies(features)
+            model = RandomForestClassifier().fit(features, s)
+            self.scores = pd.Series(model.feature_importances_, index=features.columns)
 
-        self.correlations = self.correlations.sort_values(ascending=False)
+            for col in X.columns:
+                if col not in features.columns:
+                    dummies = [name for name in features.columns if name.find(col) != -1]
+                    scores[col] = max(scores[dummies])
+                    scores = self.scores.drop(dummies)
+
+        self.scores = self.scores.sort_values(ascending=False)
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
