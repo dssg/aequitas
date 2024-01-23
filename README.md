@@ -55,7 +55,7 @@ audit = Audit(df)
 To obtain a summary of the bias audit, run:
 ```python
 # Select the fairness metric of interest for your dataset
-audit.summary_plot(["pprev", "fpr", "tpr"])
+audit.summary_plot(["tpr", "fpr", "pprev"])
 ```
 <img src="docs/_images/summary_chart.svg" width="900">
 
