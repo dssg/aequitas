@@ -122,18 +122,17 @@ class Unawareness(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
+        super().fit(X, y, s)
+
+        self.logger.info("Calculating feature correlation with sensitive attribute.")
         
         if self.strategy == "correlation":
             self.scores = pd.Series(index=X.columns)
             for col in X.columns:
                 if X[col].dtype.name == "category":
-                    self.scores[col] = self._cramerv(
-                        s.astype("category").values, X[col].values
-                    )
+                    self.scores[col] = self._cramerv(s.values, X[col].values)
                 else:
-                    self.scores[col] = self._correlation_ratio(
-                        s.astype("category").values, X[col].values
-                    )
+                    self.scores[col] = self._correlation_ratio(s.values, X[col].values)
 
         elif self.strategy == "mdi":
             features = pd.concat([X, y], axis=1)
@@ -168,6 +167,8 @@ class Unawareness(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
+        super().transform(X, y, s)
+
         remove_features = list(self.scores.loc[
             self.scores >= self.correlation_threshold
         ].index)

@@ -69,6 +69,8 @@ class DataRepairer(PreProcessing):
         s : pd.Series, optional
             The sensitive attribute.
         """
+        super().fit(X, y, s)
+
         if self.columns is None:
             self.columns = X.columns.tolist()
         if s is None:
@@ -138,6 +140,8 @@ class DataRepairer(PreProcessing):
         pd.DataFrame, pd.Series, pd.Series
             Transformed features, labels, and sensitive attribute.
         """
+        super().transform(X, y, s)
+        
         if s is None:
             raise ValueError("s must be passed.")
 

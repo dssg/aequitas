@@ -11,7 +11,7 @@ class Identity(PreProcessing):
         pass
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None) -> None:
-        pass
+        super().fit(X, y, s)
 
     def transform(
         self,
@@ -19,4 +19,5 @@ class Identity(PreProcessing):
         y: pd.Series,
         s: Optional[pd.Series] = None,
     ) -> tuple[pd.DataFrame, pd.Series, Optional[pd.Series]]:
+        super().transform(X, y, s)
         return X, y, s

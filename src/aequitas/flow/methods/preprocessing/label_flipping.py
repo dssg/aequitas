@@ -141,6 +141,8 @@ class LabelFlipping(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
+        super().fit(X, y, s)
+
         self.logger.info("Fitting LabelFlipping.")
 
         X_transformed = X.copy()
@@ -291,6 +293,8 @@ class LabelFlipping(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
+        super().transform(X, y, s)
+        
         self.logger.info("Transforming data with LabelFlipping.")
 
         if s is None and self.fair_ordering:
