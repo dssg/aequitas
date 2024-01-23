@@ -88,28 +88,22 @@ Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset sp
 - **Hyperparameter optimization**: Out of the box integration and abstraction of [Optuna](https://github.com/optuna/optuna)'s hyperparameter optimization capabilities for experimentation.
 
 
+<!DOCTYPE html>
 <html>
 <head>
   <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-
     .columns {
       display: flex;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      overflow: hidden;
+      padding: 0px;
+
     }
 
     .column {
       flex: 1;
-      padding: 20px;
-      text-align: center;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      background: #f3f4f7;
     }
   </style>
 </head>
@@ -118,24 +112,21 @@ Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset sp
 <div class="columns">
   <div class="column">
 
-# Column 1
+#### Auditing predictions
 
-This is the content of the first column.
-
+Check how to do an in-depth bias audit with the [COMPAS example notebook]().
   </div>
   <div class="column">
 
-# Column 2
+#### Auditing and correcting a model
 
-This is the content of the second column.
-
+Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the [Model correction notebook]().
   </div>
   <div class="column">
 
-# Column 3
+#### Running a Fair ML Experiment
 
-This is the content of the third column.
-
+Experiment with your own dataset or methods and check the results of a [Fair ML experiment]().
   </div>
 </div>
 
