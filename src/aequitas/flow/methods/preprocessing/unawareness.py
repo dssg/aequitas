@@ -11,8 +11,8 @@ from .preprocessing import PreProcessing
 
 class Unawareness(PreProcessing):
     def __init__(
-        self, top_k: Optional[int] = 1, 
-        correlation_threshold: Optional[float] = None,
+        self, 
+        correlation_threshold: Optional[float] = 0.5,
         strategy: Literal["correlation", "mdi"] = "correlation"
     ):
         """Removes features that are highly correlated with the sensitive attribute.
@@ -39,12 +39,6 @@ class Unawareness(PreProcessing):
         self.logger.info("Instantiating an Unawareness preprocessing method.")
         self.used_in_inference = True
 
-        if top_k is None and correlation_threshold is None:
-            raise ValueError(
-                "Since top_k is set as None, the correlation_threshold must be "
-                "passed by the user."
-            )
-        self.top_k = top_k
         self.correlation_threshold = correlation_threshold
         self.strategy = strategy
 
@@ -174,14 +168,9 @@ class Unawareness(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
-        remove_features = self.correlations.copy()
-        if self.top_k is not None:
-            remove_features = remove_features[: self.top_k]
-        if self.correlation_threshold is not None:
-            remove_features = remove_features.loc[
-                remove_features >= self.correlation_threshold
-            ]
-        remove_features = list(remove_features.index)
+        remove_features = list(self.scores.loc[
+            self.scores >= self.correlation_threshold
+        ].index)
 
         self.logger.info(
             f"Removing most correlated features with sensitive attribute: "
