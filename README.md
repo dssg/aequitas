@@ -88,6 +88,60 @@ Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset sp
 - **Hyperparameter optimization**: Out of the box integration and abstraction of [Optuna](https://github.com/optuna/optuna)'s hyperparameter optimization capabilities for experimentation.
 
 
+<html>
+<head>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .columns {
+      display: flex;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .column {
+      flex: 1;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="columns">
+  <div class="column">
+
+# Column 1
+
+This is the content of the first column.
+
+  </div>
+  <div class="column">
+
+# Column 2
+
+This is the content of the second column.
+
+  </div>
+  <div class="column">
+
+# Column 3
+
+This is the content of the third column.
+
+  </div>
+</div>
+
+</body>
+</html>
+
 ## Documentation
 
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
