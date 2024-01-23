@@ -60,7 +60,7 @@ class LabelFlipping(PreProcessing):
         ordering_method : str, optional
             The method used to calculate the margin of the base estimator. If
             "ensemble_margin", calculates the ensemble margins based on the binary
-            predictions of the classifiers. If "residuals", oreders the missclafied
+            predictions of the classifiers. If "residuals", orders the misclassified
             instances based on the average residuals of the classifiers predictions. By
             default "ensemble_margin".
         unawareness_features : list, optional
@@ -295,7 +295,9 @@ class LabelFlipping(PreProcessing):
         Parameters
         ----------
         X : pd.DataFrame
-            Feature[s.loc[i]]ector.
+            Feature matrix.
+        y : pd.Series
+            Label vector.
         s : pd.Series, optional
             Protected attribute vector.
 
