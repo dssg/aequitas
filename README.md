@@ -143,40 +143,9 @@ We provide an example of how the `Audit` class operates to obtain the metrics:
 
 ## Further documentation
 
-# TODO: Update the documentation links and websites.
-
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
-For usage examples of the python library, see our [demo notebook](https://colab.research.google.com/github/dssg/fairness_tutorial/blob/master/notebooks/single_model_audit.ipynb) from the KDD 2020 hands-on tutorial. Alternatively, have a look to
-[COMPAS notebook](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb) using Aequitas on the ProPublica COMPAS Recidivism Risk Assessment dataset.
-
-
-
-
-
-[Back to 30 Seconds to Aequitas](#30-seconds-to-aequitas)
-
-
-
-[Visit the Aequitas project website](http://dsapp.uchicago.edu/aequitas/) 
-
-[Try out the Aequitas web application](http://aequitas.dssg.io/) 
-
-
-[Try out our interact colab notebook using the COMPAS dataset.](https://colab.research.google.com/github/dssg/aequitas/blob/update_compas_notebook/docs/source/examples/compas_demo.ipynb)
-
-
-
-### Development
-
-
-Provision your development environment via the shell script ``develop``:
-
-    ./develop
-
-Common development tasks, such as deploying the webapp, may then be handled via ``manage``:
-
-    manage --help
+For more examples of the python library and the concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
 
 ## Citing Aequitas
 
@@ -190,3 +159,5 @@ Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jess
      title={Aequitas: A Bias and Fairness Audit Toolkit},
      author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid}, journal={arXiv preprint arXiv:1811.05577}, year={2018}}
 ``` 
+
+[Back to top](#aequitas-bias-auditing--fair-ml-toolkit)
