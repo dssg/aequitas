@@ -37,10 +37,9 @@ class LabelFlipping(PreProcessing):
         max_flip_rate : float, optional
             Maximum fraction of the training data to flip, by default 0.1
         disparity_target : float, optional
-            The target disparity between the groups (difference between the
-            prevalence of a group and the group with the highest prevalence). By
-            default None, which means the method will attempt to equalize the
-            prevalence of the groups.
+            The target disparity between the groups (difference between the prevalence
+            of a group and the mean prevalence). By default None, which means the
+            method will attempt to equalize the prevalence of the groups.
         score_threshold : float, optional
             The threshold above which the labels are flipped. By default None,
             which means the method will flip the labels of the instances with
@@ -213,10 +212,10 @@ class LabelFlipping(PreProcessing):
 
     def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
         prevalences = y.groupby(s).mean()
-        max_prevalence = max(prevalences)
+        mean_prevalence = y.mean()
         group_prevalences = prevalences.to_dict()
         group_disparity = {
-            k: (max_prevalence - v) / max_prevalence
+            k: (v - mean_prevalence) / mean_prevalence
             for k, v in group_prevalences.items()
         }
 
@@ -264,8 +263,8 @@ class LabelFlipping(PreProcessing):
                 if abs(scores.loc[i]) < self.score_threshold:
                     break
 
-                if (disparity[s.loc[i]] > self.disparity_target and y.loc[i] == 0) or (
-                    disparity[s.loc[i]] == 0 and y.loc[i] == 1
+                if (disparity[s.loc[i]] > self.disparity_target and y.loc[i] == 1) or (
+                    disparity[s.loc[i]] < -self.disparity_target and y.loc[i] == 0
                 ):
                     y_flipped.loc[i] = 1 - y.loc[i]
                     disparity = self._calculate_prevalence_disparity(y_flipped, s)
