@@ -39,8 +39,8 @@ To perform a bias audit, you need a pandas `DataFrame` with the following format
 | ... |       |       |             |             |     |             |
 | N   | 1     | 0     | E           | T           |     | Y           |
 
-
-Only one sensitive attribute is required, and these must be in `Categorical` format.
+where `label` is the target variable for your prediction task and `score` is the model output.
+Only one sensitive attribute is required; all must be in `Categorical` format.
 
 ```python
 from aequitas import Audit
@@ -107,7 +107,7 @@ threshold.fit(dataset.validation.X, scores_val, dataset.validation.y, dataset.va
 corrected_scores = threshold.transform(dataset.test.X, scores_test, dataset.test.s)
 ```
 
-With this sequence, we would sample a dataset, train a FairGBM model, and then adjust the scores to have equal FPR per group (Predictive equality).
+With this sequence, we would sample a dataset, train a FairGBM model, and then adjust the scores to have equal FPR per group (achieving Predictive Equality).
 
 ## 📜 Features of the Toolkit
 - **Metrics**: Audits based on confusion matrix-based metrics with flexibility to select the more important ones depending on use-case.
@@ -145,7 +145,7 @@ We provide an example of how the `Audit` class operates to obtain the metrics:
 
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
-For more examples of the python library and the concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
+For more examples of the python library and a deep dive on concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
 
 ## Citing Aequitas
 
