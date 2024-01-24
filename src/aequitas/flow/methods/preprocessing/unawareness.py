@@ -11,9 +11,10 @@ from .preprocessing import PreProcessing
 
 class Unawareness(PreProcessing):
     def __init__(
-        self, 
+        self,
         correlation_threshold: Optional[float] = 0.5,
-        strategy: Literal["correlation", "mdi"] = "correlation"
+        strategy: Literal["correlation", "mdi"] = "correlation",
+        seed: int = 0,
     ):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
@@ -30,8 +31,8 @@ class Unawareness(PreProcessing):
             features to remove. Defaults to None.
         strategy : {"correlation", "mdi"}, optional
             Strategy to use to calculate how much each feature is related to the
-            sensitive attribute. If "correlation", correlation between features 
-            is used. If "mdi", the mean decrease in impurity (MDI) is used. 
+            sensitive attribute. If "correlation", correlation between features
+            is used. If "mdi", the mean decrease in impurity (MDI) is used.
             Defaults to "correlation".
 
         """
@@ -41,6 +42,7 @@ class Unawareness(PreProcessing):
 
         self.correlation_threshold = correlation_threshold
         self.strategy = strategy
+        self.seed = seed
 
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
@@ -125,7 +127,7 @@ class Unawareness(PreProcessing):
         super().fit(X, y, s)
 
         self.logger.info("Calculating feature correlation with sensitive attribute.")
-        
+
         if self.strategy == "correlation":
             self.scores = pd.Series(index=X.columns)
             for col in X.columns:
@@ -137,14 +139,16 @@ class Unawareness(PreProcessing):
         elif self.strategy == "mdi":
             features = pd.concat([X, y], axis=1)
             features = pd.get_dummies(features)
-            model = RandomForestClassifier().fit(features, s)
+            model = RandomForestClassifier(random_state=self.seed).fit(features, s)
             self.scores = pd.Series(model.feature_importances_, index=features.columns)
 
             for col in X.columns:
                 if col not in features.columns:
-                    dummies = [name for name in features.columns if name.find(col) != -1]
-                    scores[col] = max(scores[dummies])
-                    scores = self.scores.drop(dummies)
+                    dummies = [
+                        name for name in features.columns if name.find(col) != -1
+                    ]
+                    self.scores[col] = max(self.scores[dummies])
+                    self.scores = self.scores.drop(dummies)
 
         self.scores = self.scores.sort_values(ascending=False)
 
@@ -169,9 +173,9 @@ class Unawareness(PreProcessing):
         """
         super().transform(X, y, s)
 
-        remove_features = list(self.scores.loc[
-            self.scores >= self.correlation_threshold
-        ].index)
+        remove_features = list(
+            self.scores.loc[self.scores >= self.correlation_threshold].index
+        )
 
         self.logger.info(
             f"Removing most correlated features with sensitive attribute: "
