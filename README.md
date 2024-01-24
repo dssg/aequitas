@@ -110,7 +110,7 @@ corrected_scores = threshold.transform(dataset.test.X, scores_test, dataset.test
 With this sequence, we would sample a dataset, train a FairGBM model, and then adjust the scores to have equal FPR per group (Predictive equality).
 
 ## 📜 Features of the Toolkit
-- **Metrics**: Audits based on confusion matrix-based metrics with flexibility to select the more important metrics depending on use-case.
+- **Metrics**: Audits based on confusion matrix-based metrics with flexibility to select the more important ones depending on use-case.
 - **Plotting options**: The major outcomes of bias auditing and experimenting offer also plots adequate to different user objectives. 
 - **Fair ML methods**: Interface and implementation of several Fair ML methods, including pre-, in-, and post-processing methods.
 - **Datasets**: Two "families" of datasets included, named [BankAccountFraud](https://arxiv.org/pdf/2211.13358) and [FolkTables](https://arxiv.org/abs/2108.04884).
@@ -119,23 +119,21 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 - **Modularity**: Fair ML Methods and default datasets can be used individually or integrated in an `Experiment`.
 - **Hyperparameter optimization**: Out of the box integration and abstraction of [Optuna](https://github.com/optuna/optuna)'s hyperparameter optimization capabilities for experimentation.
 
-###Fairness Metrics
-`aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated. 
-We provide an example of how the `Audit` class operates to obtain the metrics: 
+### Fairness Metrics
 
-| Operation              | Result |
-|---------------------|------------|
-| Calculate $\text{CM}$ for every group | Dataframe with $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$.           |
-| Equal Opportunity   |            |
-| Predictive Equality |            |
-|        |            |
-|        |            |
+`aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated.
+We provide an example of how the `Audit` class operates to obtain the metrics:
 
-Each bias disparity <img src="http://latex.codecogs.com/gif.latex?j"> for a given group <img src="http://latex.codecogs.com/gif.latex?a_i"> is calculated as follows:
-<img src="http://latex.codecogs.com/gif.latex?disparity_%7Bj%2C%5C%3Ba_%7Bi%7D%7D%20%3D%20%5Cfrac%7Bmetric_%7Bj%2C%5C%3Ba_%7Bi%7D%7D%7D%7Bmetric_%7Bj%2C%5C%3Ba_%7Breference%5C%3Bgroup%7D%7D%7D">
+| Operation                             | Result                                                                            |
+|---------------------------------------|-----------------------------------------------------------------------------------|
+| Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$.                      |
+| Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{ref}$. |
+| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\frac{\text{CM}_a}{\text{CM}_{ref}}, \frac{\text{CM}_b}{\text{CM}_{ref}}, ..., \frac{\text{CM}_N}{\text{CM}_{ref}}$ |
+| Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                       |
 
 
-### Included Methods
+
+### Use Cases
 
 
 <div style="display: flex; overflow: hidden;">
