@@ -133,36 +133,17 @@ We provide an example of how the `Audit` class operates to obtain the metrics:
 
 
 
-### Use Cases
+### Use Cases and examples
 
-
-<div style="display: flex; overflow: hidden;">
-  <div style="flex: 1; padding: 10px; margin: 10px; border-radius: 5px; background: #f3f4f7;">
-
-
-#### Auditing predictions
-
-Check how to do an in-depth bias audit with the [COMPAS example notebook]().
-  
-  </div>
-  <div style="flex: 1; padding: 10px; margin: 10px; border-radius: 5px; background: #f3f4f7;">
-
-#### Auditing and correcting a model
-
-Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the [Model correction notebook]().
-  </div>
-  <div style="flex: 1; padding: 10px; margin: 10px; border-radius: 5px; background: #f3f4f7;">
-
-#### Running a Fair ML Experiment
-
-Experiment with your own dataset or methods and check the results of a [Fair ML experiment]().
-  </div>
-</div>
-
-</body>
-</html>
+| Use Case | Description |
+|-|-|
+| [Auditing Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Auditing and correcting a trained model](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
+| [Running a Fair ML Experiment](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 
 ## Further documentation
+
+# TODO: Update the documentation links and websites.
 
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
