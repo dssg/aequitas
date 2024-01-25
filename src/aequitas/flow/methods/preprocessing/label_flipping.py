@@ -5,6 +5,7 @@ from ...utils.imports import import_object
 
 import inspect
 import pandas as pd
+import math
 from typing import Optional, Tuple, Literal, Union, Callable
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
@@ -16,7 +17,7 @@ class LabelFlipping(PreProcessing):
     def __init__(
         self,
         max_flip_rate: float = 0.1,
-        disparity_target: Optional[float] = None,
+        disparity_target: Optional[float] = 0.05,
         score_threshold: Optional[float] = None,
         bagging_max_samples: float = 0.5,
         bagging_base_estimator: Union[
@@ -221,6 +222,22 @@ class LabelFlipping(PreProcessing):
 
         return group_disparity
 
+    def _calculate_group_flips(self, y: pd.Series, s: pd.Series):
+        prevalence = y.mean()
+        group_prevalences = y.groupby(s).mean()
+
+        min_prevalence = prevalence - self.disparity_target * prevalence
+        max_prevalence = prevalence + self.disparity_target * prevalence
+
+        group_flips = {
+            group: math.ceil(min_prevalence * len(y[s == group])) - y[s == group].sum()
+            if group_prevalences[group] < min_prevalence
+            else math.floor(max_prevalence * len(y[s == group])) - y[s == group].sum()
+            for group in group_prevalences.index
+        }
+
+        return group_flips
+
     def _label_flipping(self, y: pd.Series, s: Optional[pd.Series], scores: pd.Series):
         """Flips the labels of the desired fraction of the training data.
 
@@ -251,7 +268,7 @@ class LabelFlipping(PreProcessing):
         n_flip = int(self.max_flip_rate * len(y))
 
         if self.fair_ordering:
-            disparity = self._calculate_prevalence_disparity(y_flipped, s)
+            group_flips = self._calculate_group_flips(y_flipped, s)
             flip_index = (
                 y_flipped.index
                 if self.ordering_method == "residuals"
@@ -263,12 +280,15 @@ class LabelFlipping(PreProcessing):
                 if abs(scores.loc[i]) < self.score_threshold:
                     break
 
-                if (disparity[s.loc[i]] > self.disparity_target and y.loc[i] == 1) or (
-                    disparity[s.loc[i]] < -self.disparity_target and y.loc[i] == 0
+                if (group_flips[s.loc[i]] > 0 and y.loc[i] == 0) or (
+                    group_flips[s.loc[i]] < 0 and y.loc[i] == 1
                 ):
                     y_flipped.loc[i] = 1 - y.loc[i]
-                    disparity = self._calculate_prevalence_disparity(y_flipped, s)
                     flip_count += 1
+                    if group_flips[s.loc[i]] > 0:
+                        group_flips[s.loc[i]] -= 1
+                    else:
+                        group_flips[s.loc[i]] += 1
 
                 if flip_count == n_flip:
                     break
