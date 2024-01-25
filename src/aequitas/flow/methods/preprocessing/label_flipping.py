@@ -211,17 +211,6 @@ class LabelFlipping(PreProcessing):
 
         return scores
 
-    def _calculate_prevalence_disparity(self, y: pd.Series, s: pd.Series):
-        prevalences = y.groupby(s).mean()
-        mean_prevalence = y.mean()
-        group_prevalences = prevalences.to_dict()
-        group_disparity = {
-            k: (v - mean_prevalence) / mean_prevalence
-            for k, v in group_prevalences.items()
-        }
-
-        return group_disparity
-
     def _calculate_group_flips(self, y: pd.Series, s: pd.Series):
         prevalence = y.mean()
         group_prevalences = y.groupby(s).mean()
