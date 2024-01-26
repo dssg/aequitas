@@ -1,22 +1,26 @@
-import argparse
-import logging
-from sys import exit
+try:
+    import argparse
+    import logging
+    from sys import exit
 
-import pandas as pd
+    import pandas as pd
 
-from aequitas.bias import Bias
-from aequitas.fairness import Fairness
-from aequitas.group import Group
-from aequitas.plotting import Plot
-from aequitas.preprocessing import preprocess_input_df
-from .utils.configs_loader import Configs
-from .utils.io import get_csv_data
-from .utils.io import get_db_data
-from .utils.io import get_engine
-from .utils.io import push_tocsv
-from .utils.io import push_todb
-from .utils.io import push_topdf
-from .utils.report import audit_report_markdown
+    from aequitas.bias import Bias
+    from aequitas.fairness import Fairness
+    from aequitas.group import Group
+    from aequitas.plotting import Plot
+    from aequitas.preprocessing import preprocess_input_df
+    from .utils.configs_loader import Configs
+    from .utils.io import get_csv_data
+    from .utils.io import get_db_data
+    from .utils.io import get_engine
+    from .utils.io import push_tocsv
+    from .utils.io import push_todb
+    from .utils.io import push_topdf
+    from .utils.report import audit_report_markdown
+
+except ImportError:
+    raise ImportError('Missing dependencies. Please run `pip install "aequitas[cli]"`')
 
 __author__ = "Rayid Ghani, Pedro Saleiro <saleiro@uchicago.edu>, Loren Hinkson"
 __copyright__ = "Copyright \xa9 2018. The University of Chicago. All Rights Reserved."
