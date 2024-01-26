@@ -34,7 +34,7 @@ DEFAULT_SPLIT = {
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
 
-DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/release-fixes/datasets/BankAccountFraud/"
+DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
 
 
 class BankAccountFraud(Dataset):
