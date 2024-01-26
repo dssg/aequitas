@@ -14,6 +14,11 @@
 
 `aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
 
+<p float="left" align="center">
+  <img src="docs/_images/Final A).svg" height="300" />
+  <img src="docs/_images/Final B).svg" height="300" />
+  <img src="docs/_images/Final C).svg" height="300" />
+</p>
 
 ## 📥 Installation
 
@@ -130,7 +135,7 @@ We support a range of methods designed to address bias and discrimination in dif
 |               |Prevalence Sampling     |Generates training sample with balanced prevalence for the groups in dataset.|
 |In-processing  |FairGBM                 |Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints.|
 |               |Fairlearn Classifier    |Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.|
-|Post-processing|Group Threshold         |Adjustes the prediction scores based on a threshold for multiple groups in the dataset.|
+|Post-processing|Group Threshold         |Adjusts the prediction scores based on a threshold for multiple groups in the dataset.|
 |               |Balanced Group Threshold|
 
 ### Fairness Metrics
@@ -142,7 +147,7 @@ We provide an example of how the `Audit` class operates to obtain the metrics:
 |---------------------------------------|---------------------------------------------------------------------------------------|
 | Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$. |
 | Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{r}$.       |
-| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\dfrac{\text{CM}_a}{\text{CM}_r} , \dfrac{\text{CM}_b}{\text{CM}_r}, ..., \dfrac{\text{CM}_N}{\text{CM}_r}$ |
+| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\dfrac{\text{CM}_a}{\text{CM}_r} , \dfrac{\text{CM}_b}{\text{CM}_r}, ..., \dfrac{\text{CM}_N}{\text{CM}_r}$. |
 | Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                           |
 
 
