@@ -119,6 +119,20 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 - **Modularity**: Fair ML Methods and default datasets can be used individually or integrated in an `Experiment`.
 - **Hyperparameter optimization**: Out of the box integration and abstraction of [Optuna](https://github.com/optuna/optuna)'s hyperparameter optimization capabilities for experimentation.
 
+### Fair ML Methods
+
+We support a range of methods designed to address bias and discrimination in different stages of the ML pipeline.
+
+|Type           |Method                  |Description |
+|---------------|------------------------|------------|
+|Pre-processing |Data Repairer           |Transforms the data distribution so that a given feature distribution is more or less independent of the sensitive attribute *s*.|
+|               |Label Flipping          |Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method.|
+|               |Prevalence Sampling     |Generates training sample with balanced prevalence for the groups in dataset.|
+|In-processing  |FairGBM                 |Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints.|
+|               |Fairlearn Classifier    |Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.|
+|Post-processing|Group Threshold         |Adjustes the prediction scores based on a threshold for multiple groups in the dataset.|
+|               |Balanced Group Threshold|
+
 ### Fairness Metrics
 
 `aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated.
