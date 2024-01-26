@@ -124,12 +124,12 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 `aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated.
 We provide an example of how the `Audit` class operates to obtain the metrics:
 
-| Operation                             | Result                                                                            |
-|---------------------------------------|-----------------------------------------------------------------------------------|
-| Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$.                      |
-| Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{ref}$. |
-| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\frac{\text{CM}_a}{\text{CM}_{ref}}, \frac{\text{CM}_b}{\text{CM}_{ref}}, ..., \frac{\text{CM}_N}{\text{CM}_{ref}}$ |
-| Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                       |
+| Operation                             | Result                                                                                |
+|---------------------------------------|---------------------------------------------------------------------------------------|
+| Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$. |
+| Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{r}$.       |
+| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\dfrac{\text{CM}_a}{\text{CM}_r} , \dfrac{\text{CM}_b}{\text{CM}_r}, ..., \dfrac{\text{CM}_N}{\text{CM}_r}$ |
+| Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                           |
 
 
 
