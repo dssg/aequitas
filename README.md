@@ -148,23 +148,35 @@ We support a range of methods designed to address bias and discrimination in dif
   <tr>
     <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
     <td> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
+    <td>Removes features that are highly correlated with the sensitive attribute.</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
+    <td>Flips selected labels to reduce disparity between groups.</td>
+  <tr>
+    <td rowspan="2"> In-processing </td>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
+    <td> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
+    <td>Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.<td>
+  </tr>
+  <tr>
+    <td rowspan="2">Post-processing</td>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
+    <td>Adjusts the prediction scores based on a threshold for multiple groups in the dataset.</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
+    <td>Adjusts the prediction scores to have equal FPR per group.</td>
+    <td></td>
+  </tr>
 </table>
 
-
-|Type           |Method                  |Description |
-|---------------|------------------------|------------|
-|Pre-processing |                        |            |
-|               |[Data Repairer](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py)           |Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute *s*.|
-|               |[Label Flipping](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py)     |Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method.|
-|               |[Prevalence Sampling](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py)    |Generates a training sample with balanced prevalence for the groups in dataset.|
-|               |[Unawareness](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py)             |Removes features that are highly correlated with the sensitive attribute.|
-|               |[Massaging](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py)               |Flips selected labels to reduce disparity between groups.|
-|In-processing  |                        |            |
-|               |[FairGBM](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py)                 |Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints.|
-|               |[Fairlearn Classifier](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py)    |Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.|
-|Post-processing|                        |            |
-|               |[Group Threshold](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py)         |Adjusts the prediction scores based on a threshold for multiple groups in the dataset.|
-|               |[Balanced Group Threshold](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py)|
 
 ### Fairness Metrics
 
