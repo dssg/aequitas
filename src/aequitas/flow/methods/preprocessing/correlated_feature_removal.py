@@ -1,58 +1,31 @@
-from typing import Optional, Literal
+from typing import Optional
 
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score
 
 from ...utils import create_logger
 from .preprocessing import PreProcessing
 
 
-class Unawareness(PreProcessing):
-    def __init__(
-        self,
-        strategy: Literal["correlation", "featureselection"] = "correlation",
-        correlation_threshold: Optional[float] = 0.5,
-        auc_threshold: Optional[int] = 0.5,
-        feature_importance_threshold: Optional[float] = 0.1,
-        n_estimators: Optional[int] = 10,
-        seed: int = 0,
-    ):
+class CorrelatedFeatureRemoval(PreProcessing):
+    def __init__(self, correlation_threshold: Optional[float] = 0.5):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
         categorical.
 
         Parameters
         ----------
-        top_k : int, optional
-            Number of features to remove. If None, the correlation_threshold
-            must be passed by the user. Defaults to 1.
         correlation_threshold : float, optional
             Features with a correlation value higher than this thresold are
             removed. If None, the top_k parameter is used to determine how many
             features to remove. Defaults to None.
-        strategy : {"correlation", "featureselection"}, optional
-            Strategy to use to calculate how much each feature is related to the
-            sensitive attribute. If "correlation", correlation between features
-            is used. "featureselection" is not implemented yet. Defaults to
-            "correlation".
-
         """
         self.logger = create_logger("methods.preprocessing.Unawareness")
         self.logger.info("Instantiating an Unawareness preprocessing method.")
         self.used_in_inference = True
 
-        self.strategy = strategy
         self.correlation_threshold = correlation_threshold
-        if strategy == "featureselection":
-            raise NotImplementedError(
-                "The feature selection strategy is not implemented yet."
-            )
-        self.strategy = strategy
-        self.seed = seed
 
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
@@ -122,66 +95,6 @@ class Unawareness(PreProcessing):
         statistic = np.sqrt(phi2_corrected / min(r_corrected - 1, k_corrected - 1))
         return statistic
 
-    def _get_correlated_features(
-        self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]
-    ) -> list[str]:
-        scores = pd.Series(index=X.columns)
-        for col in X.columns:
-            if X[col].dtype.name == "category":
-                scores[col] = self._cramerv(s.values, X[col].values)
-            else:
-                scores[col] = self._correlation_ratio(s.values, X[col].values)
-        scores = scores.sort_values(ascending=False)
-        return list(scores.loc[scores >= self.correlation_threshold].index)
-
-    def _backward_feature_elimination(
-        self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]
-    ) -> list[str]:
-        rf = RandomForestClassifier(
-            n_estimators=self.n_estimators, random_state=self.seed
-        )
-
-        features = pd.concat([X, y], axis=1)
-        features = pd.get_dummies(features)
-        target = s.copy()
-
-        features_train, features_val, target_train, target_val = train_test_split(
-            features, target
-        )
-        removed_features = []
-
-        while features_train.shape[1] > 1:
-            rf.fit(features_train, target_train)
-            predictions = rf.predict_proba(features_val)[:, 1]
-            auc = roc_auc_score(target_val, predictions)
-
-            if auc > self.auc_threshold:
-                scores = pd.Series(
-                    rf.feature_importances_, index=features_train.columns
-                )
-                feature = scores.sort_values(ascending=False).index[0]
-                if scores[feature] < self.feature_importance_threshold:
-                    break
-
-                i = feature.rfind("_")
-                if feature[:i] in X.columns:
-                    eliminate = [
-                        col
-                        for col in features_train.columns
-                        if col.startswith(feature[:i])
-                    ]
-                    removed_features.append(feature[:i])
-                else:
-                    eliminate = [feature]
-                    removed_features.append(feature)
-
-                features_train = features_train.drop(columns=eliminate)
-                features_val = features_val.drop(columns=eliminate)
-            else:
-                break
-
-        return removed_features
-
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
         """Calculates how related each feature is to the sensitive attribute.
 
@@ -196,12 +109,22 @@ class Unawareness(PreProcessing):
         """
         super().fit(X, y, s)
 
-        self.logger.info("Identifying features to remove.")
+        self.logger.info(
+            "Identifying features correlated with the sensitive attribute."
+        )
 
-        if self.strategy == "correlation":
-            self.remove_features = self._get_correlated_features(X, y, s)
+        scores = pd.Series(index=X.columns)
 
-            self.scores = self.scores.sort_values(ascending=False)
+        for col in X.columns:
+            if X[col].dtype.name == "category":
+                scores[col] = self._cramerv(s.values, X[col].values)
+            else:
+                scores[col] = self._correlation_ratio(s.values, X[col].values)
+
+        scores = scores.sort_values(ascending=False)
+        self.remove_features = list(
+            scores.loc[scores >= self.correlation_threshold].index
+        )
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
@@ -228,6 +151,7 @@ class Unawareness(PreProcessing):
             f"Removing most correlated features with sensitive attribute: "
             f"{self.remove_features}"
         )
+
         X_transformed = X.drop(columns=self.remove_features)
 
         return X_transformed, y, s
