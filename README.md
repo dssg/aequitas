@@ -78,6 +78,8 @@ experiment.run()
 ```
 Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
 
+<img src="docs/_images/pareto_example.png>" width="600">
+
 [comment]: <> (Make default experiment this easy to run)
 
 ### 🧠 Quickstart on Method Training
