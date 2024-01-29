@@ -3,7 +3,6 @@ from typing import Optional, Literal
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
-from sklearn.ensemble import RandomForestClassifier
 
 from ...utils import create_logger
 from .preprocessing import PreProcessing
@@ -13,7 +12,7 @@ class Unawareness(PreProcessing):
     def __init__(
         self,
         correlation_threshold: Optional[float] = 0.5,
-        strategy: Literal["correlation", "mdi"] = "correlation",
+        strategy: Literal["correlation", "featureselection"] = "correlation",
         seed: int = 0,
     ):
         """Removes features that are highly correlated with the sensitive attribute.
@@ -29,11 +28,11 @@ class Unawareness(PreProcessing):
             Features with a correlation value higher than this thresold are
             removed. If None, the top_k parameter is used to determine how many
             features to remove. Defaults to None.
-        strategy : {"correlation", "mdi"}, optional
+        strategy : {"correlation", "featureselection"}, optional
             Strategy to use to calculate how much each feature is related to the
             sensitive attribute. If "correlation", correlation between features
-            is used. If "mdi", the mean decrease in impurity (MDI) is used.
-            Defaults to "correlation".
+            is used. "featureselection" is not implemented yet. Defaults to
+            "correlation".
 
         """
         self.logger = create_logger("methods.preprocessing.Unawareness")
@@ -136,19 +135,8 @@ class Unawareness(PreProcessing):
                 else:
                     self.scores[col] = self._correlation_ratio(s.values, X[col].values)
 
-        elif self.strategy == "mdi":
-            features = pd.concat([X, y], axis=1)
-            features = pd.get_dummies(features)
-            model = RandomForestClassifier(random_state=self.seed).fit(features, s)
-            self.scores = pd.Series(model.feature_importances_, index=features.columns)
-
-            for col in X.columns:
-                if col not in features.columns:
-                    dummies = [
-                        name for name in features.columns if name.find(col) != -1
-                    ]
-                    self.scores[col] = max(self.scores[dummies])
-                    self.scores = self.scores.drop(dummies)
+        elif self.strategy == "featureselection":
+            raise NotImplementedError("Feature selection is not implemented yet.")
 
         self.scores = self.scores.sort_values(ascending=False)
 
