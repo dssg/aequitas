@@ -17,7 +17,7 @@
 <p float="left" align="center">
   <img src="docs/_images/Final A).svg" height="300" />
   <img src="docs/_images/Final B).svg" height="300" />
-  <img src="docs/_images/Final C).svg" height="300" />
+  <img src="docs/_images/Final C).svg" height="300" />on
 </p>
 
 ## 📥 Installation
@@ -155,7 +155,7 @@ We support a range of methods designed to address bias and discrimination in dif
   </tr>
   <tr>
     <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
-    <td>Flips selected labels to reduce disparity between groups.</td>
+    <td>Flips selected labels to reduce prevalence disparity between groups.</td>
   <tr>
     <td rowspan="2"> In-processing </td>
     <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
@@ -163,52 +163,51 @@ We support a range of methods designed to address bias and discrimination in dif
   </tr>
   <tr>
     <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
-    <td>Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.<td>
+    <td> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
   </tr>
   <tr>
     <td rowspan="2">Post-processing</td>
     <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
-    <td>Adjusts the prediction scores based on a threshold for multiple groups in the dataset.</td>
+    <td>Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
   </tr>
   <tr>
     <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
-    <td>Adjusts the prediction scores to have equal FPR per group.</td>
-    <td></td>
+    <td>Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
   </tr>
 </table>
 
 
 ### Fairness Metrics
 
-`aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated.
-We provide an example of how the `Audit` class operates to obtain the metrics:
+`aequitas` provides the value of confusion matrix metrics for each possible value of the sensitive attribute columns To calculate fairness metrics. The cells of the confusion metrics are:
 
-| Operation                             | Result                                                                                |
-|---------------------------------------|---------------------------------------------------------------------------------------|
-| Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$. |
-| Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{r}$.       |
-| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\dfrac{\text{CM}_a}{\text{CM}_r} , \dfrac{\text{CM}_b}{\text{CM}_r}, ..., \dfrac{\text{CM}_N}{\text{CM}_r}$. |
-| Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                           |
+| Cell               | Symbol  | Description                                                    | 
+|--------------------|:-------:|----------------------------------------------------------------|
+| **False Positive** | $FP_g$  | The number of entities of the group with $\hat{Y}=1$ and $Y=0$ |
+| **False Negative** | $FN_g$  | The number of entities of the group with $\hat{Y}=0$ and $Y=1$ |
+| **True Positive**  | $TP_g$  | The number of entities of the group with $\hat{Y}=1$ and $Y=1$ |
+| **True Negative**  | $TN_g$  | The number of entities of the group with $\hat{Y}=0$ and $Y=0$ |
 
+From these, we calculate several metrics:
 
+| Metric                        | Formula                                             | Description                                                                               | 
+|-------------------------------|:---------------------------------------------------:|-------------------------------------------------------------------------------------------| 
+| **Accuracy**                  | $Acc_g = \cfrac{TP_g + TN_g}{\|g\|}$                | The fraction of correctly predicted entities withing the group.                           |
+| **True Positive Rate**        | $TPR_g = \cfrac{TP_g}{TP_g + FN_g}$                 | The fraction of true positives within the label positive entities of a group.             |
+| **True Negative Rate**        | $TNR_g = \cfrac{TN_g}{TN_g + FP_g}$                 | The fraction of true negatives within the label negative entities of a group.             |
+| **False Negative Rate**       | $FNR_g = \cfrac{FN_g}{TP_g + FN_g}$                 | The fraction of false negatives within the label positive entities of a group.            |
+| **False Positive Rate**       | $FPR_g = \cfrac{FP_g}{TN_g + FP_g}$                 | The fraction of false positives within the label negative entities of a group.            |
+| **Precision**                 | $Precision_g = \cfrac{TP_g}{TP_g + FP_g}            | The fraction of true positives within the predicted positive entities of a group.         |
+| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}                  | The fraction of true negatives within the predicted negative entities of a group.         | 
+| **False Discovery Rate**      | $FDR_g = \cfrac{FP_g}{TP_g + FP_g}                  | The fraction of false positives within the predicted positive entities of a group.        |
+| **False Omission Rate**       | $FOR_g = \cfrac{FN_g}{TN_g + FN_g}                  | The fraction of false negatives within the predicted negative entities of a group.        |
+| **Predicted Positive**        | $PP_g = TP_g + FP_g$                                |  The number of entities within a group where the decision is positive, i.e., $\hat{Y}=1$. |
+| **Total Predictive Positive** | $K = \sum PP_{g(a_i)}$                              | The total number of entities predicted positive across groups defined by $A$              | 
+| **Predicted Negative**        | $PN_g = TN_g + FN_g$                                | The number of entities within a group where the decision is negative, i.e., $\hat{Y}=0$   | 
+| **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive.                 | 
+| **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$   | The fraction of the entities predicted as positive that belong to a certain group.        | 
 
-| Metric                        | Formula                                                                           | Description                                                                                                   | 
-|-------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------| 
-| **Predicted Positive**        | $PP_g$ | The number of entities within a group where the decision is positive, i.e., $\hat{Y}=1$. | 
-| **Total Predictive Positive** | $K = \sum^{A=a_n}_{A=a_1}PP_{g(a_i)}$ | The total number of entities predicted positive across groups defined by $A$ | 
-| **Predicted Negative** | $PN_g$ | The number of entities within a group which decision is negative, i.e., $\hat{Y}=0$ | 
-| **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive. | 
-| **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$ | The fraction of the entities predicted as positive that belong to a certain group.                            | 
-| **False Positive**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0.">                                           | 
-| **False Negative**            | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20FN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1.">                                           | 
-| **True Positive**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TP_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D1"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D1.">                                          | 
-| **True Negative**             | <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20TN_g">                                                                            | The number of entities of the group with <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20%5Cwidehat%7BY%7D%3D0"> and <img src="http://latex.codecogs.com/gif.latex?%5Cinline%20%5Clarge%20Y%3D0.">                                          | 
-| **False Discovery Rate**      | <img src="http://latex.codecogs.com/gif.latex?FDR_g%20%3D%20%5Cfrac%7BFP_g%7D%7BPP_g%7D%20%3D%20%5Ctext%7BPr%28%7DY%3D0%5C%3B%7C%5C%3B%5Cwidehat%7BY%7D%3D1%2CA%3Da_i%29">  | The fraction of false positives of a group within the predicted positive of the group.                        | 
-| **False Omission Rate**       | <img src="http://latex.codecogs.com/gif.latex?FOR_g%20%3D%20%5Cfrac%7BFN_g%7D%7BPN_g%7D%20%3D%20%5Ctext%7BPr%28%7DY%3D1%5C%3B%7C%5C%3B%5Cwidehat%7BY%7D%3D0%2CA%3Da_i%29">  | The fraction of false negatives of a group within the predicted negative of the group.                        | 
-| **False Positive Rate**       | <img src="http://latex.codecogs.com/gif.latex?FPR_g%20%3D%20%5Cfrac%7BFP_g%7D%7BLN_g%7D%20%3D%20%5Ctext%7BPr%28%7D%5Cwidehat%7BY%7D%3D1%5C%3B%7C%5C%3BY%3D0%2CA%3Da_i%29"> | The fraction of false positives of a group within the labeled negative of the group.                          | 
-| **False Negative Rate**       | <img src="http://latex.codecogs.com/gif.latex?FNR_g%20%3D%20%5Cfrac%7BFN_g%7D%7BLP_g%7D%20%3D%20%5Ctext%7BPr%28%7D%5Cwidehat%7BY%7D%3D0%5C%3B%7C%5C%3BY%3D1%2C%20A%3Da_i%29">  | The fraction of false negatives of a group within the labeled positives of the group.                         | 
-
-
+These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. 
 
 ### 📔Example Notebooks
 
@@ -222,7 +221,7 @@ We provide an example of how the `Audit` class operates to obtain the metrics:
 
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
-For more examples of the python library and a deep dive on concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
+For more examples of the python library and a deep dive into concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
 
 ## Citing Aequitas
 
