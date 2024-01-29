@@ -1,15 +1,22 @@
-from typing import Optional
+from typing import Optional, Union, Callable
 
 import pandas as pd
 import math
-from sklearn.naive_bayes import GaussianNB
+import inspect
 
 from ...utils import create_logger
+from ...utils.imports import import_object
 from .preprocessing import PreProcessing
 
 
 class Massaging(PreProcessing):
-    def __init__(self):
+    def __init__(
+        self,
+        classifier: Union[
+            str, Callable
+        ] = "sklearn.naive_bayes.GaussianNB",
+        **classifier_args
+    ):
         """
         Instantiates a Massaging preprocessing method.
 
@@ -18,12 +25,34 @@ class Massaging(PreProcessing):
         self.logger = create_logger("methods.preprocessing.Massaging")
         self.logger.info("Instantiating a Massaging preprocessing method.")
 
+        if isinstance(classifier, str):
+            classifier = import_object(classifier)
+        signature = inspect.signature(classifier)
+        if (
+            signature.parameters[list(signature.parameters.keys())[-1]].kind
+            == inspect.Parameter.VAR_KEYWORD
+        ):
+            args = (
+                classifier_args  # Estimator takes **kwargs, so all args are valid
+            )
+        else:
+            args = {
+                arg: value
+                for arg, value in classifier_args.items()
+                if arg in signature.parameters
+            }
+        self.classifier = classifier(**args)
+        self.logger.info(
+            f"Created base estimator {self.classifier} with params {args}, "
+            F"discarded args:{list(set(classifier_args.keys()) - set(args.keys()))}"
+        )
+
     def _rank(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]
     ) -> tuple[list, list]:
         features = pd.concat([X, s], axis=1)
         features = pd.get_dummies(features)
-        R = GaussianNB().fit(features, y)
+        R = self.classifier.fit(features, y)
         scores = pd.Series(R.predict_proba(features)[:, 1], index=X.index)
 
         pr = []
@@ -76,7 +105,7 @@ class Massaging(PreProcessing):
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
     ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
-        """Transforms the data by flipping the calculated number of label of the top 
+        """Transforms the data by flipping the calculated number of label of the top
         candidates in the promotion and the demotion groups.
 
         Parameters
