@@ -197,10 +197,10 @@ From these, we calculate several metrics:
 | **True Negative Rate**        | $TNR_g = \cfrac{TN_g}{TN_g + FP_g}$                 | The fraction of true negatives within the label negative entities of a group.             |
 | **False Negative Rate**       | $FNR_g = \cfrac{FN_g}{TP_g + FN_g}$                 | The fraction of false negatives within the label positive entities of a group.            |
 | **False Positive Rate**       | $FPR_g = \cfrac{FP_g}{TN_g + FP_g}$                 | The fraction of false positives within the label negative entities of a group.            |
-| **Precision**                 | $Precision_g = \cfrac{TP_g}{TP_g + FP_g}            | The fraction of true positives within the predicted positive entities of a group.         |
-| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}                  | The fraction of true negatives within the predicted negative entities of a group.         | 
-| **False Discovery Rate**      | $FDR_g = \cfrac{FP_g}{TP_g + FP_g}                  | The fraction of false positives within the predicted positive entities of a group.        |
-| **False Omission Rate**       | $FOR_g = \cfrac{FN_g}{TN_g + FN_g}                  | The fraction of false negatives within the predicted negative entities of a group.        |
+| **Precision**                 | $Precision_g = \cfrac{TP_g}{TP_g + FP_g}$           | The fraction of true positives within the predicted positive entities of a group.         |
+| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}$                 | The fraction of true negatives within the predicted negative entities of a group.         | 
+| **False Discovery Rate**      | $FDR_g = \cfrac{FP_g}{TP_g + FP_g}$                 | The fraction of false positives within the predicted positive entities of a group.        |
+| **False Omission Rate**       | $FOR_g = \cfrac{FN_g}{TN_g + FN_g}$                 | The fraction of false negatives within the predicted negative entities of a group.        |
 | **Predicted Positive**        | $PP_g = TP_g + FP_g$                                |  The number of entities within a group where the decision is positive, i.e., $\hat{Y}=1$. |
 | **Total Predictive Positive** | $K = \sum PP_{g(a_i)}$                              | The total number of entities predicted positive across groups defined by $A$              | 
 | **Predicted Negative**        | $PN_g = TN_g + FN_g$                                | The number of entities within a group where the decision is negative, i.e., $\hat{Y}=0$   | 
