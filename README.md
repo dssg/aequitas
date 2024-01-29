@@ -131,6 +131,18 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 We support a range of methods designed to address bias and discrimination in different stages of the ML pipeline.
 
 
+<style>
+    .methodTable {
+    }
+    .methodTable th {
+        background: Blue;
+        word-wrap: break-word;
+    }
+    .methodTable tr:nth-child(2) { background:Green; }
+</style>
+
+<div class="methodTable">
+
 <table>
   <tr>
     <th> Type </th>
@@ -145,7 +157,12 @@ We support a range of methods designed to address bias and discrimination in dif
   <tr>
     <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
     <td> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
+  </tr>
+  <tr>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
+    <td> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
 </table>
+</div>
 
 
 |Type           |Method                  |Description |
