@@ -1,7 +1,7 @@
 # *Aequitas*: Bias Auditing & Fair ML Toolkit
 
 [![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
-![OSI license](https://badgen.net/pypi/license/fairgbm)
+![OSI license](https://badgen.net/pypi/license/aequitas)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
