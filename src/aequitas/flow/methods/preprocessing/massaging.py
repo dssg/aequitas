@@ -10,6 +10,11 @@ from .preprocessing import PreProcessing
 
 class Massaging(PreProcessing):
     def __init__(self):
+        """
+        Instantiates a Massaging preprocessing method.
+
+        Flips selected labels to reduce disparity between groups.
+        """
         self.logger = create_logger("methods.preprocessing.Massaging")
         self.logger.info("Instantiating a Massaging preprocessing method.")
 
@@ -37,6 +42,21 @@ class Massaging(PreProcessing):
         return pr, dem
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
+        """Fits a classifier to the data and orders the instances by the predictions.
+        Promotion candidates are the instances with negative label in the group with
+        lowest prevalence and demotion candidates are the instances with positive
+        label in the group with highest prevalence. The number of instances to be
+        flipped is calculated to equalize the prevalences of the groups.
+
+        Parameters
+        ----------
+        X : pandas.DataFrame
+            Feature matrix.
+        y : pandas.Series
+            Label vector.
+        s : pandas.Series
+            Protected attribute vector.
+        """
         self.logger.info("Fitting Massaging preprocessing method.")
         self.pr, self.dem = self._rank(X, y, s)
 
@@ -56,6 +76,23 @@ class Massaging(PreProcessing):
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
     ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+        """Transforms the data by flipping the calculated number of label of the top 
+        candidates in the promotion and the demotion groups.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Feature matrix.
+        y : pd.Series
+            Label vector.
+        s : pd.Series, optional
+            Protected attribute vector.
+
+        Returns
+        -------
+        tuple[pd.DataFrame, pd.Series, pd.Series]
+            The transformed input, X, y, and s.
+        """
         self.logger.info("Transforming data with Massaging preprocessing method.")
         y_corrected = y.copy()
         y_corrected.loc[self.pr[: self.m]] = 1
