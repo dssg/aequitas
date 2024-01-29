@@ -130,12 +130,30 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 
 We support a range of methods designed to address bias and discrimination in different stages of the ML pipeline.
 
+
+<table>
+  <tr>
+    <th> Type </th>
+    <th> Method </th>
+    <th> Description </th>
+  </tr>
+  <tr>
+    <td rowspan="5"> Pre-processing </td>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
+    <td> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
+  </tr>
+  <tr>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
+    <td> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
+</table>
+
+
 |Type           |Method                  |Description |
 |---------------|------------------------|------------|
 |Pre-processing |                        |            |
-|               |[Data Repairer](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py)           |Transforms the data distribution so that a given feature distribution is more or less independent of the sensitive attribute *s*.|
+|               |[Data Repairer](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py)           |Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute *s*.|
 |               |[Label Flipping](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py)     |Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method.|
-|               |[Prevalence Sampling](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py)    |Generates training sample with balanced prevalence for the groups in dataset.|
+|               |[Prevalence Sampling](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py)    |Generates a training sample with balanced prevalence for the groups in dataset.|
 |               |[Unawareness](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py)             |Removes features that are highly correlated with the sensitive attribute.|
 |               |[Massaging](https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py)               |Flips selected labels to reduce disparity between groups.|
 |In-processing  |                        |            |
