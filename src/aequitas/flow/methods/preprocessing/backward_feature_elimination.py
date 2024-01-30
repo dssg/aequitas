@@ -17,13 +17,21 @@ class BackwardFeatureElimination(PreProcessing):
         n_estimators: Optional[int] = 10,
         seed: int = 0,
     ):
-        """Removes features that are highly correlated with the sensitive attribute.
-        Note: For this method, the vector s (protected attribute) is assumed to be
-        categorical.
+        """Iterively removes the most important features with respect to the sensitive
+        attribute.
 
         Parameters
         ----------
-
+        auc_threshold : int, optional
+            The value of AUC above which the removal of features continues. Defaults to
+            0.5.
+        feature_importance_threshold : float, optional
+            The value of feature importance above which the most important feature needs
+            to have to be removed. Defaults to 0.1.
+        n_estimators : int, optional
+            The number of trees in the random forest. Defaults to 10.
+        seed : int, optional
+            The seed for the random forest. Defaults to 0.
         """
         self.logger = create_logger("methods.preprocessing.BackwardFeatureElimination")
         self.logger.info(
@@ -37,7 +45,7 @@ class BackwardFeatureElimination(PreProcessing):
         self.seed = seed
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Iteratively removes the most correlated features with the sensitive
+        """Iteratively removes the most important features to predict the sensitive
         attribute.
 
         Parameters
@@ -99,7 +107,8 @@ class BackwardFeatureElimination(PreProcessing):
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
     ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
-        """Removes the most correlated features with the sensitive attribute.
+        """Removes the features which are related with the sensitive attribute the most
+        from the data.
 
         Parameters
         ----------

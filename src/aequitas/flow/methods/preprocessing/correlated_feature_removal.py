@@ -96,7 +96,7 @@ class CorrelatedFeatureRemoval(PreProcessing):
         return statistic
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Calculates how related each feature is to the sensitive attribute.
+        """Calculates correlation between each feature and the sensitive attribute.
 
         Parameters
         ----------
