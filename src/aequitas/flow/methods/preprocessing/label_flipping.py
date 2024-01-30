@@ -1,9 +1,8 @@
 from .preprocessing import PreProcessing
 
 from ...utils import create_logger
-from ...utils.imports import import_object
+from ...utils.imports import instantiate_object
 
-import inspect
 import pandas as pd
 import math
 from typing import Optional, Tuple, Literal, Union, Callable
@@ -104,26 +103,8 @@ class LabelFlipping(PreProcessing):
 
         self.bagging_max_samples = bagging_max_samples
 
-        if isinstance(bagging_base_estimator, str):
-            bagging_base_estimator = import_object(bagging_base_estimator)
-        signature = inspect.signature(bagging_base_estimator)
-        if (
-            signature.parameters[list(signature.parameters.keys())[-1]].kind
-            == inspect.Parameter.VAR_KEYWORD
-        ):
-            args = (
-                base_estimator_args  # Estimator takes **kwargs, so all args are valid
-            )
-        else:
-            args = {
-                arg: value
-                for arg, value in base_estimator_args.items()
-                if arg in signature.parameters
-            }
-        self.bagging_base_estimator = bagging_base_estimator(**args)
-        self.logger.info(
-            f"Created base estimator {self.bagging_base_estimator} with params {args}, "
-            f"discarded args:{list(set(base_estimator_args.keys()) - set(args.keys()))}"
+        self.bagging_base_estimator = instantiate_object(
+            bagging_base_estimator, **base_estimator_args
         )
         self.bagging_n_estimators = bagging_n_estimators
 
@@ -317,7 +298,7 @@ class LabelFlipping(PreProcessing):
             The transformed input, X, y, and s.
         """
         super().transform(X, y, s)
-        
+
         self.logger.info("Transforming data with LabelFlipping.")
 
         if s is None and self.fair_ordering:
