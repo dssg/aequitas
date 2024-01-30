@@ -59,7 +59,7 @@ setup(
         "webapp": REQUIREMENTS["webapp"],
         "cli": REQUIREMENTS["cli"],
     },
-    license="https://github.com/dssg/aequitas/blob/master/LICENSE",
+    license="MIT",
     zip_safe=False,
     keywords="fairness bias aequitas",
     classifiers=[
