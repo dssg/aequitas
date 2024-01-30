@@ -8,16 +8,14 @@
 
 
 <p align="center">
-  <img src="docs/_images/aequitas_logo.svg" width="450">
+  <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/aequitas_logo.svg" width="450">
 </p>
 
 
 `aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
 
 <p float="left" align="center">
-  <img src="docs/_images/Final A).svg" height="300" />
-  <img src="docs/_images/Final B).svg" height="300" />
-  <img src="docs/_images/Final C).svg" height="300" />
+  <a href="#example-notebooks"><img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/diagram.svg" width="600"/></a>
 </p>
 
 ## 📥 Installation
@@ -58,13 +56,13 @@ To obtain a summary of the bias audit, run:
 # Select the fairness metric of interest for your dataset
 audit.summary_plot(["tpr", "fpr", "pprev"])
 ```
-<img src="docs/_images/summary_chart.svg" width="900">
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/summary_chart.svg" width="900">
 
 We can also observe a single metric and sensitive attribute:
 ```python
 audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
 ```
-<img src="docs/_images/disparity_chart.svg" width="900">
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/disparity_chart.svg" width="900">
 
 ### 🧪 Quickstart on Fair ML Experimenting
 
@@ -77,6 +75,8 @@ experiment = DefaultExperiment(dataset, label="label", s="sensitive_attribute")
 experiment.run()
 ```
 Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
+
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/pareto_example.png" width="600">
 
 [comment]: <> (Make default experiment this easy to run)
 
@@ -128,43 +128,98 @@ With this sequence, we would sample a dataset, train a FairGBM model, and then a
 
 We support a range of methods designed to address bias and discrimination in different stages of the ML pipeline.
 
-|Type           |Method                  |Description |
-|---------------|------------------------|------------|
-|Pre-processing |Data Repairer           |Transforms the data distribution so that a given feature distribution is more or less independent of the sensitive attribute *s*.|
-|               |Label Flipping          |Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method.|
-|               |Prevalence Sampling     |Generates training sample with balanced prevalence for the groups in dataset.|
-|In-processing  |FairGBM                 |Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints.|
-|               |Fairlearn Classifier    |Creates a model from the Fairlearn package. Especially designed for the ExponentiatedGradient and GridSearch methods.|
-|Post-processing|Group Threshold         |Adjusts the prediction scores based on a threshold for multiple groups in the dataset.|
-|               |Balanced Group Threshold|
+<table>
+  <tr>
+    <th> Type </th>
+    <th> Method </th>
+    <th> Description </th>
+  </tr>
+  <tr>
+    <td rowspan="5"> Pre-processing </td>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
+    <td> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
+  </tr>
+  <tr>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
+    <td> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
+  </tr>
+  <tr>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
+    <td> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
+    <td>Removes features that are highly correlated with the sensitive attribute.</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
+    <td>Flips selected labels to reduce prevalence disparity between groups.</td>
+  <tr>
+    <td rowspan="2"> In-processing </td>
+    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
+    <td> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
+    <td> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Post-processing</td>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
+    <td>Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
+    <td>Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
+  </tr>
+</table>
+
 
 ### Fairness Metrics
 
-`aequitas` provides the value of confusion matrix metrics (referred as $\text{CM}$)  for each possible value of the sensitive attribute columns. To calculate fairness metrics, ratios between two groups are calculated.
-We provide an example of how the `Audit` class operates to obtain the metrics:
+`aequitas` provides the value of confusion matrix metrics for each possible value of the sensitive attribute columns To calculate fairness metrics. The cells of the confusion metrics are:
 
-| Operation                             | Result                                                                                |
-|---------------------------------------|---------------------------------------------------------------------------------------|
-| Calculate $\text{CM}$ for every group | Dataframe with confusion matrix metrics $\text{CM}_a, \text{CM}_b, ..., \text{CM}_N$. |
-| Selecting the reference group         | Either majority group, group with min metric or user-selected, $\text{CM}_{r}$.       |
-| Calculating disparities               | Dataframe with ratios between each group and the reference group, $\dfrac{\text{CM}_a}{\text{CM}_r} , \dfrac{\text{CM}_b}{\text{CM}_r}, ..., \dfrac{\text{CM}_N}{\text{CM}_r}$. |
-| Selecting the metric(s) of interest   | Summaries, plots, or tables of the results.                                           |
+| Cell               | Symbol  | Description                                                    | 
+|--------------------|:-------:|----------------------------------------------------------------|
+| **False Positive** | $FP_g$  | The number of entities of the group with $\hat{Y}=1$ and $Y=0$ |
+| **False Negative** | $FN_g$  | The number of entities of the group with $\hat{Y}=0$ and $Y=1$ |
+| **True Positive**  | $TP_g$  | The number of entities of the group with $\hat{Y}=1$ and $Y=1$ |
+| **True Negative**  | $TN_g$  | The number of entities of the group with $\hat{Y}=0$ and $Y=0$ |
 
+From these, we calculate several metrics:
 
+| Metric                        | Formula                                             | Description                                                                               | 
+|-------------------------------|:---------------------------------------------------:|-------------------------------------------------------------------------------------------| 
+| **Accuracy**                  | $Acc_g = \cfrac{TP_g + TN_g}{\|g\|}$                | The fraction of correctly predicted entities withing the group.                           |
+| **True Positive Rate**        | $TPR_g = \cfrac{TP_g}{TP_g + FN_g}$                 | The fraction of true positives within the label positive entities of a group.             |
+| **True Negative Rate**        | $TNR_g = \cfrac{TN_g}{TN_g + FP_g}$                 | The fraction of true negatives within the label negative entities of a group.             |
+| **False Negative Rate**       | $FNR_g = \cfrac{FN_g}{TP_g + FN_g}$                 | The fraction of false negatives within the label positive entities of a group.            |
+| **False Positive Rate**       | $FPR_g = \cfrac{FP_g}{TN_g + FP_g}$                 | The fraction of false positives within the label negative entities of a group.            |
+| **Precision**                 | $Precision_g = \cfrac{TP_g}{TP_g + FP_g}$           | The fraction of true positives within the predicted positive entities of a group.         |
+| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}$                 | The fraction of true negatives within the predicted negative entities of a group.         | 
+| **False Discovery Rate**      | $FDR_g = \cfrac{FP_g}{TP_g + FP_g}$                 | The fraction of false positives within the predicted positive entities of a group.        |
+| **False Omission Rate**       | $FOR_g = \cfrac{FN_g}{TN_g + FN_g}$                 | The fraction of false negatives within the predicted negative entities of a group.        |
+| **Predicted Positive**        | $PP_g = TP_g + FP_g$                                |  The number of entities within a group where the decision is positive, i.e., $\hat{Y}=1$. |
+| **Total Predictive Positive** | $K = \sum PP_{g(a_i)}$                              | The total number of entities predicted positive across groups defined by $A$              | 
+| **Predicted Negative**        | $PN_g = TN_g + FN_g$                                | The number of entities within a group where the decision is negative, i.e., $\hat{Y}=0$   | 
+| **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive.                 | 
+| **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$   | The fraction of the entities predicted as positive that belong to a certain group.        | 
 
-### Use Cases and examples
+These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. With the [`Bias`](https://github.com/dssg/aequitas/blob/master/src/aequitas/bias.py) class, several fairness metrics can be derived by different combinations of ratios of these metrics.
 
-| Use Case | Description |
+### 📔Example Notebooks
+
+| Notebook | Description |
 |-|-|
-| [Auditing Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
-| [Auditing and correcting a trained model](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
-| [Running a Fair ML Experiment](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
+| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 
 ## Further documentation
 
 You can find the toolkit documentation [here](https://dssg.github.io/aequitas/).
 
-For more examples of the python library and a deep dive on concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
+For more examples of the python library and a deep dive into concepts of fairness in ML, see our [Tutorial](https://github.com/dssg/fairness_tutorial) presented on KDD and AAAI. Visit also the [Aequitas project website](http://dsapp.uchicago.edu/aequitas/).
 
 ## Citing Aequitas
 
