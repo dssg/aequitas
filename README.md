@@ -8,16 +8,14 @@
 
 
 <p align="center">
-  <img src="docs/_images/aequitas_logo.svg" width="450">
+  <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/aequitas_logo.svg" width="450">
 </p>
 
 
 `aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
 
 <p float="left" align="center">
-  <img src="docs/_images/Final A).svg" height="300" />
-  <img src="docs/_images/Final B).svg" height="300" />
-  <img src="docs/_images/Final C).svg" height="300" />on
+  <a href="#example-notebooks"><img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/diagram.svg" width="600"/></a>
 </p>
 
 ## 📥 Installation
@@ -58,13 +56,13 @@ To obtain a summary of the bias audit, run:
 # Select the fairness metric of interest for your dataset
 audit.summary_plot(["tpr", "fpr", "pprev"])
 ```
-<img src="docs/_images/summary_chart.svg" width="900">
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/summary_chart.svg" width="900">
 
 We can also observe a single metric and sensitive attribute:
 ```python
 audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
 ```
-<img src="docs/_images/disparity_chart.svg" width="900">
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/disparity_chart.svg" width="900">
 
 ### 🧪 Quickstart on Fair ML Experimenting
 
@@ -78,7 +76,7 @@ experiment.run()
 ```
 Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
 
-<img src="docs/_images/pareto_example.png" width="600">
+<img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/pareto_example.png" width="600">
 
 [comment]: <> (Make default experiment this easy to run)
 
@@ -207,15 +205,15 @@ From these, we calculate several metrics:
 | **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive.                 | 
 | **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$   | The fraction of the entities predicted as positive that belong to a certain group.        | 
 
-These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. 
+These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. With the [`Bias`](https://github.com/dssg/aequitas/blob/master/src/aequitas/bias.py) class, several fairness metrics can be derived by different combinations of ratios of these metrics.
 
 ### 📔Example Notebooks
 
 | Notebook | Description |
 |-|-|
-| [Auditing Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
-| [Auditing and correcting a trained model](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
-| [Running a Fair ML Experiment](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
+| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 
 ## Further documentation
 
