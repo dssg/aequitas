@@ -40,6 +40,10 @@ class Unawareness(PreProcessing):
         self.used_in_inference = True
 
         self.correlation_threshold = correlation_threshold
+        if strategy == "featureselection":
+            raise NotImplementedError(
+                "The feature selection strategy is not implemented yet."
+            )
         self.strategy = strategy
         self.seed = seed
 
@@ -135,10 +139,7 @@ class Unawareness(PreProcessing):
                 else:
                     self.scores[col] = self._correlation_ratio(s.values, X[col].values)
 
-        elif self.strategy == "featureselection":
-            raise NotImplementedError("Feature selection is not implemented yet.")
-
-        self.scores = self.scores.sort_values(ascending=False)
+            self.scores = self.scores.sort_values(ascending=False)
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
