@@ -61,6 +61,7 @@ class PrevalenceSampling(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
+        super().fit(X, y, s)
         self.logger.info("Fitting sampling method.")
 
         if s is None:
@@ -117,6 +118,8 @@ class PrevalenceSampling(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
+        super().transform(X, y, s)
+        
         self.logger.info("Transforming data.")
         if s is None:
             raise ValueError("Sensitive Attribute `s` not passed.")

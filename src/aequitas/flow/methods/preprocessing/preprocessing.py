@@ -19,7 +19,7 @@ class PreProcessing(ABC):
         s : pd.Series, optional
             The protected attribute.
         """
-        pass
+        self._validate_dataset(X, y, s)
 
     @abstractmethod
     def transform(
@@ -42,4 +42,11 @@ class PreProcessing(ABC):
         pd.DataFrame
             The transformed data.
         """
-        pass
+        self._validate_dataset(X, y, s)
+
+    def _validate_dataset(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None) -> None:
+        if s.dtype.name != "category":
+            raise ValueError("The sensitive attribute must be categorical.")
+        
+        if s.name in X.columns:
+            raise ValueError("The sensitive attribute must not be in the feature matrix.")

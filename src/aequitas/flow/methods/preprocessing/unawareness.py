@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Literal
 
 import pandas as pd
 import numpy as np
@@ -10,13 +10,14 @@ from .preprocessing import PreProcessing
 
 class Unawareness(PreProcessing):
     def __init__(
-        self, top_k: Optional[int] = 1, correlation_threshold: Optional[float] = None
+        self,
+        correlation_threshold: Optional[float] = 0.5,
+        strategy: Literal["correlation", "featureselection"] = "correlation",
+        seed: int = 0,
     ):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
         categorical.
-
-
 
         Parameters
         ----------
@@ -27,18 +28,24 @@ class Unawareness(PreProcessing):
             Features with a correlation value higher than this thresold are
             removed. If None, the top_k parameter is used to determine how many
             features to remove. Defaults to None.
+        strategy : {"correlation", "featureselection"}, optional
+            Strategy to use to calculate how much each feature is related to the
+            sensitive attribute. If "correlation", correlation between features
+            is used. "featureselection" is not implemented yet. Defaults to
+            "correlation".
+
         """
         self.logger = create_logger("methods.preprocessing.Unawareness")
         self.logger.info("Instantiating an Unawareness preprocessing method.")
         self.used_in_inference = True
 
-        if top_k is None and correlation_threshold is None:
-            raise ValueError(
-                "Since top_k is set as None, the correlation_threshold must be "
-                "passed by the user."
-            )
-        self.top_k = top_k
         self.correlation_threshold = correlation_threshold
+        if strategy == "featureselection":
+            raise NotImplementedError(
+                "The feature selection strategy is not implemented yet."
+            )
+        self.strategy = strategy
+        self.seed = seed
 
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
@@ -109,8 +116,7 @@ class Unawareness(PreProcessing):
         return statistic
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Calculates the correlations between the features and the sensitive
-        attribute.
+        """Calculates how related each feature is to the sensitive attribute.
 
         Parameters
         ----------
@@ -121,19 +127,19 @@ class Unawareness(PreProcessing):
         s : pandas.Series
             Protected attribute vector.
         """
-        self.correlations = pd.Series(index=X.columns)
+        super().fit(X, y, s)
 
-        for col in X.columns:
-            if X[col].dtype.name == "category":
-                self.correlations[col] = self._cramerv(
-                    s.astype("category").values, X[col].values
-                )
-            else:
-                self.correlations[col] = self._correlation_ratio(
-                    s.astype("category").values, X[col].values
-                )
+        self.logger.info("Calculating feature correlation with sensitive attribute.")
 
-        self.correlations = self.correlations.sort_values(ascending=False)
+        if self.strategy == "correlation":
+            self.scores = pd.Series(index=X.columns)
+            for col in X.columns:
+                if X[col].dtype.name == "category":
+                    self.scores[col] = self._cramerv(s.values, X[col].values)
+                else:
+                    self.scores[col] = self._correlation_ratio(s.values, X[col].values)
+
+            self.scores = self.scores.sort_values(ascending=False)
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
@@ -154,14 +160,11 @@ class Unawareness(PreProcessing):
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
-        remove_features = self.correlations.copy()
-        if self.top_k is not None:
-            remove_features = remove_features[: self.top_k]
-        if self.correlation_threshold is not None:
-            remove_features = remove_features.loc[
-                remove_features >= self.correlation_threshold
-            ]
-        remove_features = list(remove_features.index)
+        super().transform(X, y, s)
+
+        remove_features = list(
+            self.scores.loc[self.scores >= self.correlation_threshold].index
+        )
 
         self.logger.info(
             f"Removing most correlated features with sensitive attribute: "
