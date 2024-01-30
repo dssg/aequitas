@@ -6,13 +6,18 @@
 
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
 
+`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
+
+> **New version 1.0.0**
+> The new version 1.0.0 is named **Aequitas Flow** since we are introducing new capabilities to streamline Fair ML experimentation. Keep reading!
+> 
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/aequitas_logo.svg" width="450">
 </p>
 
 
-`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
 
 <p float="left" align="center">
   <a href="#example-notebooks"><img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/diagram.svg" width="600"/></a>
