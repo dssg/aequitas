@@ -10,6 +10,7 @@
 
 > 
 > **Version 1.0.0: Aequitas Flow - Optimizing Fairness in ML Pipelines**
+> 
 > Explore Aequitas Flow, our latest update in version 1.0.0, designed to enrich Fair ML experimentation with new, streamlined capabilities. Elevate your ML fairness journey today.
 > 
 
