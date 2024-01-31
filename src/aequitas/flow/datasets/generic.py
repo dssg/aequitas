@@ -21,6 +21,7 @@ class GenericDataset(Dataset):
         self,
         label_column: str,
         sensitive_column: str,
+        df: Optional[pd.DataFrame] = None,
         categorical_columns: list[str] = [],
         dataset_path: Optional[Union[str, Path]] = None,
         train_path: Optional[Union[str, Path]] = None,
@@ -72,6 +73,9 @@ class GenericDataset(Dataset):
             if url(dataset_path) or Path(dataset_path).exists():
                 self.paths = [dataset_path]
                 self.split_required = True
+        elif df is not None:
+            self.data = df
+            self.split_required = True
         else:
             # Validate if other paths exist
             if not (train_path and validation_path and test_path):
@@ -139,6 +143,8 @@ class GenericDataset(Dataset):
     def load_data(self) -> None:
         """Load the dataset."""
         self.logger.info("Loading data.")
+        if hasattr(self, "data"):
+            return
         if self.extension == "parquet":
             read_method = pd.read_parquet
         elif self.extension == "csv":
