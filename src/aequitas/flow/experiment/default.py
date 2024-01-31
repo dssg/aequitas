@@ -1,6 +1,7 @@
 from typing import Literal, Union
 
 from omegaconf import DictConfig
+import pandas as pd
 
 from . import _configs
 from .experiment import Experiment
@@ -80,3 +81,77 @@ class DefaultExperiment(Experiment):
             "optimization": experiment_config,
         }
         super().__init__(config=DictConfig(config))
+
+    @classmethod
+    def from_pandas(
+        cls,
+        df: pd.DataFrame,
+        target_feature: str,
+        sensitive_feature: str,
+        other_dataset_args: dict = None,
+        threshold_type: str = "fixed",
+        score_threshold: float = 0.5,
+        dataset_name: str = "Dataset",
+        methods: Union[
+            list[Literal["preprocessing", "inprocessing"]], Literal["all"]
+        ] = "all",
+        experiment_size: Literal["test", "small", "medium", "large"] = "small",
+        use_baseline: bool = True,
+    ):
+        """Create a DefaultExperiment from a pandas DataFrame.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Pandas DataFrame with the dataset to be used in the experiment.
+        target_feature : str
+            Name of the column containing the label.
+        sensitive_feature : str
+            Name of the column containing the sensitive attribute.
+        other_dataset_args : dict, optional
+            Other arguments to pass to the dataset. Defaults to None.
+        threshold_type : str, optional
+            Threshold type. Defaults to "fixed".
+        score_threshold : float, optional
+            Score threshold. Defaults to 0.5.
+        dataset_name : str, optional
+            Dataset name. Defaults to "Dataset".
+        methods : Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]], optional
+            Methods to include in the experiment. If "all", all methods will be included.
+            Defaults to "all".
+        experiment_size : Literal["test", "small", "medium", "large"], optional
+            Experiment size. Defaults to "small".
+        use_baseline : bool, optional
+            Whether to include the baseline methods. Defaults to True.
+
+        Returns
+        -------
+        DefaultExperiment
+            Default experiment.
+
+        Raises
+        ------
+        ValueError
+            If the methods or experiment size are not valid.
+        """
+        dataset_config = {
+            dataset_name: {
+                "classpath": "aequitas.flow.datasets.GenericDataset",
+                "threshold": {
+                    "type": threshold_type,
+                    "value": score_threshold,
+                },
+                "args": {
+                    "df": df,
+                    "target_feature": target_feature,
+                    "sensitive_feature": sensitive_feature,
+                    **(other_dataset_args or {}),
+                }
+            }
+        }
+        return cls(
+            dataset_config=dataset_config,
+            methods=methods,
+            experiment_size=experiment_size,
+            use_baseline=use_baseline,
+        )
