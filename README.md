@@ -87,12 +87,18 @@ To perform an experiment, a dataset is required. It must have a label column, a 
 ```python
 from aequitas.flow import DefaultExperiment
 
-experiment = DefaultExperiment(dataset, label="label", s="sensitive_attribute")
+experiment = DefaultExperiment.from_pandas(dataset, target_feature="label", sensitive_feature="attr", experiment_size="small")
 experiment.run()
+
+experiment.plot_pareto()
 ```
-Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
 
 <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/pareto_example.png" width="600">
+
+The [`DefaultExperiment`](https://github.com/dssg/aequitas/blob/readme-feedback-changes/src/aequitas/flow/experiment/default.py#L9) class allows for an easier entry-point to experiments in the package. This class has two main parameters to configure the experiment: `experiment_size` and `methods`. The former defines the size of the experiment, which can be either `test` (1 model per method), `small` (10 models per method), `medium` (50 models per method), or `large` (100 models per method). The latter defines the methods to be used in the experiment, which can be either `all` or a subset, namely `preprocessing` or `inprocessing`.
+
+Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually in more granular detail in the [`Experiment`](https://github.com/dssg/aequitas/blob/readme-feedback-changes/src/aequitas/flow/experiment/experiment.py#L23) class.
+
 
 [comment]: <> (Make default experiment this easy to run)
 
