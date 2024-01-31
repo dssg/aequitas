@@ -137,50 +137,60 @@ We support a range of methods designed to address bias and discrimination in dif
 
 <table>
   <tr>
-    <th> Type </th>
-    <th> Method </th>
-    <th> Description </th>
+    <th rowspan="2"> Type </th>
+    <th rowspan="2"> Method </th>
+    <th rowspan="2"> Description </th>
   </tr>
+  <tr></tr>
   <tr>
-    <td rowspan="5"> Pre-processing </td>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
-    <td> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
+    <td rowspan="10"> Pre-processing </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
+    <td rowspan="2"> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
-    <td> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
+    <td rowspan="2"> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
-    <td> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
+    <td rowspan="2"> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
-    <td>Removes features that are highly correlated with the sensitive attribute.</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
+    <td rowspan="2">Removes features that are highly correlated with the sensitive attribute.</td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
-    <td>Flips selected labels to reduce prevalence disparity between groups.</td>
-  <tr>
-    <td rowspan="2"> In-processing </td>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
-    <td> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
+    <td rowspan="2">Flips selected labels to reduce prevalence disparity between groups.</td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
-    <td> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
+    <td rowspan="4"> In-processing </td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
+    <td rowspan="2"> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td rowspan="2">Post-processing</td>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
-    <td>Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
+    <td rowspan="2"> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
-    <td>Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
+    <td rowspan="4">Post-processing</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
+    <td rowspan="2">Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
   </tr>
+  <tr></tr>
+  <tr>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
+    <td rowspan="2">Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
+  </tr>
+  <tr></tr>
 </table>
-
 
 ### Fairness Metrics
 
