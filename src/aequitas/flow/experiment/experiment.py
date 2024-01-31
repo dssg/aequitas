@@ -168,7 +168,8 @@ class Experiment:
             for method in self.config.methods:
                 for method_name, method_items in method.items():
                     self.logger.info(
-                        f"Testing '{method_name}', saved in '{dataset_folder.resolve()}'."
+                        f"Testing '{method_name}', "
+                        f"saved in '{dataset_folder.resolve()}'."
                     )
                     if self.artifacts:
                         method_folder: Path = dataset_folder / method_name
@@ -268,5 +269,5 @@ class Experiment:
         split: str = "validation",
     ) -> None:
         results = read_results(self.exp_folder)
-        plot = Plot(results, dataset, fairness_metric, performance_metric, split=split)
-        return plot.visualize()
+        self.plot = Plot(results, dataset, fairness_metric, performance_metric, split=split)
+        return self.plot.visualize()
