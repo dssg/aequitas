@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import json
 import pickle
+import pandas as pd
 from pathlib import Path
 from typing import Iterable, Optional, Tuple, Union
 
@@ -54,7 +55,7 @@ class Experiment:
     def __init__(
         self,
         config_file: Optional[Path] = None,
-        config: Optional[DictConfig] = None,
+        config: Optional[Union[DictConfig, dict]] = None,
         default_fields: Iterable[str] = ("methods", "datasets"),
         save_artifacts: bool = True,
         save_folder: Optional[Path] = Path("artifacts"),
@@ -65,9 +66,21 @@ class Experiment:
         self.logger = create_logger("Experiment")
         self.logger.info("Instantiating Experiment class.")
 
+        self.dfs = {}
         # Read config file
         if config is not None:
-            self.config = config
+            if isinstance(config, DictConfig):
+                self.config = config
+            else:
+                # check if we have pandas dataframes passed as arguments
+                datasets = config["datasets"]
+                for dataset in datasets:
+                    for name, conf in dataset.items():
+                        if "args" in conf and "df" in conf["args"]:
+                            self.dfs[name] = conf["args"]["df"]
+                            conf["args"]["df"] = None
+                self.config = DictConfig(config)
+
         elif config_file is not None:
             self.config_reader = ConfigReader(
                 config_file, default_fields=default_fields
@@ -104,12 +117,19 @@ class Experiment:
         return sampler(**self.config.optimization.sampler_args)  # type: ignore
 
     @staticmethod
-    def read_dataset(config: Union[dict, DictConfig]) -> Dataset:
+    def read_dataset(
+        config: Union[dict, DictConfig],
+        df: Optional[pd.DataFrame] = None,
+    ) -> Dataset:
         """Read a dataset from a configuration object."""
         if isinstance(config, dict):
             config = DictConfig(config)
         dataset_class = import_object(config.classpath)
-        dataset_object = dataset_class(**config.args)  # type: ignore
+        # Casting args to dict, to add df if necessary
+        args = dict(config.args)
+        if df is not None:
+            args["df"] = df
+        dataset_object = dataset_class(**args)  # type: ignore
         return dataset_object
 
     @staticmethod
@@ -128,7 +148,7 @@ class Experiment:
         for dataset in self.config.datasets:
             for name, configs in dataset.items():  # This iterates once.
                 self.logger.debug(f"Reading '{name}'. Configurations: {configs}.")
-                dataset_object = self.read_dataset(configs)
+                dataset_object = self.read_dataset(configs, self.dfs.get(name, None))
                 dataset_object.load_data()
                 dataset_object.create_splits()
                 self.logger.debug(f"Dataset {name} successfully read.")

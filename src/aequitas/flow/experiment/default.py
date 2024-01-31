@@ -80,7 +80,7 @@ class DefaultExperiment(Experiment):
             "datasets": [dataset_config],
             "optimization": experiment_config,
         }
-        super().__init__(config=DictConfig(config))
+        super().__init__(config=config)
 
     @classmethod
     def from_pandas(
@@ -146,7 +146,7 @@ class DefaultExperiment(Experiment):
                     "target_feature": target_feature,
                     "sensitive_feature": sensitive_feature,
                     **(other_dataset_args or {}),
-                }
+                },
             }
         }
         return cls(
