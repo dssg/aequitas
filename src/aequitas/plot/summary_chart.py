@@ -182,7 +182,7 @@ def __draw_metric_line_titles(metrics, size_constants):
 
 
 def __get_parity_result_variable(row, metric, fairness_threshold):
-    """ Creates parity test result variable for each provided row, separating the Reference group from the passing ones."""
+    """Creates parity test result variable for each provided row, separating the Reference group from the passing ones."""
     if row["attribute_value"] == row["ref_group_value"]:
         return "Reference"
     elif abs(row[f"{metric}_disparity_scaled"]) < fairness_threshold - 1:
@@ -211,7 +211,7 @@ def __draw_parity_result_text(parity_result, color_scale):
                 "parity_result:O",
                 scale=color_scale,
                 legend=alt.Legend(
-                    title=Label.TEST, 
+                    title=Label.TEST,
                     padding=Legend.margin,
                     offset=0,
                 ),
@@ -222,7 +222,7 @@ def __draw_parity_result_text(parity_result, color_scale):
 
 
 def __draw_population_bar(population_bar_df, metric, color_scale):
-    """ Draws a stacked bar of the sum of the percentage of population of the groups that obtained each result for the parity test."""
+    """Draws a stacked bar of the sum of the percentage of population of the groups that obtained each result for the parity test."""
     population_bar_tooltips = [
         alt.Tooltip(field=f"{metric}_parity_result", type="nominal", title="Parity"),
         alt.Tooltip(
@@ -230,7 +230,11 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
             type="nominal",
             title="Size",
         ),
-        alt.Tooltip(field="tooltip_groups_name_size", type="nominal", title=Label.MULTIPLE_GROUPS),
+        alt.Tooltip(
+            field="tooltip_groups_name_size",
+            type="nominal",
+            title=Label.MULTIPLE_GROUPS,
+        ),
     ]
 
     population_bar = (
@@ -254,7 +258,8 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
 
 def __draw_group_circles(plot_df, metric, scales, size_constants):
     """Draws a circle for each group, color-coded by the result of the parity test.
-    The groups are spread around the central reference group according to their disparity."""
+    The groups are spread around the central reference group according to their disparity.
+    """
 
     circle_tooltip_encoding = [
         alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
@@ -300,12 +305,12 @@ def __draw_group_circles(plot_df, metric, scales, size_constants):
 def __draw_parity_test_explanation(fairness_threshold, x_position, warnings=()):
     """Draw text that explains what does pass/fail mean in the parity test results."""
     text_explanation = []
-    
+
     warn_text = alt.Chart(DUMMY_DF).mark_text(
         baseline="top",
         align="left",
         font=FONT,
-        fill='rgb(211, 47, 47)',
+        fill="rgb(211, 47, 47)",
         fontSize=Annotation.font_size,
         fontWeight=Annotation.font_weight,
     )
@@ -321,18 +326,22 @@ def __draw_parity_test_explanation(fairness_threshold, x_position, warnings=()):
 
     n_warnings = 0
     for metric_warnings in warnings:
-        if metric_warnings:        
+        if metric_warnings:
             for group, metric in metric_warnings:
                 explanation_text_warning = warn_text.encode(
                     x=alt.value(x_position),
-                    y=alt.value(Annotation.font_size * Annotation.line_spacing * (n_warnings + 2)),
+                    y=alt.value(
+                        Annotation.font_size
+                        * Annotation.line_spacing
+                        * (n_warnings + 2)
+                    ),
                     text=alt.value(
                         f"Groups {group} have {metric} of 0 (zero). This "
                         "does not allow for the calculation of relative disparities. "
                         "The groups will be absent in respective visualizations.",
-                    )
+                    ),
                 )
-                n_warnings +=1
+                n_warnings += 1
                 text_explanation.append(explanation_text_warning)
 
     explanation_text_group = explanation_text.encode(
@@ -372,9 +381,9 @@ def __create_population_bar_df(attribute_df, metric):
         attribute_df.groupby(by=f"{metric}_parity_result")
         .agg(
             {
-                "attribute_name": min,
-                "total_entities": min,
-                "group_size": sum,
+                "attribute_name": "min",
+                "total_entities": "min",
+                "group_size": "sum",
                 "tooltip_groups_name_size": lambda x: ", ".join(x),
             }
         )
@@ -392,7 +401,7 @@ def __create_population_bar_df(attribute_df, metric):
 
 
 def __create_group_rank_variable(attribute_df, metric):
-    """ Creates the disparity rank variable for the given metric, centered around 0 (the Reference Group's value). """
+    """Creates the disparity rank variable for the given metric, centered around 0 (the Reference Group's value)."""
 
     # RANK
     attribute_df[f"{metric}_disparity_rank"] = attribute_df[
@@ -411,7 +420,7 @@ def __create_group_rank_variable(attribute_df, metric):
 
 
 def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
-    """ Creates disparity explanation and formatted group size tooltip variables. """
+    """Creates disparity explanation and formatted group size tooltip variables."""
 
     # PARITY TEST EXPLANATION
     attribute_df[f"tooltip_parity_test_explanation_{metric}"] = attribute_df.apply(
@@ -445,7 +454,7 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
 
 
 def __create_disparity_variables(attribute_df, metric, fairness_threshold):
-    """ Creates scaled disparity, parity test result & disparity explanation tooltip variables. """
+    """Creates scaled disparity, parity test result & disparity explanation tooltip variables."""
     # Check if any group has a disparity of 0.
     # These values would potentially break the plots, and will raise warnings to the user.
     zero_metric_groups = attribute_df[attribute_df[f"{metric}_disparity"] == 0]
@@ -468,16 +477,19 @@ def __create_disparity_variables(attribute_df, metric, fairness_threshold):
     )
     return warning
 
+
 def __get_attribute_column(
     attribute_df, metrics, scales, attribute, size_constants, fairness_threshold
 ):
-    """ Returns a vertical concatenation of all elements of all metrics for each attribute's column."""
+    """Returns a vertical concatenation of all elements of all metrics for each attribute's column."""
 
     metric_summary = []
     metric_warnings = []
     for metric in metrics:
         # CREATE VARIABLES IN DF
-        warnings = __create_disparity_variables(attribute_df, metric, fairness_threshold)
+        warnings = __create_disparity_variables(
+            attribute_df, metric, fairness_threshold
+        )
         if warnings:
             metric_warnings.append(warnings)
         __create_tooltip_variables(attribute_df, metric, fairness_threshold)
@@ -518,12 +530,15 @@ def __get_attribute_column(
         attribute, size_constants["column_width"], size_constants
     )
 
-    return alt.vconcat(
-        attribute_title,
-        *metric_summary,
-        bounds="flush",
-        spacing=size_constants["line_spacing"],
-    ), metric_warnings
+    return (
+        alt.vconcat(
+            attribute_title,
+            *metric_summary,
+            bounds="flush",
+            spacing=size_constants["line_spacing"],
+        ),
+        metric_warnings,
+    )
 
 
 def plot_summary_chart(
