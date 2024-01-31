@@ -37,6 +37,15 @@ or
 pip install git+https://github.com/dssg/aequitas.git
 ```
 
+### 📔Example Notebooks
+
+| Notebook | Description |
+|-|-|
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
+| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
+
+
 ### 🔍 Quickstart on Bias Auditing
 
 To perform a bias audit, you need a pandas `DataFrame` with the following format:
@@ -224,13 +233,6 @@ From these, we calculate several metrics:
 
 These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. With the [`Bias`](https://github.com/dssg/aequitas/blob/master/src/aequitas/bias.py) class, several fairness metrics can be derived by different combinations of ratios of these metrics.
 
-### 📔Example Notebooks
-
-| Notebook | Description |
-|-|-|
-| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
-| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
-| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 
 ## Further documentation
 
