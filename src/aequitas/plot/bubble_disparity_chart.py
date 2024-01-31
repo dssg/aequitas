@@ -29,15 +29,28 @@ from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import labels as Label
 
-# Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
-# (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
+# Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need
+# it (like most annotations), we pass the following dummy dataframe to reduce the
+# complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
+
+metric_names = {
+    "Predictive Equality": "fpr_ratio",
+    "Equal Opportunity": "tpr_ratio",
+    "Demographic Parity": "pprev_ratio",
+    "TPR": "tpr",
+    "FPR": "fpr",
+    "FNR": "fnr",
+    "Accuracy": "accuracy",
+    "Precision": "precision",
+}
 
 
 def __get_position_scales(
     plot_table, metrics, fairness_threshold, chart_height, chart_width
 ):
-    """Computes the scales for x and y encodings to be used in the disparity bubble chart."""
+    """Computes the scales for x and y encodings to be used in the disparity bubble
+    chart."""
 
     position_scales = dict()
 
@@ -55,7 +68,8 @@ def __get_position_scales(
     max_disparities = plot_table[scaled_disparities_col_names].apply(max_column, axis=1)
     abs_max_disparity = abs(max_column(max_disparities))
 
-    # If fairness_threshold is defined, get max between threshold and max absolute disparity
+    # If fairness_threshold is defined, get max between threshold and max absolute
+    # disparity
     if fairness_threshold is not None:
         x_domain_limit = math.ceil(max(abs_max_disparity, fairness_threshold))
     else:
@@ -86,7 +100,8 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
         orient="left",
         labelAngle=Metric_Axis.label_angle,
         # LabelPadding logic:
-        # Spaces the labels further from the chart if they are part of a concatenated chart
+        # Spaces the labels further from the chart if they are part of a concatenated
+        # chart
         labelPadding=Metric_Axis.label_padding
         if not concat_chart
         else Metric_Axis.label_padding_concat_chart,
@@ -143,10 +158,12 @@ def __get_x_axis_values(x_domain, zero=True):
 def __draw_x_ticks_labels(scales, chart_height):
     """Draws the numbers in the horizontal axis."""
 
-    # The values to be drawn, we don't want to draw 0 (which corresponds to a ratio of 1) as we later draw an annotation.
+    # The values to be drawn, we don't want to draw 0 (which corresponds to a ratio of
+    # 1) as we later draw an annotation.
     axis_values = __get_x_axis_values(scales["x"].domain)
 
-    # Given the semantic of the chart, (how many times smaller or larger) we draw absolute values.
+    # Given the semantic of the chart, (how many times smaller or larger) we draw
+    # absolute values.
     axis_values_labels = [abs(x) + 1 if x != 0 else "=" for x in axis_values]
 
     axis_df = pd.DataFrame({"value": axis_values, "label": axis_values_labels})
@@ -236,7 +253,8 @@ def __draw_text_annotations(ref_group, chart_height, x_range):
 
 
 def __draw_reference_rule(ref_group, chart_height, chart_width):
-    """Draws vertical reference rule where the ratio is the same as the reference group."""
+    """Draws vertical reference rule where the ratio is the same as the reference
+    group."""
 
     reference_rule = (
         alt.Chart(DUMMY_DF)
@@ -259,7 +277,8 @@ def __draw_reference_rule(ref_group, chart_height, chart_width):
 def __draw_threshold_rules(
     threshold_df, scales, chart_height, accessibility_mode=False
 ):
-    """Draws threshold rules: red lines that mark the defined fairness_threshold in the chart."""
+    """Draws threshold rules: red lines that mark the defined fairness_threshold in the
+    chart."""
     stroke_color = (
         Threshold_Rule.stroke_accessible
         if accessibility_mode
@@ -297,7 +316,8 @@ def __draw_threshold_bands(
     chart_width,
     accessibility_mode=False,
 ):
-    """Draws threshold bands: regions painted red where the metric value is above the defined fairness_threshold."""
+    """Draws threshold bands: regions painted red where the metric value is above the
+    defined fairness_threshold."""
     fill_color = (
         Threshold_Band.color_accessible if accessibility_mode else Threshold_Band.color
     )
@@ -341,7 +361,9 @@ def __draw_threshold_text(
     n_warnings = 0
     text_explanation = []
     for group, metric in warnings:
-        y_size = chart_height * (1 - 2 / 3 * Disparity_Chart.padding_y) + Annotation.font_size * Annotation.line_spacing * (n_warnings + 1)
+        y_size = chart_height * (
+            1 - 2 / 3 * Disparity_Chart.padding_y
+        ) + Annotation.font_size * Annotation.line_spacing * (n_warnings + 1)
         explanation_text_warning = warn_text.encode(
             x=alt.value(0),
             y=alt.value(y_size),
@@ -349,9 +371,9 @@ def __draw_threshold_text(
                 f"Groups {group} have {metric} of 0 (zero). This "
                 "does not allow for the calculation of relative disparities. "
                 "The groups will be absent in respective visualizations.",
-            )
+            ),
         )
-        n_warnings +=1
+        n_warnings += 1
         text_explanation.append(explanation_text_warning)
     threshold_text = (
         alt.Chart(DUMMY_DF)
@@ -368,7 +390,9 @@ def __draw_threshold_text(
             x=alt.value(0),
             y=alt.value(chart_height * (1 - 2 / 3 * Disparity_Chart.padding_y)),
             text=alt.value(
-                f"The metric value for any group should not be {fairness_threshold} (or more) times smaller or larger than that of the reference group {ref_group}."
+                f"The metric value for any group should not be {fairness_threshold} (or"
+                f" more) times smaller or larger than that of the reference group "
+                f"{ref_group}."
             ),
         )
     )
@@ -435,7 +459,12 @@ def __draw_bubbles(
     axis_values = __get_x_axis_values(scales["x"].domain, zero=False)
 
     x_axis = alt.Axis(
-        values=axis_values, ticks=False, domain=False, labels=False, title=None, gridColor=Axis.grid_color
+        values=axis_values,
+        ticks=False,
+        domain=False,
+        labels=False,
+        title=None,
+        gridColor=Axis.grid_color,
     )
 
     # COLOR
@@ -469,8 +498,12 @@ def __draw_bubbles(
         )
 
         bubble_tooltip_encoding = [
-            alt.Tooltip(field="attribute_value", type="nominal", title=Label.SINGLE_GROUP),
-            alt.Tooltip(field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE),
+            alt.Tooltip(
+                field="attribute_value", type="nominal", title=Label.SINGLE_GROUP
+            ),
+            alt.Tooltip(
+                field="tooltip_group_size", type="nominal", title=Label.GROUP_SIZE
+            ),
             alt.Tooltip(
                 field=f"tooltip_disparity_explanation_{metric}",
                 type="nominal",
@@ -587,7 +620,7 @@ def get_disparity_bubble_chart_components(
             chart_height,
             chart_width,
             accessibility_mode,
-            metric_warnings
+            metric_warnings,
         )
 
         # ASSEMBLE CHART WITH THRESHOLD
@@ -631,18 +664,21 @@ def plot_disparity_bubble_chart(
     :type metrics_list: list
     :param attribute: an attribute to plot
     :type attribute: str
-    :param fairness_threshold: a value for the maximum allowed disparity, defaults to 1.25
+    :param fairness_threshold: a value for the maximum allowed disparity, defaults to
+    1.25
     :type fairness_threshold: float, optional
     :param chart_height: a value (in pixels) for the height of the chart
     :type chart_height: int, optional
     :param chart_width: a value (in pixels) for the width of the chart
     :type chart_width: int, optional
-    :param accessibility_mode: a switch for the display of more accessible visual elements, defaults to False
+    :param accessibility_mode: a switch for the display of more accessible visual
+    elements, defaults to False
     :type accessibility_mode: bool, optional
 
     :return: the full disparities chart
     :rtype: Altair chart object
     """
+    metrics_list = [metric_names[metric] for metric in metrics_list]
 
     (
         plot_table,
@@ -704,7 +740,8 @@ def plot_disparity_bubble_chart(
             title=f"Disparities on {attribute.title()}",
             padding={
                 "top": Disparity_Chart.full_chart_padding,
-                "bottom": -FONT_SIZE_SMALL * 2/3 * len(metrics_list) + Disparity_Chart.full_chart_padding,
+                "bottom": -FONT_SIZE_SMALL * 2 / 3 * len(metrics_list)
+                + Disparity_Chart.full_chart_padding,
                 "left": Disparity_Chart.full_chart_padding,
                 "right": Disparity_Chart.full_chart_padding,
             },
