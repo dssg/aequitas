@@ -38,6 +38,15 @@ class GenericDataset(Dataset):
 
         Parameters
         ----------
+        label_column : str
+            The name of the label column in the dataset.
+        sensitive_column : str
+            The name of the sensitive column in the dataset.
+        df : pd.DataFrame, optional
+            The dataset to be used. If None, the dataset will be loaded from the
+            specified paths. Defaults to None.
+        dataset_path : Union[str, Path]
+            The path to the dataset. May be URL.
         train_path : Union[str, Path]
             The path to the training data. May be URL.
         validation_path : Union[str, Path]
