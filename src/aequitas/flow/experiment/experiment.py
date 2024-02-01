@@ -266,8 +266,10 @@ class Experiment:
         dataset: str,
         fairness_metric: str = "Predictive Equality",
         performance_metric: str = "TPR",
-        split: str = "validation",
+        split: str = "test",
     ) -> None:
         results = read_results(self.exp_folder)
-        self.plot = Plot(results, dataset, fairness_metric, performance_metric, split=split)
+        self.plot = Plot(
+            results, dataset, fairness_metric, performance_metric, split=split
+        )
         return self.plot.visualize()
