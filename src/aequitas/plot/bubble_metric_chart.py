@@ -32,17 +32,6 @@ from aequitas.plot.commons import labels as Label
 # complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-metric_names = {
-    "Predictive Equality": "fpr_ratio",
-    "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "pprev_ratio",
-    "TPR": "tpr",
-    "FPR": "fpr",
-    "FNR": "fnr",
-    "Accuracy": "accuracy",
-    "Precision": "precision",
-}
-
 
 def __get_position_scales(metrics, chart_height, chart_width, concat_chart):
     """Computes the scales for x and y encodings to be used in the metric bubble
@@ -559,8 +548,6 @@ def plot_metric_bubble_chart(
     :return: the full metrics chart
     :rtype: Altair chart object
     """
-    metrics_list = [metric_names[metric] for metric in metrics_list]
-
     (
         plot_table,
         metrics,

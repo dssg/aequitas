@@ -34,17 +34,6 @@ from aequitas.plot.commons import labels as Label
 # complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-metric_names = {
-    "Predictive Equality": "fpr_ratio",
-    "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "pprev_ratio",
-    "TPR": "tpr",
-    "FPR": "fpr",
-    "FNR": "fnr",
-    "Accuracy": "accuracy",
-    "Precision": "precision",
-}
-
 
 def __get_position_scales(
     plot_table, metrics, fairness_threshold, chart_height, chart_width
@@ -678,8 +667,6 @@ def plot_disparity_bubble_chart(
     :return: the full disparities chart
     :rtype: Altair chart object
     """
-    metrics_list = [metric_names[metric] for metric in metrics_list]
-
     (
         plot_table,
         metrics,

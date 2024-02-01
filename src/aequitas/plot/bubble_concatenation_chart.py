@@ -97,8 +97,6 @@ def plot_concatenated_bubble_charts(
     :return: the full disparities chart
     :rtype: Altair chart object
     """
-    metrics_list = [metric_names[metric] for metric in metrics_list]
-
     (
         plot_table,
         metrics,

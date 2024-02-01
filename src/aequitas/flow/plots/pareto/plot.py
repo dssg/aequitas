@@ -216,7 +216,7 @@ class Plot:
         model_id: int,
         dataset: Any,
         sensitive_attribute: Union[str, list[str]],
-        metrics: list[str] = ["TPR", "FPR"],
+        metrics: list[str] = ["tpr", "fpr"],
         fairness_threshold: float = 1.2,
         results_path: Union[Path, str] = "examples/experiment_results",
         reference_groups: Optional[dict[str, str]] = None,

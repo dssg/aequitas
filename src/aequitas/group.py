@@ -464,7 +464,7 @@ class Group(object):
 
     def plot_summary(
         disparities: pd.DataFrame,
-        metrics: list[str] = ["FPR", "TPR"],
+        metrics: list[str] = ["fpr", "tpr"],
         fairness_threshold: float = 1.25,
     ):
         """
@@ -475,7 +475,7 @@ class Group(object):
         disparities : pandas.DataFrame
             Disparities for each group.
         metrics : list[str], optional
-            List of metrics to plot. Defaults to ["FPR", "TPR"].
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """
@@ -484,7 +484,7 @@ class Group(object):
     def plot_disparity(
         disparities: pd.DataFrame,
         attribute: str,
-        metrics: list[str] = ["FPR", "TPR"],
+        metrics: list[str] = ["fpr", "tpr"],
         fairness_threshold: float = 1.25,
     ):
         """
@@ -495,7 +495,7 @@ class Group(object):
         disparities : pandas.DataFrame
             Disparities for each group.
         metrics : list[str], optional
-            List of metrics to plot. Defaults to ["FPR", "TPR"].
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """
@@ -506,7 +506,7 @@ class Group(object):
     def plot_absolute(
         disparities: pd.DataFrame,
         attribute: str,
-        metrics: list[str] = ["FPR", "TPR"],
+        metrics: list[str] = ["fpr", "tpr"],
         fairness_threshold: float = 1.25,
     ):
         """
@@ -517,7 +517,7 @@ class Group(object):
         disparities : pandas.DataFrame
             Disparities for each group.
         metrics : list[str], optional
-            List of metrics to plot. Defaults to ["FPR", "TPR"].
+            List of metrics to plot. Defaults to ["fpr", "tpr"].
         fairness_threshold : float, optional
             Threshold to use to determine fairness. Defaults to 1.2.
         """

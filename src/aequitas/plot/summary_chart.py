@@ -30,17 +30,6 @@ from aequitas.plot.commons import labels as Label
 # complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-metric_names = {
-    "Predictive Equality": "fpr_ratio",
-    "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "pprev_ratio",
-    "TPR": "tpr",
-    "FPR": "fpr",
-    "FNR": "fnr",
-    "Accuracy": "accuracy",
-    "Precision": "precision",
-}
-
 
 def __get_scales(max_num_groups):
     """Creates an Altair scale for the color of the parity test result, and another
@@ -596,8 +585,6 @@ def plot_summary_chart(
     :return: the full summary chart
     :rtype: Altair chart object
     """
-    metrics_list = [metric_names[metric] for metric in metrics_list]
-
     # If a specific list of attributes was not passed, use all from df
     (
         metrics,
