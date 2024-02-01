@@ -10,7 +10,14 @@ from .experiment import Experiment
 class DefaultExperiment(Experiment):
     def __init__(
         self,
-        dataset_config: Union[DictConfig, dict],
+        df: pd.DataFrame,
+        label_column: str,
+        sensitive_column: str,
+        categorical_columns: list[str] = [],
+        other_dataset_args: dict = None,
+        threshold_type: str = "fixed",
+        score_threshold: float = 0.5,
+        dataset_name: str = "Dataset",
         methods: Union[
             list[Literal["preprocessing", "inprocessing"]], Literal["all"]
         ] = "all",
@@ -25,19 +32,68 @@ class DefaultExperiment(Experiment):
 
         Parameters
         ----------
-        dataset_config : Union[DictConfig, dict]
-            Dataset configuration.
+        df : pd.DataFrame
+            Pandas DataFrame with the dataset to be used in the experiment.
+        label_column : str
+            Name of the column containing the label.
+        sensitive_column : str
+            Name of the column containing the sensitive attribute.
+        categorical_columns : list[str], optional
+            List of categorical columns. Defaults to [].
+        other_dataset_args : dict, optional
+            Other arguments to pass to the dataset. Defaults to None.
+        threshold_type : str, optional
+            Threshold type. Defaults to "fixed".
+        score_threshold : float, optional
+            Score threshold. Defaults to 0.5.
+        dataset_name : str, optional
+            Dataset name. Defaults to "Dataset".
         methods : Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]], optional
             Methods to include in the experiment. If "all", all methods will be included.
             Defaults to "all".
         experiment_size : Literal["test", "small", "medium", "large"], optional
             Experiment size. Defaults to "small".
+        use_baseline : bool, optional
+            Whether to include the baseline methods. Defaults to True.
 
         Raises
         ------
         ValueError
             If the methods or experiment size are not valid.
         """
+        dataset_config = {
+            dataset_name: {
+                "classpath": "aequitas.flow.datasets.GenericDataset",
+                "threshold": {
+                    "type": threshold_type,
+                    "value": score_threshold,
+                },
+                "args": {
+                    "df": df,
+                    "label_column": label_column,
+                    "sensitive_column": sensitive_column,
+                    "categorical_columns": categorical_columns,
+                    **(other_dataset_args or {}),
+                },
+            }
+        }
+
+        config = self._generate_config(
+            dataset_config=dataset_config,
+            methods=methods,
+            experiment_size=experiment_size,
+            use_baseline=use_baseline,
+        )
+
+        super().__init__(config=config)
+
+    @staticmethod
+    def _generate_config(
+        dataset_config: dict,
+        methods: Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]],
+        experiment_size: Literal["test", "small", "medium", "large"],
+        use_baseline: bool,
+    ):
         # Validate methods:
         if methods == "all":
             default_methods = [
@@ -74,24 +130,17 @@ class DefaultExperiment(Experiment):
                 "Invalid experiment_size value. Try one of "
                 f"{['test', 'small', 'medium', 'large']}."
             )
-        # Update experiment config:
-        config = {
+        # Generate experiment config:
+        return {
             "methods": method_configs,
             "datasets": [dataset_config],
             "optimization": experiment_config,
         }
-        super().__init__(config=config)
 
     @classmethod
-    def from_pandas(
+    def from_config(
         cls,
-        df: pd.DataFrame,
-        target_feature: str,
-        sensitive_feature: str,
-        other_dataset_args: dict = None,
-        threshold_type: str = "fixed",
-        score_threshold: float = 0.5,
-        dataset_name: str = "Dataset",
+        dataset_config: Union[DictConfig, dict],
         methods: Union[
             list[Literal["preprocessing", "inprocessing"]], Literal["all"]
         ] = "all",
@@ -102,27 +151,13 @@ class DefaultExperiment(Experiment):
 
         Parameters
         ----------
-        df : pd.DataFrame
-            Pandas DataFrame with the dataset to be used in the experiment.
-        target_feature : str
-            Name of the column containing the label.
-        sensitive_feature : str
-            Name of the column containing the sensitive attribute.
-        other_dataset_args : dict, optional
-            Other arguments to pass to the dataset. Defaults to None.
-        threshold_type : str, optional
-            Threshold type. Defaults to "fixed".
-        score_threshold : float, optional
-            Score threshold. Defaults to 0.5.
-        dataset_name : str, optional
-            Dataset name. Defaults to "Dataset".
+        dataset_config : Union[DictConfig, dict]
+            Dataset configuration.
         methods : Union[list[Literal["preprocessing", "inprocessing"]], Literal["all"]], optional
             Methods to include in the experiment. If "all", all methods will be included.
             Defaults to "all".
         experiment_size : Literal["test", "small", "medium", "large"], optional
             Experiment size. Defaults to "small".
-        use_baseline : bool, optional
-            Whether to include the baseline methods. Defaults to True.
 
         Returns
         -------
@@ -134,24 +169,11 @@ class DefaultExperiment(Experiment):
         ValueError
             If the methods or experiment size are not valid.
         """
-        dataset_config = {
-            dataset_name: {
-                "classpath": "aequitas.flow.datasets.GenericDataset",
-                "threshold": {
-                    "type": threshold_type,
-                    "value": score_threshold,
-                },
-                "args": {
-                    "df": df,
-                    "target_feature": target_feature,
-                    "sensitive_feature": sensitive_feature,
-                    **(other_dataset_args or {}),
-                },
-            }
-        }
-        return cls(
+        config = cls._generate_config(
             dataset_config=dataset_config,
             methods=methods,
             experiment_size=experiment_size,
             use_baseline=use_baseline,
         )
+
+        return super().__init__(config=config)
