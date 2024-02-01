@@ -158,7 +158,7 @@ We support a range of methods designed to address bias and discrimination in dif
   </tr>
   <tr></tr>
   <tr>
-    <td rowspan="10"> Pre-processing </td>
+    <td rowspan="12"> Pre-processing </td>
     <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
     <td rowspan="2"> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
   </tr>
@@ -174,13 +174,19 @@ We support a range of methods designed to address bias and discrimination in dif
   </tr>
   <tr></tr>
   <tr>
-    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
+    <td rowspan="2">Flips selected labels to reduce prevalence disparity between groups.</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/correlation_suppression.py">Correlation Suppression</td>
     <td rowspan="2">Removes features that are highly correlated with the sensitive attribute.</td>
   </tr>
   <tr></tr>
   <tr>
-    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
-    <td rowspan="2">Flips selected labels to reduce prevalence disparity between groups.</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/feature_importance_suppression.py">Feature Importance Suppression</td>
+    <td rowspan="2">Iterively removes the most important features with respect to the sensitive attribute.
+    </td>
   </tr>
   <tr></tr>
   <tr>
