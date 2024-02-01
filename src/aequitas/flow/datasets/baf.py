@@ -11,7 +11,7 @@ from .dataset import Dataset
 
 VARIANTS = ["Base", "TypeI", "TypeII", "TypeIII", "TypeIV", "TypeV", "Sample"]
 
-CATEGORICAL_FEATURES = [
+CATEGORICAL_COLUMNS = [
     "payment_type",
     "employment_status",
     "housing_status",
@@ -19,9 +19,9 @@ CATEGORICAL_FEATURES = [
     "device_os",
 ]
 
-TARGET_FEATURE = "fraud_bool"
+LABEL_COLUMN = "fraud_bool"
 
-SENSITIVE_FEATURE = "customer_age_bin"
+SENSITIVE_COLUMN = "customer_age_bin"
 
 SPLIT_TYPES = ["random", "month"]  # Add more if wanted.
 SPLIT_VALUES = ["train", "validation", "test"]
@@ -34,7 +34,9 @@ DEFAULT_SPLIT = {
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
 
-DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
+DEFAULT_URL = (
+    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
+)
 
 
 class BankAccountFraud(Dataset):
@@ -55,14 +57,14 @@ class BankAccountFraud(Dataset):
         Defaults to 42.
     extension : str, optional
         Extension type of the dataset files. Defaults to "parquet".
-    target_feature : str, optional
-        Name of the target feature. If None, defaults to "fraud_bool".
-    sensitive_feature : str, optional
-        Name of the sensitive feature. If None, defaults to "customer_age_bin".
+    label_column : str, optional
+        Name of the label column. If None, defaults to "fraud_bool".
+    sensitive_column : str, optional
+        Name of the sensitive column. If None, defaults to "customer_age_bin".
     include_month : bool, optional
-        whether to include the month column in the features. Defaults to True.
+        whether to include the month column in the columns. Defaults to True.
     age_cutoff : int, optional
-        Age cutoff for creating the binary age feature, if using age as the
+        Age cutoff for creating the binary age column, if using age as the
         sensitive attribute. Defaults to 50.
     """
 
@@ -74,25 +76,25 @@ class BankAccountFraud(Dataset):
         path: Union[str, Path] = DEFAULT_PATH,
         seed: int = 42,
         extension: str = "parquet",
-        target_feature: Optional[str] = None,
-        sensitive_feature: Optional[str] = None,
+        label_column: Optional[str] = None,
+        sensitive_column: Optional[str] = None,
         include_month: bool = True,
         age_cutoff: int = 50,
     ):
         super().__init__()
 
-        self.target_feature = (
-            TARGET_FEATURE if target_feature is None else target_feature
+        self.label_column = (
+            LABEL_COLUMN if label_column is None else label_column
         )
 
-        if sensitive_feature == "customer_age" or sensitive_feature is None:
-            self.sensitive_feature = SENSITIVE_FEATURE
-        elif sensitive_feature not in CATEGORICAL_FEATURES:
+        if sensitive_column == "customer_age" or sensitive_column is None:
+            self.sensitive_column = SENSITIVE_COLUMN
+        elif sensitive_column not in CATEGORICAL_COLUMNS:
             raise ValueError(
-                f"Invalid sensitive feature value. Try one of: {CATEGORICAL_FEATURES}"
+                f"Invalid sensitive column value. Try one of: {CATEGORICAL_COLUMNS}"
             )
         else:
-            self.sensitive_feature = sensitive_feature
+            self.sensitive_column = sensitive_column
 
         self.age_cutoff = age_cutoff
 
@@ -165,12 +167,14 @@ class BankAccountFraud(Dataset):
             self.data = pd.read_parquet(path)
         else:
             self.data = pd.read_csv(path)
-        for col in CATEGORICAL_FEATURES:
+        for col in CATEGORICAL_COLUMNS:
             self.data[col] = self.data[col].astype("category")
 
-        if self.sensitive_feature == "customer_age_bin":
+        if self.sensitive_column == "customer_age_bin":
             self.data["customer_age_bin"] = self.data["customer_age"] >= self.age_cutoff
-            self.data["customer_age_bin"] = self.data["customer_age_bin"].astype(int)
+            self.data["customer_age_bin"] = self.data["customer_age_bin"].astype(
+                "category"
+            )
 
     def create_splits(self) -> None:
         """Create train, validation, and test splits for the dataset."""

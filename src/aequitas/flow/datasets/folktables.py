@@ -18,7 +18,7 @@ VARIANTS = [
     "ACS_sample",
 ]
 
-TARGET_FEATURES = {
+LABEL_COLUMNS = {
     "ACSIncome": "PINCP",
     "ACS_sample": "PINCP",
     "ACSEmployment": "ESR",
@@ -27,9 +27,9 @@ TARGET_FEATURES = {
     "ACSTravelTime": "JWMNP",
 }
 
-SENSITIVE_FEATURE = "RAC1P"
+SENSITIVE_COLUMN = "RAC1P"
 
-CATEGORICAL_FEATURES = {
+CATEGORICAL_COLUMNS = {
     "ACSIncome": ["COW", "MAR", "OCCP", "POBP", "RELP", "RAC1P"],
     "ACSEmployment": ["MAR", "ESP", "MIG", "CIT", "MIL", "ANC", "RELP", "RAC1P"],
     "ACSMobility": ["MAR", "ESP", "CIT", "MIL", "ANC", "RELP", "RAC1P", "COW", "ESR"],
@@ -62,7 +62,7 @@ CATEGORICAL_FEATURES = {
     ],
 }
 
-BOOL_FEATURES = {
+BOOL_COLUMNS = {
     "ACSIncome": ["SEX"],
     "ACSEmployment": ["SEX", "DIS", "NATIVTY", "DEAR", "DEYE", "DREM"],
     "ACSMobility": [
@@ -86,7 +86,9 @@ DEFAULT_SPLIT = None
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
 
-DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/FolkTables/"
+DEFAULT_URL = (
+    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/FolkTables/"
+)
 
 
 class FolkTables(Dataset):
@@ -98,8 +100,8 @@ class FolkTables(Dataset):
         path: Union[str, Path] = DEFAULT_PATH,
         seed: int = 42,
         extension: str = "parquet",
-        target_feature: Optional[str] = None,
-        sensitive_feature: Optional[str] = None,
+        label_column: Optional[str] = None,
+        sensitive_column: Optional[str] = None,
         age_cutoff: Optional[int] = 50,
     ):
         """Instantiate a FolkTables dataset.
@@ -119,12 +121,12 @@ class FolkTables(Dataset):
             Defaults to 42.
         extension : str, optional
             Extension type of the dataset files. Defaults to "parquet".
-        target_feature : str, optional
-            Name of the target feature. If None, defaults to "fraud_bool".
-        sensitive_feature : str, optional
-            Name of the sensitive feature. If None, defaults to "customer_age_bin".
+        label_column : str, optional
+            Name of the label column. If None, defaults to "fraud_bool".
+        sensitive_column : str, optional
+            Name of the sensitive column. If None, defaults to "customer_age_bin".
         age_cutoff : int, optional
-            Age cutoff for creating the binary age feature, if using age as the
+            Age cutoff for creating the binary age column, if using age as the
             sensitive attribute. Defaults to 50.
         """
         super().__init__()
@@ -158,24 +160,24 @@ class FolkTables(Dataset):
         self._train: LabeledFrame = None
         self._validation: LabeledFrame = None
         self._test: LabeledFrame = None
-        self.target_feature = (
-            TARGET_FEATURES[self.variant] if target_feature is None else target_feature
+        self.label_column = (
+            LABEL_COLUMNS[self.variant] if label_column is None else label_column
         )
 
-        if sensitive_feature == "AGEP":
-            self.sensitive_feature = "AGEP_bin"
+        if sensitive_column == "AGEP":
+            self.sensitive_column = "AGEP_bin"
         elif (
-            (sensitive_feature is not None)
-            and (sensitive_feature not in CATEGORICAL_FEATURES[variant])
-            and (sensitive_feature not in BOOL_FEATURES[variant])
+            (sensitive_column is not None)
+            and (sensitive_column not in CATEGORICAL_COLUMNS[variant])
+            and (sensitive_column not in BOOL_COLUMNS[variant])
         ):
             raise ValueError(
-                f"Invalid sensitive feature value. "
-                f"Try one of: {CATEGORICAL_FEATURES[variant] + BOOL_FEATURES[variant]}"
+                f"Invalid sensitive column value. "
+                f"Try one of: {CATEGORICAL_COLUMNS[variant] + BOOL_COLUMNS[variant]}"
             )
         else:
-            self.sensitive_feature = (
-                SENSITIVE_FEATURE if sensitive_feature is None else sensitive_feature
+            self.sensitive_column = (
+                SENSITIVE_COLUMN if sensitive_column is None else sensitive_column
             )
         self.age_cutoff = age_cutoff
         self._indexes = None  # Store indexes of predefined splits
@@ -235,15 +237,19 @@ class FolkTables(Dataset):
             else:
                 self.data = pd.read_csv(path)
 
-        for col in CATEGORICAL_FEATURES[self.variant]:
+        for col in CATEGORICAL_COLUMNS[self.variant]:
             self.data[col] = self.data[col].astype("category")
 
-        for col in BOOL_FEATURES[self.variant]:
-            self.data[col] = self.data[col].replace(2, 0).astype(bool)
+        for col in BOOL_COLUMNS[self.variant]:
+            self.data[col] = (
+                self.data[col]
+                .replace(2, 0)
+                .astype("category" if col == self.sensitive_feature else bool)
+            )
 
-        if self.sensitive_feature == "AGEP_bin":
+        if self.sensitive_column == "AGEP_bin":
             self.data["AGEP_bin"] = self.data["AGEP"] >= self.age_cutoff
-            self.data["AGEP_bin"] = self.data["AGEP_bin"].astype(int)
+            self.data["AGEP_bin"] = self.data["AGEP_bin"].astype("category")
 
         self.logger.debug("Data shape: {self.data.shape}.")
         self.logger.info("Data loaded successfully.")

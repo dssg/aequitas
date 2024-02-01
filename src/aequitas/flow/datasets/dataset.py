@@ -11,9 +11,9 @@ class Dataset(ABC):
         self._train = None
         self._validation = None
         self._test = None
-        self.target_feature = None
-        self.sensitive_feature = None
-        self.categorical_features = None
+        self.label_column = None
+        self.sensitive_column = None
+        self.categorical_columns = None
 
     @abstractmethod
     def load_data(self) -> None:
@@ -40,7 +40,7 @@ class Dataset(ABC):
     def data(self, value: pd.DataFrame):
         """Set the dataset."""
         self._data = LabeledFrame(
-            value, y_col=self.target_feature, s_col=self.sensitive_feature
+            value, y_col=self.label_column, s_col=self.sensitive_column
         )
 
     @property
@@ -55,7 +55,7 @@ class Dataset(ABC):
     def train(self, value: pd.DataFrame):
         """Set the training split of the dataset."""
         self._train = LabeledFrame(
-            value, y_col=self.target_feature, s_col=self.sensitive_feature
+            value, y_col=self.label_column, s_col=self.sensitive_column
         )
 
     @property
@@ -70,7 +70,7 @@ class Dataset(ABC):
     def validation(self, value: pd.DataFrame):
         """Set the validation split of the dataset."""
         self._validation = LabeledFrame(
-            value, y_col=self.target_feature, s_col=self.sensitive_feature
+            value, y_col=self.label_column, s_col=self.sensitive_column
         )
 
     @property
@@ -85,5 +85,5 @@ class Dataset(ABC):
     def test(self, value: pd.DataFrame):
         """Set the test split of the dataset."""
         self._test = LabeledFrame(
-            value, y_col=self.target_feature, s_col=self.sensitive_feature
+            value, y_col=self.label_column, s_col=self.sensitive_column
         )
