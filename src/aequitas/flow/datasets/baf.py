@@ -34,7 +34,9 @@ DEFAULT_SPLIT = {
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
 
-DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
+DEFAULT_URL = (
+    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
+)
 
 
 class BankAccountFraud(Dataset):
@@ -170,7 +172,9 @@ class BankAccountFraud(Dataset):
 
         if self.sensitive_feature == "customer_age_bin":
             self.data["customer_age_bin"] = self.data["customer_age"] >= self.age_cutoff
-            self.data["customer_age_bin"] = self.data["customer_age_bin"].astype(int)
+            self.data["customer_age_bin"] = self.data["customer_age_bin"].astype(
+                "category"
+            )
 
     def create_splits(self) -> None:
         """Create train, validation, and test splits for the dataset."""

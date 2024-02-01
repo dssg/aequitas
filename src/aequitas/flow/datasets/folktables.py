@@ -86,7 +86,9 @@ DEFAULT_SPLIT = None
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
 
-DEFAULT_URL = "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/FolkTables/"
+DEFAULT_URL = (
+    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/FolkTables/"
+)
 
 
 class FolkTables(Dataset):
@@ -239,11 +241,15 @@ class FolkTables(Dataset):
             self.data[col] = self.data[col].astype("category")
 
         for col in BOOL_FEATURES[self.variant]:
-            self.data[col] = self.data[col].replace(2, 0).astype(bool)
+            self.data[col] = (
+                self.data[col]
+                .replace(2, 0)
+                .astype("category" if col == self.sensitive_feature else bool)
+            )
 
         if self.sensitive_feature == "AGEP_bin":
             self.data["AGEP_bin"] = self.data["AGEP"] >= self.age_cutoff
-            self.data["AGEP_bin"] = self.data["AGEP_bin"].astype(int)
+            self.data["AGEP_bin"] = self.data["AGEP_bin"].astype("category")
 
         self.logger.debug("Data shape: {self.data.shape}.")
         self.logger.info("Data loaded successfully.")
