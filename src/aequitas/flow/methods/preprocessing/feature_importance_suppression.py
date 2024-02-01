@@ -9,7 +9,7 @@ from ...utils import create_logger
 from .preprocessing import PreProcessing
 
 
-class BackwardFeatureElimination(PreProcessing):
+class FeatureImportanceSuppression(PreProcessing):
     def __init__(
         self,
         auc_threshold: Optional[int] = 0.5,
@@ -33,9 +33,11 @@ class BackwardFeatureElimination(PreProcessing):
         seed : int, optional
             The seed for the random forest. Defaults to 0.
         """
-        self.logger = create_logger("methods.preprocessing.BackwardFeatureElimination")
+        self.logger = create_logger(
+            "methods.preprocessing.FeatureImportanceSuppression"
+        )
         self.logger.info(
-            "Instantiating a BackwardFeatureElimination preprocessing method."
+            "Instantiating a FeatureImportanceSuppression preprocessing method."
         )
         self.used_in_inference = True
 
