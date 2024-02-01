@@ -176,6 +176,8 @@ class Audit:
         matplotlib.pyplot.Axes
             Axes containing the summary plot.
         """
+        if not hasattr(self, "disparity_df"):
+            self.audit()
         if not isinstance(metrics, list):
             metrics = [metrics]
         return summary(self.disparity_df, metrics, **kwargs)
@@ -200,6 +202,8 @@ class Audit:
         matplotlib.pyplot.Axes
             Axes containing the disparity plot.
         """
+        if not hasattr(self, "disparity_df"):
+            self.audit()
         if not isinstance(metrics, list):
             metrics = [metrics]
         return disparity(self.disparity_df, metrics, attribute, **kwargs)
@@ -224,6 +228,8 @@ class Audit:
         matplotlib.pyplot.Axes
             Axes containing the absolute disparity plot.
         """
+        if not hasattr(self, "disparity_df"):
+            self.audit()
         if not isinstance(metrics, list):
             metrics = [metrics]
         return absolute(self.disparity_df, metrics, attribute, **kwargs)
