@@ -23,7 +23,10 @@ class PreProcessing(ABC):
 
     @abstractmethod
     def transform(
-        self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
+        self,
+        X: pd.DataFrame,
+        y: pd.Series,
+        s: Optional[pd.Series] = None,
     ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
         """
         Transform the data according to the preprocessing method.
