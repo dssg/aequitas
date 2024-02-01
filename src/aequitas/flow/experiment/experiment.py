@@ -263,12 +263,15 @@ class Experiment:
 
     def plot_pareto(
         self,
-        dataset: str,
+        dataset: str = "Dataset",
         fairness_metric: str = "Predictive Equality",
         performance_metric: str = "TPR",
         split: str = "test",
     ) -> None:
         results = read_results(self.exp_folder)
+        if dataset not in results:
+            raise ValueError(f"Dataset '{dataset}' was not used in experiment."
+                             f" Try on of the following: {list(results.keys())}")
         self.plot = Plot(
             results, dataset, fairness_metric, performance_metric, split=split
         )
