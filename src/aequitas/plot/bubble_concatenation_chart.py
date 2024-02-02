@@ -17,17 +17,6 @@ from aequitas.plot.commons import initializers as Initializer
 # complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
-metric_names = {
-    "Predictive Equality": "fpr_ratio",
-    "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "pprev_ratio",
-    "TPR": "tpr",
-    "FPR": "fpr",
-    "FNR": "fnr",
-    "Accuracy": "accuracy",
-    "Precision": "precision",
-}
-
 
 def __get_chart_sizes(chart_width):
     """Calculates the widths of the disparity and metric charts that make-up the
