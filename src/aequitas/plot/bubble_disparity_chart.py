@@ -28,6 +28,8 @@ from aequitas.plot.commons.style.text import FONT, FONT_SIZE_SMALL
 from aequitas.plot.commons.style.sizes import Disparity_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import labels as Label
+from aequitas.plot.commons.metrics import possible_metrics, display_name
+
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need
 # it (like most annotations), we pass the following dummy dataframe to reduce the
@@ -71,7 +73,7 @@ def __get_position_scales(
     y_range = get_chart_size_range(chart_height, Disparity_Chart.padding_y)
     if chart_height < 300:
         y_range[0] = 30
-    y_domain = [metric.upper() for metric in metrics]
+    y_domain = [display_name.get(metric.lower(), metric).upper() for metric in metrics]
     position_scales["y"] = alt.Scale(domain=y_domain, range=y_range)
 
     return position_scales
@@ -81,7 +83,7 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
     """Draws an horizontal rule and the left-hand side label for each metric.
     The groups' bubbles will be positioned on this horizontal rule."""
 
-    metrics_labels = [metric.upper() for metric in metrics]
+    metrics_labels = [display_name.get(metric.lower(), metric).upper() for metric in metrics]
 
     metrics_axis = alt.Axis(
         domain=False,
@@ -118,7 +120,6 @@ def __draw_metrics_rules(metrics, scales, concat_chart):
             x2="x2:Q",
         )
     )
-
     return metrics_rules
 
 
@@ -502,7 +503,7 @@ def __draw_bubbles(
                 field=f"{metric}",
                 type="quantitative",
                 format=".2f",
-                title=f"{metric}".upper(),
+                title=f"{display_name.get(metric, metric)}".upper(),
             ),
         ]
 
@@ -511,7 +512,7 @@ def __draw_bubbles(
 
         bubble_centers += (
             alt.Chart(plot_table)
-            .transform_calculate(metric_variable=f"'{metric.upper()}'")
+            .transform_calculate(metric_variable=f"'{display_name.get(metric.lower(), metric).upper()}'")
             .mark_point(filled=True, size=Bubble.center_size, cursor=Bubble.cursor)
             .encode(
                 x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
@@ -531,7 +532,7 @@ def __draw_bubbles(
         bubble_areas += (
             alt.Chart(plot_table)
             .mark_circle(opacity=Bubble.opacity, cursor=Bubble.cursor)
-            .transform_calculate(metric_variable=f"'{metric.upper()}'")
+            .transform_calculate(metric_variable=f"'{display_name.get(metric.lower(), metric).upper()}'")
             .encode(
                 x=alt.X(f"{metric}_disparity_scaled:Q", scale=scales["x"], axis=x_axis),
                 y=alt.Y("metric_variable:N", scale=scales["y"], axis=no_axis()),
@@ -667,6 +668,7 @@ def plot_disparity_bubble_chart(
     :return: the full disparities chart
     :rtype: Altair chart object
     """
+    metrics = [possible_metrics.get(metric.lower(), metric) for metric in metrics_list]
     (
         plot_table,
         metrics,
@@ -677,7 +679,7 @@ def plot_disparity_bubble_chart(
         selection,
     ) = Initializer.prepare_bubble_chart(
         disparity_df,
-        metrics_list,
+        metrics,
         attribute,
         fairness_threshold,
         chart_height,

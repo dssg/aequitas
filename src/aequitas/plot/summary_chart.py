@@ -24,6 +24,7 @@ from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
 from aequitas.plot.commons import labels as Label
+from aequitas.plot.commons.metrics import possible_metrics, display_name
 
 # Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need
 # it (like most annotations), we pass the following dummy dataframe to reduce the
@@ -586,6 +587,7 @@ def plot_summary_chart(
     :rtype: Altair chart object
     """
     # If a specific list of attributes was not passed, use all from df
+    metrics = [possible_metrics.get(metric.lower(), metric) for metric in metrics_list]
     (
         metrics,
         attributes,
@@ -593,7 +595,7 @@ def plot_summary_chart(
         chart_width,
     ) = Initializer.prepare_summary_chart(
         disparity_df,
-        metrics_list,
+        metrics,
         attributes_list,
         fairness_threshold,
         chart_height,
@@ -619,8 +621,10 @@ def plot_summary_chart(
     # SCALES
     scales = __get_scales(max_num_groups)
 
+    display_metrics = [display_name.get(metric, metric) for metric in metrics]
+
     # METRIC TITLES
-    metric_titles = __draw_metric_line_titles(metrics, size_constants)
+    metric_titles = __draw_metric_line_titles(display_metrics, size_constants)
 
     # RELEVANT FIELDS
     viz_fields = [
