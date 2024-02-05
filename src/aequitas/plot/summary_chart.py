@@ -217,7 +217,6 @@ def __draw_parity_result_text(parity_result, color_scale):
                 scale=color_scale,
                 legend=alt.Legend(
                     title=Label.TEST,
-                    title=Label.TEST,
                     padding=Legend.margin,
                     offset=0,
                 ),
