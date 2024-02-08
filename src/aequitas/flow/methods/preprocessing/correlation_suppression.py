@@ -1,51 +1,29 @@
-from typing import Optional, Literal
-
+from typing import Optional
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
-
 from ...utils import create_logger
 from .preprocessing import PreProcessing
 
 
-class Unawareness(PreProcessing):
-    def __init__(
-        self,
-        correlation_threshold: Optional[float] = 0.5,
-        strategy: Literal["correlation", "featureselection"] = "correlation",
-        seed: int = 0,
-    ):
+class CorrelaitonSuppression(PreProcessing):
+    def __init__(self, correlation_threshold: Optional[float] = 0.5):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
         categorical.
-
         Parameters
         ----------
-        top_k : int, optional
-            Number of features to remove. If None, the correlation_threshold
-            must be passed by the user. Defaults to 1.
         correlation_threshold : float, optional
             Features with a correlation value higher than this thresold are
             removed. If None, the top_k parameter is used to determine how many
             features to remove. Defaults to None.
-        strategy : {"correlation", "featureselection"}, optional
-            Strategy to use to calculate how much each feature is related to the
-            sensitive attribute. If "correlation", correlation between features
-            is used. "featureselection" is not implemented yet. Defaults to
-            "correlation".
-
         """
-        self.logger = create_logger("methods.preprocessing.Unawareness")
-        self.logger.info("Instantiating an Unawareness preprocessing method.")
+        self.logger = create_logger("methods.preprocessing.CorrelaitonSuppression")
+        self.logger.info(
+            "Instantiating an CorrelaitonSuppression preprocessing method."
+        )
         self.used_in_inference = True
-
         self.correlation_threshold = correlation_threshold
-        if strategy == "featureselection":
-            raise NotImplementedError(
-                "The feature selection strategy is not implemented yet."
-            )
-        self.strategy = strategy
-        self.seed = seed
 
     def _correlation_ratio(
         self, categorical_feature: np.ndarray, numeric_feature: np.ndarray
@@ -57,14 +35,12 @@ class Unawareness(PreProcessing):
         the numeric data is purely due to the difference within the categorical
         data. A value of 0 indicates that the variance in the numeric data is
         completely unaffected by any differences within the categorical data.
-
         Parameters
         ----------
         categorical_feature : numpy.ndarray
             Categorical column.
         numeric_feature : numpy.ndarray
             Numeric column.
-
         Returns
         -------
         float
@@ -89,14 +65,12 @@ class Unawareness(PreProcessing):
         Cramer's V is a heavily biased estimator and tends to overestimate the
         strength of the correlation. Therefore, a biased correction is normally
         applied to the statistic.
-
         Parameters
         ----------
         a : numpy.ndarray
             First categorical column.
         b : numpy.ndarray
             Second categorical column.
-
         Returns
         -------
         float
@@ -107,16 +81,14 @@ class Unawareness(PreProcessing):
         n = np.sum(contingency.values)
         r, k = contingency.shape
         phi2 = chi2 / n
-
         phi2_corrected = max(0, phi2 - (k - 1) * (r - 1) / (n - 1))
         r_corrected = r - (r - 1) ** 2 / (n - 1)
         k_corrected = k - (k - 1) ** 2 / (n - 1)
-
         statistic = np.sqrt(phi2_corrected / min(r_corrected - 1, k_corrected - 1))
         return statistic
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
-        """Calculates how related each feature is to the sensitive attribute.
+        """Calculates correlation between each feature and the sensitive attribute.
 
         Parameters
         ----------
@@ -128,24 +100,24 @@ class Unawareness(PreProcessing):
             Protected attribute vector.
         """
         super().fit(X, y, s)
-
-        self.logger.info("Calculating feature correlation with sensitive attribute.")
-
-        if self.strategy == "correlation":
-            self.scores = pd.Series(index=X.columns)
-            for col in X.columns:
-                if X[col].dtype.name == "category":
-                    self.scores[col] = self._cramerv(s.values, X[col].values)
-                else:
-                    self.scores[col] = self._correlation_ratio(s.values, X[col].values)
-
-            self.scores = self.scores.sort_values(ascending=False)
+        self.logger.info(
+            "Identifying features correlated with the sensitive attribute."
+        )
+        scores = pd.Series(index=X.columns)
+        for col in X.columns:
+            if X[col].dtype.name == "category":
+                scores[col] = self._cramerv(s.values, X[col].values)
+            else:
+                scores[col] = self._correlation_ratio(s.values, X[col].values)
+        scores = scores.sort_values(ascending=False)
+        self.remove_features = list(
+            scores.loc[scores >= self.correlation_threshold].index
+        )
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None
     ) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
         """Removes the most correlated features with the sensitive attribute.
-
         Parameters
         ----------
         X : pd.DataFrame
@@ -154,22 +126,15 @@ class Unawareness(PreProcessing):
             Label vector.
         s : pd.Series, optional
             Protected attribute vector.
-
         Returns
         -------
         tuple[pd.DataFrame, pd.Series, pd.Series]
             The transformed input, X, y, and s.
         """
         super().transform(X, y, s)
-
-        remove_features = list(
-            self.scores.loc[self.scores >= self.correlation_threshold].index
-        )
-
         self.logger.info(
             f"Removing most correlated features with sensitive attribute: "
-            f"{remove_features}"
+            f"{self.remove_features}"
         )
-        X_transformed = X.drop(columns=remove_features)
-
+        X_transformed = X.drop(columns=self.remove_features)
         return X_transformed, y, s
