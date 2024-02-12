@@ -8,6 +8,7 @@ import numpy as np
 import pkg_resources
 
 from .plot import Plot
+from ...utils.metrics import FAIRNESS_METRICS, PERFORMANCE_METRICS
 
 
 # NumPy data types are not JSON serializable. This custom JSON encoder will
@@ -90,12 +91,9 @@ def visualize(wrapper: Plot, mode="display", save_path=None, pareto_only=False):
     if pareto_only:
         wrapper_results_flat = wrapper_results_flat[wrapper_results_flat["is_pareto"]]
 
-    fairness_metrics = list(wrapper.available_fairness_metrics)
-    performance_metrics = list(wrapper.available_performance_metrics)
-
     filtered_results = wrapper_results_flat[
-        fairness_metrics
-        + performance_metrics
+        FAIRNESS_METRICS
+        + PERFORMANCE_METRICS
         + ["model_id", "hyperparams", "is_pareto"]
     ]
 
@@ -108,8 +106,8 @@ def visualize(wrapper: Plot, mode="display", save_path=None, pareto_only=False):
         "recommended_model": wrapper.best_model_details,
         "optimized_fairness_metric": wrapper.fairness_metric,
         "optimized_performance_metric": wrapper.performance_metric,
-        "fairness_metrics": fairness_metrics,
-        "performance_metrics": performance_metrics,
+        "fairness_metrics": FAIRNESS_METRICS,
+        "performance_metrics": PERFORMANCE_METRICS,
         "tuner_type": "Random Search",  # Hardcoded for now
         "alpha": wrapper.alpha,
     }
