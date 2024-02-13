@@ -1,7 +1,7 @@
 # *Aequitas*: Bias Auditing & Fair ML Toolkit
 
 [![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://badgen.net/pypi/license/aequitas)](https://github.com/dssg/aequitas/blob/master/LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
@@ -36,6 +36,16 @@ or
 ```cmd
 pip install git+https://github.com/dssg/aequitas.git
 ```
+
+### 📔Example Notebooks
+
+| Notebook | Description |
+|-|-|
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
+| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
+| [Add your method to Aequitas Flow](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_add_method.ipynb) | Learn how to add your own method to the Aequitas Flow toolkit. |
+
 
 ### 🔍 Quickstart on Bias Auditing
 
@@ -78,12 +88,18 @@ To perform an experiment, a dataset is required. It must have a label column, a 
 ```python
 from aequitas.flow import DefaultExperiment
 
-experiment = DefaultExperiment(dataset, label="label", s="sensitive_attribute")
+experiment = DefaultExperiment.from_pandas(dataset, target_feature="label", sensitive_feature="attr", experiment_size="small")
 experiment.run()
+
+experiment.plot_pareto()
 ```
-Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually.
 
 <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/pareto_example.png" width="600">
+
+The [`DefaultExperiment`](https://github.com/dssg/aequitas/blob/readme-feedback-changes/src/aequitas/flow/experiment/default.py#L9) class allows for an easier entry-point to experiments in the package. This class has two main parameters to configure the experiment: `experiment_size` and `methods`. The former defines the size of the experiment, which can be either `test` (1 model per method), `small` (10 models per method), `medium` (50 models per method), or `large` (100 models per method). The latter defines the methods to be used in the experiment, which can be either `all` or a subset, namely `preprocessing` or `inprocessing`.
+
+Several aspects of an experiment (*e.g.*, algorithms, number of runs, dataset splitting) can be configured individually in more granular detail in the [`Experiment`](https://github.com/dssg/aequitas/blob/readme-feedback-changes/src/aequitas/flow/experiment/experiment.py#L23) class.
+
 
 [comment]: <> (Make default experiment this easy to run)
 
@@ -137,50 +153,66 @@ We support a range of methods designed to address bias and discrimination in dif
 
 <table>
   <tr>
-    <th> Type </th>
-    <th> Method </th>
-    <th> Description </th>
+    <th rowspan="2"> Type </th>
+    <th rowspan="2"> Method </th>
+    <th rowspan="2"> Description </th>
   </tr>
+  <tr></tr>
   <tr>
-    <td rowspan="5"> Pre-processing </td>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
-    <td> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
+    <td rowspan="12"> Pre-processing </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/data_repairer.py"> Data Repairer </a> </td>
+    <td rowspan="2"> Transforms the data distribution so that a given feature distribution is marginally independent of the sensitive attribute, s. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
-    <td> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
+    <td rowspan="2"> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
-    <td> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/prevalence_sample.py"> Prevalence Sampling </a> </td>
+    <td rowspan="2"> Generates a training sample with controllable balanced prevalence for the groups in dataset, either by undersampling or oversampling. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/unawareness.py">Unawareness</td>
-    <td>Removes features that are highly correlated with the sensitive attribute.</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
+    <td rowspan="2">Flips selected labels to reduce prevalence disparity between groups.</td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/massaging.py">Massaging</td>
-    <td>Flips selected labels to reduce prevalence disparity between groups.</td>
-  <tr>
-    <td rowspan="2"> In-processing </td>
-    <td> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
-    <td> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/correlation_suppression.py">Correlation Suppression</td>
+    <td rowspan="2">Removes features that are highly correlated with the sensitive attribute.</td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
-    <td> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/feature_importance_suppression.py">Feature Importance Suppression</td>
+    <td rowspan="2">Iterively removes the most important features with respect to the sensitive attribute.
+    </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td rowspan="2">Post-processing</td>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
-    <td>Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
+    <td rowspan="4"> In-processing </td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairgbm.py"> FairGBM </a> </td>
+    <td rowspan="2"> Novel method where a boosting trees algorithm (LightGBM) is subject to pre-defined fairness constraints. </td>
   </tr>
+  <tr></tr>
   <tr>
-    <td><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
-    <td>Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/inprocessing/fairlearn_classifier.py">Fairlearn Classifier</td>
+    <td rowspan="2"> Models from the Fairlearn reductions package. Possible parameterization for ExponentiatedGradient and GridSearch methods.</td>
   </tr>
+  <tr></tr>
+  <tr>
+    <td rowspan="4">Post-processing</td>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/group_threshold.py">Group Threshold</td>
+    <td rowspan="2">Adjusts the threshold per group to obtain a certain fairness criterion (e.g., all groups with 10% FPR)</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td rowspan="2"><a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/postprocessing/balanced_group_threshold.py">Balanced Group Threshold</td>
+    <td rowspan="2">Adjusts the threshold per group to obtain a certain fairness criterion, while satisfying a global constraint (e.g., Demographic Parity with a global FPR of 10%)</td>
+  </tr>
+  <tr></tr>
 </table>
-
 
 ### Fairness Metrics
 
@@ -214,13 +246,6 @@ From these, we calculate several metrics:
 
 These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. With the [`Bias`](https://github.com/dssg/aequitas/blob/master/src/aequitas/bias.py) class, several fairness metrics can be derived by different combinations of ratios of these metrics.
 
-### 📔Example Notebooks
-
-| Notebook | Description |
-|-|-|
-| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
-| [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
-| [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 
 ## Further documentation
 
