@@ -180,6 +180,7 @@ class GenericDataset(Dataset):
                 original_size = remainder_df.shape[0]
                 for key, value in self.splits.items():
                     adjusted_frac = (original_size / remainder_df.shape[0]) * value
+                    adjusted_frac = min(adjusted_frac, 1.0)
                     sample = remainder_df.sample(
                         frac=adjusted_frac, random_state=self.seed
                     )
