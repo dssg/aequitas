@@ -244,7 +244,7 @@ class FolkTables(Dataset):
             self.data[col] = (
                 self.data[col]
                 .replace(2, 0)
-                .astype("category" if col == self.sensitive_feature else bool)
+                .astype("category" if col == self.sensitive_column else bool)
             )
 
         if self.sensitive_column == "AGEP_bin":
