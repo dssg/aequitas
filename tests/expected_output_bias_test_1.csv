@@ -1,3 +1,0 @@
-reference_group,attribute_name,group_size_ref,pp_ref,ppr_ref,pprev_ref,group_label_pos_ref,group_label_neg_ref,pn_ref,tp_ref,fp_ref,tn_ref,fn_ref,fpr_ref,fnr_ref,for_ref,fdr_ref,attribute_value,group_size,pp,ppr,pprev,group_label_pos,group_label_neg,pn,tp,fp,tn,fn,fpr,fnr,for,fdr,fnr_disparity,fpr_disparity,for_disparity,fdr_disparity,ppr_disparity,pprev_disparity
-High,class,5,3,0.5,0.6,3,2,2,2,1,1,1,0.5,0.3333333333333333,0.5,0.3333333333333333,High,5,3,0.5,0.6,3,2,2,2,1,1,1,0.5,0.3333333333333333,0.5,0.3333333333333333,1,1,1,1,1,1
-High,class,5,3,0.5,0.6,3,2,2,2,1,1,1,0.5,0.3333333333333333,0.5,0.3333333333333333,Low,5,3,0.5,0.6,2,3,2,1,2,1,1,0.6666666666666666,0.5,0.5,0.6666666666666666,1.5,1.3333333333333333,1,2,1,1

@@ -77,44 +77,44 @@ def helper(input_filename, expected_filename, config_file):
 # simplest tests
 def test_group_class_1():
     # test that the results from group are as expected
-    return helper('test_1.csv', 'expected_output_group_test_1.csv', 'test_1.yaml')
+    return helper('artifacts/test_1.csv', 'artifacts/expected_output_group_test_1.csv', 'artifacts/test_1.yaml')
 
 
 def test_bias_class_1():
     # test that the results from bias are as expected (note it also tests group)
-    return helper('test_1.csv', 'expected_output_bias_test_1.csv', 'test_1.yaml')
+    return helper('artifacts/test_1.csv', 'artifacts/expected_output_bias_test_1.csv', 'artifacts/test_1.yaml')
 
 
 def test_fairness_class_1():
     # test that the results from fairness are as expected (note it also tests bias and group)
-    return helper('test_1.csv', 'expected_output_fairness_test_1.csv', 'test_1.yaml')
+    return helper('artifacts/test_1.csv', 'artifacts/expected_output_fairness_test_1.csv', 'artifacts/test_1.yaml')
 
 
 def test_common_attributes_2():
     # test that aequitas deals with shared group attribute labels
-    return helper('test_2.csv', 'expected_output_test_2.csv', 'test_2.yaml')
+    return helper('artifacts/test_2.csv', 'artifacts/expected_output_test_2.csv', 'artifacts/test_2.yaml')
 
 
 def test_all_1_scores_3():
-    return helper('test_3.csv', 'expected_output_test_3.csv', 'test_1.yaml')
+    return helper('artifacts/test_3.csv', 'artifacts/expected_output_test_3.csv', 'artifacts/test_1.yaml')
 
 
 def test_all_0_scores_4():
-    return helper('test_4.csv', 'expected_output_test_4.csv', 'test_1.yaml')
+    return helper('artifacts/test_4.csv', 'artifacts/expected_output_test_4.csv', 'artifacts/test_1.yaml')
 
 
 def test_all_1_labels_5():
-    return helper('test_5.csv', 'expected_output_test_5.csv', 'test_1.yaml')
+    return helper('artifacts/test_5.csv', 'artifacts/expected_output_test_5.csv', 'artifacts/test_1.yaml')
 
 
 def test_all_0_labels_6():
-    return helper('test_6.csv', 'expected_output_test_6.csv', 'test_1.yaml')
+    return helper('artifacts/test_6.csv', 'artifacts/expected_output_test_6.csv', 'artifacts/test_1.yaml')
 
 
 def test_threshold_7():
-    return helper('test_1.csv', 'expected_output_test_7.csv', 'test_3.yaml')
+    return helper('artifacts/test_1.csv', 'artifacts/expected_output_test_7.csv', 'artifacts/test_3.yaml')
 
 
 def test_threshold_8():
-    return helper('test_1.csv', 'expected_output_test_8.csv', 'test_4.yaml')
+    return helper('artifacts/test_1.csv', 'artifacts/expected_output_test_8.csv', 'artifacts/test_4.yaml')
 
