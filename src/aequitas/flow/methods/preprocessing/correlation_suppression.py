@@ -6,7 +6,7 @@ from ...utils import create_logger
 from .preprocessing import PreProcessing
 
 
-class CorrelaitonSuppression(PreProcessing):
+class CorrelationSuppression(PreProcessing):
     def __init__(self, correlation_threshold: Optional[float] = 0.5):
         """Removes features that are highly correlated with the sensitive attribute.
         Note: For this method, the vector s (protected attribute) is assumed to be
