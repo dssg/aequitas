@@ -1,0 +1,12 @@
+#available options: "predefined", "majority" and "min_metric"
+ref_groups_method: "predefined"
+
+# if "predefined" is selected, you need to provide the column:value pairs to be used as reference
+ref_groups:
+  "class": "High"
+
+# fairness threshold to be used for assessing fairness
+fairness_threshold: 0.9
+
+# available fairness_measeure "Impact Parity", "Statistical Parity", "FPR Parity", "FDR Parity", "FNR Parity", "FOR Parity"
+#fairness_measures: ["FPR Parity", "FNR Parity"]
