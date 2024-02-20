@@ -25,7 +25,7 @@ class LabelFlipping(PreProcessing):
         bagging_n_estimators: int = 10,
         fair_ordering: bool = True,
         ordering_method: Literal["ensemble_margin", "residuals"] = "ensemble_margin",
-        unawareness_features: Optional[list] = None,
+        unawareness_features: Optional[Union[bool, list, str]] = None,
         seed: int = 42,
         **base_estimator_args,
     ):
@@ -116,6 +116,33 @@ class LabelFlipping(PreProcessing):
         self.used_in_inference = False
         self.seed = seed
 
+    def _feature_suppression(self, X: pd.DataFrame, s: pd.Series) -> pd.DataFrame:
+        X_transformed = X.copy()
+
+        if self.unawareness_features is None:
+            if s.name not in X_transformed.columns:
+                X_transformed[s.name] = s
+
+        else:
+            if isinstance(self.unawareness_features, bool):
+                if self.unawareness_features and s.name in X_transformed.columns:
+                    X_transformed = X_transformed.drop(columns=s.name)
+                elif (
+                    not self.unawareness_features
+                    and s.name not in X_transformed.columns
+                ):
+                    X_transformed[s.name] = s
+
+            else:
+                unawareness_features_list = (
+                    [self.unawareness_features]
+                    if isinstance(self.unawareness_features, str)
+                    else self.unawareness_features
+                )
+                X_transformed = X_transformed.drop(columns=unawareness_features_list)
+        
+        return X_transformed
+
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
         """
         Fits a bagging classifier to the data. The estimators' can then be used to
@@ -135,10 +162,7 @@ class LabelFlipping(PreProcessing):
 
         self.logger.info("Fitting LabelFlipping.")
 
-        X_transformed = X.copy()
-        if self.unawareness_features is not None:
-            X_transformed = X_transformed.drop(columns=self.unawareness_features)
-
+        X_transformed = self._feature_suppression(X, s)
         X_transformed = pd.get_dummies(X_transformed)
 
         self.ensemble = BaggingClassifier(
@@ -202,9 +226,12 @@ class LabelFlipping(PreProcessing):
         max_prevalence = prevalence + self.disparity_target * prevalence
 
         group_flips = {
-            group: math.ceil(min_prevalence * len(y[s == group])) - y[s == group].sum()
-            if group_prevalences[group] < min_prevalence
-            else math.floor(max_prevalence * len(y[s == group])) - y[s == group].sum()
+            group: (
+                math.ceil(min_prevalence * len(y[s == group])) - y[s == group].sum()
+                if group_prevalences[group] < min_prevalence
+                else math.floor(max_prevalence * len(y[s == group]))
+                - y[s == group].sum()
+            )
             for group in group_prevalences.index
         }
 
@@ -307,10 +334,7 @@ class LabelFlipping(PreProcessing):
                 "is True."
             )
 
-        X_transformed = X.copy()
-        if self.unawareness_features is not None:
-            X_transformed = X_transformed.drop(columns=self.unawareness_features)
-
+        X_transformed = self._feature_suppression(X, s)
         X_transformed = pd.get_dummies(X_transformed)
 
         scores = self._score_instances(X_transformed, y)
