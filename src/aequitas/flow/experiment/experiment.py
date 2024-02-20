@@ -231,15 +231,15 @@ class Experiment:
                         f"'{method_name}' in '{dataset_name}'."
                     )
                     objective = ObjectiveFunction(
-                        X_train=dataset["train"]["X"],
-                        y_train=dataset["train"]["y"],
-                        s_train=dataset["train"]["s"],
-                        X_val=dataset["validation"]["X"],
-                        y_val=dataset["validation"]["y"],
-                        s_val=dataset["validation"]["s"],
-                        X_test=dataset["test"]["X"],
-                        y_test=dataset["test"]["y"],
-                        s_test=dataset["test"]["s"],
+                        X_train=dataset["train"]["X"].copy(deep=True),
+                        y_train=dataset["train"]["y"].copy(deep=True),
+                        s_train=dataset["train"]["s"].copy(deep=True),
+                        X_val=dataset["validation"]["X"].copy(deep=True),
+                        y_val=dataset["validation"]["y"].copy(deep=True),
+                        s_val=dataset["validation"]["s"].copy(deep=True),
+                        X_test=dataset["test"]["X"].copy(deep=True),
+                        y_test=dataset["test"]["y"].copy(deep=True),
+                        s_test=dataset["test"]["s"].copy(deep=True),
                         threshold=threshold,
                         preprocessing_method=pre,  # type: ignore
                         preprocessing_configs=pre_configs.args,
