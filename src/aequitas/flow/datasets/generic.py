@@ -164,8 +164,12 @@ class GenericDataset(Dataset):
                 self._validate_splits()
         else:
             train = read_method(self.paths[0])
+            train_index = train.index[-1]
             validation = read_method(self.paths[1])
+            validation.set_index(validation.index + train_index + 1, inplace=True)
+            validation_index = validation.index[-1]
             test = read_method(self.paths[2])
+            test.set_index(test.index + validation_index + 1, inplace=True)
             self._indexes = [train.index, validation.index, test.index]
 
             self.data = pd.concat([train, validation, test])
