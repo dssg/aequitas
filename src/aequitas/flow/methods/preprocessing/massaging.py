@@ -24,6 +24,7 @@ class Massaging(PreProcessing):
 
         self.classifier = instantiate_object(classifier, **classifier_args)
         self.logger.info(f"Created base estimator {self.classifier}")
+        self.used_in_inference = False
 
     def _rank(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]

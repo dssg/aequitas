@@ -64,7 +64,7 @@ CATEGORICAL_COLUMNS = {
 
 BOOL_COLUMNS = {
     "ACSIncome": ["SEX"],
-    "ACSEmployment": ["SEX", "DIS", "NATIVTY", "DEAR", "DEYE", "DREM"],
+    "ACSEmployment": ["SEX", "DIS", "NATIVITY", "DEAR", "DEYE", "DREM"],
     "ACSMobility": [
         "SEX",
         "DIS",
