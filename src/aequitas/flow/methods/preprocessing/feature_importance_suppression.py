@@ -16,7 +16,7 @@ class FeatureImportanceSuppression(PreProcessing):
         feature_importance_threshold: Optional[float] = 0.1,
         n_estimators: Optional[int] = 10,
         seed: int = 0,
-        n_jobs: int = 1
+        n_jobs: int = 1,
     ):
         """Iterively removes the most important features with respect to the sensitive
         attribute.
