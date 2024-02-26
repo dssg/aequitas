@@ -54,6 +54,7 @@ class DataRepairer(PreProcessing):
         self.repair_level = repair_level
         self.columns = columns
         self.definition = definition
+        self.used_in_inference = True
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series] = None) -> None:
         """
@@ -72,7 +73,11 @@ class DataRepairer(PreProcessing):
         super().fit(X, y, s)
 
         if self.columns is None:
-            self.columns = X.columns.tolist()
+            self.columns = [
+                column
+                for column in X.columns
+                if (X[column].dtype != "category" and X[column].dtype != "bool")
+            ]
         if s is None:
             raise ValueError("s must be passed.")
         self._quantile_points = np.linspace(0, 1, self.definition)
@@ -141,7 +146,7 @@ class DataRepairer(PreProcessing):
             Transformed features, labels, and sensitive attribute.
         """
         super().transform(X, y, s)
-        
+
         if s is None:
             raise ValueError("s must be passed.")
 

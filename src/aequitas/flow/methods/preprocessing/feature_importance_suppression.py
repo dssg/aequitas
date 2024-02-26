@@ -16,6 +16,7 @@ class FeatureImportanceSuppression(PreProcessing):
         feature_importance_threshold: Optional[float] = 0.1,
         n_estimators: Optional[int] = 10,
         seed: int = 0,
+        n_jobs: int = 1
     ):
         """Iterively removes the most important features with respect to the sensitive
         attribute.
@@ -32,6 +33,8 @@ class FeatureImportanceSuppression(PreProcessing):
             The number of trees in the random forest. Defaults to 10.
         seed : int, optional
             The seed for the random forest. Defaults to 0.
+        n_jobs : int, optional
+            The number of jobs to run in parallel. Defaults to 1.
         """
         self.logger = create_logger(
             "methods.preprocessing.FeatureImportanceSuppression"
@@ -45,6 +48,7 @@ class FeatureImportanceSuppression(PreProcessing):
         self.feature_importance_threshold = feature_importance_threshold
         self.n_estimators = n_estimators
         self.seed = seed
+        self.n_jobs = n_jobs
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
         """Iteratively removes the most important features to predict the sensitive
@@ -64,7 +68,7 @@ class FeatureImportanceSuppression(PreProcessing):
         self.logger.info("Identifying features to remove.")
 
         rf = RandomForestClassifier(
-            n_estimators=self.n_estimators, random_state=self.seed
+            n_estimators=self.n_estimators, random_state=self.seed, n_jobs=self.n_jobs
         )
 
         features = pd.concat([X, y], axis=1)
