@@ -231,12 +231,12 @@ class FolkTables(Dataset):
                 self.data = pd.read_parquet(path)
         else:
             if self.split_type == "predefined":
-                train = pd.read_csv(self.path[0])
+                train = pd.read_csv(path[0])
                 train_index = train.index[-1]
-                validation = pd.read_csv(self.path[1])
+                validation = pd.read_csv(path[1])
                 validation.set_index(validation.index + train_index + 1, inplace=True)
                 validation_index = validation.index[-1]
-                test = pd.read_csv(self.path[2])
+                test = pd.read_csv(path[2])
                 test.set_index(test.index + validation_index + 1, inplace=True)
                 self._indexes = [train.index, validation.index, test.index]
 
