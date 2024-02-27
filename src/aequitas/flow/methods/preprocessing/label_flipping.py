@@ -140,7 +140,7 @@ class LabelFlipping(PreProcessing):
                     else self.unawareness_features
                 )
                 X_transformed = X_transformed.drop(columns=unawareness_features_list)
-        
+
         return X_transformed
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
