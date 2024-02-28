@@ -152,7 +152,7 @@ class GenericDataset(Dataset):
     def load_data(self) -> None:
         """Load the dataset."""
         self.logger.info("Loading data.")
-        if hasattr(self, "data"):
+        if self._data is not None:
             return
         if self.extension == "parquet":
             read_method = pd.read_parquet
