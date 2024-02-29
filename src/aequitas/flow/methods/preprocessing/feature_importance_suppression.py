@@ -71,8 +71,7 @@ class FeatureImportanceSuppression(PreProcessing):
             n_estimators=self.n_estimators, random_state=self.seed, n_jobs=self.n_jobs
         )
 
-        features = pd.concat([X, y], axis=1)
-        features = pd.get_dummies(features)
+        features = pd.get_dummies(X)
         target = s.copy()
 
         features_train, features_val, target_train, target_val = train_test_split(
