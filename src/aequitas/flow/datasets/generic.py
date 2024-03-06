@@ -155,12 +155,10 @@ class GenericDataset(Dataset):
         if self._data is not None:
             return
         if self.extension == "parquet":
-            self.logger.info("Loading data from parquet.")
             read_method = pd.read_parquet
         elif self.extension == "csv":
             read_method = pd.read_csv
         if len(self.paths) == 1:
-            self.logger.info("Loading data from parquet single file.")
             self.data = read_method(self.paths[0])
             if self.split_type == "column":
                 self._validate_splits()
@@ -174,7 +172,7 @@ class GenericDataset(Dataset):
             test.set_index(test.index + validation_index + 1, inplace=True)
             self._indexes = [train.index, validation.index, test.index]
 
-            self.data = pd.concat([train, validation, test]).reset_index(drop=True)
+            self.data = pd.concat([train, validation, test])
         self.logger.info("Data loaded successfully.")
 
     def create_splits(self) -> None:

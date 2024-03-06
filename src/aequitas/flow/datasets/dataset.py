@@ -31,7 +31,10 @@ class Dataset(ABC):
     @property
     def data(self) -> LabeledFrame:
         """Return the dataset."""
-        return self._data
+        if self._data is not None:
+            return self._data
+        else:
+            raise ValueError("Data is not loaded yet. Run `load_data` method.")
 
     @data.setter
     def data(self, value: pd.DataFrame):
