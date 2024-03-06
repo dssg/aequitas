@@ -199,8 +199,6 @@ class GenericDataset(Dataset):
                         self, key, self.data[self.data[self.split_column].isin(value)]
                     )
         else:
-            print(self.data)
-            print(self.data.loc[self._indexes[0]])
             self.train = self.data.loc[self._indexes[0]]
             self.validation = self.data.loc[self._indexes[1]]
             self.test = self.data.loc[self._indexes[2]]

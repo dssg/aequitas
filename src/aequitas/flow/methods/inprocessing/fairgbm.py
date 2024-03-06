@@ -1,7 +1,7 @@
 from typing import Optional
 
 import pandas as pd
-# from fairgbm import FairGBMClassifier
+from fairgbm import FairGBMClassifier
 
 from ...utils import create_logger
 from .inprocessing import InProcessing
