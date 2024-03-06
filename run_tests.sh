@@ -9,6 +9,7 @@ source .venv/bin/activate
 # Install the required packages
 pip install -r ./requirements/main.txt -r ./requirements/cli.txt -r ./requirements/webapp.txt
 pip install -e .
+
 pip install pytest pytest-cov
 
 # Run the tests
