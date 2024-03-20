@@ -11,6 +11,7 @@ __pycache__/
 .venv
 .coverage
 .vscode
+cov.xml
 
 *.DS_Store*
 

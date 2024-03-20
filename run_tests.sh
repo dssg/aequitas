@@ -13,7 +13,7 @@ pip install -e .
 pip install pytest pytest-cov
 
 # Run the tests
-pytest
+coverage run -m pytest --cov-report xml:cov.xml --cov-report term
 
 # Deactivate the virtual environment
 deactivate
