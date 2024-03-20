@@ -10,4 +10,4 @@ The testing script itself can be run using the following commans
 
 `./run_tests.sh`
 
-The script will run all defined tests in a virtual environment and output the coverage report in the terminal.
+The script will run all defined tests in a virtual environment and output the coverage report in the terminal. It will also add an xml file of the coverage report `cov.xml` to the base folder.
