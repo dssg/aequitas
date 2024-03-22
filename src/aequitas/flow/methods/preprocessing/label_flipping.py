@@ -286,7 +286,7 @@ class LabelFlipping(PreProcessing):
                 # find and keep first "flips" instances to flip as true, rest as false
                 true_indices = intersection[intersection].index
                 if len(true_indices) > abs(flips):
-                    intersection[true_indices[abs(flips):]] = False
+                    intersection[true_indices[abs(flips) :]] = False
                 to_flip = to_flip | intersection
             # Check if we are flipping more than n_flip
             true_indices = to_flip[to_flip].index
@@ -342,7 +342,7 @@ class LabelFlipping(PreProcessing):
         X_transformed = pd.get_dummies(X_transformed)
 
         scores = self._score_instances(X_transformed, y)
-        y_flipped = self._label_flipping_new(y, s, scores)
+        y_flipped = self._label_flipping(y, s, scores)
 
         self.logger.info("Data transformed.")
         return X, y_flipped, s
