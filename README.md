@@ -1,4 +1,4 @@
-# *Aequitas*: Bias Auditing & Fair ML Toolkit
+# *Aequitas*: Bias Auditing & "Correction" Toolkit
 
 [![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
 [![License: MIT](https://badgen.net/pypi/license/aequitas)](https://github.com/dssg/aequitas/blob/master/LICENSE)
@@ -14,7 +14,7 @@ For more context around dealing with bias and fairness issues in AI//ML systems,
 > 
 > **Version 1.0.0: Aequitas Flow - Optimizing Fairness in ML Pipelines**
 > 
-> Explore Aequitas Flow, our latest update in version 1.0.0, designed to enrich Fair ML experimentation with new, streamlined capabilities. Elevate your ML fairness journey today.
+> Explore Aequitas Flow, our latest update in version 1.0.0, designed to augment bias audits with bias mitigation and allow enrich  experimentation with Fair ML methods using our new, streamlined capabilities. 
 > 
 
 
@@ -40,11 +40,11 @@ or
 pip install git+https://github.com/dssg/aequitas.git
 ```
 
-### 📔Example Notebooks
+### 📔Example Notebooks supporting various tasks and workflows
 
 | Notebook | Description |
 |-|-|
-| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook or use your own data. |
 | [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
 | [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 | [Add your method to Aequitas Flow](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_add_method.ipynb) | Learn how to add your own method to the Aequitas Flow toolkit. |
@@ -84,7 +84,7 @@ audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
 ```
 <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/disparity_chart.svg" width="900">
 
-### 🧪 Quickstart on Fair ML Experimenting
+### 🧪 Quickstart on experimenting with Bias Reduction (Fair ML) methods
 
 To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.  
 
