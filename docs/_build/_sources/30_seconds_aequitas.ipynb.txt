@@ -11,7 +11,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The Aequitas toolkit is a flexible bias-audit utility for algorithmic decision-making models, accessible via Python API, command line interface (CLI), and through our [web application](http://aequitas.dssg.io/). \n",
+    "The Aequitas toolkit is a flexible Fair ML package for algorithmic decision-making models, accessible via Python API, command line interface (CLI), and through our [web application](http://aequitas.dssg.io/). \n",
     "\n",
     "Use Aequitas to evaluate model performance across several bias and fairness metrics, and utilize the [most relevant metrics](https://dsapp.uchicago.edu/wp-content/uploads/2018/05/metrictree-1200x750.png) to your process in model selection.\n",
     "\n",

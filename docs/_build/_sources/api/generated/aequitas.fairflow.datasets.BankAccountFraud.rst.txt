@@ -1,6 +1,0 @@
-﻿aequitas.fairflow.datasets.BankAccountFraud
-===========================================
-
-.. currentmodule:: aequitas.fairflow.datasets
-
-.. autoclass:: BankAccountFraud

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en"
+      data-content_root="../../../../"
+      x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      class="scroll-smooth"
+      :class="{'dark': darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)}"
+>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
+  <meta name="theme-color" metia="(prefers-color-scheme: dark)" content="black" />
+  
+    <title>aequitas.flow.experiment.experiment | aequitas  documentation</title>
+    <meta property="og:title" content="aequitas.flow.experiment.experiment | aequitas  documentation" />
+    <meta name="twitter:title" content="aequitas.flow.experiment.experiment | aequitas  documentation" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme.css?v=5b4133db" />
+        <link rel="search" title="Search" href="../../../../search.html" />
+        <link rel="index" title="Index" href="../../../../genindex.html" />
+
+    <script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+<link href="../../../../ _static/default.css" rel="stylesheet" type="text/css">
+
+</head>
+<body x-data="{ showSidebar: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+    <div x-cloak x-show="showSidebar" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content" class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
+      Skip to content
+    </a><header
+  class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+    <div class="hidden mr-4 md:flex">
+      <a href="../../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">aequitas  documentation</span>
+      </a></div><button
+      class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
+      type="button" @click="showSidebar = true">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" aria-hidden="true"
+        fill="currentColor">
+        <path
+          d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z" />
+      </svg>
+      <span class="sr-only">Toggle navigation menu</span>
+    </button>
+    <div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+      <div class="flex-1 w-full md:w-auto md:flex-none"><form id="searchbox"
+      action="../../../../search.html"
+      method="get"
+      class="relative flex items-center group"
+      @keydown.k.window.meta="$refs.search.focus()">
+  <input x-ref="search"
+          name="q"
+          id="search-input"
+          type="search"
+          aria-label="Search the docs"
+          placeholder="Search ..."
+          class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" />
+  <kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+    <span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+      </div>
+      <nav class="flex items-center space-x-1">
+        <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
+          class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
+          type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
+            <path
+              d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+            class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
+            <path
+              d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+    <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
+  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
+  :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
+
+    <a href="../../../../index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">aequitas  documentation</span>
+    </a>
+
+    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+      <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../30_seconds_aequitas.html">Welcome to Aequitas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../30_seconds_aequitas.html#Bias-measures-tailored-to-your-problem">Bias measures tailored to your problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../input_data.html">Understanding Input Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../output_data.html">Understanding Output</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metrics.html">Understanding the Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CLI.html">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../using_python.html">Using Aequitas with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../30_seconds_webapp.html">Running the webapp locally</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/index.html">API Docs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/aequitas.html">Aequitas API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/flow.html">Aequitas Flow API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/flow/experiment.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Experiment</span></code> classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/flow/datasets.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Dataset</span></code> classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/index.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html">COMPAS Analysis using Aequitas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#Pre-Aequitas:-Exploring-the-COMPAS-Dataset">Pre-Aequitas: Exploring the COMPAS Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#Putting-Aequitas-to-the-task">Putting Aequitas to the task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#What-biases-exist-in-my-model?">What biases exist in my model?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#How-do-I-visualize-bias-in-my-model?">How do I visualize bias in my model?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#What-levels-of-disparity-exist-between-population-groups?">What levels of disparity exist between population groups?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#How-do-I-visualize-disparities-in-my-model?">How do I visualize disparities in my model?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#How-do-I-assess-model-fairness?">How do I assess model fairness?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#How-do-I-visualize-bias-metric-parity?">How do I visualize bias metric parity?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#How-do-I-visualize-parity-between-groups-in-my-model?">How do I visualize parity between groups in my model?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/compas_demo.html#The-Aequitas-Effect">The Aequitas Effect</a></li>
+</ul>
+</li>
+</ul>
+
+</nav>
+      </div>
+    </div>
+    <button type="button" @click="showSidebar = false"
+      class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+        stroke="none" class="h-4 w-4">
+        <path
+          d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z" />
+      </svg>
+    </button>
+  </aside>
+        <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs"
+     class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+  <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
+     href="../../../../index.html">
+    <span class="hidden md:inline">aequitas  documentation</span>
+    <svg xmlns="http://www.w3.org/2000/svg"
+         height="18"
+         width="18"
+         viewBox="0 96 960 960"
+         aria-label="Home"
+         fill="currentColor"
+         stroke="none"
+         class="md:hidden">
+      <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z" />
+    </svg>
+  </a>
+  
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap"
+       href="../../../index.html">Module code</a>
+    
+<div class="mr-1">/</div><span aria-current="page"
+        class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">aequitas.flow.experiment.experiment</span>
+</nav>
+
+    <div id="content" role="main">
+      <h1>Source code for aequitas.flow.experiment.experiment</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">hpt</span> <span class="kn">import</span> <span class="n">OptunaTuner</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">ListConfig</span>
+<span class="kn">from</span> <span class="nn">optuna.samplers</span> <span class="kn">import</span> <span class="n">BaseSampler</span>
+
+<span class="kn">from</span> <span class="nn">..datasets.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">..methods.inprocessing.inprocessing</span> <span class="kn">import</span> <span class="n">InProcessing</span>
+<span class="kn">from</span> <span class="nn">..methods.postprocessing.identity</span> <span class="kn">import</span> <span class="n">Identity</span> <span class="k">as</span> <span class="n">PostIdentity</span>
+<span class="kn">from</span> <span class="nn">..methods.postprocessing.postprocessing</span> <span class="kn">import</span> <span class="n">PostProcessing</span>
+<span class="kn">from</span> <span class="nn">..methods.postprocessing.threshold</span> <span class="kn">import</span> <span class="n">Threshold</span>
+<span class="kn">from</span> <span class="nn">..methods.preprocessing.identity</span> <span class="kn">import</span> <span class="n">Identity</span> <span class="k">as</span> <span class="n">PreIdentity</span>
+<span class="kn">from</span> <span class="nn">..methods.preprocessing.preprocessing</span> <span class="kn">import</span> <span class="n">PreProcessing</span>
+<span class="kn">from</span> <span class="nn">..optimization</span> <span class="kn">import</span> <span class="n">ObjectiveFunction</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">ConfigReader</span><span class="p">,</span> <span class="n">create_logger</span><span class="p">,</span> <span class="n">import_object</span><span class="p">,</span> <span class="n">read_results</span>
+<span class="kn">from</span> <span class="nn">..plots.pareto</span> <span class="kn">import</span> <span class="n">Plot</span>
+
+
+<div class="viewcode-block" id="Experiment">
+<a class="viewcode-back" href="../../../../api/flow/experiment.html#aequitas.flow.experiment.Experiment">[docs]</a>
+<span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to run a FairML Experiment.</span>
+
+<span class="sd">    This class allows to test multiple methods on multiple or a single dataset, with</span>
+<span class="sd">    configurable hyperparameter optimization algorithms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config_file : Union[pathlib.Path, str], optional</span>
+<span class="sd">        Path to the experiment&#39;s configuration file.</span>
+<span class="sd">    config : Union[DictConfig, dict], optional</span>
+<span class="sd">        Configuration object to run the experiment.</span>
+<span class="sd">    default_fields : Iterable[str], optional</span>
+<span class="sd">        Default fields to include in the configuration, by default (&quot;methods&quot;,</span>
+<span class="sd">        &quot;datasets&quot;).</span>
+<span class="sd">    save_artifacts : bool, default True</span>
+<span class="sd">        Whether to save artifacts (`i.e.`, results of the experiment) or not.</span>
+<span class="sd">    artifacts : Iterable[str], default (&quot;results&quot;, &quot;methods&quot;, &quot;predictions&quot;)</span>
+<span class="sd">        Artifacts to save. These can be:</span>
+<span class="sd">          - &quot;results&quot;: The result files with metrics.</span>
+<span class="sd">          - &quot;methods&quot;: The models created by the experiment (pickle format).</span>
+<span class="sd">          - &quot;predictions&quot;: The predictions made by the models (parquet format). This</span>
+<span class="sd">            saves both the scores and binarized predictions.</span>
+<span class="sd">    save_folder : pathlib.Path, default &quot;./artifacts&quot;</span>
+<span class="sd">        Path to the folder where artifacts will be saved.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        Name of the experiment, by default None. If None, the name will be</span>
+<span class="sd">        generated as an unique hash of the configuration file.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; from aequitas.flow.experiment import Experiment</span>
+<span class="sd">    &gt;&gt;&gt; experiment = Experiment(config_file=&quot;configs/default.yaml&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; experiment.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SAMPLERS_MODULE</span> <span class="o">=</span> <span class="s2">&quot;optuna.samplers.&quot;</span>
+
+    <span class="n">POSSIBLE_ARTIFACTS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;results&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;methods&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;predictions&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;optimizer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;transformed_datasets&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DictConfig</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_fields</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;methods&quot;</span><span class="p">,</span> <span class="s2">&quot;datasets&quot;</span><span class="p">),</span>
+        <span class="n">save_artifacts</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">save_folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;artifacts&quot;</span><span class="p">),</span>
+        <span class="n">artifacts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="s2">&quot;methods&quot;</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">),</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Initialize logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="s2">&quot;Experiment&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Instantiating Experiment class.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dfs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Read config file</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># check if we have pandas dataframes passed as arguments</span>
+                <span class="n">datasets</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="s2">&quot;args&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="s2">&quot;df&quot;</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dfs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="s2">&quot;df&quot;</span><span class="p">]</span>
+                            <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="s2">&quot;df&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">DictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">config_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_reader</span> <span class="o">=</span> <span class="n">ConfigReader</span><span class="p">(</span>
+                <span class="n">config_file</span><span class="p">,</span> <span class="n">default_fields</span><span class="o">=</span><span class="n">default_fields</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_reader</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing configuration file&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check if optimization parameters are provided</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;optimization&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide optimization parameters in the config file.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Debug log the benchmark config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Experiment config: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Initialize dataset storage for the experiment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Set artifacts to save</span>
+        <span class="k">if</span> <span class="n">save_artifacts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POSSIBLE_ARTIFACTS</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">artifacts</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Instantiate sampler object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instantiate_sampler</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_folder</span> <span class="o">=</span> <span class="n">save_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_instantiate_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseSampler</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Instantiating sampling object.&quot;</span><span class="p">)</span>
+        <span class="n">sampler_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAMPLERS_MODULE</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">sampler</span>
+        <span class="n">sampler</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">sampler_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sampler</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">sampler_args</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+<div class="viewcode-block" id="Experiment.read_dataset">
+<a class="viewcode-back" href="../../../../api/flow/experiment.html#aequitas.flow.experiment.Experiment.read_dataset">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_dataset</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">],</span>
+        <span class="n">df</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a dataset from a configuration object.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">DictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">dataset_class</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">classpath</span><span class="p">)</span>
+        <span class="c1"># Casting args to dict, to add df if necessary</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s2">&quot;df&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="n">dataset_object</span> <span class="o">=</span> <span class="n">dataset_class</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">return</span> <span class="n">dataset_object</span></div>
+
+
+<div class="viewcode-block" id="Experiment.read_method_step">
+<a class="viewcode-back" href="../../../../api/flow/experiment.html#aequitas.flow.experiment.Experiment.read_method_step">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_method_step</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PreProcessing</span><span class="p">,</span> <span class="n">InProcessing</span><span class="p">,</span> <span class="n">PostProcessing</span><span class="p">],</span> <span class="n">DictConfig</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read a method step from a configuration object.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">DictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">method_class</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">classpath</span><span class="p">)</span>
+        <span class="n">hyperparameter_space</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">args</span>
+        <span class="k">return</span> <span class="n">method_class</span><span class="p">,</span> <span class="n">hyperparameter_space</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_read_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Reading datasets from configuration.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">configs</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># This iterates once.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. Configurations: </span><span class="si">{</span><span class="n">configs</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="n">dataset_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataset</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">dataset_object</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+                <span class="n">dataset_object</span><span class="o">.</span><span class="n">create_splits</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> successfully read.&quot;</span><span class="p">)</span>
+                <span class="n">splits</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Splitting </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2"> into X, y, and s.&quot;</span><span class="p">)</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset_object</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span><span class="o">.</span><span class="n">X</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset_object</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span><span class="o">.</span><span class="n">y</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataset_object</span><span class="p">,</span> <span class="n">split</span><span class="p">)</span><span class="o">.</span><span class="n">s</span>
+                    <span class="n">splits</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">:</span> <span class="n">s</span><span class="p">}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">splits</span>
+
+<div class="viewcode-block" id="Experiment.run">
+<a class="viewcode-back" href="../../../../api/flow/experiment.html#aequitas.flow.experiment.Experiment.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the experiment.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Beginning Experiment.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span>
+        <span class="n">dataset_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide a folder to save artifacts.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">generate_hash</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_folder</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving objects to &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_datasets</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">dataset_id</span><span class="p">,</span> <span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using &#39;</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">:</span>
+                <span class="n">dataset_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span> <span class="o">/</span> <span class="n">dataset_name</span>
+                <span class="n">dataset_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Saving dataset-related objects to &#39;</span><span class="si">{</span><span class="n">dataset_folder</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">method_name</span><span class="p">,</span> <span class="n">method_items</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Testing &#39;</span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;saved in &#39;</span><span class="si">{</span><span class="n">dataset_folder</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">:</span>
+                        <span class="n">method_folder</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">dataset_folder</span> <span class="o">/</span> <span class="n">method_name</span>
+                        <span class="n">method_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;Saving dataset&amp;method-related objects to &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">method_folder</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                        <span class="p">)</span>
+
+                    <span class="c1"># Instantiate one random search optimizer</span>
+                    <span class="c1"># The objective function is doing the heavy lifting in HPTs code.</span>
+
+                    <span class="c1"># Validate if we received pre-processing techniques.</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method_items</span><span class="p">,</span> <span class="s2">&quot;preprocessing&quot;</span><span class="p">):</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">pre_configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">method_items</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">pre</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">pre_configs</span><span class="o">.</span><span class="n">classpath</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">pre_configs</span> <span class="o">=</span> <span class="n">DictConfig</span><span class="p">({</span><span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+                        <span class="n">pre</span> <span class="o">=</span> <span class="n">PreIdentity</span>
+                    <span class="c1"># Validate in the same way the post-processing technique.</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method_items</span><span class="p">,</span> <span class="s2">&quot;postprocessing&quot;</span><span class="p">):</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">post_configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">method_items</span><span class="o">.</span><span class="n">postprocessing</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">post</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">post_configs</span><span class="o">.</span><span class="n">classpath</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">post_configs</span> <span class="o">=</span> <span class="n">DictConfig</span><span class="p">({</span><span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+                        <span class="n">post</span> <span class="o">=</span> <span class="n">PostIdentity</span>
+
+                    <span class="n">_</span><span class="p">,</span> <span class="n">inp_configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">method_items</span><span class="o">.</span><span class="n">inprocessing</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">inp</span> <span class="o">=</span> <span class="n">import_object</span><span class="p">(</span><span class="n">inp_configs</span><span class="o">.</span><span class="n">classpath</span><span class="p">)</span>
+
+                    <span class="c1"># Kinda big line to get the threshold parameters...</span>
+                    <span class="n">threshold_configs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset_id</span><span class="p">][</span>
+                        <span class="n">dataset_name</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">threshold</span>
+                    <span class="n">threshold</span> <span class="o">=</span> <span class="n">Threshold</span><span class="p">(</span><span class="o">**</span><span class="n">threshold_configs</span><span class="p">)</span>
+                    <span class="c1"># This is a big instantiation, maybe receive datasets all together?</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Creating objective function for &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2">&#39; in &#39;</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">objective</span> <span class="o">=</span> <span class="n">ObjectiveFunction</span><span class="p">(</span>
+                        <span class="n">X_train</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="s2">&quot;X&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">y_train</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">s_train</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">][</span><span class="s2">&quot;s&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">X_val</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">][</span><span class="s2">&quot;X&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">y_val</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">s_val</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">][</span><span class="s2">&quot;s&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">X_test</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][</span><span class="s2">&quot;X&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">y_test</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">s_test</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">][</span><span class="s2">&quot;s&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                        <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+                        <span class="n">preprocessing_method</span><span class="o">=</span><span class="n">pre</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">preprocessing_configs</span><span class="o">=</span><span class="n">pre_configs</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">inprocessing_method</span><span class="o">=</span><span class="n">inp</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">inprocessing_configs</span><span class="o">=</span><span class="n">inp_configs</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">postprocessing_method</span><span class="o">=</span><span class="n">post</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">postprocessing_configs</span><span class="o">=</span><span class="n">post_configs</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">eval_metric</span><span class="o">=</span><span class="s2">&quot;tpr&quot;</span><span class="p">,</span>  <span class="c1"># TODO Change this</span>
+                        <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">artifacts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                        <span class="n">artifacts_folder</span><span class="o">=</span><span class="n">method_folder</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                    <span class="p">)</span>
+
+                    <span class="n">tuner</span> <span class="o">=</span> <span class="n">OptunaTuner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">)</span>
+
+                    <span class="n">tuner</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span>
+                        <span class="n">n_trials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">n_trials</span><span class="p">,</span>
+                        <span class="n">n_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">optimization</span><span class="o">.</span><span class="n">n_jobs</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="s2">&quot;results&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">method_folder</span> <span class="o">/</span> <span class="s2">&quot;results.pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">_models_results</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">generate_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Generating Hash for provided configuration.&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">dt_handler</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">):</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown type&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">dt_handler</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hash generated: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">plot_pareto</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Dataset&quot;</span><span class="p">,</span>
+        <span class="n">fairness_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Predictive Equality&quot;</span><span class="p">,</span>
+        <span class="n">performance_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TPR&quot;</span><span class="p">,</span>
+        <span class="n">split</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">read_results</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exp_folder</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dataset &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">&#39; was not used in experiment.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; Try on of the following: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">Plot</span><span class="p">(</span>
+            <span class="n">results</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">fairness_metric</span><span class="p">,</span> <span class="n">performance_metric</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">split</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span></div>
+
+</pre></div>
+    </div></div>
+        </main>
+      </div>
+    </div><footer class="py-6 border-t border-border md:py-0">
+    <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+      <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+        <p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2024, Center for Data Science and Public Policy&nbsp;Built with <a class="font-medium underline underline-offset-4"
+    href="https://www.sphinx-doc.org"
+    rel="noreferrer">Sphinx 7.2.6</a></p>
+</div>
+</div>
+</footer>
+  </div>
+  
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script defer="defer" src="../../../../_static/theme.js?v=40b7bc71"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+</body>
+</html>

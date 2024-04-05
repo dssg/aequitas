@@ -1,6 +1,0 @@
-﻿aequitas.fairflow.datasets.FolkTables
-=====================================
-
-.. currentmodule:: aequitas.fairflow.datasets
-
-.. autoclass:: FolkTables
