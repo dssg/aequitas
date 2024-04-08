@@ -94,7 +94,13 @@ autodoc_member_order = "bysource"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+
+html_theme_options = {
+    "logo_light": "icon.ico",
+    "logo_dark": "icon.ico"
+}
+
+html_favicon = 'icon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
