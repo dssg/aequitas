@@ -30,7 +30,7 @@ Sample Jupyter Notebook
    :glob:
    
    30_seconds_aequitas.ipynb
-   installation.ipynb
+   installation
    input_data.ipynb
    output_data.ipynb
    metrics.ipynb
