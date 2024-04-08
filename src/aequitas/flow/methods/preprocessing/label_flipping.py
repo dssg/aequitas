@@ -8,6 +8,7 @@ import math
 from typing import Optional, Tuple, Literal, Union, Callable
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 METHODS = ["ensemble_margin", "residuals"]
 
@@ -165,11 +166,18 @@ class LabelFlipping(PreProcessing):
         X_transformed = self._feature_suppression(X, s)
         X_transformed = pd.get_dummies(X_transformed)
 
+        n_jobs = (
+            self.bagging_n_estimators
+            if isinstance(self.bagging_base_estimator, DecisionTreeClassifier)
+            else 1
+        )
+
         self.ensemble = BaggingClassifier(
             estimator=self.bagging_base_estimator,
             n_estimators=self.bagging_n_estimators,
             max_samples=self.bagging_max_samples,
             random_state=self.seed,
+            n_jobs=n_jobs,
         ).fit(X_transformed, y)
 
     def _score_instances(self, X: pd.DataFrame, y: pd.Series) -> pd.Series:

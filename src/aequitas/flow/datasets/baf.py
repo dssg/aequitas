@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 import pandas as pd
-import requests
+from datasets import load_dataset
 from validators import url
 
 from ..utils import create_logger
@@ -34,9 +34,7 @@ DEFAULT_SPLIT = {
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/BankAccountFraud").resolve()
 
-DEFAULT_URL = (
-    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/BankAccountFraud/"
-)
+HUGGINGFACE_REPO = "ines-osilva/baf-testing"
 
 
 class BankAccountFraud(Dataset):
@@ -83,9 +81,7 @@ class BankAccountFraud(Dataset):
     ):
         super().__init__()
 
-        self.label_column = (
-            LABEL_COLUMN if label_column is None else label_column
-        )
+        self.label_column = LABEL_COLUMN if label_column is None else label_column
 
         if sensitive_column == "customer_age" or sensitive_column is None:
             self.sensitive_column = SENSITIVE_COLUMN
@@ -204,15 +200,20 @@ class BankAccountFraud(Dataset):
                     )
 
     def _download_data(self) -> None:
-        """Obtains the data of the sample dataset from Aequitas repository."""
-        self.logger.info("Downloading sample data from repository.")
+        """Obtains the data of the sample dataset from HuggingFace."""
+        self.logger.info("Downloading sample data from HuggingFace.")
 
         check_path = Path(self.path) / f"{self.variant}.{self.extension}"
         if not check_path.exists():
-            dataset_url = DEFAULT_URL + f"{self.variant}.{self.extension}"
-            self.logger.debug(f"Downloading from {dataset_url}.")
-            r = requests.get(dataset_url)
+            self.logger.debug(f"Downloading from {HUGGINGFACE_REPO}.")
+            dataset = load_dataset(
+                HUGGINGFACE_REPO,
+                self.variant,
+                token="",
+            )["train"].to_pandas()
             os.makedirs(check_path.parent, exist_ok=True)
-            with open(check_path, "wb") as f:
-                f.write(r.content)
+            if self.extension == "parquet":
+                dataset.to_parquet(check_path)
+            elif self.extension == "csv":
+                dataset.to_csv(check_path, index=False)
         self.logger.info("Downloaded data successfully.")

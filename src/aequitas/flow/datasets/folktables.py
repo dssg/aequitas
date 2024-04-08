@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 import pandas as pd
-import requests
+from datasets import load_dataset
 from validators import url
 
 from ..utils import LabeledFrame, create_logger
@@ -86,9 +86,7 @@ DEFAULT_SPLIT = None
 
 DEFAULT_PATH = (Path(__file__).parent / "../../datasets/FolkTables").resolve()
 
-DEFAULT_URL = (
-    "https://raw.githubusercontent.com//dssg/aequitas/master/datasets/FolkTables/"
-)
+HUGGINGFACE_REPO = "ines-osilva/folktables-testing"
 
 
 class FolkTables(Dataset):
@@ -289,14 +287,19 @@ class FolkTables(Dataset):
 
     def _download_data(self) -> None:
         """Obtains the data from Aequitas repository."""
-        self.logger.info("Downloading folktables data from repository.")
+        self.logger.info("Downloading folktables data from HuggingFace.")
         for split in ["train", "validation", "test"]:
             check_path = Path(self.path) / f"{self.variant}.{split}.{self.extension}"
             if not check_path.exists():
-                dataset_url = DEFAULT_URL + f"{self.variant}.{split}.{self.extension}"
-                self.logger.debug(f"Downloading from {dataset_url}.")
-                r = requests.get(dataset_url)
+                self.logger.debug(f"Downloading from {HUGGINGFACE_REPO}.")
+                dataset = load_dataset(
+                    HUGGINGFACE_REPO,
+                    self.variant,
+                    token="",
+                )[split].to_pandas()
                 os.makedirs(check_path.parent, exist_ok=True)
-                with open(check_path, "wb") as f:
-                    f.write(r.content)
+                if self.extension == "parquet":
+                    dataset.to_parquet(check_path)
+                elif self.extension == "csv":
+                    dataset.to_csv(check_path, index=False)
         self.logger.info("Downloaded data successfully.")
