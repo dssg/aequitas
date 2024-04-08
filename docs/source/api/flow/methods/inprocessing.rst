@@ -4,7 +4,7 @@
 The :mod:`inprocessing` methods introduce modifications in the algorithms to ensure fairness during model training.
 The :class:`InProcessing` class is the abstract class from which all specific preprocessing methods derive.
  
-.. curentmodule:: aequitas.flow.methods
+.. currentmodule:: aequitas.flow.methods
 .. autoclass:: InProcessing
     :members:
 

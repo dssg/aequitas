@@ -21,11 +21,6 @@ class Threshold(PostProcessing):
         Threshold value to apply. The meaning of the threshold value depends on
         the threshold_type. Must be between 0 and 1 for 'fixed', 'fpr', and
         'tpr' threshold types. Must be an integer for 'top_k' threshold type.
-
-    Methods
-    -------
-    fit(X, y_hat, y, s=None)
-        Compute the threshold based on the given threshold_type and threshold_value.
     """
 
     def __init__(self, threshold_type: str, threshold_value: Union[float, int]):

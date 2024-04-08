@@ -5,7 +5,7 @@
 After obtaining the model predictions for a given task, :mod:`postprocessing` methods can be applied to improve the fairness of the decisions.
 The :class:`PostProcessing` class is the abstract class from which all specific preprocessing methods derive.
  
-.. curentmodule:: aequitas.flow.methods
+.. currentmodule:: aequitas.flow.methods
 .. autoclass:: PostProcessing
     :members:
 
