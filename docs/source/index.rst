@@ -89,7 +89,7 @@ Explore the documentation
    installation
    user_guide
    api/index
-   examples/index
+   examples
 
 Citing Aequitas
 ---------------
