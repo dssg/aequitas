@@ -36,6 +36,8 @@ class BalancedGroupThreshold(PostProcessing):
                 - tpr: true positive rate
                 - fpr: false positive rate
                 - pprev: predicted prevalence
+        alpha : float, optional
+            The alpha value to use for the model score correction. The default is 1.
         """
         self.logger = create_logger("methods.postprocessing.BalancedGroupThreshold")
         self.threshold_type = threshold_type
