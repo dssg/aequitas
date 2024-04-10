@@ -14,6 +14,7 @@ class BalancedGroupThreshold(PostProcessing):
         threshold_type: str,
         threshold_value: Union[float, int],
         fairness_metric: str,
+        alpha: float = 1,
     ):
         """Initialize a new instance of the BalancedGroupThreshold class.
 
@@ -40,6 +41,7 @@ class BalancedGroupThreshold(PostProcessing):
         self.threshold_type = threshold_type
         self.threshold_value = threshold_value
         self.fairness_metric = fairness_metric
+        self.alpha = alpha
 
         self.thresholds = {}
 
@@ -100,6 +102,11 @@ class BalancedGroupThreshold(PostProcessing):
             # Forward fill the 'value' column
             group_df["value"].fillna(method="ffill", inplace=True)
             group_df["value"].fillna(0, inplace=True)
+
+            # Apply model score correction
+            group_df["value"] = group_df["value"] * self.alpha + (
+               1 - group_df["y_hat"]
+            ) * (1 - self.alpha)
             return group_df
 
         # Create a single DataFrame
