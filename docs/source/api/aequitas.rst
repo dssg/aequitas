@@ -1,27 +1,23 @@
 Aequitas API
 ====================================
 
+:mod:`Audit`
+----------------------------------
+.. currentmodule:: aequitas.audit
+.. autoclass:: Audit
+
 :mod:`Group`
 ----------------------------------
-.. automodule:: src.aequitas.group
+.. automodule:: aequitas.group
     :members:
 
 :mod:`Bias`
 -----------------------------------
-.. automodule:: src.aequitas.bias
+.. automodule:: aequitas.bias
     :members:
 
 :mod:`Fairness`
 ---------------------------------
-.. automodule:: src.aequitas.fairness
+.. automodule:: aequitas.fairness
     :members:
 
-:mod:`Plotting`
----------------------------------
-.. automodule:: src.aequitas.plotting
-    :members:
-
-:mod:`Preprocessing`
-----------------------------------
-.. automodule:: src.aequitas.preprocessing
-    :members:

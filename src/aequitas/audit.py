@@ -9,6 +9,38 @@ from .plot import summary, disparity, absolute
 
 
 class Audit:
+    """
+    This class allows to audit a model for fairness, and plot the results. The Audit
+    class is a wrapper around the Group and Bias classes.
+
+    It additionally allows to obtain global metrics of performance of your
+    predictions or scores.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame containing the scores, labels, and sensitive attribute(s).
+    threshold : dict, optional
+        Dictionary containing the threshold for the scores. If the scores are
+        already binarized, this parameter is ignored. The keys of the dictionary are
+        'threshold_type' and 'threshold_value'. These are used to construct an
+        aequitas.flow.methods.postprocessing.Threshold object.
+    score_column : str, optional
+        Name of the column containing the scores (or predictions). By default,
+        'score'.
+    label_column : str, optional
+        Name of the column containing the labels. By default, 'label'.
+    sensitive_attribute_column : Union[str, list[str]], optional
+        Name of the column(s) containing the sensitive attribute(s). If None, all
+        columns except the score and label columns are considered sensitive
+        attributes. By default, None.
+    reference_groups : Union[Literal["maj", "min"],  dict], optional
+        Reference group(s) to use for the bias metrics. If 'maj', the majority group
+        is used. If 'min', the minority group is used. If a dictionary is passed,
+        the keys are the sensitive attribute columns and the values are the
+        reference groups. By default, 'maj'.
+    """
+
     def __init__(
         self,
         df: pd.DataFrame,
@@ -18,37 +50,6 @@ class Audit:
         sensitive_attribute_column: Optional[Union[str, list[str]]] = None,
         reference_groups: Optional[Union[Literal["maj", "min"], dict]] = "maj",
     ):
-        """
-        This class allows to audit a model for fairness, and plot the results. The Audit
-        class is a wrapper around the Group and Bias classes.
-
-        It additionally allows to obtain global metrics of performance of your
-        predictions or scores.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            DataFrame containing the scores, labels, and sensitive attribute(s).
-        threshold : dict, optional
-            Dictionary containing the threshold for the scores. If the scores are
-            already binarized, this parameter is ignored. The keys of the dictionary are
-            'threshold_type' and 'threshold_value'. These are used to construct an
-            aequitas.flow.methods.postprocessing.Threshold object.
-        score_column : str, optional
-            Name of the column containing the scores (or predictions). By default,
-            'score'.
-        label_column : str, optional
-            Name of the column containing the labels. By default, 'label'.
-        sensitive_attribute_column : Union[str, list[str]], optional
-            Name of the column(s) containing the sensitive attribute(s). If None, all
-            columns except the score and label columns are considered sensitive
-            attributes. By default, None.
-        reference_groups : Union[Literal["maj", "min"],  dict], optional
-            Reference group(s) to use for the bias metrics. If 'maj', the majority group
-            is used. If 'min', the minority group is used. If a dictionary is passed,
-            the keys are the sensitive attribute columns and the values are the
-            reference groups. By default, 'maj'.
-        """
         self.df = df
         self.score_column = score_column
         self.threshold = threshold
