@@ -1,23 +1,30 @@
 Aequitas API
 ====================================
 
-:mod:`Audit`
+Welcome to the Aequitas API documentation. 
+
+This bias audit toolkit is designed to enable anyone to audit machine learning models for discrimination and bias, and to make informed and equitable decisions around developing and deploying predictive risk-assessment tools.
+
+Audit
 ----------------------------------
+
 .. currentmodule:: aequitas.audit
 .. autoclass:: Audit
 
-:mod:`Group`
+Group
 ----------------------------------
-.. automodule:: aequitas.group
-    :members:
 
-:mod:`Bias`
+.. currentmodule:: aequitas.group
+.. autoclass:: Group
+
+Bias
 -----------------------------------
-.. automodule:: aequitas.bias
-    :members:
 
-:mod:`Fairness`
+.. currentmodule:: aequitas.bias
+.. autoclass:: Bias
+
+Fairness
 ---------------------------------
-.. automodule:: aequitas.fairness
-    :members:
 
+.. currentmodule:: aequitas.fairness
+.. autoclass:: Fairness

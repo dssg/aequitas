@@ -2,6 +2,7 @@ Aequitas Flow API
 =================
 
 Welcome to the Aequitas Flow API documentation. 
+
 This API provides a comprehensive suite of tools designed to facilitate experiments, manage datasets, and apply various methods for training fair models. 
 
 Experiments Module

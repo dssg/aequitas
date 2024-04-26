@@ -1,17 +1,25 @@
 User Guide
 =======================
 
-Welcome to the Aequitas Flow User Guide!
-In this section you will find more information and additional examples on how to take advantage of the tools provided on Aequitas Flow.
+Welcome to the Aequitas User Guide!
+In this section you will find more information and additional examples on how to take advantage of the tools provided on this API.
+
+
+Aequitas User Guide
+-------------------
 
 .. toctree::
    :maxdepth: 1
    :glob:
    
-   input_data.ipynb
-   output_data.ipynb
-   metrics.ipynb
-   CLI.ipynb
-   config.ipynb
-   using_python.ipynb
-   30_seconds_webapp.ipynb
+   aequitas_userguide/input_data
+   aequitas_userguide/output_data
+
+Aequitas Flow User Guide
+------------------------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   examples.rst 
