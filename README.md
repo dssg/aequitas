@@ -258,10 +258,21 @@ For more examples of the python library and a deep dive into concepts of fairnes
 
 ## Citing Aequitas
 
+To cite Aequitas, please refer to the following papers:
 
-If you use Aequitas in a scientific publication, we would appreciate citations to the following paper:
+1. Aequitas Flow: Streamlining Fair ML Experimentation (2024) [PDF](https://arxiv.org/pdf/2405.05809)
+   
+```bib
+@article{jesus2024aequitas,
+  title={Aequitas Flow: Streamlining Fair ML Experimentation},
+  author={Jesus, S{\'e}rgio and Saleiro, Pedro and Jorge, Beatriz M and Ribeiro, Rita P and Gama, Jo{\~a}o and Bizarro, Pedro and Ghani, Rayid and others},
+  journal={arXiv preprint arXiv:2405.05809},
+  year={2024}
+}
 
-Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequitas: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ([PDF](https://arxiv.org/pdf/1811.05577.pdf))
+```
+
+2. Aequitas: A Bias and Fairness Audit Toolkit (2018) [PDF](https://arxiv.org/pdf/1811.05577.pdf)
 
 ```bib
    @article{2018aequitas,
