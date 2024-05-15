@@ -1,4 +1,4 @@
-# *Aequitas*: Bias Auditing & Fair ML Toolkit
+# *Aequitas*: Bias Auditing & "Correction" Toolkit
 
 [![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
 [![License: MIT](https://badgen.net/pypi/license/aequitas)](https://github.com/dssg/aequitas/blob/master/LICENSE)
@@ -6,12 +6,15 @@
 
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
 
-`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. The objective of this package is to provide an easy-to-use and transparent tool for auditing predictors, as well as experimenting with Fair ML methods in binary classification settings.
+`aequitas` is an open-source bias auditing and Fair ML toolkit for data scientists, machine learning researchers, and policymakers. We provide an easy-to-use and transparent tool for auditing predictors of ML models, as well as experimenting with "correcting biased model" using Fair ML methods in binary classification settings.
+
+For more context around dealing with bias and fairness issues in AI//ML systems, take a look at our [detailed tutorial](https://dssg.github.io/fairness_tutorial/) and related publications.
+
 
 > 
 > **Version 1.0.0: Aequitas Flow - Optimizing Fairness in ML Pipelines**
 > 
-> Explore Aequitas Flow, our latest update in version 1.0.0, designed to enrich Fair ML experimentation with new, streamlined capabilities. Elevate your ML fairness journey today.
+> Explore Aequitas Flow, our latest update in version 1.0.0, designed to augment bias audits with bias mitigation and allow enrich  experimentation with Fair ML methods using our new, streamlined capabilities. 
 > 
 
 
@@ -37,11 +40,11 @@ or
 pip install git+https://github.com/dssg/aequitas.git
 ```
 
-### 📔Example Notebooks
+### 📔Example Notebooks supporting various tasks and workflows
 
 | Notebook | Description |
 |-|-|
-| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook. |
+| [Audit a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/compas_demo.ipynb) | Check how to do an in-depth bias audit with the COMPAS example notebook or use your own data. |
 | [Correct a Model's Predictions](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_model_audit_and_correct.ipynb) | Create a dataframe to audit a specific model, and correct the predictions with group-specific thresholds in the Model correction notebook. |
 | [Train a Model with Fairness Considerations](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_experiment.ipynb) | Experiment with your own dataset or methods and check the results of a Fair ML experiment. |
 | [Add your method to Aequitas Flow](https://colab.research.google.com/github/dssg/aequitas/blob/notebooks/aequitas_flow_add_method.ipynb) | Learn how to add your own method to the Aequitas Flow toolkit. |
@@ -81,7 +84,7 @@ audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
 ```
 <img src="https://raw.githubusercontent.com/dssg/aequitas/master/docs/_images/disparity_chart.svg" width="900">
 
-### 🧪 Quickstart on Fair ML Experimenting
+### 🧪 Quickstart on experimenting with Bias Reduction (Fair ML) methods
 
 To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.  
 
@@ -255,10 +258,21 @@ For more examples of the python library and a deep dive into concepts of fairnes
 
 ## Citing Aequitas
 
+To cite Aequitas, please refer to the following papers:
 
-If you use Aequitas in a scientific publication, we would appreciate citations to the following paper:
+1. Aequitas Flow: Streamlining Fair ML Experimentation (2024) [PDF](https://arxiv.org/pdf/2405.05809)
+   
+```bib
+@article{jesus2024aequitas,
+  title={Aequitas Flow: Streamlining Fair ML Experimentation},
+  author={Jesus, S{\'e}rgio and Saleiro, Pedro and Jorge, Beatriz M and Ribeiro, Rita P and Gama, Jo{\~a}o and Bizarro, Pedro and Ghani, Rayid and others},
+  journal={arXiv preprint arXiv:2405.05809},
+  year={2024}
+}
 
-Pedro Saleiro, Benedict Kuester, Abby Stevens, Ari Anisfeld, Loren Hinkson, Jesse London, Rayid Ghani, Aequitas: A Bias and Fairness Audit Toolkit,  arXiv preprint arXiv:1811.05577 (2018). ([PDF](https://arxiv.org/pdf/1811.05577.pdf))
+```
+
+2. Aequitas: A Bias and Fairness Audit Toolkit (2018) [PDF](https://arxiv.org/pdf/1811.05577.pdf)
 
 ```bib
    @article{2018aequitas,
