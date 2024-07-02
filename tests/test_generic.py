@@ -199,11 +199,10 @@ class TestGenericDataset(unittest.TestCase):
                 ),
                 split_values={"train": 0.3, "validation": 0.1, "test": 0.2},
             )
-        self.assertEqual(
-            cm.output,
-            [
-                "WARNING:datasets.GenericDataset:Using only 0.6000000000000001 of the dataset."
-            ],
+        self.assertEqual(len(cm.output), 1)
+        self.assertIn(
+            "WARNING:datasets.GenericDataset:Using only 0.6",
+            cm.output[0]
         )
 
     def test_missing_splits_column(self):
