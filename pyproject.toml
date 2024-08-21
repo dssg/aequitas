@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aequitas"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = ["None"]
 readme = "README.md"
@@ -11,7 +11,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "3.9.16"
+python = ">=3.8,<4"
 matplotlib = ">=3.0.3"
 pandas = ">=0.24.1"
 pyyaml = ">=5.1"
@@ -48,6 +48,10 @@ flake8 = "3.5.0"
 twine = "1.14.0"
 pytest = "^8.2.0"
 pytest-cov = "^5.0.0"
+
+[[tool.poetry.source]]
+name = "pypi-public"
+url = "https://pypi.org/simple/"
 
 [build-system]
 requires = ["poetry-core"]
