@@ -212,37 +212,28 @@ class FolkTables(Dataset):
         if self._download:
             self._download_data()
 
-        if self.split_type == "predefined":
-            path = []
-            for split in ["train", "validation", "test"]:
-                if isinstance(self.path, str):
-                    path.append(self.path + f"/{self.variant}.{split}.{self.extension}")
-                else:
-                    path.append(self.path / f"{self.variant}.{split}.{self.extension}")
-        else:
-            path = self.path / f"{self.variant}.{self.extension}"
+        path = []
+        for split in ["train", "validation", "test"]:
+            if isinstance(self.path, str):
+                path.append(self.path + f"/{self.variant}.{split}.{self.extension}")
+            else:
+                path.append(self.path / f"{self.variant}.{split}.{self.extension}")
 
         if self.extension == "parquet":
-            if self.split_type == "predefined":
-                datasets = [pd.read_parquet(p) for p in path]
-                self._indexes = [d.index for d in datasets]
-                self.data = pd.concat(datasets)
-            else:
-                self.data = pd.read_parquet(path)
+            datasets = [pd.read_parquet(p) for p in path]
+            self._indexes = [d.index for d in datasets]
+            self.data = pd.concat(datasets)
         else:
-            if self.split_type == "predefined":
-                train = pd.read_csv(path[0])
-                train_index = train.index[-1]
-                validation = pd.read_csv(path[1])
-                validation.set_index(validation.index + train_index + 1, inplace=True)
-                validation_index = validation.index[-1]
-                test = pd.read_csv(path[2])
-                test.set_index(test.index + validation_index + 1, inplace=True)
-                self._indexes = [train.index, validation.index, test.index]
+            train = pd.read_csv(path[0])
+            train_index = train.index[-1]
+            validation = pd.read_csv(path[1])
+            validation.set_index(validation.index + train_index + 1, inplace=True)
+            validation_index = validation.index[-1]
+            test = pd.read_csv(path[2])
+            test.set_index(test.index + validation_index + 1, inplace=True)
+            self._indexes = [train.index, validation.index, test.index]
 
-                self.data = pd.concat([train, validation, test])
-            else:
-                self.data = pd.read_csv(path)
+            self.data = pd.concat([train, validation, test])
 
         for col in CATEGORICAL_COLUMNS[self.variant]:
             self.data[col] = self.data[col].astype("category")
