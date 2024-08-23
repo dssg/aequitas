@@ -1,9 +1,12 @@
 import unittest
 import os
 import pandas as pd
+
+from pathlib import Path
 from aequitas.flow.datasets.generic import GenericDataset
 
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = Path(__file__)
+TEST_DIR = BASE_DIR.parents[2]
 
 
 class TestGenericDataset(unittest.TestCase):
@@ -33,7 +36,7 @@ class TestGenericDataset(unittest.TestCase):
             sensitive_column="sensitive",
             extension="parquet",
             dataset_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data.parquet"
+                TEST_DIR, "test_artifacts/test_generic/data.parquet"
             ),
         )
         dataset.load_data()
@@ -46,7 +49,7 @@ class TestGenericDataset(unittest.TestCase):
             label_column="label",
             sensitive_column="sensitive",
             extension="csv",
-            dataset_path=os.path.join(BASE_DIR, "test_artifacts/test_generic/data.csv"),
+            dataset_path=os.path.join(TEST_DIR, "test_artifacts/test_generic/data.csv"),
         )
         dataset.load_data()
         self.assertEqual(len(dataset.data), 10)
@@ -59,13 +62,13 @@ class TestGenericDataset(unittest.TestCase):
             sensitive_column="sensitive",
             extension="csv",
             train_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_train.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_train.csv"
             ),
             validation_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_validation.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_validation.csv"
             ),
             test_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_test.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_test.csv"
             ),
         )
         dataset.load_data()
@@ -104,7 +107,7 @@ class TestGenericDataset(unittest.TestCase):
         dataset = GenericDataset(
             label_column="label",
             sensitive_column="sensitive",
-            dataset_path=os.path.join(BASE_DIR, "test_artifacts/test_generic/data.csv"),
+            dataset_path=os.path.join(TEST_DIR, "test_artifacts/test_generic/data.csv"),
             split_type="column",
             extension="csv",
             split_column="sensitive",
@@ -119,20 +122,20 @@ class TestGenericDataset(unittest.TestCase):
     def test_all_paths_provided(self):
         self.assertRaisesRegex(
             ValueError,
-             "If single dataset path is passed, the other paths must be None.",
+            "If single dataset path is passed, the other paths must be None.",
             GenericDataset,
             label_column="label",
             sensitive_column="sensitive",
             train_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_train.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_train.csv"
             ),
             validation_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_validation.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_validation.csv"
             ),
             test_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_test.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_test.csv"
             ),
-            dataset_path=os.path.join(BASE_DIR, "test_artifacts/test_generic/data.csv"),
+            dataset_path=os.path.join(TEST_DIR, "test_artifacts/test_generic/data.csv"),
         )
 
     def test_missing_paths(self):
@@ -143,10 +146,10 @@ class TestGenericDataset(unittest.TestCase):
             label_column="label",
             sensitive_column="sensitive",
             train_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_train.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_train.csv"
             ),
             validation_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_validation.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_validation.csv"
             ),
         )
 
@@ -157,12 +160,12 @@ class TestGenericDataset(unittest.TestCase):
             GenericDataset,
             label_column="label",
             sensitive_column="sensitive",
-            train_path=os.path.join(BASE_DIR, "test_artifacts/data_train.csv"),
+            train_path=os.path.join(TEST_DIR, "test_artifacts/data_train.csv"),
             validation_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_validation.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_validation.csv"
             ),
             test_path=os.path.join(
-                BASE_DIR, "test_artifacts/test_generic/data_test.csv"
+                TEST_DIR, "test_artifacts/test_generic/data_test.csv"
             ),
         )
 
@@ -173,7 +176,7 @@ class TestGenericDataset(unittest.TestCase):
             GenericDataset,
             label_column="label",
             sensitive_column="sensitive",
-            dataset_path=os.path.join(BASE_DIR, "test_artifacts/test_generic/data.csv"),
+            dataset_path=os.path.join(TEST_DIR, "test_artifacts/test_generic/data.csv"),
             split_values={"train": 0.63, "validation": 0.37},
         )
 
@@ -185,25 +188,23 @@ class TestGenericDataset(unittest.TestCase):
             GenericDataset,
             label_column="label",
             sensitive_column="sensitive",
-            dataset_path=os.path.join(BASE_DIR, "test_artifacts/test_generic/data.csv"),
+            dataset_path=os.path.join(TEST_DIR, "test_artifacts/test_generic/data.csv"),
             split_values={"train": 0.63, "validation": 0.37, "test": 0.2},
         )
 
     def test_invalid_splits_warn(self):
         with self.assertLogs("datasets.GenericDataset", level="WARN") as cm:
-            dataset = GenericDataset(
+            GenericDataset(
                 label_column="label",
                 sensitive_column="sensitive",
                 dataset_path=os.path.join(
-                    BASE_DIR, "test_artifacts/test_generic/data.csv"
+                    TEST_DIR, "test_artifacts/test_generic/data.csv"
                 ),
-                split_values={"train": 0.3, "validation": 0.1, "test": 0.2},
+                split_values={"train": 0.5, "validation": 0.1, "test": 0.2},
             )
         self.assertEqual(
             cm.output,
-            [
-                "WARNING:datasets.GenericDataset:Using only 0.6000000000000001 of the dataset."
-            ],
+            ["WARNING:datasets.GenericDataset:Using only 0.8 of the " "dataset."],
         )
 
     def test_missing_splits_column(self):
