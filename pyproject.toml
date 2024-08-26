@@ -1,58 +1,52 @@
-[tool.poetry]
+[project]
 name = "aequitas"
 version = "1.0.0"
 description = ""
-authors = ["None"]
 readme = "README.md"
-packages = [
-    { include = "aequitas", from="src" },
-    { include = "aequitas_cli", from="src" },
-    { include = "aequitas_webapp", from="src" },
+requires-python = ">=3.8, <3.12"
+dependencies = [
+    "matplotlib>=3.7.5",
+    "pandas>=2.0.3",
+    "pyyaml>=6.0.2",
+    "seaborn>=0.13.2",
+    "altair>=5.4.0",
+    "millify>=0.1.1",
+    "scipy>=1.10.1",
+    "optuna>=3.6.1",
+    "aif360>=0.6.1",
+    "lightgbm>=4.5.0",
+    "fairgbm>=0.9.14",
+    "fairlearn>=0.10.0",
+    "hydra-core>=1.3.2",
+    "hyperparameter-tuning>=0.3.1",
+    "validators>=0.33.0",
+    "numpy>=1.24.4",
+    "fastparquet>=2024.2.0",
+    "requests>=2.32.3",
+    "torch>=2.4.0",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<4"
-matplotlib = ">=3.0.3"
-pandas = ">=0.24.1"
-pyyaml = ">=5.1"
-seaborn = ">=0.9.0"
-altair = ">=4.1.0"
-millify = "0.1.1"
-scipy = ">=0.18.1"
-optuna = ">=3.0.0"
-aif360 = ">=0.5.0"
-fairgbm = "0.9.14"
-fairlearn = ">=0.8.0"
-hydra-core = ">=1.3.0"
-validators = ">=0.22.0"
-hyperparameter-tuning = ">=0.3.1"
-numpy = "1.23.5"
-fastparquet = "2024.2.0"
-sqlalchemy = {version = ">=1.1.1", optional = true}
-tabulate = {version = "0.8.2", optional = true}
-xhtml2pdf = {version = "0.2.15", optional = true}
-ohio = {version = ">=0.2.0", optional = true}
-markdown2 = {version = "2.3.5", optional = true}
-flask = {version = "0.12.2", optional = true}
-flask-bootstrap = {version = "3.3.7.1", optional = true}
-
-[tool.poetry.extras]
-cli = ["sqlalchemy", "tabulate", "xhtml2pdf", "ohio", "markdown2"]
-webapp = ["flask", "flask-bootstrap"]
-
-[tool.poetry.group.dev.dependencies]
-argcmdr = "0.6.0"
-awsebcli = "3.20.10"
-bumpversion = "0.5.3"
-flake8 = "3.5.0"
-twine = "1.14.0"
-pytest = "^8.2.0"
-pytest-cov = "^5.0.0"
-
-[[tool.poetry.source]]
-name = "pypi-public"
-url = "https://pypi.org/simple/"
+[project.optional-dependencies]
+cli = [
+    "sqlalchemy>=1.1.1",
+    "tabulate>=0.9.0",
+    "xhtml2pdf>=0.2.15",
+    "ohio>=0.2.0",
+    "markdown2>=2.3.5",
+]
+webapp = [
+    "flask>=0.12.2",
+    "flask-bootstrap>=3.3.7.1"
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.2",
+    "pytest>=8.3.2",
+    "pytest-cov>=5.0.0",
+    "ipykernel>=6.29.5",
+]
