@@ -83,9 +83,7 @@ class BankAccountFraud(Dataset):
     ):
         super().__init__()
 
-        self.label_column = (
-            LABEL_COLUMN if label_column is None else label_column
-        )
+        self.label_column = LABEL_COLUMN if label_column is None else label_column
 
         if sensitive_column == "customer_age" or sensitive_column is None:
             self.sensitive_column = SENSITIVE_COLUMN
@@ -107,11 +105,12 @@ class BankAccountFraud(Dataset):
         else:
             self.variant = variant
             self.logger.debug(f"Variant: {self.variant}")
-        if url(path) or path.exists():
-            self.path = path
+
+        self.extension = extension
+        self.path = path
+        if url(path) or self._check_paths():
             self._download = False
         else:
-            self.path = path
             self._download = True
         if split_type not in SPLIT_TYPES:
             raise ValueError(f"Invalid split_type value. Try one of: {SPLIT_TYPES}")
@@ -120,7 +119,6 @@ class BankAccountFraud(Dataset):
             self.splits = splits
             self._validate_splits()
             self.logger.debug("Splits successfully validated.")
-        self.extension = extension
         self.seed = seed
         self.data: pd.DataFrame = None
         self.include_month = include_month
@@ -202,6 +200,11 @@ class BankAccountFraud(Dataset):
                             columns=["month"]
                         ),
                     )
+
+    def _check_paths(self) -> bool:
+        """Check if the data is already downloaded."""
+        check_path = Path(self.path) / f"{self.variant}.{self.extension}"
+        return check_path.exists()
 
     def _download_data(self) -> None:
         """Obtains the data of the sample dataset from Aequitas repository."""
