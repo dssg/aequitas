@@ -273,7 +273,7 @@ class LabelFlipping(PreProcessing):
                 if self.ordering_method == "residuals"
                 else y_flipped.loc[scores <= 0].index
             )
-            to_flip = pd.Series(index=flip_index).fillna(False).loc[y_flipped.index]
+            to_flip = pd.Series(index=flip_index).fillna(False)
             for group, flips in group_flips.items():
                 if flips > 0:
                     labels = y == 0
