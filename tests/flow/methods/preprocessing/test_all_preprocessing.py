@@ -25,6 +25,7 @@ METHODS = [
 
 class TestAllPreprocessing(unittest.TestCase):
     methods = []
+
     def setUp(self):
         self.dataset = FolkTables("ACS_sample")
         self.dataset.load_data()
@@ -41,7 +42,9 @@ class TestAllPreprocessing(unittest.TestCase):
     def test_1_fit_methods(self):
         for method in self.methods:
             method.fit(self.dataset.train.X, self.dataset.train.y, self.dataset.train.s)
-    
+
     def test_2_transform_methods(self):
         for method in self.methods:
-            method.transform(self.dataset.train.X, self.dataset.train.y, self.dataset.train.s)
+            method.transform(
+                self.dataset.train.X, self.dataset.train.y, self.dataset.train.s
+            )
