@@ -49,4 +49,7 @@ dev-dependencies = [
     "pytest>=8.3.2",
     "pytest-cov>=5.0.0",
     "ipykernel>=6.29.5",
+    "jupyterlab>=4.2.5",
+    "ipywidgets>=8.1.5",
+    "setuptools>=74.1.2",
 ]
