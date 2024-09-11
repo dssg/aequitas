@@ -75,5 +75,17 @@ uv run --extra cli --extra webapp pytest --cov-report xml:cov.xml
 This file can be used by your IDE (e.g. VSCode) to display the coverage of the tests.
 Ensure that the code you submit has a good coverage of tests (at least 80%).
 
+## Publishing the Package
+
+To publish the package, you need to have the necessary permissions to the PyPI repository. If you have the permissions, first you need to build the wheel of the package:
+```bash
+uv run python -m setup sdist bdist_wheel
+```
+Then, you can publish the package to the PyPI repository:
+```bash
+uvx twine upload dist/*
+```
+Ideally, this will be done by Actions in the future, but for now, this is the manual process.
+
 ## Documentation
 TBD.
