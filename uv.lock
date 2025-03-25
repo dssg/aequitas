@@ -23,7 +23,6 @@ dependencies = [
     { name = "hyperparameter-tuning" },
     { name = "lightgbm" },
     { name = "matplotlib" },
-    { name = "millify" },
     { name = "numpy" },
     { name = "optuna" },
     { name = "pandas" },
@@ -70,7 +69,6 @@ requires-dist = [
     { name = "lightgbm", specifier = ">=4.5.0" },
     { name = "markdown2", marker = "extra == 'cli'", specifier = ">=2.3.5" },
     { name = "matplotlib", specifier = ">=3.7.5" },
-    { name = "millify", specifier = ">=0.1.1" },
     { name = "numpy", specifier = ">=1.24.4" },
     { name = "ohio", marker = "extra == 'cli'", specifier = ">=0.2.0" },
     { name = "optuna", specifier = ">=3.6.1" },
@@ -1738,12 +1736,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/99/5b/a36a337438a14116b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/8e/9ad090d3553c280a8060fbf6e24dc1c0c29704ee7d1c372f0c174aa59285/matplotlib_inline-0.1.7-py3-none-any.whl", hash = "sha256:df192d39a4ff8f21b1895d72e6a13f5fcc5099f00fa84384e0ea28c2cc0653ca", size = 9899 },
 ]
-
-[[package]]
-name = "millify"
-version = "0.1.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c9/60/f81b9440107ac22cd8fa36924e194bb258b01aaa5484b8693eba2b542300/millify-0.1.1.tar.gz", hash = "sha256:619defdc98b6d23f941b5ce4aaf4bf87a0e0f64cd0446ffa299be94486597f1a", size = 1219 }
 
 [[package]]
 name = "mpmath"

@@ -10,7 +10,6 @@ dependencies = [
     "pyyaml>=6.0.2",
     "seaborn>=0.13.2",
     "altair>=5.4.0",
-    "millify>=0.1.1",
     "scipy>=1.10.1",
     "optuna>=3.6.1",
     "aif360>=0.6.1",
