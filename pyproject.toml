@@ -34,8 +34,10 @@ cli = [
     "markdown2>=2.3.5",
 ]
 webapp = [
-    "flask>=0.12.2",
-    "flask-bootstrap>=3.3.7.1"
+    "flask>=0.12.2,<2.0.0",
+    "flask-bootstrap>=3.3.7.1",
+    "jinja2>=2.10,<3.0.0",
+    "markupsafe>=1.0,<2.1.0"
 ]
 
 [build-system]
