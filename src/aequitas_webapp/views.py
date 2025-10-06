@@ -3,20 +3,21 @@ import os.path
 import tempfile
 
 import pandas as pd
+from flask import (
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from markupsafe import Markup
+from werkzeug.utils import secure_filename
+
 from aequitas.fairness import Fairness
 from aequitas.preprocessing import preprocess_input_df
 from aequitas_cli.aequitas_audit import audit
 from aequitas_cli.utils.configs_loader import Configs
-from flask import (
-    abort,
-    Markup,
-    request,
-    redirect,
-    url_for,
-    flash,
-    render_template,
-)
-from werkzeug.utils import secure_filename
 
 from . import app
 

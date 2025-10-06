@@ -22,7 +22,6 @@ dependencies = [
     "numpy>=1.24.4",
     "fastparquet>=2024.2.0",
     "requests>=2.32.3",
-    "torch>=2.4.0",
 ]
 
 [project.optional-dependencies]
@@ -34,10 +33,12 @@ cli = [
     "markdown2>=2.3.5",
 ]
 webapp = [
-    "flask>=0.12.2,<2.0.0",
-    "flask-bootstrap>=3.3.7.1",
-    "jinja2>=2.10,<3.0.0",
-    "markupsafe>=1.0,<2.1.0"
+    "flask>=2.0.0",
+    "flask-bootstrap>=3.3.7.1"
+]
+
+flow = [
+    "torch>=2.4.0"
 ]
 
 [build-system]

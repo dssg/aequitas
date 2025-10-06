@@ -20,7 +20,8 @@ COPY serve.py ./
 
 # Create virtual environment and install dependencies
 RUN uv venv && \
-    uv sync --frozen --extra webapp --extra cli
+    # uv sync --frozen --extra webapp --extra cli
+    uv sync --frozen --extra webapp --extra cli --extra flow
 
 # Make uv-installed Python available
 ENV PATH="/aequitas/.venv/bin:$PATH"
