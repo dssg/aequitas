@@ -1,9 +1,8 @@
 from .preprocessing import PreProcessing
 
 from ...utils import create_logger
-from ...utils.imports import import_object
+from ...utils.imports import instantiate_object
 
-import inspect
 import pandas as pd
 import math
 from typing import Optional, Tuple, Literal, Union, Callable
@@ -26,7 +25,7 @@ class LabelFlipping(PreProcessing):
         bagging_n_estimators: int = 10,
         fair_ordering: bool = True,
         ordering_method: Literal["ensemble_margin", "residuals"] = "ensemble_margin",
-        unawareness_features: Optional[list] = None,
+        unawareness_features: Optional[Union[bool, list, str]] = None,
         seed: int = 42,
         **base_estimator_args,
     ):
@@ -104,26 +103,8 @@ class LabelFlipping(PreProcessing):
 
         self.bagging_max_samples = bagging_max_samples
 
-        if isinstance(bagging_base_estimator, str):
-            bagging_base_estimator = import_object(bagging_base_estimator)
-        signature = inspect.signature(bagging_base_estimator)
-        if (
-            signature.parameters[list(signature.parameters.keys())[-1]].kind
-            == inspect.Parameter.VAR_KEYWORD
-        ):
-            args = (
-                base_estimator_args  # Estimator takes **kwargs, so all args are valid
-            )
-        else:
-            args = {
-                arg: value
-                for arg, value in base_estimator_args.items()
-                if arg in signature.parameters
-            }
-        self.bagging_base_estimator = bagging_base_estimator(**args)
-        self.logger.info(
-            f"Created base estimator {self.bagging_base_estimator} with params {args}, "
-            f"discarded args:{list(set(base_estimator_args.keys()) - set(args.keys()))}"
+        self.bagging_base_estimator = instantiate_object(
+            bagging_base_estimator, **base_estimator_args
         )
         self.bagging_n_estimators = bagging_n_estimators
 
@@ -134,6 +115,33 @@ class LabelFlipping(PreProcessing):
         self.unawareness_features = unawareness_features
         self.used_in_inference = False
         self.seed = seed
+
+    def _feature_suppression(self, X: pd.DataFrame, s: pd.Series) -> pd.DataFrame:
+        X_transformed = X.copy()
+
+        if self.unawareness_features is None:
+            if s.name not in X_transformed.columns:
+                X_transformed[s.name] = s
+
+        else:
+            if isinstance(self.unawareness_features, bool):
+                if self.unawareness_features and s.name in X_transformed.columns:
+                    X_transformed = X_transformed.drop(columns=s.name)
+                elif (
+                    not self.unawareness_features
+                    and s.name not in X_transformed.columns
+                ):
+                    X_transformed[s.name] = s
+
+            else:
+                unawareness_features_list = (
+                    [self.unawareness_features]
+                    if isinstance(self.unawareness_features, str)
+                    else self.unawareness_features
+                )
+                X_transformed = X_transformed.drop(columns=unawareness_features_list)
+
+        return X_transformed
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]) -> None:
         """
@@ -154,10 +162,7 @@ class LabelFlipping(PreProcessing):
 
         self.logger.info("Fitting LabelFlipping.")
 
-        X_transformed = X.copy()
-        if self.unawareness_features is not None:
-            X_transformed = X_transformed.drop(columns=self.unawareness_features)
-
+        X_transformed = self._feature_suppression(X, s)
         X_transformed = pd.get_dummies(X_transformed)
 
         self.ensemble = BaggingClassifier(
@@ -215,15 +220,18 @@ class LabelFlipping(PreProcessing):
 
     def _calculate_group_flips(self, y: pd.Series, s: pd.Series):
         prevalence = y.mean()
-        group_prevalences = y.groupby(s).mean()
+        group_prevalences = y.groupby(s, observed=True).mean()
 
         min_prevalence = prevalence - self.disparity_target * prevalence
         max_prevalence = prevalence + self.disparity_target * prevalence
 
         group_flips = {
-            group: math.ceil(min_prevalence * len(y[s == group])) - y[s == group].sum()
-            if group_prevalences[group] < min_prevalence
-            else math.floor(max_prevalence * len(y[s == group])) - y[s == group].sum()
+            group: (
+                math.ceil(min_prevalence * len(y[s == group])) - y[s == group].sum()
+                if group_prevalences[group] < min_prevalence
+                else math.floor(max_prevalence * len(y[s == group]))
+                - y[s == group].sum()
+            )
             for group in group_prevalences.index
         }
 
@@ -251,11 +259,11 @@ class LabelFlipping(PreProcessing):
         y_flipped : pd.Series
             The transformed label vector.
         """
-        y_flipped = y.reindex(
+        y_flipped = y.loc[
             scores.sort_values(
                 ascending=(self.ordering_method == "ensemble_margin")
             ).index
-        )
+        ]
         n_flip = int(self.max_flip_rate * len(y))
 
         if self.fair_ordering:
@@ -265,26 +273,30 @@ class LabelFlipping(PreProcessing):
                 if self.ordering_method == "residuals"
                 else y_flipped.loc[scores <= 0].index
             )
-            flip_count = 0
+            to_flip = pd.Series(index=flip_index).fillna(False)
+            for group, flips in group_flips.items():
+                if flips > 0:
+                    labels = y == 0
+                elif flips < 0:
+                    labels = y == 1
+                else:
+                    labels = y == -1  # To keep everything false.
+                group_instances = s == group
+                intersection = (group_instances & labels).loc[y_flipped.index]
+                # find and keep first "flips" instances to flip as true, rest as false
+                true_indices = intersection[intersection].index
+                if len(true_indices) > abs(flips):
+                    intersection[true_indices[abs(flips) :]] = False
+                to_flip = to_flip | intersection
+            # Check if we are flipping more than n_flip
+            true_indices = to_flip[to_flip].index
+            if to_flip.sum() > n_flip:
+                to_flip[true_indices[n_flip:]] = False
+            y_flipped[to_flip] = 1 - y_flipped[to_flip]
 
-            for i in flip_index:
-                if abs(scores.loc[i]) < self.score_threshold:
-                    break
-
-                if (group_flips[s.loc[i]] > 0 and y.loc[i] == 0) or (
-                    group_flips[s.loc[i]] < 0 and y.loc[i] == 1
-                ):
-                    y_flipped.loc[i] = 1 - y.loc[i]
-                    flip_count += 1
-                    if group_flips[s.loc[i]] > 0:
-                        group_flips[s.loc[i]] -= 1
-                    else:
-                        group_flips[s.loc[i]] += 1
-
-                if flip_count == n_flip:
-                    break
-
-            self.logger.info(f"Flipped {flip_count} instances.")
+            differences = (y_flipped.loc[y.index] != y).sum()
+            # Check the indexes of instances that were flipped
+            self.logger.info(f"Flipped {differences} instances.")
 
         else:
             n_above_threshold = scores.loc[abs(scores) >= self.score_threshold].shape[0]
@@ -294,7 +306,7 @@ class LabelFlipping(PreProcessing):
 
             self.logger.info(f"Flipped {n_flip} instances.")
 
-        return y_flipped.reindex(y.index)
+        return y_flipped.loc[y.index]
 
     def transform(
         self, X: pd.DataFrame, y: pd.Series, s: Optional[pd.Series]
@@ -317,7 +329,7 @@ class LabelFlipping(PreProcessing):
             The transformed input, X, y, and s.
         """
         super().transform(X, y, s)
-        
+
         self.logger.info("Transforming data with LabelFlipping.")
 
         if s is None and self.fair_ordering:
@@ -326,10 +338,7 @@ class LabelFlipping(PreProcessing):
                 "is True."
             )
 
-        X_transformed = X.copy()
-        if self.unawareness_features is not None:
-            X_transformed = X_transformed.drop(columns=self.unawareness_features)
-
+        X_transformed = self._feature_suppression(X, s)
         X_transformed = pd.get_dummies(X_transformed)
 
         scores = self._score_instances(X_transformed, y)

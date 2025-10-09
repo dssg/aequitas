@@ -14,7 +14,7 @@ def get_examples(
         "methods/data_repair",
     ]
 ) -> None:
-    """Downloads the examples from the fairflow repository.
+    """Downloads the examples from the aequitas flow repository.
 
     Note that this should not be used outside Google Colab, as it clutters the directory
     with with the git files from Aequitas repository.
@@ -22,11 +22,11 @@ def get_examples(
     Parameters
     ----------
     directory : Literal["configs", "examples/data_repair", "experiment_results"]
-        The directory to download from the fairflow repository.
+        The directory to download from the aequitas flow repository.
     """
     directory = "examples/" + directory
     logger = create_logger("utils.colab")
-    logger.info("Downloading examples from fairflow repository.")
+    logger.info("Downloading examples from aequitas flow repository.")
     # Create directory if it doesn't exist
     Path(directory).mkdir(parents=True, exist_ok=True)
     # Check if git repository already exists in folder

@@ -270,10 +270,6 @@ class Bias(object):
                                                   specific_measures=selected_significance,
                                                   label_score_ref=None)
 
-            ref_groups_dict = assemble_ref_groups(df, ref_group_flag='_ref_group_value',
-                                                  specific_measures=selected_significance,
-                                                  label_score_ref=None)
-
             attr_cols = df['attribute_name'].unique()
 
             for attribute in attr_cols:

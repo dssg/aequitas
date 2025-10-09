@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 
 
 from .plot import Plot
+from ...utils.metrics import METRIC_NAMES
 
 sns.set()
 sns.set_style("whitegrid", {"grid.linestyle": "--"})
@@ -53,22 +54,11 @@ order = [
     "grid_search_folktables",
 ]
 
-metrics_names = {
-    "Predictive Equality": "Pred. Eq.",
-    "Equal Opportunity": "Eq. Opp.",
-    "Demographic Parity": "Dem. Par.",
-    "TPR": "TPR",
-    "FPR": "FPR",
-    "FNR": "FNR",
-    "Accuracy": "Acc.",
-    "Precision": "Prec.",
-}
-
 
 def visualize(plot: Plot):
     # define the name of the metrics for plot
-    perf_metric_plot = metrics_names[plot.performance_metric]
-    fair_metric_plot = metrics_names[plot.fairness_metric]
+    perf_metric_plot = METRIC_NAMES[plot.performance_metric]
+    fair_metric_plot = METRIC_NAMES[plot.fairness_metric]
 
     x = plot.x
 

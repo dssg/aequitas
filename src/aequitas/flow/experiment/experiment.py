@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import json
 import pickle
+import pandas as pd
 from pathlib import Path
 from typing import Iterable, Optional, Tuple, Union
 
@@ -17,7 +18,8 @@ from ..methods.postprocessing.threshold import Threshold
 from ..methods.preprocessing.identity import Identity as PreIdentity
 from ..methods.preprocessing.preprocessing import PreProcessing
 from ..optimization import ObjectiveFunction
-from ..utils import ConfigReader, create_logger, import_object
+from ..utils import ConfigReader, create_logger, import_object, read_results
+from ..plots.pareto import Plot
 
 
 class Experiment:
@@ -54,7 +56,7 @@ class Experiment:
     def __init__(
         self,
         config_file: Optional[Path] = None,
-        config: Optional[DictConfig] = None,
+        config: Optional[Union[DictConfig, dict]] = None,
         default_fields: Iterable[str] = ("methods", "datasets"),
         save_artifacts: bool = True,
         save_folder: Optional[Path] = Path("artifacts"),
@@ -65,9 +67,21 @@ class Experiment:
         self.logger = create_logger("Experiment")
         self.logger.info("Instantiating Experiment class.")
 
+        self.dfs = {}
         # Read config file
         if config is not None:
-            self.config = config
+            if isinstance(config, DictConfig):
+                self.config = config
+            else:
+                # check if we have pandas dataframes passed as arguments
+                datasets = config["datasets"]
+                for dataset in datasets:
+                    for name, conf in dataset.items():
+                        if "args" in conf and "df" in conf["args"]:
+                            self.dfs[name] = conf["args"]["df"]
+                            conf["args"]["df"] = None
+                self.config = DictConfig(config)
+
         elif config_file is not None:
             self.config_reader = ConfigReader(
                 config_file, default_fields=default_fields
@@ -104,12 +118,19 @@ class Experiment:
         return sampler(**self.config.optimization.sampler_args)  # type: ignore
 
     @staticmethod
-    def read_dataset(config: Union[dict, DictConfig]) -> Dataset:
+    def read_dataset(
+        config: Union[dict, DictConfig],
+        df: Optional[pd.DataFrame] = None,
+    ) -> Dataset:
         """Read a dataset from a configuration object."""
         if isinstance(config, dict):
             config = DictConfig(config)
         dataset_class = import_object(config.classpath)
-        dataset_object = dataset_class(**config.args)  # type: ignore
+        # Casting args to dict, to add df if necessary
+        args = dict(config.args)
+        if df is not None:
+            args["df"] = df
+        dataset_object = dataset_class(**args)  # type: ignore
         return dataset_object
 
     @staticmethod
@@ -128,7 +149,7 @@ class Experiment:
         for dataset in self.config.datasets:
             for name, configs in dataset.items():  # This iterates once.
                 self.logger.debug(f"Reading '{name}'. Configurations: {configs}.")
-                dataset_object = self.read_dataset(configs)
+                dataset_object = self.read_dataset(configs, self.dfs.get(name, None))
                 dataset_object.load_data()
                 dataset_object.create_splits()
                 self.logger.debug(f"Dataset {name} successfully read.")
@@ -143,7 +164,7 @@ class Experiment:
 
     def run(self) -> None:
         self.logger.info("Beginning Experiment.")
-        exp_folder: Path = Path()
+        self.exp_folder: Path = Path()
         dataset_folder: Path = Path()
         if self.artifacts:
             if self.save_folder is None:
@@ -152,14 +173,14 @@ class Experiment:
             if not self.hash:
                 self.generate_hash()
 
-            exp_folder: Path = self.save_folder / self.hash
-            exp_folder.mkdir(parents=True, exist_ok=True)
-            self.logger.info(f"Saving objects to '{exp_folder.resolve()}'.")
+            self.exp_folder: Path = self.save_folder / self.hash
+            self.exp_folder.mkdir(parents=True, exist_ok=True)
+            self.logger.info(f"Saving objects to '{self.exp_folder.resolve()}'.")
         self._read_datasets()
         for dataset_id, (dataset_name, dataset) in enumerate(self.datasets.items()):
             self.logger.info(f"Using '{dataset_name}'.")
             if self.artifacts:
-                dataset_folder: Path = exp_folder / dataset_name
+                dataset_folder: Path = self.exp_folder / dataset_name
                 dataset_folder.mkdir(parents=True, exist_ok=True)
                 self.logger.debug(
                     f"Saving dataset-related objects to '{dataset_folder.resolve()}'."
@@ -167,7 +188,8 @@ class Experiment:
             for method in self.config.methods:
                 for method_name, method_items in method.items():
                     self.logger.info(
-                        f"Testing '{method_name}', saved in '{dataset_folder.resolve()}'."
+                        f"Testing '{method_name}', "
+                        f"saved in '{dataset_folder.resolve()}'."
                     )
                     if self.artifacts:
                         method_folder: Path = dataset_folder / method_name
@@ -209,15 +231,15 @@ class Experiment:
                         f"'{method_name}' in '{dataset_name}'."
                     )
                     objective = ObjectiveFunction(
-                        X_train=dataset["train"]["X"],
-                        y_train=dataset["train"]["y"],
-                        s_train=dataset["train"]["s"],
-                        X_val=dataset["validation"]["X"],
-                        y_val=dataset["validation"]["y"],
-                        s_val=dataset["validation"]["s"],
-                        X_test=dataset["test"]["X"],
-                        y_test=dataset["test"]["y"],
-                        s_test=dataset["test"]["s"],
+                        X_train=dataset["train"]["X"].copy(deep=True),
+                        y_train=dataset["train"]["y"].copy(deep=True),
+                        s_train=dataset["train"]["s"].copy(deep=True),
+                        X_val=dataset["validation"]["X"].copy(deep=True),
+                        y_val=dataset["validation"]["y"].copy(deep=True),
+                        s_val=dataset["validation"]["s"].copy(deep=True),
+                        X_test=dataset["test"]["X"].copy(deep=True),
+                        y_test=dataset["test"]["y"].copy(deep=True),
+                        s_test=dataset["test"]["s"].copy(deep=True),
                         threshold=threshold,
                         preprocessing_method=pre,  # type: ignore
                         preprocessing_configs=pre_configs.args,
@@ -258,3 +280,19 @@ class Experiment:
             json.dumps(self.config, default=dt_handler, sort_keys=True).encode("utf-8")
         ).hexdigest()
         self.logger.debug(f"Hash generated: {self.hash}.")
+
+    def plot_pareto(
+        self,
+        dataset: str = "Dataset",
+        fairness_metric: str = "Predictive Equality",
+        performance_metric: str = "TPR",
+        split: str = "test",
+    ) -> None:
+        results = read_results(self.exp_folder)
+        if dataset not in results:
+            raise ValueError(f"Dataset '{dataset}' was not used in experiment."
+                             f" Try on of the following: {list(results.keys())}")
+        self.plot = Plot(
+            results, dataset, fairness_metric, performance_metric, split=split
+        )
+        return self.plot.visualize()

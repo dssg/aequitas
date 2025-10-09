@@ -166,9 +166,9 @@ class ObjectiveFunction:
         start_time = time.process_time()
         preprocessing.fit(self.X_train, self.y_train, self.s_train)
         preprocessing_output = preprocessing.transform(
-            self.X_train,
-            self.y_train,
-            self.s_train,
+            self.X_train.copy(),
+            self.y_train.copy(),
+            self.s_train.copy(),
         )
         inprocessing.fit(*preprocessing_output)
 

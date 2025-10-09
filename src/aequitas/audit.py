@@ -6,6 +6,7 @@ import pandas as pd
 from .bias import Bias
 from .group import Group
 from .plot import summary, disparity, absolute
+from .flow.methods.postprocessing import Threshold
 
 
 class Audit:
@@ -49,7 +50,7 @@ class Audit:
             the keys are the sensitive attribute columns and the values are the
             reference groups. By default, 'maj'.
         """
-        self.df = df
+        self.df = df.copy(deep=True)
         self.score_column = score_column
         self.threshold = threshold
         self.label_column = label_column
@@ -253,6 +254,14 @@ class Audit:
         # If not binarized and a threshold is not passed, raise an error
         if not self.binarized and self.threshold is None:
             raise ValueError("Scores are not binarized. Please pass a threshold.")
+        if not self.binarized:
+            self.threshold_object = Threshold(**self.threshold)
+            self.threshold_object.fit(
+                None, self.df[self.score_column], self.df[self.label_column]
+            )
+            self.df[self.score_column] = self.threshold_object.transform(
+                None, self.df[self.score_column]
+            )
 
     def _validate_label_column(self):
         # Check if column exists

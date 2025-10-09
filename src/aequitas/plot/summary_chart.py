@@ -24,9 +24,11 @@ from aequitas.plot.commons.style.sizes import Summary_Chart
 from aequitas.plot.commons import initializers as Initializer
 from aequitas.plot.commons import validators as Validator
 from aequitas.plot.commons import labels as Label
+from aequitas.plot.commons.metrics import possible_metrics, display_name
 
-# Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need it
-# (like most annotations), we pass the following dummy dataframe to reduce the complexity of the resulting vega spec.
+# Altair 2.4.1 requires that all chart receive a dataframe, for charts that don't need
+# it (like most annotations), we pass the following dummy dataframe to reduce the
+# complexity of the resulting vega spec.
 DUMMY_DF = pd.DataFrame({"a": [1, 1], "b": [0, 0]})
 
 
@@ -52,9 +54,9 @@ def __get_scales(max_num_groups):
 def __get_size_constants(
     chart_height, chart_width, num_attributes, num_metrics, max_num_groups
 ):
-    """Calculates the heights, widths and spacings of the components of the summary chart
-    based on the provided desired overall chart height and width, as well as the number of
-    attributes (columns) and metrics (lines)."""
+    """Calculates the heights, widths and spacings of the components of the summary
+    chart based on the provided desired overall chart height and width, as well as the
+    number of attributes (columns) and metrics (lines)."""
 
     size_constants = dict(
         # Chart sizes
@@ -65,11 +67,11 @@ def __get_size_constants(
         column_spacing=0.15 * chart_width / num_attributes,
         column_width=Summary_Chart.column_width_ratio * chart_width / num_attributes,
         # Circle size
-        ## Conditional definition of the size where for each additional unit in
-        ## max_num_groups, we subtract 25 squared pixels from the area of the
-        ## circle, which has the base value of 350 for 0 groups. From max_num_groups
-        ## equal to 13 or more, we keep the size at the minimum value of 25 to
-        ## make sure the circles are visible.
+        # Conditional definition of the size where for each additional unit in
+        # max_num_groups, we subtract 25 squared pixels from the area of the
+        # circle, which has the base value of 350 for 0 groups. From max_num_groups
+        # equal to 13 or more, we keep the size at the minimum value of 25 to
+        # make sure the circles are visible.
         group_circle_size=-25 * max_num_groups + 350 if max_num_groups < 13 else 25,
     )
     return size_constants
@@ -163,9 +165,10 @@ def __draw_metric_line_titles(metrics, size_constants):
         )
 
     # EMPTY CORNER SPACE
-    # To make sure that the attribute columns align properly with the title column, we need to create a blank
-    # space of the same size of the attribute titles. For this purpose, we use the same function (__draw_attribute_title)
-    # and pass in an empty string so that nothing is actually drawn.
+    # To make sure that the attribute columns align properly with the title column, we
+    # need to create a blank space of the same size of the attribute titles. For this
+    # purpose, we use the same function (__draw_attribute_title) and pass in an empty
+    # string so that nothing is actually drawn.
     top_left_corner_space = __draw_attribute_title(
         "", size_constants["metric_titles_width"], size_constants
     )
@@ -182,7 +185,8 @@ def __draw_metric_line_titles(metrics, size_constants):
 
 
 def __get_parity_result_variable(row, metric, fairness_threshold):
-    """Creates parity test result variable for each provided row, separating the Reference group from the passing ones."""
+    """Creates parity test result variable for each provided row, separating the
+    Reference group from the passing ones."""
     if row["attribute_value"] == row["ref_group_value"]:
         return "Reference"
     elif abs(row[f"{metric}_disparity_scaled"]) < fairness_threshold - 1:
@@ -192,7 +196,8 @@ def __get_parity_result_variable(row, metric, fairness_threshold):
 
 
 def __draw_parity_result_text(parity_result, color_scale):
-    """Draws the uppercased text result of the provided parity test (Pass, Fail or Reference),
+    """Draws the uppercased text result of the provided parity test (Pass, Fail or
+    Reference),
     color-coded according to the provided Altair scale."""
 
     return (
@@ -222,7 +227,8 @@ def __draw_parity_result_text(parity_result, color_scale):
 
 
 def __draw_population_bar(population_bar_df, metric, color_scale):
-    """Draws a stacked bar of the sum of the percentage of population of the groups that obtained each result for the parity test."""
+    """Draws a stacked bar of the sum of the percentage of population of the groups
+    that obtained each result for the parity test."""
     population_bar_tooltips = [
         alt.Tooltip(field=f"{metric}_parity_result", type="nominal", title="Parity"),
         alt.Tooltip(
@@ -258,7 +264,8 @@ def __draw_population_bar(population_bar_df, metric, color_scale):
 
 def __draw_group_circles(plot_df, metric, scales, size_constants):
     """Draws a circle for each group, color-coded by the result of the parity test.
-    The groups are spread around the central reference group according to their disparity.
+    The groups are spread around the central reference group according to their
+    disparity.
     """
 
     circle_tooltip_encoding = [
@@ -348,7 +355,8 @@ def __draw_parity_test_explanation(fairness_threshold, x_position, warnings=()):
         x=alt.value(x_position),
         y=alt.value(0),
         text=alt.value(
-            f"For a group to pass the parity test its disparity to the reference group cannot exceed the fairness threshold ({fairness_threshold})."
+            f"For a group to pass the parity test its disparity to the reference group "
+            f"cannot exceed the fairness threshold ({fairness_threshold})."
         ),
     )
 
@@ -356,7 +364,8 @@ def __draw_parity_test_explanation(fairness_threshold, x_position, warnings=()):
         x=alt.value(x_position),
         y=alt.value(Annotation.font_size * Annotation.line_spacing),
         text=alt.value(
-            f"An attribute passes the parity test for a given metric if all its groups pass the test."
+            "An attribute passes the parity test for a given metric if all its groups "
+            "pass the test."
         ),
     )
     text_explanation.append(explanation_text_group)
@@ -401,7 +410,8 @@ def __create_population_bar_df(attribute_df, metric):
 
 
 def __create_group_rank_variable(attribute_df, metric):
-    """Creates the disparity rank variable for the given metric, centered around 0 (the Reference Group's value)."""
+    """Creates the disparity rank variable for the given metric, centered around 0 (the
+    Reference Group's value)."""
 
     # RANK
     attribute_df[f"{metric}_disparity_rank"] = attribute_df[
@@ -454,9 +464,11 @@ def __create_tooltip_variables(attribute_df, metric, fairness_threshold):
 
 
 def __create_disparity_variables(attribute_df, metric, fairness_threshold):
-    """Creates scaled disparity, parity test result & disparity explanation tooltip variables."""
+    """Creates scaled disparity, parity test result & disparity explanation tooltip
+    variables."""
     # Check if any group has a disparity of 0.
-    # These values would potentially break the plots, and will raise warnings to the user.
+    # These values would potentially break the plots, and will raise warnings to the
+    # user.
     zero_metric_groups = attribute_df[attribute_df[f"{metric}_disparity"] == 0]
     zero_values = zero_metric_groups["attribute_value"].values
     warning = None
@@ -478,10 +490,12 @@ def __create_disparity_variables(attribute_df, metric, fairness_threshold):
     return warning
 
 
+
 def __get_attribute_column(
     attribute_df, metrics, scales, attribute, size_constants, fairness_threshold
 ):
-    """Returns a vertical concatenation of all elements of all metrics for each attribute's column."""
+    """Returns a vertical concatenation of all elements of all metrics for each
+    attribute's column."""
 
     metric_summary = []
     metric_warnings = []
@@ -496,8 +510,8 @@ def __get_attribute_column(
         __create_group_rank_variable(attribute_df, metric)
 
         # PARITY RESULT TEXT
-        ## The parity result is equal to the "worst" of each group's results
-        ## If one group fails the parity test, the whole metric fails (for that attribute)
+        # The parity result is equal to the "worst" of each group's results
+        # If one group fails the parity test, the whole metric fails (for that attr.)
         parity_result = attribute_df.loc[
             attribute_df[f"{metric}_parity_result"] != "Reference"
         ][f"{metric}_parity_result"].min()
@@ -549,17 +563,19 @@ def plot_summary_chart(
     chart_height=None,
     chart_width=None,
 ):
-    """Draws chart that summarizes the parity results for the provided metrics across the existing attributes.
-    This includes an overall result, the specific results by each attribute's groups as well as the percentage
-    of population by result.
+    """Draws chart that summarizes the parity results for the provided metrics across
+    the existing attributes. This includes an overall result, the specific results by
+    each attribute's groups as well as the percentage of population by result.
 
     :param disparity_df: a dataframe generated by the Aequitas Bias class
     :type disparity_df: pandas.core.frame.DataFrame
     :param metrics_list: a list of the metrics of interest
     :type metrics_list: list
-    :param attributes_list: a list of the attributes of interest, defaults to using all in the dataframe
+    :param attributes_list: a list of the attributes of interest, defaults to using all
+    in the dataframe
     :type attributes_list: list, optional
-    :param fairness_threshold: a value for the maximum allowed disparity, defaults to 1.25
+    :param fairness_threshold: a value for the maximum allowed disparity, defaults to
+    1.25
     :type fairness_threshold: float, optional
     :param chart_height: a value (in pixels) for the height of the chart
     :type chart_height: int, optional
@@ -569,8 +585,8 @@ def plot_summary_chart(
     :return: the full summary chart
     :rtype: Altair chart object
     """
-
-    ## If a specific list of attributes was not passed, use all from df
+    # If a specific list of attributes was not passed, use all from df
+    metrics = [possible_metrics.get(metric.lower(), metric) for metric in metrics_list]
     (
         metrics,
         attributes,
@@ -578,7 +594,7 @@ def plot_summary_chart(
         chart_width,
     ) = Initializer.prepare_summary_chart(
         disparity_df,
-        metrics_list,
+        metrics,
         attributes_list,
         fairness_threshold,
         chart_height,
@@ -604,8 +620,10 @@ def plot_summary_chart(
     # SCALES
     scales = __get_scales(max_num_groups)
 
+    display_metrics = [display_name.get(metric, metric) for metric in metrics]
+
     # METRIC TITLES
-    metric_titles = __draw_metric_line_titles(metrics, size_constants)
+    metric_titles = __draw_metric_line_titles(display_metrics, size_constants)
 
     # RELEVANT FIELDS
     viz_fields = [

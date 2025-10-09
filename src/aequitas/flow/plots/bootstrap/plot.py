@@ -1,8 +1,9 @@
-from typing import Literal, Optional
+from typing import Optional
 
 import numpy as np
 
 from ...utils.evaluation import bootstrap_hyperparameters
+from ...utils.metrics import METRIC_NAMES, FAIRNESS_METRIC, PERFORMANCE_METRIC
 from ...evaluation import Result
 
 
@@ -14,27 +15,13 @@ DEFAULT_KWARGS = {
 }
 
 
-metrics = {
-    "Predictive Equality": "fpr_ratio",
-    "Equal Opportunity": "tpr_ratio",
-    "Demographic Parity": "pprev_ratio",
-    "TPR": "tpr",
-    "FPR": "fpr",
-    "FNR": "fnr",
-    "Accuracy": "accuracy",
-    "Precision": "precision",
-}
-
-
 class Plot:
     def __init__(
         self,
         results: dict[str, dict[str, Result]],
         dataset: str,
-        fairness_metric: Literal[
-            "Predictive Equality", "Equal Opportunity", "Demographic Parity"
-        ],
-        performance_metric: Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"],
+        fairness_metric: FAIRNESS_METRIC,
+        performance_metric: PERFORMANCE_METRIC,
         method: Optional[str] = None,
         confidence_intervals: float = 0.95,
         **kwargs,
@@ -64,8 +51,8 @@ class Plot:
         for key, value in DEFAULT_KWARGS.items():
             if key not in self.kwargs:
                 self.kwargs[key] = value
-        self.kwargs["fairness_metric"] = metrics[fairness_metric]
-        self.kwargs["performance_metric"] = metrics[performance_metric]
+        self.kwargs["fairness_metric"] = METRIC_NAMES[fairness_metric]
+        self.kwargs["performance_metric"] = METRIC_NAMES[performance_metric]
         self.bootstrap_results = {}
         if isinstance(self.kwargs["alpha_points"], np.ndarray):
             self.x = self.kwargs["alpha_points"]

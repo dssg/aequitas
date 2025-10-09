@@ -119,7 +119,7 @@ class PrevalenceSampling(PreProcessing):
             The transformed input, X, y, and s.
         """
         super().transform(X, y, s)
-        
+
         self.logger.info("Transforming data.")
         if s is None:
             raise ValueError("Sensitive Attribute `s` not passed.")

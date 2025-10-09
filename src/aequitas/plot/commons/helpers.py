@@ -1,12 +1,47 @@
 import altair as alt
 import numpy as np
-
-from millify import millify, prettify
+import math
+import re
+from decimal import Decimal
 
 
 def no_axis():
     """Returns an invisible Altair axis."""
     return alt.Axis(domain=False, grid=False, ticks=False, labels=False, title=None)
+
+
+def remove_exponent(d):
+    """Remove exponent."""
+    return d.quantize(Decimal(1)) if d == d.to_integral() else d.normalize()
+
+
+def millify(n, precision=0, drop_nulls=True, prefixes=[]):
+    """Humanize number."""
+    millnames = ["", "k", "M", "B", "T", "P", "E", "Z", "Y"]
+    if prefixes:
+        millnames = [""]
+        millnames.extend(prefixes)
+    n = float(n)
+    millidx = max(
+        0,
+        min(
+            len(millnames) - 1, int(math.floor(0 if n == 0 else math.log10(abs(n)) / 3))
+        ),
+    )
+    result = "{:.{precision}f}".format(n / 10 ** (3 * millidx), precision=precision)
+    if drop_nulls:
+        result = remove_exponent(Decimal(result))
+    return "{0}{dx}".format(result, dx=millnames[millidx])
+
+
+def prettify(amount, separator=","):
+    """Separate with predefined separator."""
+    orig = str(amount)
+    new = re.sub("^(-?\d+)(\d{3})", "\g<1>{0}\g<2>".format(separator), str(amount))
+    if orig == new:
+        return new
+    else:
+        return prettify(new)
 
 
 def format_number(value):

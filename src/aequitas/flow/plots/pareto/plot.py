@@ -8,6 +8,7 @@ from ...evaluation import Result
 from ....bias import Bias
 from ....group import Group
 from ....plot import summary, disparity
+from ...utils.metrics import FAIRNESS_METRIC, PERFORMANCE_METRIC
 
 
 _names = {
@@ -54,10 +55,12 @@ class Plot:
         Name of the dataset to be used in the Pareto plot.
     method : union[str, list], optional
         Name of the method to plot. If none, all methods will be plotted.
-    fairness_metric : {"Predictive Equality", "Equal Opportunity", "Demographic Parity"}
-        The default fairness metric to use in the Pareto plot.
-    performance_metric : {"TPR", "FPR", "FNR", "Accuracy", "Precision"}
-        The default performance metric to use in the Pareto plot.
+    fairness_metric : str
+        The default fairness metric to use in the Pareto plot. Possible values
+        are defined in aequitas.flow.utils.metrics
+    performance_metric : str
+        The default performance metric to use in the Pareto plot. Possible values
+        are defined in aequitas.flow.utils.metrics
     alpha : float, optional
         The alpha value to use in the Pareto plot.
     direction : {"minimize", "maximize"}, optional
@@ -68,10 +71,8 @@ class Plot:
         self,
         results: dict[str, dict[str, Result]],
         dataset: str,
-        fairness_metric: Literal[
-            "Predictive Equality", "Equal Opportunity", "Demographic Parity"
-        ],
-        performance_metric: Literal["TPR", "FPR", "FNR", "Accuracy", "Precision"],
+        fairness_metric: FAIRNESS_METRIC,
+        performance_metric: PERFORMANCE_METRIC,
         method: Optional[Union[str, list]] = None,
         alpha: float = 0.5,
         direction: Literal["minimize", "maximize"] = "maximize",
@@ -109,18 +110,6 @@ class Plot:
         self.performance_metric = performance_metric
         self.alpha = alpha
         self.direction = direction
-        self.available_fairness_metrics = {
-            "Predictive Equality",
-            "Equal Opportunity",
-            "Demographic Parity",
-        }  # Hardcoded for now
-        self.available_performance_metrics = [
-            "TPR",
-            "FPR",
-            "FNR",
-            "Accuracy",
-            "Precision",
-        ]
         self._best_model_idx: int = 0
 
     @property
@@ -302,7 +291,7 @@ class Plot:
         model_id: int,
         dataset: Any,
         sensitive_attribute: Union[str, list[str]],
-        metrics: list[str] = ["tpr", "fpr"],
+        metrics: list[str] = ["TPR", "FPR"],
         fairness_threshold: float = 1.2,
         results_path: Union[Path, str] = "examples/experiment_results",
         reference_groups: Optional[dict[str, str]] = None,

@@ -8,6 +8,10 @@ __pycache__/
 
 .envrc
 .manage
+.venv
+.coverage
+.vscode
+cov.xml
 
 *.DS_Store*
 
