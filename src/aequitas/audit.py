@@ -6,7 +6,7 @@ import pandas as pd
 from .bias import Bias
 from .group import Group
 from .plot import summary, disparity, absolute
-from .flow.methods.postprocessing import Threshold
+from .utils.threshold import Threshold
 
 
 class Audit:
