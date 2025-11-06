@@ -3,13 +3,13 @@ name = "aequitas"
 version = "1.0.0"
 description = ""
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10, <3.14"
 dependencies = [
     "matplotlib>=3.10.0",
     "pandas>=2.0.3",
     "pyyaml>=6.0.2",
     "seaborn>=0.13.2",
-    "altair>=5.4.0",
+    "altair>=5.5.0",
     "scipy>=1.10.1",
     "validators>=0.33.0",
     "numpy>=1.26.0",
