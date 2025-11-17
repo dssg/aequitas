@@ -54,7 +54,7 @@ pip install git+https://github.com/dssg/aequitas.git
 
 To perform a bias audit, you need a pandas `DataFrame` with the following format:
 
-|     | label | score | sens_attr_1 | sens_attr_2 | ... | sens_attr_N |
+|     | label_value | score | sens_attr_1 | sens_attr_2 | ... | sens_attr_N |
 |-----|-------|-------|-------------|-------------|-----|-------------|
 | 0   | 0     | 0     | A           | F           |     | Y           |
 | 1   | 0     | 1     | C           | F           |     | N           |
@@ -62,7 +62,7 @@ To perform a bias audit, you need a pandas `DataFrame` with the following format
 | ... |       |       |             |             |     |             |
 | N   | 1     | 0     | E           | T           |     | Y           |
 
-where `label` is the target variable for your prediction task and `score` is the model output.
+where `label_value` is the target variable for your prediction task and `score` is the model output.
 Only one sensitive attribute is required; all must be in `Categorical` format.
 
 ```python
@@ -91,7 +91,7 @@ To perform an experiment, a dataset is required. It must have a label column, a 
 ```python
 from aequitas.flow import DefaultExperiment
 
-experiment = DefaultExperiment.from_pandas(dataset, target_feature="label", sensitive_feature="attr", experiment_size="small")
+experiment = DefaultExperiment.from_pandas(dataset, target_feature="label_value", sensitive_feature="attr", experiment_size="small")
 experiment.run()
 
 experiment.plot_pareto()
