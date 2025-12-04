@@ -37,6 +37,19 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Using the CLI" href="CLI.html" />
     <link rel="prev" title="Understanding Output" href="output_data.html" /> 
+    <link rel="prev" title="Understanding Output" href="output_data.html" /> 
+    
+    <!-- Add MathJax for rendering LaTeX formulas -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          displayMath: [['$$','$$'], ['\\[','\\]']],
+          processEscapes: true
+        }
+      };
+    </script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body class="wy-body-for-nav">
@@ -185,17 +198,205 @@
     text-align: unset;
 }
 </style>
+
 <div class="section" id="Understanding-the-Metrics">
-<h1>Understanding the Metrics<a class="headerlink" href="#Understanding-the-Metrics" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="Preliminary-Concepts">
-<h2>Preliminary Concepts<a class="headerlink" href="#Preliminary-Concepts" title="Permalink to this headline">¶</a></h2>
-<p><img alt="image0" src="_images/preliminary_concepts.jpg" /></p>
+  <h1>Understanding the Metrics<a class="headerlink" href="#Understanding-the-Metrics" title="Permalink to this headline">¶</a></h1>
+  
+  <div class="section" id="Preliminary-Concepts">
+    <h2>Preliminary Concepts<a class="headerlink" href="#Preliminary-Concepts" title="Permalink to this headline">¶</a></h2>
+    
+    <p>Before diving into the metrics, let's establish the fundamental notation and concepts used throughout this documentation:</p>
+    
+    <h3>Notation</h3>
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="20%" />
+    <col width="15%" />
+    <col width="65%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr class="row-odd"><th class="head">Concept</th>
+    <th class="head">Symbol</th>
+    <th class="head">Description</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr class="row-even"><td><strong>Model Score</strong></td>
+    <td>$S \in [0,1]$</td>
+    <td>A real valued score assigned to each entity by the predictor.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Model Prediction</strong><br/><em>Decision</em></td>
+    <td>$\hat{Y} \in \{0, 1\}$</td>
+    <td>The binary decision assigned to a given entity (data point) by the model based on the score</td>
+    </tr>
+    <tr class="row-even"><td><strong>True Outcome</strong><br/><em>Ground Truth</em></td>
+    <td>$Y \in \{0, 1\}$</td>
+    <td>The actual, observed outcome for an entity.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Protected Attribute</strong></td>
+    <td>$A = \{a_1, a_2, ..., a_n\}$</td>
+    <td>A multi-valued variable that defines protected groups (e.g., race, gender, age). E.g., $gender = \{female, male, other\}$</td>
+    </tr>
+    <tr class="row-even"><td><strong>Group</strong></td>
+    <td>$g(a_i)$</td>
+    <td>A specific subgroup defined by all entities that share the same value of the protected attribute(s). E.g., $gender = female$</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Reference Group</strong></td>
+    <td>$g(a_r)$</td>
+    <td>The group that is used as a reference for calculating fairness metrics.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Labeled Positive</strong></td>
+    <td>$LP_g$</td>
+    <td>Number of entities in group $g$ that are labeled as positive.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Labeled Negative</strong></td>
+    <td>$LN_g$</td>
+    <td>Number of entities in group $g$ that are labeled as negative.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Predicted Positive</strong></td>
+    <td>$PP_g$</td>
+    <td>Number of entities in group $g$ for which the predicted decision is positive, i.e., $\hat{Y}=1$.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Total Predicted Positive</strong></td>
+    <td>$K = \sum_{A=a_1}^{A = a_n} PP_g(a_i)$</td>
+    <td>Total number of entities predicted positive across groups defined by $A$.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>Predicted Negative</strong></td>
+    <td>$PN_g$</td>
+    <td>Number of entities in group $g$ for which the predicted decision is negative, i.e., $\hat{Y}=0$.</td>
+    </tr>
+    </tbody>
+    </table>
+    
+    <h3>Confusion Matrix</h3>
+    <p>Aequitas calculates fairness metrics based on the confusion matrix for each group defined by protected attributes. The confusion matrix consists of four fundamental cells:</p>
+    
+    <table border="1" class="docutils">
+    <colgroup>
+    <col width="25%" />
+    <col width="15%" />
+    <col width="60%" />
+    </colgroup>
+    <thead valign="bottom">
+    <tr class="row-odd"><th class="head">Cell</th>
+    <th class="head">Symbol</th>
+    <th class="head">Description</th>
+    </tr>
+    </thead>
+    <tbody valign="top">
+    <tr class="row-even"><td><strong>True Positive</strong></td>
+    <td>$TP_g$</td>
+    <td>The number of entities in group $g$ with $\hat{Y}=1$ and $Y=1$. These are correctly predicted positive cases.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>True Negative</strong></td>
+    <td>$TN_g$</td>
+    <td>The number of entities in group $g$ with $\hat{Y}=0$ and $Y=0$. These are correctly predicted negative cases.</td>
+    </tr>
+    <tr class="row-even"><td><strong>False Positive</strong></td>
+    <td>$FP_g$</td>
+    <td>The number of entities in group $g$ with $\hat{Y}=1$ and $Y=0$. These are incorrectly predicted as positive.</td>
+    </tr>
+    <tr class="row-odd"><td><strong>False Negative</strong></td>
+    <td>$FN_g$</td>
+    <td>The number of entities in group $g$ with $\hat{Y}=0$ and $Y=1$. These are incorrectly predicted as negative.</td>
+    </tr>
+    </tbody>
+    </table>
+    
+    <p>Note that for any group $g$, the total number of entities is $|g| = TP_g + TN_g + FP_g + FN_g$.</p>
+    </div>
+  
+  <div class="section" id="Bias-Metrics">
+  <h2>Bias Metrics<a class="headerlink" href="#Bias-Metrics" title="Permalink to this headline">¶</a></h2>
+  
+  <div class="section" id="Fairness-Metrics">
+  <p>From the confusion matrix, we can calculate the following fairness metrics for each group:</p>
+  
+  <table border="1" class="docutils">
+  <colgroup>
+  <col width="25%" />
+  <col width="20%" />
+  <col width="55%" />
+  </colgroup>
+  <thead valign="bottom">
+  <tr class="row-odd"><th class="head">Fairness Metric</th>
+  <th class="head">Notation</th>
+  <th class="head">Description</th>
+  </tr>
+  </thead>
+  <tbody valign="top">
+  <tr class="row-odd"><td><strong>Prevalence</strong></td>
+  <td>$Prev_g = LP_g/|g| = Pr(Y=1|A=a_i)$</td>
+  <td>The fraction of entities in group $g$ that are labeled as positive.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>Predicted Prevalence</strong><br/><em>Impact Parity</em></td>
+  <td>$PPrev_g = PP_g/|g| = Pr(\hat{Y}=1 | A=a_i)$</td>
+  <td>The fraction of entities in group $g$ that were predicted as positive.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>Predicted Positive Rate</strong><br/><em>Statistical Parity</em> </td>
+  <td>$PPR_g = PP_g/K = Pr(a=a_i|\hat{Y}=1)$</td>
+  <td>The fraction of all predicted positives that belong to group $g$.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>False Discovery Rate</strong><br/><em>FDR Parity</em></td>
+  <td>$FDR_g = FP_g/PP_g = Pr(Y=0|\hat{Y}=1, A=a_i)$</td>
+  <td>The fraction of all predicted positives that are actually negative in group $g$.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>False Omission Rate</strong><br/><em>FOR Parity</em></td>
+  <td>$FOR_g = FN_g/PN_g = Pr(Y=1|\hat{Y}=0, A=a_i)$</td>
+  <td>The fraction of all predicted negatives that are actually positive in group $g$.</td>
+  </tr>
+  <tr class="row-even"><td><strong>False Positive Rate (FPR)</strong><br/><em>Predictive Equality</em></td>
+  <td>$FPR_g = FP_g/LN_g = Pr(\hat{Y}=1|Y=0, A=a_i)$</td>
+  <td>The fraction of actual negatives that are incorrectly predicted as positive.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>False Negative Rate (FNR)</strong><br/><em>FNR Parity</em></td>
+  <td>$FNR_g = FN_g/LP_g = Pr(\hat{Y}=0|Y=1, A=a_i)$</td>
+  <td>The fraction of actual positives that are incorrectly predicted as negative.</td>
+  </tr>
+  <tr class="row-even"><td><strong>True Positive Rate (TPR)</strong><br/><em>Equal Opportunity</em></td>
+  <td>$TPR_g = \frac{TP_g}{TP_g + FN_g}$</td>
+  <td>The fraction of actual positives that are correctly identified. Measures how well the model identifies positive cases.</td>
+  </tr>
+  <tr class="row-odd"><td><strong>True Negative Rate (TNR)</strong><br/><em>TNR Parity</em></td>
+  <td>$TNR_g = \frac{TN_g}{TN_g + FP_g}$</td>
+  <td>The fraction of actual negatives that are correctly identified. Measures how well the model identifies negative cases.</td>
+  </tr>
+  <tr class="row-even"><td><strong>Precision</strong><br/><em>Precision Parity</em></td>
+  <td>$Precision_g = \frac{TP_g}{TP_g + FP_g}$</td>
+  <td>The fraction of predicted positives that are actually positive. Measures the reliability of positive predictions.</td>
+  </tr>
+  </tbody>
+  </table>
 </div>
-<div class="section" id="Bias-Metrics">
-<h2>Bias Metrics<a class="headerlink" href="#Bias-Metrics" title="Permalink to this headline">¶</a></h2>
-<p><img alt="image1" src="_images/metrics.jpg" /></p>
-</div>
-</div>
+
+  <div class="section" id="Fairness-Threshold">
+  <h3>Fairness Threshold (Tau)<a class="headerlink" href="#Fairness-Threshold" title="Permalink to this headline">¶</a></h3>
+  
+  <p>Aequitas uses a fairness threshold (tau, default 0.8) to determine whether a disparity ratio indicates fairness. A metric is considered fair if:</p>
+  
+  <p>$$\tau \leq \text{disparity\_ratio} \leq \frac{1}{\tau}$$</p>
+  
+  <p>For example, with $\tau = 0.8$, a disparity ratio between 0.8 and 1.25 is considered fair. This implements the "80% rule" commonly used in employment discrimination law (also known as the four-fifths rule).</p>
+  
+  <p>The threshold can be customized based on your specific fairness requirements and regulatory context.</p>
+  </div>
+  
+  <div class="section" id="Choosing-the-Right-Metric">
+  <h3>Choosing the Right Metric<a class="headerlink" href="#Choosing-the-Right-Metric" title="Permalink to this headline">¶</a></h3>
+  
+  <p>The choice of fairness metric depends on your specific use case and the type of bias you want to detect:</p>
+  
+  <ul class="simple">
+  <li><p><strong>Statistical Parity / Impact Parity</strong>: Use when you want to ensure equal representation in predictions, regardless of outcomes. Useful for auditing without labels.</p></li>
+  <li><p><strong>Equal Opportunity</strong>: Use when you want to ensure qualified individuals from all groups have equal chances of being selected (e.g., hiring, admissions).</p></li>
+  <li><p><strong>Predictive Equality</strong>: Use when you want to ensure unqualified individuals from all groups are treated equally (e.g., criminal justice, loan approvals).</p></li>
+  <li><p><strong>Equalized Odds</strong>: Use when you need both equal opportunity and predictive equality, providing the strongest fairness guarantee.</p></li>
+  <li><p><strong>Precision Parity</strong>: Use when the reliability of positive predictions is critical (e.g., medical diagnosis, fraud detection).</p></li>
+  </ul>
+  
+  <p><strong>Note:</strong> It's important to understand that different fairness metrics can conflict with each other. Achieving one type of fairness may require compromising another, especially when base rates differ across groups. Aequitas helps you explore these trade-offs.</p>
+  </div>
+  </div>
 
 
            </div>
