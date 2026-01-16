@@ -15,7 +15,7 @@ class Audit:
         df: pd.DataFrame,
         threshold: Optional[dict] = None,
         score_column: Optional[str] = "score",
-        label_column: Optional[str] = "label",
+        label_column: Optional[str] = "label_value",
         sensitive_attribute_column: Optional[Union[str, list[str]]] = None,
         reference_groups: Optional[Union[Literal["maj", "min"], dict]] = "maj",
     ):
@@ -39,7 +39,7 @@ class Audit:
             Name of the column containing the scores (or predictions). By default,
             'score'.
         label_column : str, optional
-            Name of the column containing the labels. By default, 'label'.
+            Name of the column containing the labels. By default, 'label_value'.
         sensitive_attribute_column : Union[str, list[str]], optional
             Name of the column(s) containing the sensitive attribute(s). If None, all
             columns except the score and label columns are considered sensitive
