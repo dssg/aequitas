@@ -1,4 +1,4 @@
-FROM python:3.6.6
+FROM python:3.9
 COPY . /aequitas
 WORKDIR /aequitas
 RUN python setup.py install
