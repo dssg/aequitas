@@ -263,11 +263,15 @@ To cite Aequitas, please refer to the following papers:
 1. Aequitas Flow: Streamlining Fair ML Experimentation (2024) [PDF](https://arxiv.org/pdf/2405.05809)
 
 ```bib
-@article{jesus2024aequitas,
+@article{2024aequitas,
+  author={S{{\'e}}rgio Jesus and Pedro Saleiro and In{{\^e}}s Oliveira e Silva and Beatriz M. Jorge and Rita P. Ribeiro and Jo{{\~a}}o Gama and Pedro Bizarro and Rayid Ghani},
   title={Aequitas Flow: Streamlining Fair ML Experimentation},
-  author={Jesus, S{\'e}rgio and Saleiro, Pedro and Jorge, Beatriz M and Ribeiro, Rita P and Gama, Jo{\~a}o and Bizarro, Pedro and Ghani, Rayid and others},
-  journal={arXiv preprint arXiv:2405.05809},
-  year={2024}
+  journal={Journal of Machine Learning Research},
+  year={2024},
+  volume={25},
+  number={354},
+  pages={1--7},
+  url ={http://jmlr.org/papers/v25/24-0677.html}
 }
 ```
 
