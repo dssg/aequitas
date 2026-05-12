@@ -1,8 +1,25 @@
 [project]
 name = "aequitas"
 version = "1.1.0"
-description = ""
+description = "The bias and fairness audit toolkit."
 readme = "README.md"
+license = "MIT"
+keywords = ["fairness", "bias", "aequitas"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+authors = [
+    { name = "Center for Data Science and Public Policy", email = "datascifellows@gmail.com" },
+]
 requires-python = ">=3.10, <3.14"
 dependencies = [
     "matplotlib>=3.10.0",
@@ -17,6 +34,12 @@ dependencies = [
     "requests>=2.32.3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/dssg/aequitas"
+Documentation = "https://dssg.github.io/aequitas/"
+Repository = "https://github.com/dssg/aequitas"
+Issues = "https://github.com/dssg/aequitas/issues"
+
 [project.optional-dependencies]
 cli = [
     "sqlalchemy>=1.1.1",
@@ -27,7 +50,7 @@ cli = [
 ]
 webapp = [
     "flask>=2.0.0",
-    "flask-bootstrap>=3.3.7.1"
+    "flask-bootstrap>=3.3.7.1",
 ]
 flow = [
     "torch>=2.4.0",

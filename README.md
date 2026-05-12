@@ -2,7 +2,7 @@
 
 [![](https://pepy.tech/badge/aequitas)](https://pypi.org/project/aequitas/)
 [![License: MIT](https://badgen.net/pypi/license/aequitas)](https://github.com/dssg/aequitas/blob/master/LICENSE)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 [comment]: <> (Add badges for coverage when we have tests, update repo for other types of badges!)
 
@@ -11,11 +11,11 @@
 For more context around dealing with bias and fairness issues in AI//ML systems, take a look at our [detailed tutorial](https://dssg.github.io/fairness_tutorial/) and related publications.
 
 
-> 
+>
 > **Version 1.0.0: Aequitas Flow - Optimizing Fairness in ML Pipelines**
-> 
-> Explore Aequitas Flow, our latest update in version 1.0.0, designed to augment bias audits with bias mitigation and allow enrich  experimentation with Fair ML methods using our new, streamlined capabilities. 
-> 
+>
+> Explore Aequitas Flow, our latest update in version 1.0.0, designed to augment bias audits with bias mitigation and allow enrich  experimentation with Fair ML methods using our new, streamlined capabilities.
+>
 
 
 <p align="center">
@@ -86,7 +86,7 @@ audit.disparity_plot(attribute="sens_attr_2", metrics=["fpr"])
 
 ### 🧪 Quickstart on experimenting with Bias Reduction (Fair ML) methods
 
-To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.  
+To perform an experiment, a dataset is required. It must have a label column, a sensitive attribute column, and features.
 
 ```python
 from aequitas.flow import DefaultExperiment
@@ -168,7 +168,7 @@ We support a range of methods designed to address bias and discrimination in dif
   </tr>
   <tr></tr>
   <tr>
-    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td> 
+    <td rowspan="2"> <a href="https://github.com/dssg/aequitas/blob/master/src/aequitas/flow/methods/preprocessing/label_flipping.py"> Label Flipping </a> </td>
     <td rowspan="2"> Flips the labels of a fraction of the training data according to the Fair Ordering-Based Noise Correction method. </td>
   </tr>
   <tr></tr>
@@ -221,7 +221,7 @@ We support a range of methods designed to address bias and discrimination in dif
 
 `aequitas` provides the value of confusion matrix metrics for each possible value of the sensitive attribute columns To calculate fairness metrics. The cells of the confusion metrics are:
 
-| Cell               | Symbol  | Description                                                    | 
+| Cell               | Symbol  | Description                                                    |
 |--------------------|:-------:|----------------------------------------------------------------|
 | **False Positive** | $FP_g$  | The number of entities of the group with $\hat{Y}=1$ and $Y=0$ |
 | **False Negative** | $FN_g$  | The number of entities of the group with $\hat{Y}=0$ and $Y=1$ |
@@ -230,22 +230,22 @@ We support a range of methods designed to address bias and discrimination in dif
 
 From these, we calculate several metrics:
 
-| Metric                        | Formula                                             | Description                                                                               | 
-|-------------------------------|:---------------------------------------------------:|-------------------------------------------------------------------------------------------| 
+| Metric                        | Formula                                             | Description                                                                               |
+|-------------------------------|:---------------------------------------------------:|-------------------------------------------------------------------------------------------|
 | **Accuracy**                  | $Acc_g = \cfrac{TP_g + TN_g}{\|g\|}$                | The fraction of correctly predicted entities withing the group.                           |
 | **True Positive Rate**        | $TPR_g = \cfrac{TP_g}{TP_g + FN_g}$                 | The fraction of true positives within the label positive entities of a group.             |
 | **True Negative Rate**        | $TNR_g = \cfrac{TN_g}{TN_g + FP_g}$                 | The fraction of true negatives within the label negative entities of a group.             |
 | **False Negative Rate**       | $FNR_g = \cfrac{FN_g}{TP_g + FN_g}$                 | The fraction of false negatives within the label positive entities of a group.            |
 | **False Positive Rate**       | $FPR_g = \cfrac{FP_g}{TN_g + FP_g}$                 | The fraction of false positives within the label negative entities of a group.            |
 | **Precision**                 | $Precision_g = \cfrac{TP_g}{TP_g + FP_g}$           | The fraction of true positives within the predicted positive entities of a group.         |
-| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}$                 | The fraction of true negatives within the predicted negative entities of a group.         | 
+| **Negative Predictive Value** | $NPV_g = \cfrac{TN_g}{TN_g + FN_g}$                 | The fraction of true negatives within the predicted negative entities of a group.         |
 | **False Discovery Rate**      | $FDR_g = \cfrac{FP_g}{TP_g + FP_g}$                 | The fraction of false positives within the predicted positive entities of a group.        |
 | **False Omission Rate**       | $FOR_g = \cfrac{FN_g}{TN_g + FN_g}$                 | The fraction of false negatives within the predicted negative entities of a group.        |
 | **Predicted Positive**        | $PP_g = TP_g + FP_g$                                |  The number of entities within a group where the decision is positive, i.e., $\hat{Y}=1$. |
-| **Total Predictive Positive** | $K = \sum PP_{g(a_i)}$                              | The total number of entities predicted positive across groups defined by $A$              | 
-| **Predicted Negative**        | $PN_g = TN_g + FN_g$                                | The number of entities within a group where the decision is negative, i.e., $\hat{Y}=0$   | 
-| **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive.                 | 
-| **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$   | The fraction of the entities predicted as positive that belong to a certain group.        | 
+| **Total Predictive Positive** | $K = \sum PP_{g(a_i)}$                              | The total number of entities predicted positive across groups defined by $A$              |
+| **Predicted Negative**        | $PN_g = TN_g + FN_g$                                | The number of entities within a group where the decision is negative, i.e., $\hat{Y}=0$   |
+| **Predicted Prevalence**      | $Pprev_g=\cfrac{PP_g}{\|g\|}=P(\hat{Y}=1 \| A=a_i)$ | The fraction of entities within a group which were predicted as positive.                 |
+| **Predicted Positive Rate**   | $PPR_g = \cfrac{PP_g}{K} = P(A=A_i \| \hat{Y}=1)$   | The fraction of the entities predicted as positive that belong to a certain group.        |
 
 These are implemented in the [`Group`](https://github.com/dssg/aequitas/blob/master/src/aequitas/group.py) class. With the [`Bias`](https://github.com/dssg/aequitas/blob/master/src/aequitas/bias.py) class, several fairness metrics can be derived by different combinations of ratios of these metrics.
 
@@ -261,7 +261,7 @@ For more examples of the python library and a deep dive into concepts of fairnes
 To cite Aequitas, please refer to the following papers:
 
 1. Aequitas Flow: Streamlining Fair ML Experimentation (2024) [PDF](https://arxiv.org/pdf/2405.05809)
-   
+
 ```bib
 @article{jesus2024aequitas,
   title={Aequitas Flow: Streamlining Fair ML Experimentation},
@@ -269,15 +269,16 @@ To cite Aequitas, please refer to the following papers:
   journal={arXiv preprint arXiv:2405.05809},
   year={2024}
 }
-
 ```
 
 2. Aequitas: A Bias and Fairness Audit Toolkit (2018) [PDF](https://arxiv.org/pdf/1811.05577.pdf)
 
 ```bib
-   @article{2018aequitas,
-     title={Aequitas: A Bias and Fairness Audit Toolkit},
-     author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid}, journal={arXiv preprint arXiv:1811.05577}, year={2018}}
-``` 
+@article{2018aequitas,
+  title={Aequitas: A Bias and Fairness Audit Toolkit},
+  author={Saleiro, Pedro and Kuester, Benedict and Stevens, Abby and Anisfeld, Ari and Hinkson, Loren and London, Jesse and Ghani, Rayid}, journal={arXiv preprint arXiv:1811.05577},
+  year={2018}
+}
+```
 
 [Back to top](#aequitas-bias-auditing--fair-ml-toolkit)
