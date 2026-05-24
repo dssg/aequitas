@@ -39,7 +39,7 @@ class FairGBM(InProcessing):
             f"Input size for model training: {X.shape[0]} rows, "
             f"{X.shape[1]} columns."
         )
-        self.model.fit(X=X, y=y, constraint_group=s)
+        self.model.fit(X=X, y=y, constraint_group=s.astype(int))
 
     def predict_proba(
         self, X: pd.DataFrame, s: Optional[pd.Series] = None
