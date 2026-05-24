@@ -64,8 +64,7 @@ class PrevalenceSampling(PreProcessing):
         super().fit(X, y, s)
         self.logger.info("Fitting sampling method.")
 
-        if s is None:
-            raise ValueError("Sensitive Attribute `s` not passed.")
+        # Validations for the sensitive attribute are done at parent class.
 
         if self.s_ref is None:  # Get more frequent group.
             self.s_ref = s.mode().values[0]
@@ -91,7 +90,7 @@ class PrevalenceSampling(PreProcessing):
 
             self.logger.debug(f"Calculating sampling size for group {group}.")
 
-            self.sampling_rate[group] = self.calculate_sample_sizes(
+            self.sampling_rate[group] = self._calculate_sample_sizes(
                 positives, negatives, self.ref_prevalence, self.strategy, self.alpha
             )
             self.logger.debug(
@@ -121,8 +120,8 @@ class PrevalenceSampling(PreProcessing):
         super().transform(X, y, s)
 
         self.logger.info("Transforming data.")
-        if s is None:
-            raise ValueError("Sensitive Attribute `s` not passed.")
+ 
+         # Validations for the sensitive attribute are done at parent class.
 
         final_X = X.copy()
         final_y = y.copy()
@@ -165,7 +164,7 @@ class PrevalenceSampling(PreProcessing):
         self.logger.info("Data transformed.")
         return final_X.copy(), final_y.copy(), final_s.copy()
 
-    def calculate_sample_sizes(
+    def _calculate_sample_sizes(
         self, p: int, n: int, target: float, strategy: str, alpha: float
     ) -> tuple[int, int]:
         """Calculate sample sizes, for both under and oversampling.
