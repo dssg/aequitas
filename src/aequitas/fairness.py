@@ -206,12 +206,13 @@ class Fairness(object):
         :return: A dictionary of overall, unsupervised, and supervised fairness determinations
         """
         overall_fairness = {}
-        if 'Unsupervised Fairness' in group_attribute_df.columns:
-            overall_fairness['Unsupervised Fairness'] = False if \
-                group_attribute_df['Unsupervised Fairness'].min() == False else True
-
-        if 'Supervised Fairness' in group_attribute_df.columns:
-            overall_fairness['Supervised Fairness'] = False if group_attribute_df['Supervised Fairness'].min() == False else True
+        for col in ('Unsupervised Fairness', 'Supervised Fairness'):
+            if col in group_attribute_df.columns:
+                vals = group_attribute_df[col].dropna()
+                if vals.empty:
+                    overall_fairness[col] = 'Undefined'
+                else:
+                    overall_fairness[col] = False if (vals == False).any() else True
 
         fair_vals = [val for key, val in overall_fairness.items()]
         if False in fair_vals:
