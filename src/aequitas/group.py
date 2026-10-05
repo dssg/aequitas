@@ -307,7 +307,7 @@ class Group(object):
          attr_cols: List[str]
              Columns with protected attributes. If not specified, all
              columns except 'id', 'model_id', 'entity_id', 'score', 'label_value'
-             are used. The values in these columns must be categorical.
+             are used. Object, pandas string and categorical dtypes are supported.
          score_col : str
              Column of the dataframe that represents classification result.
              Must be numeric / binary.
@@ -347,10 +347,19 @@ class Group(object):
             if col not in df.columns:
                 raise KeyError(f'The attribute column "{col}" is not on the dataframe.')
             # Validate if column has correct datatype.
-            if df[col].dtype not in (object, str):
+            dtype = df[col].dtype
+            if not (
+                pd.api.types.is_object_dtype(dtype)
+                or pd.api.types.is_string_dtype(dtype)
+                or isinstance(dtype, pd.CategoricalDtype)
+            ):
                 raise TypeError(
                     f'The attribute column "{col}" has in invalid datatype.'
                 )
+            # Work on the copied frame, using the same grouping semantics as
+            # object-valued attributes. Unused categories must not create empty
+            # groups (and zero-denominator metrics) during groupby.
+            df[col] = df[col].astype(object)
 
         # In case no threshold is provided.
         metrics_matrices = []
