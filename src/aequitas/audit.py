@@ -43,7 +43,8 @@ class Audit:
         sensitive_attribute_column : Union[str, list[str]], optional
             Name of the column(s) containing the sensitive attribute(s). If None, all
             columns except the score and label columns are considered sensitive
-            attributes. By default, None.
+            attributes. Object, pandas string and categorical dtypes are supported.
+            By default, None.
         reference_groups : Union[Literal["maj", "min"],  dict], optional
             Reference group(s) to use for the bias metrics. If 'maj', the majority group
             is used. If 'min', the minority group is used. If a dictionary is passed,
@@ -63,7 +64,6 @@ class Audit:
         # Validate the sensitive attribute column(s) (if passed) is in the DataFrame
         self._validate_sensitive_attribute_column()
         self.label_column = label_column
-        self.sensitive_attribute_column = sensitive_attribute_column
         self.reference_groups = reference_groups
 
     @classmethod
@@ -300,9 +300,18 @@ class Audit:
                     f"Sensitive attribute column(s) {self.sensitive_attribute_column}"
                     " not found in the DataFrame."
                 )
-        # Check if values are categorical / object
+        # Normalize a single name and retain inferred columns for the audit.
+        if isinstance(self.sensitive_attribute_column, str):
+            self.sensitive_attribute_column = [self.sensitive_attribute_column]
+        else:
+            self.sensitive_attribute_column = list(self.sensitive_attribute_column)
+        # Accept categorical/string extension dtypes as well as object columns.
         for dtype in self.df[self.sensitive_attribute_column].dtypes:
-            if dtype != "object":
+            if not (
+                pd.api.types.is_object_dtype(dtype)
+                or pd.api.types.is_string_dtype(dtype)
+                or isinstance(dtype, pd.CategoricalDtype)
+            ):
                 raise ValueError(
                     f"Sensitive attribute column(s) {self.sensitive_attribute_column}"
                     " must be categorical."
