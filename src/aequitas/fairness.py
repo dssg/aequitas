@@ -201,17 +201,23 @@ class Fairness(object):
         Calculates overall fairness regardless of the group_attributes.
         Searches for 'False' parity determinations across group_attributes and
         outputs 'True' determination if all group_attributes are fair.
+        Categories without non-missing determinations are 'Undefined'.
 
         :param group_attribute_df: the output df of the get_group_attributes_fairness
         :return: A dictionary of overall, unsupervised, and supervised fairness determinations
         """
         overall_fairness = {}
         if 'Unsupervised Fairness' in group_attribute_df.columns:
-            overall_fairness['Unsupervised Fairness'] = False if \
-                group_attribute_df['Unsupervised Fairness'].min() == False else True
+            values = group_attribute_df['Unsupervised Fairness'].dropna()
+            overall_fairness['Unsupervised Fairness'] = (
+                bool(values.min()) if not values.empty else 'Undefined'
+            )
 
         if 'Supervised Fairness' in group_attribute_df.columns:
-            overall_fairness['Supervised Fairness'] = False if group_attribute_df['Supervised Fairness'].min() == False else True
+            values = group_attribute_df['Supervised Fairness'].dropna()
+            overall_fairness['Supervised Fairness'] = (
+                bool(values.min()) if not values.empty else 'Undefined'
+            )
 
         fair_vals = [val for key, val in overall_fairness.items()]
         if False in fair_vals:
