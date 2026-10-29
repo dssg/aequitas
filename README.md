@@ -40,6 +40,14 @@ or
 pip install git+https://github.com/dssg/aequitas.git
 ```
 
+The bias mitigation methods and experiments of Aequitas Flow need extra dependencies:
+
+```cmd
+pip install "aequitas[flow]"
+```
+
+The datasets in `aequitas.flow.datasets` work with the base installation.
+
 ### 📔Example Notebooks supporting various tasks and workflows
 
 | Notebook | Description |
