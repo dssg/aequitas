@@ -1,11 +1,11 @@
 """Visualization module to display or save interactive visual application"""
 import json
 from datetime import datetime
+from importlib.resources import files
 from string import Template
 from uuid import uuid4
 
 import numpy as np
-import pkg_resources
 
 from .plot import Plot
 from ...utils.metrics import FAIRNESS_METRICS, PERFORMANCE_METRICS
@@ -45,15 +45,9 @@ def _generate_filename(tuner_type, alpha, performance_metric, fairness_metric):
 
 def _make_html(payload):
     div_id = _id_generator()
-    template_path = pkg_resources.resource_filename(__name__, "template.html")
-    pareto_js_path = pkg_resources.resource_filename(__name__, "js/dist/fairAutoML.js")
-
-    with open(pareto_js_path, "r") as file:
-        pareto_js_bundle = file.read()
-
-    with open(template_path, "r") as file:
-        html_template = file.read()
-        html_template = Template(html_template)
+    package_files = files(__package__)
+    pareto_js_bundle = (package_files / "js" / "dist" / "fairAutoML.js").read_text()
+    html_template = Template((package_files / "template.html").read_text())
 
     return html_template.substitute(
         div_id=div_id,
