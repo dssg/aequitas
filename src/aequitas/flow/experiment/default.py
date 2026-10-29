@@ -65,8 +65,8 @@ class DefaultExperiment(Experiment):
             dataset_name: {
                 "classpath": "aequitas.flow.datasets.GenericDataset",
                 "threshold": {
-                    "type": threshold_type,
-                    "value": score_threshold,
+                    "threshold_type": threshold_type,
+                    "threshold_value": score_threshold,
                 },
                 "args": {
                     "df": df,
@@ -108,13 +108,20 @@ class DefaultExperiment(Experiment):
                 f"{['all', ['preprocessing', 'inprocessing']]}."
             )
         method_configs = []
+        if use_baseline:
+            method_configs.extend(_configs.baseline_methods)
         for method in default_methods:
-            if use_baseline:
-                method_configs.extend(_configs.baseline_methods)
             if method == "preprocessing":
                 method_configs.extend(_configs.preprocessing_methods)
             elif method == "inprocessing":
                 method_configs.extend(_configs.inprocessing_methods)
+        # The baseline is also one of the preprocessing methods. Methods with the same
+        # name share an artifacts folder, so each method is kept only once.
+        method_configs = [
+            config
+            for index, config in enumerate(method_configs)
+            if config not in method_configs[:index]
+        ]
 
         # Validate experiment size:
         if experiment_size == "test":

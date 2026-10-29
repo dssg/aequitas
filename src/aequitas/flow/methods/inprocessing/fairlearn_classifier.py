@@ -81,11 +81,12 @@ class FairlearnClassifier(InProcessing):
             **self.kwargs,
         )
 
-        # Depending on reduction, use probability mass function method.
+        # Depending on reduction, use probability mass function method. The method is
+        # stored by name so that the classifier can be pickled.
         if isinstance(self.reduction, ExponentiatedGradient):
-            self.predict_proba_method = lambda clf: clf._pmf_predict
+            self.predict_proba_method = "_pmf_predict"
         else:
-            self.predict_proba_method = lambda clf: clf.predict_proba
+            self.predict_proba_method = "predict_proba"
 
     def fit(self, X: pd.DataFrame, y: pd.Series, s: pd.Series):
         """Fits the fairlearn classifier to the data.
@@ -118,7 +119,7 @@ class FairlearnClassifier(InProcessing):
             The protected attribute.
         """
         return pd.Series(
-            data=self.predict_proba_method(self.reduction)(X)[:, 1],
+            data=getattr(self.reduction, self.predict_proba_method)(X)[:, 1],
             name="predictions",
             index=X.index,
         )  # Note: This is based on assumption of using LightGBM as base estimator

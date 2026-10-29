@@ -104,7 +104,7 @@ class Experiment:
         if save_artifacts:
             self.artifacts = tuple(set(self.POSSIBLE_ARTIFACTS) & set(artifacts))
         else:
-            self.artifacts = None
+            self.artifacts = ()
 
         # Instantiate sampler object
         self.sampler = self._instantiate_sampler()
@@ -191,8 +191,8 @@ class Experiment:
                         f"Testing '{method_name}', "
                         f"saved in '{dataset_folder.resolve()}'."
                     )
+                    method_folder: Path = dataset_folder / method_name
                     if self.artifacts:
-                        method_folder: Path = dataset_folder / method_name
                         method_folder.mkdir(parents=True, exist_ok=True)
                         self.logger.debug(
                             "Saving dataset&method-related objects to "
