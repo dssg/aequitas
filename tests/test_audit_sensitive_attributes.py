@@ -73,9 +73,7 @@ def test_categorical_audit_ignores_unused_categories(ordered, numeric_categories
 def test_multiple_sensitive_attributes_keep_inferred_columns(selection):
     frame = _frame()
     frame["second_group"] = ["x", "y"] * 4
-    expected = Audit(
-        frame, sensitive_attribute_column=["group", "second_group"]
-    )
+    expected = Audit(frame, sensitive_attribute_column=["group", "second_group"])
     expected.audit()
     frame["group"] = frame["group"].astype("category")
     frame["second_group"] = frame["second_group"].astype("string")
